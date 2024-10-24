@@ -59,3 +59,4 @@ Explain how to run the automated tests.
 # Authors
 
 Natalie Crawford - natcrawfordd@gmail.com, crawfon@email.sc.edu
+Kennedy Houston - kenbhx@gmail.com, kbh5@email.sc.edu
