@@ -6,7 +6,7 @@ function App() {
     <div className="App">
       <header className="App-header">
         <h1>Pandas Capstone Project</h1>
-        <h2>Merge conflict - kelly </h2>
+        <h2>Kelly</h2>
         <p>
           Edit <code>src/App.js</code> and save to reload.
         </p>
@@ -18,9 +18,9 @@ function App() {
         >
           Learn React
         </a>
-        <h2>LearnLink</h2>
+        <h2>LearnLinkkkkk</h2>
         <h2>file</h2>
-        <h3>hi2</h3>
+        <h3>hi</h3>
       </header>
     </div>
   );
