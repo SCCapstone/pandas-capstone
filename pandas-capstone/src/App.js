@@ -6,6 +6,7 @@ function App() {
     <div className="App">
       <header className="App-header">
         <h1>Pandas Capstone Project</h1>
+<<<<<<< Updated upstream
         <h2>Merge conflict - kelly </h2>
         <p>
           Edit <code>src/App.js</code> and save to reload.
@@ -18,6 +19,9 @@ function App() {
         >
           Learn React
         </a>
+=======
+        <h2>LearnLink</h2>
+>>>>>>> Stashed changes
       </header>
     </div>
   );
