@@ -20,7 +20,11 @@ function App() {
         </a>
         <h2>LearnLink</h2>
         <h2>file</h2>
+<<<<<<< HEAD
         <h3>hi</h3>
+=======
+        <h3>hi2</h3>
+>>>>>>> 76bb3c042eea932840ad68d443410f50f33ac91b
       </header>
     </div>
   );
