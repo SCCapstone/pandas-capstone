@@ -11,7 +11,7 @@ Users can use the resources and have a personal grade calculator as well.
 In order to build this project you first have to install:
 
 -   [Node.js](https://nodejs.org/en/)
--   [React](https://github.com/facebook/create-react-app).x
+-   [React](https://github.com/facebook/create-react-app)
 
 If possible, list the actual commands you used to install these, so the reader
 can just cut-n-paste the commands and get everything setup.
