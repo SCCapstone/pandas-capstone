@@ -5,7 +5,7 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <h1>Pandas Capstone Project</h1>
+        <h1>Pandas Senior Capstone Project</h1>
         <h2>Merge conflict - kelly </h2>
         <p>
           Edit <code>src/App.js</code> and save to reload.
