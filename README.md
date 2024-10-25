@@ -11,7 +11,7 @@ Users can use the resources and have a personal grade calculator as well.
 In order to build this project you first have to install:
 
 -   [Node.js](https://nodejs.org/en/)
--   [React](add link)
+-   [React](https://github.com/facebook/create-react-app)
 
 If possible, list the actual commands you used to install these, so the reader
 can just cut-n-paste the commands and get everything setup.
@@ -60,4 +60,9 @@ Explain how to run the automated tests.
 
 Natalie Crawford - natcrawfordd@gmail.com, crawfon@email.sc.edu
 Kennedy Houston - kenbhx@gmail.com, kbh5@email.sc.edu
+<<<<<<< HEAD
 Yesha Patel - yeshapatel143@icloud.com, yppatel@email.sc.edu
+=======
+Yesha Patel - yeshapatel143@icloud.com yppatel@email.sc.edu
+Kelly Finnegan - kellfin9946@gmail.com, finnegak@email.sc.edu
+>>>>>>> ec05570efa60169356a8c4b1eddca23e2cc26d75
