@@ -60,4 +60,4 @@ Explain how to run the automated tests.
 
 Natalie Crawford - natcrawfordd@gmail.com, crawfon@email.sc.edu
 Kennedy Houston - kenbhx@gmail.com, kbh5@email.sc.edu
-Yesha Patel - yeshapatel143@icloud.com yppatel@email.sc.edu
+Yesha Patel - yeshapatel143@icloud.com, yppatel@email.sc.edu
