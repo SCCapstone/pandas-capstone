@@ -1,38 +1,105 @@
-.App {
+body {
+  background-color: #D4EAF7;
+}
+h1 {
+  text-align: left;
+  position: relative;
+  font-size: 64px;
+  color: #00668C;
+  font-family: 'Inter', 'medium';
+  top: 130px;
+  left: 116px;
+}
+p{
+  text-align: left;
+  position: relative;
+  font-size: 32px;
+  color: #00668C;
+  font-family: 'Inter', 'medium';
+  align-content: center;
+  top: 110px;
+  left: 116px;
+}
+.getStarted {
+  background-color: #FEAD2B;
+  color:#FFFEFB;
+  font-family: 'Inter', 'semi bold';
+  font-size: 64px;
   text-align: center;
+  border-radius: 10px;
+  border-color: #FEAD2B;
+  position: relative;
+  width: 524px;
+  height: 160px;
+  word-spacing: normal;
+  top: 122px;
+  left: 112px;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.studyGroup {
+  background-color: #00668C;
+  color:#FFFEFB;
+  font-family: 'Inter', 'semi bold';
+  font-size: 48px;
+  text-align: center;
+  border-radius: 10px;
+  border-color: #00668C;
+  width:630px;
+  position: relative;
+  bottom: 240px;
+  left: 750px;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+.studyResources {
+  background-color: #00668C;
+  color:#FFFEFB;
+  font-family: 'Inter', 'semi bold';
+  font-size: 48px;
+  text-align: center;
+  border-radius: 10px;
+  border-color: #00668C;
+  width:630px;
+  position: relative;
+  bottom: 220px;
+  left: 750px;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+.messaging {
+  background-color: #00668C;
+  color:#FFFEFB;
+  font-family: 'Inter', 'semi bold';
+  font-size: 48px;
+  text-align: center;
+  border-radius: 10px;
+  border-color: #00668C;
+  width:630px;
+  position: relative;
+  bottom: 200px;
+  left: 750px;
+  word-spacing: normal;
 }
 
-.App-link {
-  color: #61dafb;
+.gradeCalculator {
+  background-color: #00668C;
+  color:#FFFEFB;
+  font-family: 'Inter', 'semi bold';
+  font-size: 48px;
+  text-align: center;
+  border-radius: 10px;
+  border-color: #00668C;
+  width:630px;
+  position: relative;
+  bottom: 180px;
+  left: 750px;
+  word-spacing: normal;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.copyright {
+  color: #00668C;
+  text-align: center;
+  font-family: 'Inter', 'regular';
+  font-size: 20px;
+  bottom: 893px;
+  right:697px;
+  height: 88px;
 }
