@@ -1,3 +1,12 @@
+## commands to run in terminal in the ui directory for the first call of npm start
+# only need to be ran once at the beginning of the project
+-- npm install web-vitals
+-- npm install @testing-library/react @testing-library/jest-dom
+-- npm install --save-dev @types/testing-library__react @types/jest @types/react-dom
+
+
+
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
