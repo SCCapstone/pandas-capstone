@@ -20,10 +20,20 @@ You only need to add instructions for the OS you are using.
 
 ## Setup
 
+
 Here you list all the one-time things the developer needs to do after cloning
 your repo. Sometimes there is no need for this section, but some apps require
 some first-time configuration from the developer, for example: setting up a
 database for running your webapp locally.
+
+Navigate to the server directory and enter these commands in the command line of the terminal\
+-- npm i ts-node typescript nodemon @types/cors @types/express @types/node--save-dev \
+-- npm i @prisma/client cors express prisma\
+
+Navigate to the ui directory and enter these commands in the command line of the terminal\
+-- npm install web-vitals\
+-- npm install @testing-library/react @testing-library/jest-dom\
+-- npm install --save-dev @types/testing-library__react @types/jest @types/react-dom\
 
 ## Running
 
