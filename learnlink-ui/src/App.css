@@ -1,3 +1,36 @@
+.App{
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  gap: 10px;
+
+}
+.Logo {
+  width: 600px; /* Adjust this size as needed */
+  position:relative;
+  margin: 20px auto; /* Centers the logo and adds space around it */
+}
+
+.Logo svg {
+  width: 100%; /* Ensures SVG scales with the container */
+  height: auto;
+}
+
+.WelcomePage {
+  padding-top: 0;
+  margin-top: 10px;
+  position: relative;
+  display:flex;
+  flex-direction: column;
+}
+
+.Copyright {
+  margin-top: 20px;
+  font-size: 14px;
+  color: #00668C;
+  text-align: center;
+}
+
 body {
   background-color: #D4EAF7;
 }
@@ -7,8 +40,8 @@ h1 {
   font-size: 64px;
   color: #00668C;
   font-family: 'Inter', 'medium';
-  top: 130px;
-  left: 116px;
+  padding-left: 116px;
+  
 }
 p{
   text-align: left;
@@ -17,8 +50,7 @@ p{
   color: #00668C;
   font-family: 'Inter', 'medium';
   align-content: center;
-  top: 110px;
-  left: 116px;
+  padding-left: 116px;
 }
 .getStarted {
   background-color: #FEAD2B;
@@ -32,8 +64,8 @@ p{
   width: 524px;
   height: 160px;
   word-spacing: normal;
-  top: 122px;
-  left: 112px;
+  margin-left: 112px;
+  
 }
 
 .studyGroup {
@@ -92,14 +124,4 @@ p{
   bottom: 180px;
   left: 750px;
   word-spacing: normal;
-}
-
-.copyright {
-  color: #00668C;
-  text-align: center;
-  font-family: 'Inter', 'regular';
-  font-size: 20px;
-  bottom: 893px;
-  right:697px;
-  height: 88px;
 }
