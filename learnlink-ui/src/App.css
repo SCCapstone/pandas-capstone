@@ -55,6 +55,7 @@ p{
   align-content: center;
   padding-left: 10%;
 }
+
 .getStarted {
   background-color: #FEAD2B;
   color:#FFFEFB;
@@ -70,6 +71,8 @@ p{
   margin-left: 10%;
   
 }
+
+/* TODO: Adjust the spacing for these 4 buttons so that they can move as the screen size changes */
 
 .studyGroup {
   background-color: #00668C;
