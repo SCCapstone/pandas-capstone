@@ -16,7 +16,7 @@ function Welcome() {
         <MySvgFile />
       </div>
       <div className = "WelcomePage">
-        <h1>Welcome!</h1>
+        <h1 className="well">Welcome!</h1>
         <p>LearnLink is an online platform that<br></br>connects like-minded individuals to <br></br>form study groups!</p>
         <button className="getStarted" onClick={handleGetStarted}>Get Started</button> <br></br>
         <button className="studyGroup">Study Groups</button> <br></br>
