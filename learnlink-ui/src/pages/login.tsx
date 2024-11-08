@@ -3,8 +3,12 @@ import logo from './logo.svg';
 
 function Login() {
     return (
-        <div>
-            
+        <div className="login">
+        <div className = "Logo">
+            <MySvgFile />
+        </div>
+        
+
         </div>
     );
 }
