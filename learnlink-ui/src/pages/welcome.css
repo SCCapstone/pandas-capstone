@@ -1,0 +1,133 @@
+.welcome{
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    gap: 5px;
+  
+  }
+  .Logo {
+    width: 600px;
+    position:relative;
+    margin: auto; /* Centers the logo and adds space around it */
+    padding-bottom: 0;
+  }
+  
+  .Logo svg {
+    width: 100%; /* Ensures SVG scales with the container */
+    height: auto;
+  }
+  
+  .WelcomePage {
+    padding-top: 0;
+    margin-top: 10px;
+    position: relative;
+    display:flex;
+    flex-direction: column;
+  }
+  
+  .Copyright {
+    margin-top: 20px;
+    font-size: 14px;
+    color: #00668C;
+    text-align: center;
+  }
+  
+  body {
+    background-color: #D4EAF7;
+  }
+  
+  
+  h1 {
+    text-align: left;
+    position: relative;
+    font-size: 64px;
+    color: #00668C;
+    font-family: 'Inter', 'medium';
+    padding-left: 10%;
+    
+  }
+  p{
+    text-align: left;
+    position: relative;
+    font-size: 32px;
+    color: #00668C;
+    font-family: 'Inter', 'medium';
+    align-content: center;
+    padding-left: 10%;
+  }
+  
+  .getStarted {
+    background-color: #FEAD2B;
+    color:#FFFEFB;
+    font-family: 'Inter', 'semi bold';
+    font-size: 64px;
+    text-align: center;
+    border-radius: 10px;
+    border-color: #FEAD2B;
+    position: relative;
+    width: 524px;
+    height: 160px;
+    word-spacing: normal;
+    margin-left: 10%;
+    
+  }
+  
+  /* TODO: Adjust the spacing for these 4 buttons so that they can move as the screen size changes */
+  
+  .studyGroup {
+    background-color: #00668C;
+    color:#FFFEFB;
+    font-family: 'Inter', 'semi bold';
+    font-size: 48px;
+    text-align: center;
+    border-radius: 10px;
+    border-color: #00668C;
+    width:630px;
+    position: relative;
+    bottom: 240px;
+    left: 750px;
+  }
+  
+  .studyResources {
+    background-color: #00668C;
+    color:#FFFEFB;
+    font-family: 'Inter', 'semi bold';
+    font-size: 48px;
+    text-align: center;
+    border-radius: 10px;
+    border-color: #00668C;
+    width:630px;
+    position: relative;
+    bottom: 220px;
+    left: 750px;
+  }
+  
+  .messaging {
+    background-color: #00668C;
+    color:#FFFEFB;
+    font-family: 'Inter', 'semi bold';
+    font-size: 48px;
+    text-align: center;
+    border-radius: 10px;
+    border-color: #00668C;
+    width:630px;
+    position: relative;
+    bottom: 200px;
+    left: 750px;
+    word-spacing: normal;
+  }
+  
+  .gradeCalculator {
+    background-color: #00668C;
+    color:#FFFEFB;
+    font-family: 'Inter', 'semi bold';
+    font-size: 48px;
+    text-align: center;
+    border-radius: 10px;
+    border-color: #00668C;
+    width:630px;
+    position: relative;
+    bottom: 180px;
+    left: 750px;
+    word-spacing: normal;
+  }
