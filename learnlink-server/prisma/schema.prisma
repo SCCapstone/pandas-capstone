@@ -14,75 +14,61 @@ datasource db {
 }
 
 model User {
-  id                  Int              @id @default(autoincrement())
-  name                String
-  email               String           @unique
-  password            String
-  profile_preferences Json?
-  created_at          DateTime         @default(now())
-  updated_at          DateTime         @updatedAt
-  studyGroups         StudyGroup[]     @relation("UserStudyGroups")
-  matches             Match[]          @relation("UserMatches")
-  messages            Message[]        @relation("UserMessages")
-  notifications       Notification[]
-  StudyGroup          StudyGroup[]
-  UserStudyGroup      UserStudyGroup[]
+  id                   Int              @id @default(autoincrement())
+  name                 String
+  email                String           @unique
+  password             String
+  profile_preferences  Json?
+  created_at           DateTime         @default(now())
+  updated_at           DateTime         @updatedAt
+  studyGroups          StudyGroup[]     @relation("UserStudyGroups")
+  createdStudyGroups   StudyGroup[]     @relation("CreatedStudyGroups")
+  matches              Match[]
+  messages             Message[]
+  notifications        Notification[]
 }
 
 model StudyGroup {
   id             Int              @id @default(autoincrement())
   name           String
   subject        String
-  description    String
+  description    String?
   created_by     Int
   created_at     DateTime         @default(now())
-  updated_at     DateTime         @updatedAt
-  creator        User             @relation(fields: [created_by], references: [id])
-  users          User[]           @relation("UserStudyGroups")
-  matches        Match[]          @relation("GroupMatches")
-  messages       Message[]        @relation("GroupMessages")
-  UserStudyGroup UserStudyGroup[]
-}
-
-model UserStudyGroup {
-  user_id        Int
-  study_group_id Int
-  joined_at      DateTime @default(now())
-
-  user        User       @relation(fields: [user_id], references: [id])
-  study_group StudyGroup @relation(fields: [study_group_id], references: [id])
-
-  @@id([user_id, study_group_id])
+  creator         User             @relation("CreatedStudyGroups", fields: [created_by], references: [id])
+  users           User[]           @relation("UserStudyGroups")
+  matches        Match[]
+  messages       Message[]
 }
 
 model Match {
-  id             Int      @id @default(autoincrement())
-  user_id        Int
-  study_group_id Int
-  matched_at     DateTime @default(now())
+  id              Int         @id @default(autoincrement())
+  user_id         Int
+  study_group_id  Int
+  matched_at      DateTime    @default(now())
 
-  user        User       @relation("UserMatches", fields: [user_id], references: [id])
-  study_group StudyGroup @relation("GroupMatches", fields: [study_group_id], references: [id])
+  user            User        @relation(fields: [user_id], references: [id])
+  studyGroup      StudyGroup  @relation(fields: [study_group_id], references: [id])
 }
 
 model Message {
-  id             Int      @id @default(autoincrement())
-  study_group_id Int
-  user_id        Int
-  content        String
-  sent_at        DateTime @default(now())
+  id              Int         @id @default(autoincrement())
+  study_group_id  Int
+  user_id         Int
+  content         String
+  sent_at         DateTime    @default(now())
 
-  study_group StudyGroup @relation("GroupMessages", fields: [study_group_id], references: [id])
-  user        User       @relation("UserMessages", fields: [user_id], references: [id])
+  studyGroup      StudyGroup  @relation(fields: [study_group_id], references: [id])
+  user            User        @relation(fields: [user_id], references: [id])
 }
 
 model Notification {
-  id         Int      @id @default(autoincrement())
-  user_id    Int
-  type       String
-  message    String
-  read       Boolean  @default(false)
-  created_at DateTime @default(now())
+  id              Int         @id @default(autoincrement())
+  user_id         Int
+  type            String
+  message         String
+  read            Boolean     @default(false)
+  created_at      DateTime    @default(now())
 
-  user User @relation(fields: [user_id], references: [id])
+  user            User        @relation(fields: [user_id], references: [id])
 }
