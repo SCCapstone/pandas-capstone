@@ -1,3 +1,4 @@
+//landing page
 import React from 'react';
 import './LandingPage.css';
 import { FaSearch, FaBell, FaCog, FaUserCircle } from 'react-icons/fa';

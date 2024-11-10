@@ -3,7 +3,7 @@ import Welcome from './pages/welcome';
 import Login from './pages/login';
 import Signup from './pages/signup';
 import LandingPage from './components/LandingPage';
-
+//routes
 function App() {
   return (
     <Router>
