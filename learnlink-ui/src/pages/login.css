@@ -1,0 +1,121 @@
+  /* Login css */
+  .login {
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .container {
+    width: 450px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .l1 {
+      width: 513px;
+      height: 108px;
+      font-family: 'Inter';
+      font-weight: lighter;
+      font-size: 64px;
+      line-height: 1.2;
+      text-align: left;
+      margin-bottom: 20px;
+  }
+  .t2 {
+    width: 513px;
+    font-family: 'Inter';
+    font-weight: normal;
+    font-size: 18px;
+    text-align: left;
+    line-height: 1.2;
+    margin-top: 5px;
+    margin-bottom: 15px;
+  }
+
+  /* give email and password spacing between the input type */
+
+  label {
+      width: auto;
+      height: auto;
+      font-family: 'Inter';
+      font-weight: normal;
+      font-size: 14px;
+      line-height: 20px;
+      text-align: left;
+      margin-bottom: 10px;
+      line-height: 10px;
+      display:block;
+  }
+  input {
+      width: 450px;
+      height: 18px;
+      margin-bottom: 10px;
+      padding: 5px;
+  }
+  .fp {
+      width: 450px;
+      display: flex;
+      justify-content: right;
+      margin: 12px 0px;
+  }
+  .fp label {
+      text-align: right;
+      font-size: 14px;
+  }
+  .or {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin: 15px 0;
+  }
+  .or label {
+    font-size: 16px;
+    text-align: center;
+  }
+
+  .lButton {
+      width: 465px;
+      height: 30px;
+      background-color: #00668C;
+      color: white;
+      border-color: #00668C;
+      font-size: 14px;
+  }
+  .sign {
+    width: 465px;
+    height: 30px;
+    background-color: #00668C;
+    color: white;
+    border-color: #00668C;
+    font-size: 14px;
+}
+
+  .Logo2 {
+    width: 200px;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    padding-bottom: 0;
+  }
+  
+  .Logo2 svg {
+    width: 300px; /* Ensures SVG scales with the container */
+    height: auto;
+  }
+
+  .Copyright2 {
+    margin-top: 20px;
+    font-size: 14px;
+    color: #00668C;
+    text-align: center;
+    width: 450px;
+    position: fixed;
+    bottom: 10px;
+  }
+  
