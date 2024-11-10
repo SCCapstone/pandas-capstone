@@ -1,13 +1,14 @@
 import React from 'react';
 import logo from './logo.svg';
 import './App.css';
-import { ReactComponent as MySvgFile } from './LearnLink.svg';
+import Logo from './components/Logo';
+import CopyrightFooter from './components/CopyrightFooter';
 
 function App() {
   return (
     <div className="App">
       <div className = "Logo">
-        <MySvgFile />
+        <Logo />
       </div>
       <div className = "WelcomePage">
         <h1>Welcome!</h1>
@@ -19,7 +20,7 @@ function App() {
         <button className="gradeCalculator">Grade Calculator</button> 
       </div>
       <div className = "Copyright">
-        <footer>&copy; LearnLink</footer>
+        <CopyrightFooter/>
       </div>
     </div>
   );
