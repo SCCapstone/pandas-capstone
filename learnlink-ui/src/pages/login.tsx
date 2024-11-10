@@ -1,11 +1,11 @@
-import { ReactComponent as MySvgFile } from './LearnLink.svg';
-import logo from './logo.svg';
+
+import Logo from '../components/Logo';
 
 function Login() {
     return (
         <div className="login">
         <div className = "Logo">
-            <MySvgFile />
+            <Logo />
         </div>
         <div className="container">
            <h1>Login</h1>

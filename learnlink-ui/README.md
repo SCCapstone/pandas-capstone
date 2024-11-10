@@ -2,6 +2,7 @@
 # only need to be ran once at the beginning of the project
 -- npm install web-vitals   \
 -- npm install @testing-library/react @testing-library/jest-dom   \
+-- npm install react-router-dom@latest
 -- npm install --save-dev @types/testing-library__react @types/jest @types/react-dom
 
 

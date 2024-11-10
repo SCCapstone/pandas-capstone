@@ -1,8 +1,8 @@
-import logo from './logo.svg';
-import './welcome.css';
-import { ReactComponent as MySvgFile } from './LearnLink.svg';
-import {useNavigate} from 'react-router-dom';
 
+import './welcome.css';
+import {useNavigate} from 'react-router-dom';
+import Logo from '../components/Logo';
+import Copyright from '../components/CopyrightFooter';
 function Welcome() {
     const navigate = useNavigate();
 
@@ -13,7 +13,7 @@ function Welcome() {
   return (
       <div className="welcome">
       <div className = "Logo">
-        <MySvgFile />
+        <Logo/>
       </div>
       <div className = "WelcomePage">
         <h1 className="well">Welcome!</h1>
@@ -25,7 +25,7 @@ function Welcome() {
         <button className="gradeCalculator">Grade Calculator</button> 
       </div>
         <div className = "Copyright">
-          <footer>&copy; LearnLink</footer>
+          <Copyright/>
         </div>
       </div>
   );

@@ -1,7 +1,7 @@
 import React from 'react';
 import logo from './logo.svg';
 import '../App.css';
-import { ReactComponent as MySvgFile } from '../LearnLink.svg'
+import { ReactComponent as MySvgFile } from './LearnLink.svg'
 
 function Logo(){
     return(

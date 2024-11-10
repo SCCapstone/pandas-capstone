@@ -1,1 +1,19 @@
+.Logo {
+    width: 600px;
+    position:relative;
+    margin: auto; /* Centers the logo and adds space around it */
+    padding-bottom: 0;
+  }
+  
+  .Logo svg {
+    width: 100%; /* Ensures SVG scales with the container */
+    height: auto;
+  }
 
+
+.Copyright {
+    margin-top: 20px;
+    font-size: 14px;
+    color: #00668C;
+    text-align: center;
+  }
