@@ -1,6 +1,6 @@
 import React from 'react';
 import logo from './logo.svg';
-import '../App.css';
+import './components.css';
 import { ReactComponent as MySvgFile } from './LearnLink.svg'
 
 function Logo(){
