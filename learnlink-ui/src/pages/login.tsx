@@ -22,7 +22,9 @@ function Login() {
                     <label>Forgot password?</label>   
                 </div>
 
-                <button className="lButton">Login</button>
+                <button className="lButton"
+                        onClick={() => navigate('/landingpage')}
+                >Login</button>
 
                 <div className="or">
                     <label>OR</label>
