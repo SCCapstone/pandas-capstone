@@ -1,19 +1,81 @@
 .Logo {
-    width: 600px;
-    position:relative;
-    margin: auto; /* Centers the logo and adds space around it */
-    padding-bottom: 0;
-  }
+  width: 600px;
+  position:relative;
+  margin: auto; /* Centers the logo and adds space around it */
+  padding-bottom: 0;
+}
   
-  .Logo svg {
-    width: 100%; /* Ensures SVG scales with the container */
-    height: auto;
-  }
+.Logo svg {
+  width: 100%; /* Ensures SVG scales with the container */
+  height: auto;
+}
 
 
 .Copyright {
-    margin-top: 20px;
-    font-size: 14px;
-    color: #00668C;
-    text-align: center;
-  }
+  margin-top: 20px;
+  font-size: 14px;
+  color: #00668C;
+  text-align: center;
+}
+
+.landing-page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+}
+  
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 2rem;
+  background-color: #e0f0ff;
+}
+
+.logo {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #0077b6;
+}
+
+.nav-links a {
+  margin: 0 1rem;
+  color: #0077b6;
+  text-decoration: none;
+}
+
+.nav-links a:hover {
+  text-decoration: underline;
+}
+
+.nav-icons {
+  display: flex;
+  align-items: center;
+}
+
+.search-bar {
+  position: relative;
+  margin-right: 1rem;
+}
+
+.search-bar input {
+  padding: 0.5rem;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+}
+
+.search-icon {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #0077b6;
+}
+
+.icon {
+  font-size: 1.5rem;
+  margin-left: 1rem;
+  color: #0077b6;
+  cursor: pointer;
+}

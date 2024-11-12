@@ -1,6 +1,6 @@
 // Navbar.tsx
 import React from 'react';
-import './Navbar.css';
+import './components.css';
 import { FaSearch, FaBell, FaCog, FaUserCircle } from 'react-icons/fa';
 
 const Navbar: React.FC = () => {
