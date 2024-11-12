@@ -7,7 +7,7 @@ import { FaSearch, FaBell, FaCog, FaUserCircle } from 'react-icons/fa';
 const Navbar: React.FC = () => {
   return (
     <header className="navbar">
-      <div className="logo"><Logo/></div>
+      <div className="nav-logo"><Logo/></div>
       <nav className="nav-links">
         <a href="/profile">Profile</a>
         <a href="/messaging">Messaging</a>

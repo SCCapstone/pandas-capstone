@@ -1,10 +1,10 @@
 .Logo {
-  width: 600px;
-  position:relative;
+  width: 100%; /* Ensures the logo scales based on the container */
+  position: relative;
   margin: auto; /* Centers the logo and adds space around it */
   padding-bottom: 0;
 }
-  
+
 .Logo svg {
   width: 100%; /* Ensures SVG scales with the container */
   height: auto;
@@ -17,6 +17,7 @@
   color: #00668C;
   text-align: center;
 }
+
 
 .landing-page {
   display: flex;
@@ -33,6 +34,10 @@
   background-color: #e0f0ff;
 }
 
+.nav-logo {
+  width: 300px; /* Set the desired width for the logo */
+  height: auto; /* Adjust the height to maintain the aspect ratio */
+}
 
 .nav-links a {
   margin: 0 1rem;
