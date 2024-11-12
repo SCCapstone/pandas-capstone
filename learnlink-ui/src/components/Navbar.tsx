@@ -1,12 +1,13 @@
 // Navbar.tsx
 import React from 'react';
 import './components.css';
+import Logo from '../components/Logo';
 import { FaSearch, FaBell, FaCog, FaUserCircle } from 'react-icons/fa';
 
 const Navbar: React.FC = () => {
   return (
     <header className="navbar">
-      <div className="logo">LearnLink</div>
+      <div className="logo"><Logo/></div>
       <nav className="nav-links">
         <a href="/profile">Profile</a>
         <a href="/messaging">Messaging</a>
