@@ -1,10 +1,11 @@
 /* Overall styling for the application */
 body {
-  background-color: #D4EAF7;
-  font-family: 'Roboto', sans-serif; /* Use a more modern, easy-to-read font */
+  background-color: #A7D3F1; /* Slightly darker background for better contrast */
+  font-family: 'Roboto', sans-serif; /* Modern, easy-to-read font */
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  color: #333; /* Ensure text is legible */
 }
 
 /* Welcome section styling */
@@ -12,56 +13,57 @@ body {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  gap: 20px; /* Increased gap for better spacing */
-  justify-content: center; /* Centers content vertically */
+  gap: 30px; /* Increased gap for better spacing */
+  justify-content: center;
+  align-items: center;
 }
 
 /* Logo styling */
 .Logo {
-  width: 300px;
-  margin: auto; 
-  padding-bottom: 0;
+  width: 280px; /* Slightly smaller to keep balance */
+  margin: 0 auto;
 }
 
 .Logo svg {
-  width: 100%; 
+  width: 100%;
   height: auto;
 }
 
 /* Welcome page header */
 .WelcomePage {
-  padding-top: 0;
-  margin-top: 20px; /* Slightly increased margin for better separation */
+  margin-top: 30px; /* Increased margin for better separation */
   display: flex;
   flex-direction: column;
   align-items: center;
+  padding: 0 20px;
+  text-align: center;
 }
 
 /* Copyright section */
 .Copyright {
   margin-top: 20px;
-  font-size: 16px; /* Increased font size for readability */
-  color: #00668C;
+  font-size: 16px;
+  color: #004c72; /* Darker shade for better contrast */
   text-align: center;
   font-family: 'Roboto', sans-serif;
 }
 
 /* Main heading */
 .well {
-  text-align: left;
-  font-size: 48px; /* Reduced font size for better balance */
-  color: #00668C;
-  font-family: 'Roboto', sans-serif;
+  font-size: 56px; /* Slightly larger for better prominence */
+  color: #004c72;
   padding-left: 10%;
+  text-align: left;
+  font-weight: 600;
+  letter-spacing: 2px;
 }
 
 /* Paragraph styling */
 p {
-  text-align: left;
-  font-size: 20px; /* Reduced font size for better readability */
-  color: #00668C;
-  font-family: 'Roboto', sans-serif;
+  font-size: 18px; /* Adjusted for better readability */
+  color: #004c72;
   padding-left: 10%;
+  text-align: left;
 }
 
 /* Button styling */
@@ -69,20 +71,26 @@ p {
   background-color: #FEAD2B;
   color: #FFFEFB;
   font-family: 'Roboto', sans-serif;
-  font-weight: 700; /* Use bold instead of 'semi bold' */
-  font-size: 32px; /* Reduced size for better proportion */
+  font-weight: 700;
+  font-size: 36px; /* Increased size for better proportion */
   text-align: center;
-  border-radius: 10px;
+  border-radius: 12px;
   border-color: #FEAD2B;
   width: 80%;
-  max-width: 600px; /* Responsive width */
-  height: 120px; /* Adjusted height */
+  max-width: 600px;
+  height: 130px; /* Adjusted height */
   margin-left: 10%;
   display: flex;
   justify-content: center;
   align-items: center;
-  letter-spacing: 1px; /* Added letter spacing for visual clarity */
+  letter-spacing: 1.2px;
   cursor: pointer;
+  transition: background-color 0.3s ease-in-out, transform 0.2s ease;
+}
+
+.getStarted:hover {
+  background-color: #e8911d; /* Darker hover color */
+  transform: scale(1.05); /* Subtle scale on hover */
 }
 
 /* Styled buttons */
@@ -93,58 +101,54 @@ button {
   font-weight: 700;
   font-size: 24px;
   text-align: center;
-  border-radius: 10px;
+  border-radius: 12px;
   border-color: #00668C;
   width: 80%;
   max-width: 600px;
   height: 100px;
   margin-bottom: 20px;
   cursor: pointer;
-  letter-spacing: 1px;
-  transition: background-color 0.3s ease-in-out;
+  letter-spacing: 1.2px;
+  transition: background-color 0.3s ease-in-out, transform 0.2s ease;
 }
 
 button:hover {
-  background-color: #004c72; /* Darker shade on hover */
+  background-color: #004c72;
+  transform: scale(1.05);
 }
 
 /* Specific buttons */
 .studyGroup, .studyResources, .messaging, .gradeCalculator {
-  font-size: 24px; /* Reduced font size for consistency */
+  font-size: 24px;
   font-weight: 700;
   width: 80%;
   max-width: 600px;
   margin-left: 10%;
   text-align: center;
-  border-radius: 10px;
+  border-radius: 12px;
   padding: 20px;
   margin-bottom: 20px;
+  cursor: pointer;
+  transition: background-color 0.3s ease-in-out, transform 0.2s ease;
 }
 
-.studyGroup {
+.studyGroup, .studyResources, .messaging, .gradeCalculator {
   background-color: #00668C;
 }
 
-.studyResources {
-  background-color: #00668C;
-}
-
-.messaging {
-  background-color: #00668C;
-}
-
-.gradeCalculator {
-  background-color: #00668C;
+.studyGroup:hover, .studyResources:hover, .messaging:hover, .gradeCalculator:hover {
+  background-color: #004c72;
+  transform: scale(1.05);
 }
 
 /* Responsive behavior: Ensure layout is mobile-friendly */
 @media (max-width: 768px) {
   .welcome {
-    gap: 15px;
+    gap: 20px;
   }
 
   .well, p, .getStarted, button {
-    font-size: 18px; /* Adjust font size for mobile */
+    font-size: 18px;
   }
 
   .Logo {
@@ -152,6 +156,6 @@ button:hover {
   }
 
   .studyGroup, .studyResources, .messaging, .gradeCalculator {
-    width: 90%; /* Full width on mobile */
+    width: 90%;
   }
 }
