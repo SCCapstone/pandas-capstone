@@ -72,7 +72,7 @@ p {
   color: #FFFEFB;
   font-family: 'Roboto', sans-serif;
   font-weight: 700;
-  font-size: 36px; /* Increased size for better proportion */
+  font-size: 45px; /* Increased size for better proportion */
   text-align: center;
   border-radius: 12px;
   border-color: #FEAD2B;
@@ -99,7 +99,7 @@ button {
   color: #FFFEFB;
   font-family: 'Roboto', sans-serif;
   font-weight: 700;
-  font-size: 24px;
+  font-size: 50px;
   text-align: center;
   border-radius: 12px;
   border-color: #00668C;
@@ -119,7 +119,7 @@ button:hover {
 
 /* Specific buttons */
 .studyGroup, .studyResources, .messaging, .gradeCalculator {
-  font-size: 24px;
+  font-size: 18px;
   font-weight: 700;
   width: 80%;
   max-width: 600px;
@@ -144,11 +144,11 @@ button:hover {
 /* Responsive behavior: Ensure layout is mobile-friendly */
 @media (max-width: 768px) {
   .welcome {
-    gap: 20px;
+    gap: 5px;
   }
 
   .well, p, .getStarted, button {
-    font-size: 18px;
+    font-size: 50px;
   }
 
   .Logo {
