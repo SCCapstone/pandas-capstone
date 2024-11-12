@@ -2,19 +2,33 @@
 
 import React from 'react';
 import Navbar from '../components/Navbar';
+import './settings.css'
 import './LandingPage.css';
 import CopyrightFooter from '../components/CopyrightFooter';
+import { useNavigate } from 'react-router-dom';
 
-const LandingPage: React.FC = () => {
+const Settings: React.FC = () => {
+  const navigate = useNavigate();
+
+    const handleLogOut = () => {
+        navigate('/welcome');
+    };
   return (
-    <div className="landing-page">
+    <div className="settings">
       <Navbar />
-      <main className="content">
-        <p>To start searching please update your profile via top left corner!</p>
-      </main>
-      <CopyrightFooter />
-    </div>
+      <div className="content">
+        <button className="logOut" onClick={handleLogOut}>Log Out</button>
+        <button className="changePassword">Change Password</button>
+        <button className="deleteAccount">Delete Account</button>
+      </div>
+      <div className="Copyright3">
+        <CopyrightFooter />
+      </div>
+      
+    </div> 
+
+        
   );
 };
 
-export default LandingPage;
+export default Settings;
