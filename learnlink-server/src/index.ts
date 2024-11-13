@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import bcrypt from 'bcrypt';
 import { PrismaClient } from "@prisma/client";
 
 
@@ -15,7 +16,7 @@ app.post("/api/users", async (req, res) => {
 
   try {
     // Hash the password before storing it in the database -> for security
-    const hashedPassword = password; 
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     const newUser = await prisma.user.create({
       data: {
