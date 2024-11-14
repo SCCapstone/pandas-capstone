@@ -12,7 +12,7 @@ function Welcome() {
 
   return (
       <div className="welcome">
-      <div className = "Logo">
+      <div className = "WelcomeLogo">
         <Logo/>
       </div>
       <div className = "WelcomePage">

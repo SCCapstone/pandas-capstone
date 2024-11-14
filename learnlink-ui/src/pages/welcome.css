@@ -19,14 +19,9 @@ body {
 }
 
 /* Logo styling */
-.Logo {
-  width: 150px; /* Slightly smaller to keep balance */
-  margin: 0 auto;
-}
-
-.Logo svg {
-  width: 100%;
-  height: auto;
+.WelcomeLogo {
+  width: 600px; /* Set the desired width for the logo */
+  height: auto; /* Adjust the height to maintain the aspect ratio */  
 }
 
 /* Welcome page header */
