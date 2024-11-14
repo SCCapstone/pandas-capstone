@@ -38,8 +38,8 @@ function Login() {
                 </button> 
             </div>
 
-            <div className="Copyright2">
-                <Copyright />
+            <div className="Copyright">
+                <Copyright/>
             </div>
         </div>
     );
