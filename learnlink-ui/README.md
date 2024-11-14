@@ -2,7 +2,8 @@
 # only need to be ran once at the beginning of the project
 -- npm install web-vitals   \
 -- npm install @testing-library/react @testing-library/jest-dom   \
--- npm install react-router-dom@latest      \
+-- npm install react-router-dom@latest react-hook-form   \
+-- npm install axios    \
 -- npm install --save-dev @types/testing-library__react @types/jest @types/react-dom
 
 

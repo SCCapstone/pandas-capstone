@@ -37,11 +37,13 @@ const Signup: React.FC = () => {
             alert('Account created successfully');
             navigate('/landingpage');
             // or we could navigate the user to login page for succesful registration
-            // naviagte('/login')
-        } catch (error) { 
-            console.error(error);
-            alert('Error during signup');
+        
+        }  catch (error) { 
+            console.error("Error during signup:", error);
+            if (error instanceof Error) alert(error.message);
+            else alert('Error during signup');
         }
+        
     }
 
     return (
