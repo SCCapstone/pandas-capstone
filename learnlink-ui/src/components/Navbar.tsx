@@ -15,6 +15,7 @@ const Navbar: React.FC = () => {
     <header className="navbar">
       <div className="nav-logo"><Logo/></div>
       <nav className="nav-links">
+        
         <a href="/profile">Profile</a>
         <a href="/messaging">Messaging</a>
         <a href="/resources">Resources</a>

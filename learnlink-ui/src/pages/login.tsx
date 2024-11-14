@@ -1,4 +1,5 @@
 import './login.css';
+import '../index.css';
 import Logo from '../components/Logo';
 import Copyright from '../components/CopyrightFooter';
 import { useNavigate } from 'react-router-dom';

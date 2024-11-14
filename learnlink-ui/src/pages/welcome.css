@@ -1,11 +1,23 @@
 /* Overall styling for the application */
+
+:root {
+  font-family: Inter, sans-serif;
+  font-feature-settings: 'liga' 1, 'calt' 1; /* fix for Chrome */
+}
+@supports (font-variation-settings: normal) {
+  :root { font-family: InterVariable, sans-serif; }
+}
+
 body {
-  background-color: #A7D3F1; /* Slightly darker background for better contrast */
-  font-family: 'Roboto', sans-serif; /* Modern, easy-to-read font */
+  background-color: #D4EAF7;
   margin: 0;
   padding: 0;
   box-sizing: border-box;
   color: #333; /* Ensure text is legible */
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight:medium;
 }
 
 /* Welcome section styling */
