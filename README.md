@@ -28,7 +28,7 @@ database for running your webapp locally.
 
 Navigate to the server directory and enter these commands in the command line of the terminal
 ```
-npm i ts-node typescript nodemon @types/cors @types/express @types/node--save-dev
+npm i ts-node typescript nodemon @types/cors @types/express @types/node @types/jsonwebtoken --save-dev
 npm i @prisma/client cors express prisma bcrypt
 ```
 
