@@ -100,14 +100,14 @@ const Login: React.FC = () => {
                 </div>
                 
                 <button 
-                    className="sign" 
+                    className="lButton" 
                     onClick={() => navigate('/signup')}
                 >
                     Sign Up
                 </button> 
             </div>
 
-            <div className="Copyright">
+            <div className="Copyright2">
                 <Copyright/>
             </div>
         </div>

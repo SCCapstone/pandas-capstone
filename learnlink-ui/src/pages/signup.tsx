@@ -170,7 +170,7 @@ const Signup: React.FC = () => {
                         required
                     />
 
-                    <label>Confirm Password</label>
+                    <label>Re-Type Password</label>
                     <input
                         type="password"
                         placeholder="**************"

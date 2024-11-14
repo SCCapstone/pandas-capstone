@@ -98,10 +98,12 @@ button {
   font-weight: 700;
   font-size: 50px;
   text-align: center;
-  border-radius: 12px;
-  border-color: #00668C;
-  width: 80%;
-  max-width: 600px;
+  /* border-radius: 12px; */
+  /* border-color: #00668C; */
+  /* width: 80%; */
+  /* max-width: 600px; */
+  border: 0;
+  box-shadow: none;
   height: 100px;
   margin-bottom: 20px;
   cursor: pointer;
