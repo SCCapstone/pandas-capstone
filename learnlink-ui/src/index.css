@@ -2,11 +2,22 @@
 
 body {
   margin: 0;
-  font-weight: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: #D4EAF7;
 }
+h1, h2, h3, h4, h5, h6 {
+  font-weight:medium;
+}
+
+label {
+  font-weight: normal;
+}
+
+button {
+  font-weight: bold;
+}
+
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
