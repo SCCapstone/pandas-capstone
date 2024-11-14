@@ -57,7 +57,7 @@ const Signup: React.FC = () => {
             return;
         }
 
-        if (!formData.firstName || !formData.lastName || !formData.email || !formData.password) {
+        if (!formData.firstName || !formData.lastName || !formData.email || !formData.username || !formData.password) {
             setError('All fields are required');
             return;
         }
@@ -75,6 +75,7 @@ const Signup: React.FC = () => {
                     firstName: formData.firstName,
                     lastName: formData.lastName,
                     email: formData.email,
+                    username: formData.username,
                     password: formData.password,
                 }),
             });

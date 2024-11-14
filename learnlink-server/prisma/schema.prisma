@@ -18,6 +18,7 @@ model User {
   firstName                 String
   lastName                 String
   email                String           @unique
+  username             String           @unique
   password             String
   profile_preferences  Json?
   created_at           DateTime         @default(now())
