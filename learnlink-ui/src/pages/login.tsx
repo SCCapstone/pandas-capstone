@@ -87,24 +87,26 @@ const Login: React.FC = () => {
                     />
                     {error && <p className="error">{error}</p>}
 
-                    <div className="fp">
-                        <label>Forgot password?</label>   
+                    <div className="fpp">
+                        Forgot password?
                     </div>
 
-                    <button className="lButton" type="submit">Login</button>
-                </form>
-               
+                    <button className="lButton" type="submit" disabled={loading}>
+                        {loading ? "Logging in..." : "Login"}
+                    </button>
 
-                <div className="or">
-                    <label>OR</label>
-                </div>
-                
-                <button 
-                    className="lButton" 
-                    onClick={() => navigate('/signup')}
-                >
-                    Sign Up
-                </button> 
+                    <div className="or">
+                        <label>Or</label>
+                    </div>
+
+                    <button 
+                        className="lButton" 
+                        type="button" // Prevent form submission
+                        onClick={() => navigate('/signup')}
+                    >
+                        Sign Up
+                    </button> 
+                </form>
             </div>
 
             <div className="Copyright2">
