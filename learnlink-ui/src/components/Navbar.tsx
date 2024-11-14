@@ -11,12 +11,15 @@ const Navbar: React.FC = () => {
     const handleSettings = () => {
         navigate('/settings');
     };
+    const handleMessaging = () => {
+        navigate('/messaging');
+    };
   return (
     <header className="navbar">
       <div className="nav-logo"><Logo/></div>
       <nav className="nav-links">
         <a href="/profile">Profile</a>
-        <a href="/messaging">Messaging</a>
+        <a href="/messaging" onClick={handleMessaging} >Messaging</a>
         <a href="/resources">Resources</a>
       </nav>
       <div className="nav-icons">
