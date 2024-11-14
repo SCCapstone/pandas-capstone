@@ -1,20 +1,24 @@
-// placeholder so it can run
 
 import React from 'react';
+import './messaging.css'
 import Navbar from '../components/Navbar';
-import './LandingPage.css';
 import CopyrightFooter from '../components/CopyrightFooter';
+import './LandingPage.css';
+import { useNavigate } from 'react-router-dom';
 
-const LandingPage: React.FC = () => {
+const Messaging: React.FC = () => {
   return (
-    <div className="landing-page">
+    <div className="chat">
       <Navbar />
-      <main className="content">
-        <p>To start searching please update your profile via top left corner!</p>
-      </main>
-      <CopyrightFooter />
+      <div className="content">
+       <p> Hello </p>
+      </div>
+      <div className = "copy4">
+        <CopyrightFooter />
+      </div>
+    
     </div>
   );
 };
 
-export default LandingPage;
+export default Messaging;
