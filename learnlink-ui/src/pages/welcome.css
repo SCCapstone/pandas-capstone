@@ -20,7 +20,7 @@ body {
 
 /* Logo styling */
 .Logo {
-  width: 280px; /* Slightly smaller to keep balance */
+  width: 150px; /* Slightly smaller to keep balance */
   margin: 0 auto;
 }
 
@@ -37,15 +37,6 @@ body {
   align-items: center;
   padding: 0 20px;
   text-align: center;
-}
-
-/* Copyright section */
-.Copyright {
-  margin-top: 20px;
-  font-size: 16px;
-  color: #004c72; /* Darker shade for better contrast */
-  text-align: center;
-  font-family: 'Roboto', sans-serif;
 }
 
 /* Main heading */
