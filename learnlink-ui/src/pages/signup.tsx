@@ -1,50 +1,110 @@
-import React from 'react';
+import React,  { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './signup.css';
 import Logo from '../components/Logo';
 import Copyright from '../components/CopyrightFooter';
-import { SignUpData, signUpUser } from '../services/authService';
-import { SubmitHandler, useForm } from 'react-hook-form';
 
-type SignUpInputs =  {
-    userName: string;
+type User = {
+    id: number;
+    firstName: string;
+    lastName: string;
     email: string;
-    password: string;
-    confirmPassword: string;
-}
+    username: string;
+    password: string; // Hashing done on backend
+    profile_preferences?: {
+        // Undecided on what this will look like
+    };
+    created_at?: string;
+    updated_at?: string;
+    // Might need to add more later, notifs, matches etc.
+};
 
 const Signup: React.FC = () => {
     const navigate = useNavigate();
+    const [formData, setFormData] = useState<User>({
+        id: 0,
+        firstName: '',
+        lastName: '',
+        email: '',
+        username: '',
+        password: '',
+        created_at: '',
+        updated_at: '',
+    });
 
-    const {register, handleSubmit, formState: {errors}} = useForm<SignUpInputs>();
+    const [confirmPassword, setConfirmPassword] = useState<string>('');
+    const [error, setError] = useState<string | null>(null);
+    const [loading, setLoading] = useState<boolean>(false);
 
-    const handleSignUp: SubmitHandler<SignUpInputs> = async(data) => {
-        if (data.password != data.confirmPassword) {
-            alert('Password does not match');
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setFormData((prev) => ({
+            ...prev,
+            [name]: value,
+        }));
+    };
+
+    const handleConfirmPasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setConfirmPassword(e.target.value);
+    };
+
+    // Form submission
+    const handleSignup = async (e: React.FormEvent) => {
+        e.preventDefault();
+
+        if (formData.password !== confirmPassword) {
+            setError('Passwords do not match.');
             return;
         }
 
-        try{
-            const result = await signUpUser (
-                {
-                    username: data.userName,
-                    password: data.password,
-                    email: data.email,
-
-                }
-            );
-
-            alert('Account created successfully');
-            navigate('/landingpage');
-            // or we could navigate the user to login page for succesful registration
-        
-        }  catch (error) { 
-            console.error("Error during signup:", error);
-            if (error instanceof Error) alert(error.message);
-            else alert('Error during signup');
+        if (!formData.firstName || !formData.lastName || !formData.email || !formData.password) {
+            setError('All fields are required');
+            return;
         }
-        
-    }
+
+        setLoading(true);
+
+        try {
+            // POST request
+            const response = await fetch('http://localhost:2020/api/users', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    firstName: formData.firstName,
+                    lastName: formData.lastName,
+                    email: formData.email,
+                    password: formData.password,
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to create user');
+            }
+
+            // Clear form
+            setFormData({
+                id: 0,
+                firstName: '',
+                lastName: '',
+                email: '',
+                username: '',
+                password: '',
+                created_at: '',
+                updated_at: '',
+            });
+            setConfirmPassword('');
+            setError(null);
+
+            // Navigate to landing page after successful signup
+            navigate('/LandingPage');
+        } catch (error) {
+            setError('Failed to sign up. Please try again later.');
+        } finally {
+            setLoading(false);
+        }
+    };
 
     return (
         <div className="signup">
@@ -54,38 +114,78 @@ const Signup: React.FC = () => {
             <div className="container">
                 <h1 className="l1">Sign Up</h1>
                 <h2 className="t2">Enter your credentials to join LearnLink.</h2>
-                
-                <div className="nameFields">
-                    <label>First Name</label>
-                    <input type="text" placeholder="John" />
-                </div>
-                <div className="nameFields">
-                    <label>Last Name</label>
-                    <input type="text" placeholder="Doe" />
-                </div>
 
-                <form onSubmit={handleSubmit(handleSignUp)}>
+                {/* Form to collect user data */}
+                <form onSubmit={handleSignup}>
+                    <div className="nameFields">
+                        <label>First Name</label>
+                        <input
+                            type="text"
+                            placeholder="John"
+                            name="firstName"
+                            value={formData.firstName}
+                            onChange={handleChange}
+                            required
+                        />
+                    </div>
+                    <div className="nameFields">
+                        <label>Last Name</label>
+                        <input
+                            type="text"
+                            placeholder="Doe"
+                            name="lastName"
+                            value={formData.lastName}
+                            onChange={handleChange}
+                            required
+                        />
+                    </div>
+
                     <label>Username</label>
-                    <input type="text" placeholder="john_doe123" {...register("userName", {required: "Username is required"})}/>
-                    {errors.userName && <p className="error">{errors.userName.message}</p>}
-                    
+                    <input
+                        type="text"
+                        placeholder="john_doe123"
+                        name="username"
+                        value={formData.username}
+                        onChange={handleChange}
+                    />
+
                     <label>Email</label>
-                    <input type="text" placeholder="example@learnlink.com" {...register("email", {required: "Email is required"})}/>
-                    {errors.email && <p className="error">{errors.email.message}</p>}
+                    <input
+                        type="email"
+                        placeholder="example@learnlink.com"
+                        name="email"
+                        value={formData.email}
+                        onChange={handleChange}
+                        required
+                    />
 
                     <label>Password</label>
-                    <input type="password" placeholder="**************" {...register("password", {required: "Password is required"})}/>
-                    {errors.password && <p className="error">{errors.password.message}</p>}
-                    
+                    <input
+                        type="password"
+                        placeholder="**************"
+                        name="password"
+                        value={formData.password}
+                        onChange={handleChange}
+                        required
+                    />
+
                     <label>Confirm Password</label>
-                    <input type="password" placeholder="**************" {...register("confirmPassword", {required: "Confrim Password is required"})}/>
-                    {errors.confirmPassword && <p className="error">{errors.confirmPassword.message}</p>}
-                    
-                    <button className="signUpButton">Sign Up</button>
+                    <input
+                        type="password"
+                        placeholder="**************"
+                        value={confirmPassword}
+                        onChange={handleConfirmPasswordChange}
+                        required
+                    />
+
+                    {/* Show error if there's any */}
+                    {error && <p className="error">{error}</p>}
+
+                    <button className="signUpButton" type="submit" disabled={loading}>
+                        {loading ? 'Signing Up...' : 'Sign Up'}
+                    </button>
                 </form>
-                
-                
-                
+
                 <div className="loginRedirect">
                     <label>Already have an account? <a href="/login">Log in</a></label>
                 </div>
@@ -96,6 +196,6 @@ const Signup: React.FC = () => {
             </div>
         </div>
     );
-}
+};
 
 export default Signup;
