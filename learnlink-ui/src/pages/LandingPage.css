@@ -3,6 +3,7 @@
   display: flex;
   flex-direction: column;
   height: 100vh;
+  background-color: #fff;
 }
 .content {
   flex-grow: 1;
@@ -11,4 +12,17 @@
   justify-content: center;
   font-size: 1.25rem;
   color: #0077b6;
+}
+
+.Copyright2 {
+  margin-top: 20px;
+  font-size: 14px;
+  color: #00668C;
+  text-align: center;
+  vertical-align: center;
+  width: 100%;
+  position: fixed;
+  line-height: 30px;
+  bottom: 0;
+  background-color: #D4EAF7 ;
 }

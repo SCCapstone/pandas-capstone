@@ -11,7 +11,9 @@ const LandingPage: React.FC = () => {
       <main className="content">
         <p>To start searching please update your profile via top left corner!</p>
       </main>
+      <div className="Copyright2">
       <CopyrightFooter />
+      </div>
     </div>
   );
 };
