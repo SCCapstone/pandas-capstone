@@ -4,6 +4,7 @@ import Login from './pages/login';
 import Signup from './pages/signup';
 import LandingPage from './pages/LandingPage';
 import Settings from './pages/settings';
+import Messaging from './pages/messaging';
 //routes
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
           <Route path="/signup" element={<Signup />} />
           <Route path="/landingpage" element={<LandingPage />} />
           <Route path="/settings" element={<Settings />} />
+          <Route path="/messaging" element = {<Messaging/> }/>
         </Routes> 
       </div>
     </Router>
