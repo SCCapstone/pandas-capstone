@@ -1,6 +1,4 @@
 /* Settings CSS */
-
-
 .content {
     flex-direction: column;
     align-items: center;
@@ -49,7 +47,6 @@
     position: relative;
     top: 230px;
 }
-
 
 .Copyright3 {
     margin-top: 20px;
