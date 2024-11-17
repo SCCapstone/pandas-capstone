@@ -26,3 +26,8 @@
   bottom: 0;
   background-color: #D4EAF7 ;
 }
+p {
+  margin: 0;
+  padding: 0;
+  text-align: center;
+}
