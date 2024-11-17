@@ -1,9 +1,6 @@
-// placeholder
-
 import React from 'react';
 import Navbar from '../components/Navbar';
 import './settings.css'
-import './LandingPage.css';
 import CopyrightFooter from '../components/CopyrightFooter';
 import { useNavigate } from 'react-router-dom';
 
@@ -21,7 +18,7 @@ const Settings: React.FC = () => {
         <button className="changePassword">Change Password</button>
         <button className="deleteAccount">Delete Account</button>
       </div>
-      <div className="Copyright3">
+      <div>
         <CopyrightFooter />
       </div>
       

@@ -1,5 +1,6 @@
 
 import './welcome.css';
+import '../index.css';
 import {useNavigate} from 'react-router-dom';
 import Logo from '../components/Logo';
 import Copyright from '../components/CopyrightFooter';
@@ -14,7 +15,7 @@ function Welcome() {
   return (
       <div className="welcome">
       <div className="Logo2">
-                <Logo />
+        <Logo />
       </div>
       <div className = "WelcomePage">
         <div className='leftContainer'>
@@ -31,7 +32,7 @@ function Welcome() {
           <button className="menuButtons">Grade Calculator</button> 
         </div>
       </div>
-        <div className = "Copyright2">
+        <div className = "Copyright">
           <Copyright/>
         </div>
       </div>

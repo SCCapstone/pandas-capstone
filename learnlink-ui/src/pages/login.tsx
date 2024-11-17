@@ -1,7 +1,6 @@
 import './login.css';
-import '../index.css';
 import Logo from '../components/Logo';
-import Copyright from '../components/CopyrightFooter';
+import CopyrightFooter from '../components/CopyrightFooter';
 import { useNavigate } from 'react-router-dom';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { login } from '../services/authService';
@@ -65,54 +64,57 @@ const Login: React.FC = () => {
             <div className="Logo2">
                 <Logo />
             </div>
-            <div className="container">
-                <h1 className="l1">Login</h1>
-                <h2 className="t2">Enter your credentials to login.</h2>
-                <form onSubmit={handleLogin}>
-                    <label>Username</label>
-                    <input 
-                        type="text"
-                        placeholder="JohnDoe123"
-                        value={username}
-                        onChange={handleUsernameChange}
-                        required
-                    />
-                    <label>Password</label>
-                    <input
-                        type="password"
-                        placeholder="Enter your password"
-                        value={password}
-                        onChange={handlePasswordChange}
-                        required
-                    />
-                    {error && <p className="error">{error}</p>}
+            <div className="flexed">
+                <div className="container">
+                    <h1 className="l1">Login</h1>
+                    <h2 className="t2">Enter your credentials to login.</h2>
+                    <form onSubmit={handleLogin}>
+                        <label>Username</label>
+                        <input 
+                            type="text"
+                            placeholder="JohnDoe123"
+                            value={username}
+                            onChange={handleUsernameChange}
+                            required
+                        />
+                        <label>Password</label>
+                        <input
+                            type="password"
+                            placeholder="Enter your password"
+                            value={password}
+                            onChange={handlePasswordChange}
+                            required
+                        />
+                        {error && <p className="error">{error}</p>}
 
-                    <div className="fpp">
-                        Forgot password?
-                    </div>
+                        <div className="fpp">
+                            Forgot password?
+                        </div>
 
-                    <button className="lButton" type="submit" disabled={loading}>
-                        {loading ? "Logging in..." : "Login"}
-                    </button>
+                        <button className="lButton" type="submit" disabled={loading}>
+                            {loading ? "Logging in..." : "Login"}
+                        </button>
 
-                    <div className="or">
-                        <label>Or</label>
-                    </div>
+                        <div className="or">
+                            <label>Or</label>
+                        </div>
 
-                    <button 
-                        className="lButton" 
-                        type="button" // Prevent form submission
-                        onClick={() => navigate('/signup')}
-                    >
-                        Sign Up
-                    </button> 
-                </form>
+                        <button 
+                            className="lButton" 
+                            type="button" // Prevent form submission
+                            onClick={() => navigate('/signup')}
+                        >
+                            Sign Up
+                        </button> 
+                    </form>
+                </div>
+            </div>
+            <div>
+                <CopyrightFooter />
             </div>
 
-            <div className="Copyright2">
-                <Copyright/>
-            </div>
         </div>
+        
     );
 }
 

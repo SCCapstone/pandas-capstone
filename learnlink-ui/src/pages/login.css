@@ -1,5 +1,8 @@
-  /* Login css */
-.login {
+/* Login css */
+body{
+  background-color: #D4EAF7;
+}
+.flexed {
   margin: 0;
   padding: 0;
   height: 100vh;
