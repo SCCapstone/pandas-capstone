@@ -8,7 +8,7 @@ function Welcome() {
     const navigate = useNavigate();
 
     const handleGetStarted = () => {
-        navigate('login');
+        navigate('/login');
     }
 
   return (
