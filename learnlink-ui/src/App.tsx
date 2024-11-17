@@ -6,6 +6,8 @@ import LandingPage from './pages/LandingPage';
 import Settings from './pages/settings';
 import Messaging from './pages/messaging';
 import Profile from './pages/profile';
+import Resources from './pages/resources';
+
 //routes
 function App() {
   return (
@@ -20,6 +22,7 @@ function App() {
           <Route path="/settings" element={<Settings />} />
           <Route path="/messaging" element = {<Messaging/> }/>
           <Route path="/profile" element = {<Profile/> }/>
+          <Route path="/resources" element = {<Resources/> }/>
         </Routes> 
       </div>
     </Router>

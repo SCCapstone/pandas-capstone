@@ -108,91 +108,92 @@ const Signup: React.FC = () => {
     };
 
     return (
-        <div className="signup">
+        <div>
             <div className="Logo2">
                 <Logo />
             </div>
-            <div className="container">
-                <h1 className="l1">Sign Up</h1>
-                <h2 className="t2">Enter your credentials to join LearnLink.</h2>
+            <div className="signup">
+                <div className="container">
+                    <h1 className="l1">Sign Up</h1>
+                    <h2 className="t2">Enter your credentials to join LearnLink.</h2>
 
-                {/* Form to collect user data */}
-                <form onSubmit={handleSignup}>
-                    <div className="nameFields">
-                        <label>First Name</label>
+                    {/* Form to collect user data */}
+                    <form onSubmit={handleSignup}>
+                        <div className="nameFields">
+                            <label>First Name</label>
+                            <input
+                                type="text"
+                                placeholder="John"
+                                name="firstName"
+                                value={formData.firstName}
+                                onChange={handleChange}
+                                required
+                            />
+                        </div>
+                        <div className="nameFields">
+                            <label>Last Name</label>
+                            <input
+                                type="text"
+                                placeholder="Doe"
+                                name="lastName"
+                                value={formData.lastName}
+                                onChange={handleChange}
+                                required
+                            />
+                        </div>
+
+                        <label>Username</label>
                         <input
                             type="text"
-                            placeholder="John"
-                            name="firstName"
-                            value={formData.firstName}
+                            placeholder="john_doe123"
+                            name="username"
+                            value={formData.username}
+                            onChange={handleChange}
+                        />
+
+                        <label>Email</label>
+                        <input
+                            type="email"
+                            placeholder="example@learnlink.com"
+                            name="email"
+                            value={formData.email}
                             onChange={handleChange}
                             required
                         />
-                    </div>
-                    <div className="nameFields">
-                        <label>Last Name</label>
+
+                        <label>Password</label>
                         <input
-                            type="text"
-                            placeholder="Doe"
-                            name="lastName"
-                            value={formData.lastName}
+                            type="password"
+                            placeholder="**************"
+                            name="password"
+                            value={formData.password}
                             onChange={handleChange}
                             required
                         />
+
+                        <label>Re-Type Password</label>
+                        <input
+                            type="password"
+                            placeholder="**************"
+                            value={confirmPassword}
+                            onChange={handleConfirmPasswordChange}
+                            required
+                        />
+
+                        {/* Show error if there's any */}
+                        {error && <p className="error">{error}</p>}
+
+                        <button className="signUpButton" type="submit" disabled={loading}>
+                            {loading ? 'Signing Up...' : 'Sign Up'}
+                        </button>
+                    </form>
+
+                    <div className="loginRedirect">
+                        <label>Already have an account? <a href="/login">Log in</a></label>
                     </div>
-
-                    <label>Username</label>
-                    <input
-                        type="text"
-                        placeholder="john_doe123"
-                        name="username"
-                        value={formData.username}
-                        onChange={handleChange}
-                    />
-
-                    <label>Email</label>
-                    <input
-                        type="email"
-                        placeholder="example@learnlink.com"
-                        name="email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        required
-                    />
-
-                    <label>Password</label>
-                    <input
-                        type="password"
-                        placeholder="**************"
-                        name="password"
-                        value={formData.password}
-                        onChange={handleChange}
-                        required
-                    />
-
-                    <label>Re-Type Password</label>
-                    <input
-                        type="password"
-                        placeholder="**************"
-                        value={confirmPassword}
-                        onChange={handleConfirmPasswordChange}
-                        required
-                    />
-
-                    {/* Show error if there's any */}
-                    {error && <p className="error">{error}</p>}
-
-                    <button className="signUpButton" type="submit" disabled={loading}>
-                        {loading ? 'Signing Up...' : 'Sign Up'}
-                    </button>
-                </form>
-
-                <div className="loginRedirect">
-                    <label>Already have an account? <a href="/login">Log in</a></label>
                 </div>
             </div>
-
-            <div className="Copyright2">
+            <div>
                 <Copyright />
             </div>
         </div>

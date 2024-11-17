@@ -13,10 +13,7 @@ const Messaging: React.FC = () => {
       <div className="content">
        <p> Hello </p>
       </div>
-      <div className = "copy4">
-        <CopyrightFooter />
-      </div>
-    
+      <CopyrightFooter />
     </div>
   );
 };

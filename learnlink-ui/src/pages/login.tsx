@@ -60,11 +60,11 @@ const Login: React.FC = () => {
     };
 
     return (
-        <div className="login">
+        <div>
             <div className="Logo2">
                 <Logo />
             </div>
-            <div className="flexed">
+            <div className="login">
                 <div className="container">
                     <h1 className="l1">Login</h1>
                     <h2 className="t2">Enter your credentials to login.</h2>

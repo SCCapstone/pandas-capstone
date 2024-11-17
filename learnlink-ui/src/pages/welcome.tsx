@@ -13,26 +13,28 @@ function Welcome() {
     }
 
   return (
-      <div className="welcome">
-      <div className="Logo2">
-        <Logo />
-      </div>
-      <div className = "WelcomePage">
-        <div className='leftContainer'>
-          <div className='titleContainer'>
-            <h1 className="well">Welcome!</h1>
-            <p>LearnLink is an online platform that connects like-minded individuals to form study groups!</p>
+      <div>
+        <div className="welcome">
+          <div className="Logo2">
+            <Logo />
           </div>
-          <button className="getStarted" onClick={handleGetStarted}>Get<br></br>Started</button>
+          <div className = "WelcomePage">
+            <div className='leftContainer'>
+              <div className='titleContainer'>
+                <h1 className="well">Welcome!</h1>
+                <p>LearnLink is an online platform that connects like-minded individuals to form study groups!</p>
+              </div>
+              <button className="getStarted" onClick={handleGetStarted}>Get<br></br>Started</button>
+            </div>
+            <div className='menuButtonContainer'>
+              <button className="menuButtons">Study Groups</button> <br></br>
+              <button className="menuButtons">Study Resources</button> <br></br>
+              <button className="menuButtons">Messaging</button> <br></br>
+              <button className="menuButtons">Grade Calculator</button> 
+            </div>
+          </div>
         </div>
-        <div className='menuButtonContainer'>
-          <button className="menuButtons">Study Groups</button> <br></br>
-          <button className="menuButtons">Study Resources</button> <br></br>
-          <button className="menuButtons">Messaging</button> <br></br>
-          <button className="menuButtons">Grade Calculator</button> 
-        </div>
-      </div>
-        <div className = "Copyright">
+        <div>
           <Copyright/>
         </div>
       </div>

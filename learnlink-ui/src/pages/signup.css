@@ -1,12 +1,17 @@
   /* Signup css */
-.signup {
+body{
   margin: 0;
   padding: 0;
+  background-color: #D4EAF7;
+}
+
+.signup {
   height: 90vh;
   overflow-y: scroll;
   display: flex;
   justify-content: center;
   align-items: center;
+  background-color: #D4EAF7;
 }
 
 .container {
@@ -20,15 +25,15 @@
 }
 
 .l1 {
-    width: 513px;
-    height: 108px;
-    font-family: 'Inter';
-    font-weight: 500;
-    font-size: 64px;
-    line-height: 1.2;
-    text-align: left;
-    margin-bottom: 5px;
-    color: #3B3C3D;
+  width: 513px;
+  height: 108px;
+  font-family: 'Inter';
+  font-weight: 500;
+  font-size: 64px;
+  line-height: 1.2;
+  text-align: left;
+  margin-bottom: 5px;
+  color: #3B3C3D;
 }
 
 .t2 {
@@ -96,14 +101,8 @@ input {
   font-size: 14px;
   font-weight: 500;
 }
-.sign {
-  width: 465px;
-  height: 30px;
-  background-color: #00668C;
-  color: white;
-  border-color: #00668C;
-  font-size: 14px;
-}
+
+
 
 .Logo2 {
   width: 200px;
@@ -116,16 +115,6 @@ input {
 .Logo2 svg {
   width: 300px; /* Ensures SVG scales with the container */
   height: auto;
-}
-
-.Copyright2 {
-  margin-top: 20px;
-  font-size: 14px;
-  color: #00668C;
-  text-align: center;
-  width: 450px;
-  position: fixed;
-  bottom: 10px;
 }
 
 .loginRedirect{

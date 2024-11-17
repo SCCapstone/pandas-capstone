@@ -6,13 +6,6 @@
 @supports (font-variation-settings: normal) {
   :root { font-family: InterVariable, sans-serif; }
 }
-body {
-  background-color: #D4EAF7;
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  color: #333; /* Ensure text is legible & color scheme */
-}
 
 body .welcome {
   background-image: url( '../components/Curve.svg' );
@@ -32,6 +25,7 @@ h1, h2, h3, h4, h5, h6 {
   gap: 30px; /* Increased gap for better spacing and readable */
   justify-content: center;
   align-items: center;
+  background-color: #D4EAF7;
 }
 
 /* Logo styling */

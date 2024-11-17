@@ -10,9 +10,7 @@ const Profile: React.FC = () => {
       <main className="content">
         <p>Work in Progress</p>
       </main>
-      <div>
       <CopyrightFooter />
-      </div>
     </div>
   );
 };
