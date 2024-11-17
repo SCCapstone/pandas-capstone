@@ -1,20 +1,20 @@
-// placeholder
-
 import React from 'react';
 import Navbar from '../components/Navbar';
-import './LandingPage.css';
+import './profile.css';
 import CopyrightFooter from '../components/CopyrightFooter';
 
-const LandingPage: React.FC = () => {
+const Profile: React.FC = () => {
   return (
-    <div className="landing-page">
+    <div className="profile-page">
       <Navbar />
       <main className="content">
-        <p>To start searching please update your profile via top left corner!</p>
+        <p>Work in Progress</p>
       </main>
+      <div>
       <CopyrightFooter />
+      </div>
     </div>
   );
 };
 
-export default LandingPage;
+export default Profile;

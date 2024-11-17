@@ -1,0 +1,21 @@
+.profile-page {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background-color: #fff;
+}
+.content {
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    color: #0077b6;
+}
+
+p {
+    margin: 0;
+    padding: 0;
+    text-align: center;
+}
+  

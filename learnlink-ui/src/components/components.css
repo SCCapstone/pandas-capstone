@@ -10,24 +10,19 @@
   height: auto;
 }
 
-
 .Copyright {
   margin-top: 20px;
-  margin-bottom: 20px;
   font-size: 14px;
   color: #00668C;
   text-align: center;
-  bottom: 10px;
-  
+  vertical-align: center;
+  width: 100%;
+  position: fixed;
+  line-height: 50px;
+  bottom: 0;
+  background-color: #D4EAF7 ;
 }
 
-
-.landing-page {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-}
-  
 .navbar {
   display: flex;
   align-items: center;

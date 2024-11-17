@@ -1,4 +1,7 @@
 /* Settings CSS */
+body{
+    background-color:white;
+  }
 .content {
     flex-direction: column;
     align-items: center;
@@ -47,13 +50,3 @@
     position: relative;
     top: 230px;
 }
-
-.Copyright3 {
-    margin-top: 20px;
-    font-size: 14px;
-    color: #00668C;
-    text-align: center;
-    width: 100%;
-    position: fixed;
-    bottom: 10px;
-  }
