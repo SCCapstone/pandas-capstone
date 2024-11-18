@@ -13,9 +13,8 @@ const Resources: React.FC = () => {
         <button className="tab">GRADE CALC</button>
       </div>
       <main className="resources-content">
-        <p className="tips">Tip Tip Tips!!</p>
+        <p className="tips">study tips here:</p>
         <div className="tip-icon">
-          <img src="/path/to/your/image.jpg" alt="Tip Icon" />
         </div>
       </main>
       <footer className="footer-placeholder">
