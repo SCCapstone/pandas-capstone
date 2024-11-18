@@ -22,7 +22,7 @@ function Welcome() {
             <div className='leftContainer'>
               <div className='titleContainer'>
                 <h1 className="well">Welcome!</h1>
-                <p>LearnLink is an online platform that connects like-minded individuals to form study groups!</p>
+                <p>The best way to find your study partner!</p>
               </div>
               <button className="getStarted" onClick={handleGetStarted}>Get<br></br>Started</button>
             </div>
