@@ -8,7 +8,7 @@ const Profile: React.FC = () => {
     <div className="profile-page">
       <Navbar />
       <header className="profile-header">
-        <h1 className="profile-title">Profile</h1>
+        <h1 className="profile-title"></h1>
       </header>
       <main className="profile-content">
         <div className="profile-details">
