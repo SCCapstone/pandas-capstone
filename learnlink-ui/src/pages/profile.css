@@ -1,21 +1,107 @@
+/* General styles */
 .profile-page {
+    font-family: 'Arial', sans-serif;
+    color: black;
+  }
+  
+  .profile-header {
+    background-color: #2c658f;
+    text-align: center;
+    padding: 1rem 0;
+  }
+  
+  .profile-title {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #ffcf43;
+    text-shadow: 2px 2px 3px #000;
+  }
+  
+  /* Main content */
+  .profile-content {
+    padding: 2rem;
     display: flex;
     flex-direction: column;
-    height: 100vh;
-    background-color: #fff;
-}
-.content {
-    flex-grow: 1;
-    display: flex;
     align-items: center;
+    gap: 2rem;
+  }
+  
+  .profile-details {
+    display: flex;
+    justify-content: space-between;
+    width: 80%;
+    max-width: 800px;
+  }
+  
+  .profile-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    flex: 1;
+  }
+  
+  .profile-form label {
+    font-size: 1rem;
+  }
+  
+  .profile-form input,
+  .profile-form textarea {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
+  .profile-picture {
+    flex: 0.5;
+    display: flex;
     justify-content: center;
-    font-size: 1.25rem;
-    color: #0077b6;
-}
-
-p {
-    margin: 0;
-    padding: 0;
+    align-items: center;
+  }
+  
+  .upload-button {
+    background-color: #ffcf43;
+    color: black;
+    font-size: 1rem;
+    font-weight: bold;
+    border: none;
+    border-radius: 50%;
+    width: 150px;
+    height: 150px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
     text-align: center;
-}
+    transition: transform 0.2s;
+  }
+  
+  .upload-button:hover {
+    transform: scale(1.05);
+  }
+  
+  /* Buttons */
+  .profile-buttons {
+    display: flex;
+    justify-content: space-between;
+    width: 80%;
+    max-width: 400px;
+  }
+  
+  .back-button,
+  .save-button {
+    background-color: black;
+    color: white;
+    font-size: 1rem;
+    font-weight: bold;
+    padding: 0.5rem 1.5rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .back-button:hover,
+  .save-button:hover {
+    background-color: #333;
+  }
   

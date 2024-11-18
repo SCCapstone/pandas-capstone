@@ -5,12 +5,22 @@ import CopyrightFooter from '../components/CopyrightFooter';
 
 const Resources: React.FC = () => {
   return (
-    <div className="resources">
-        <Navbar />
-        <div className="content">
-            <p> Hello </p>
+    <div className="resources-page">
+      <Navbar />
+      <div className="resources-tabs">
+        <button className="tab active">STUDY TIPS</button>
+        <button className="tab">EXTERNAL RESOURCES</button>
+        <button className="tab">GRADE CALC</button>
       </div>
-      <CopyrightFooter />
+      <main className="resources-content">
+        <p className="tips">Tip Tip Tips!!</p>
+        <div className="tip-icon">
+          <img src="/path/to/your/image.jpg" alt="Tip Icon" />
+        </div>
+      </main>
+      <footer className="footer-placeholder">
+        <CopyrightFooter />
+      </footer>
     </div>
   );
 };
