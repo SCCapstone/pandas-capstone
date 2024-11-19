@@ -1,25 +1,19 @@
 /* General styles */
 .profile-page {
   background-color: #fff; /* Match background color */
-  margin: 0;
-  padding: 0;
-  display: flex; /* Ensure flexbox is applied */
-  flex-direction: column;
-  justify-content: center; /* Horizontally center the container */
-  align-items: center; /* Vertically center the container */
 }
 
 /* Main container styles */
 .main-container {
   width: 80%; /* Same width as login container */
   padding: 20px;
+  margin: 0 auto; /* Horizontally center the container */
   display: flex;
   margin-bottom: 40px;
   flex-direction: column;
-  justify-content: center; /* Horizontally center the container */
   text-align: left;
   overflow-y: scroll;
-  /*background-color: #ccc; /* This can be removed or adjusted */
+  /* background-color: #ccc; */
 }
 
 .form-container {
@@ -54,6 +48,7 @@
 .profile-form {
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
   gap: .25rem; /* Similar to the padding between inputs in login form */
   flex: 1;
 }
