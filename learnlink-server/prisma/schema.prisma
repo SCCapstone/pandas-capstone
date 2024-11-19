@@ -23,6 +23,15 @@ model User {
   profile_preferences Json?
   created_at          DateTime       @default(now())
   updated_at          DateTime       @updatedAt
+  age                 Int?
+  college             String?
+  major               String?
+  grade               Grade?
+  relevant_courses    String[]
+  study_method        String?
+  bio                 String?
+  gender              Gender?
+  profilePic          String?
   studyGroups         StudyGroup[]   @relation("UserStudyGroups")
   createdStudyGroups  StudyGroup[]   @relation("CreatedStudyGroups")
   matches             Match[]
@@ -83,4 +92,20 @@ model Notification {
   created_at DateTime @default(now())
 
   user User @relation(fields: [user_id], references: [id])
+}
+
+enum Grade {
+  Freshman
+  Sophomore
+  Junior
+  Senior
+  Graduate_Student
+}
+
+enum Gender {
+  Woman
+  Man
+  Nonbinary
+  Other
+  Prefer_not_to_say
 }
