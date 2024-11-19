@@ -83,6 +83,81 @@ app.post('/api/login', async (req, res): Promise<any> => {
   }
 });
 
+
+
+//chat endpoints
+// Get all chats
+app.get('/api/chats', async (req, res) => {
+  try {
+    const chats = await prisma.Chat.findMany({
+      include: { messages: true }, // Include messages associated with the chat
+      orderBy: { sent_at: 'desc' },
+    });
+    res.json(chats);
+  } catch (error) {
+    console.error("Error fetching chats:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// Get messages for a specific chat
+app.get('/api/chats/:chatId/messages', async (req, res) => {
+  const { chatId } = req.params;
+
+  try {
+    const messages = await prisma.message.findMany({
+      where: { id: parseInt(chatId) },
+      orderBy: { sent_at: 'asc' },
+    });
+    res.json(messages);
+  } catch (error) {
+    console.error("Error fetching messages:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// Create a new chat
+app.post('/api/chats', async (req, res) => {
+  const { name, userId } = req.body; // Assuming the user is the creator of the chat
+
+  try {
+    const newChat = await prisma.chat.create({
+      data: {
+        name,
+        users: {
+          connect: { id: userId }, // Assuming a user creates the chat
+        },
+      },
+    });
+    res.status(201).json(newChat);
+  } catch (error) {
+    console.error("Error creating chat:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// Add a message to a chat
+app.post('/api/chats/:chatId/messages', async (req, res) => {
+  const { chatId } = req.params;
+  const { userId, content } = req.body; // Assuming the user sending the message
+
+  try {
+    const newMessage = await prisma.chat.create({
+      data: {
+        id: parseInt(chatId),
+        content,
+        user_id: userId, // Link message to user who sent it
+      },
+    });
+    res.status(201).json(newMessage);
+  } catch (error) {
+    console.error("Error creating message:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+
+
 app.listen(PORT, () => {
   console.log(`server running on localhost:${PORT}`);
 });

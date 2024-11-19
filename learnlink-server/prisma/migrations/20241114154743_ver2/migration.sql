@@ -35,16 +35,37 @@ CREATE TABLE "Match" (
     CONSTRAINT "Match_pkey" PRIMARY KEY ("id")
 );
 
--- CreateTable
+-- Create Chat Table
+CREATE TABLE "Chat" (
+    "id" SERIAL NOT NULL,
+    "name" TEXT NOT NULL,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY ("id")
+);
+
+-- Create a join table between User and Chat for many-to-many relationship
+CREATE TABLE "ChatUsers" (
+    "user_id" INT NOT NULL,
+    "chat_id" INT NOT NULL,
+    CONSTRAINT "ChatUsers_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "User" ("id") ON DELETE CASCADE,
+    CONSTRAINT "ChatUsers_chat_id_fkey" FOREIGN KEY ("chat_id") REFERENCES "Chat" ("id") ON DELETE CASCADE,
+    PRIMARY KEY ("user_id", "chat_id")
+);
+
+-- Create Message Table
 CREATE TABLE "Message" (
     "id" SERIAL NOT NULL,
-    "study_group_id" INTEGER NOT NULL,
-    "user_id" INTEGER NOT NULL,
     "content" TEXT NOT NULL,
-    "sent_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-
-    CONSTRAINT "Message_pkey" PRIMARY KEY ("id")
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "user_id" INT NOT NULL,
+    "chat_id" INT NOT NULL,
+    CONSTRAINT "Message_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "User" ("id") ON DELETE CASCADE,
+    CONSTRAINT "Message_chat_id_fkey" FOREIGN KEY ("chat_id") REFERENCES "Chat" ("id") ON DELETE CASCADE,
+    PRIMARY KEY ("id")
 );
+
+-- Index for performance
+CREATE INDEX "idx_Message_chat_id" ON "Message" ("chat_id");
 
 -- CreateTable
 CREATE TABLE "Notification" (

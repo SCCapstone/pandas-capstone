@@ -53,15 +53,22 @@ model Match {
   studyGroup      StudyGroup  @relation(fields: [study_group_id], references: [id])
 }
 
-model Message {
-  id              Int         @id @default(autoincrement())
-  study_group_id  Int
-  user_id         Int
-  content         String
-  sent_at         DateTime    @default(now())
+model Chat {
+  id        Int       @id @default(autoincrement())
+  name      String
+  createdAt DateTime  @default(now())
+  users     User[]    @relation("User")
+  messages  Message[] @relation("Message")
+}
 
-  studyGroup      StudyGroup  @relation(fields: [study_group_id], references: [id])
-  user            User        @relation(fields: [user_id], references: [id])
+model Message {
+  id        Int       @id @default(autoincrement())
+  content   String
+  createdAt DateTime  @default(now())
+  userId    Int
+  chatId    Int
+  user      User      @relation(fields: [userId], references: [id])
+  chat      Chat      @relation(fields: [chatId], references: [id])
 }
 
 model Notification {
