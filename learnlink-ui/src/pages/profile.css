@@ -1,107 +1,140 @@
 /* General styles */
 .profile-page {
-    font-family: 'Arial', sans-serif;
-    color: black;
-  }
-  
-  .profile-header {
-    background-color: #2c658f;
-    text-align: center;
-    padding: 1rem 0;
-  }
-  
-  .profile-title {
-    font-size: 2rem;
-    font-weight: bold;
-    color: #ffcf43;
-    text-shadow: 2px 2px 3px #000;
-  }
-  
-  /* Main content */
-  .profile-content {
-    padding: 2rem;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 2rem;
-  }
-  
-  .profile-details {
-    display: flex;
-    justify-content: space-between;
-    width: 80%;
-    max-width: 800px;
-  }
-  
-  .profile-form {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    flex: 1;
-  }
-  
-  .profile-form label {
-    font-size: 1rem;
-  }
-  
-  .profile-form input,
-  .profile-form textarea {
-    width: 100%;
-    padding: 0.5rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-  }
-  
-  .profile-picture {
-    flex: 0.5;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  
-  .upload-button {
-    background-color: #ffcf43;
-    color: black;
-    font-size: 1rem;
-    font-weight: bold;
-    border: none;
-    border-radius: 50%;
-    width: 150px;
-    height: 150px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    text-align: center;
-    transition: transform 0.2s;
-  }
-  
-  .upload-button:hover {
-    transform: scale(1.05);
-  }
-  
-  /* Buttons */
-  .profile-buttons {
-    display: flex;
-    justify-content: space-between;
-    width: 80%;
-    max-width: 400px;
-  }
-  
-  .back-button,
-  .save-button {
-    background-color: black;
-    color: white;
-    font-size: 1rem;
-    font-weight: bold;
-    padding: 0.5rem 1.5rem;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  
-  .back-button:hover,
-  .save-button:hover {
-    background-color: #333;
-  }
-  
+  background-color: #fff; /* Match background color */
+  margin: 0;
+  padding: 0;
+  display: flex; /* Ensure flexbox is applied */
+  flex-direction: column;
+  justify-content: center; /* Horizontally center the container */
+  align-items: center; /* Vertically center the container */
+}
+
+/* Main container styles */
+.main-container {
+  width: 80%; /* Same width as login container */
+  padding: 20px;
+  display: flex;
+  margin-bottom: 40px;
+  flex-direction: column;
+  justify-content: center; /* Horizontally center the container */
+  text-align: left;
+  overflow-y: scroll;
+  /*background-color: #ccc; /* This can be removed or adjusted */
+}
+
+.form-container {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  gap: 1rem; /* Similar to the padding between inputs in login form */
+}
+
+.profile-details {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  gap: 4rem; /* Similar to the padding between inputs in login form */
+}
+
+/* Profile header and title */
+.profile-header {
+  text-align: left;
+  padding: 1rem 0;
+}
+
+.profile-title {
+  font-family: 'Inter';
+  font-size: 64px; /* Match the font size from the login form */
+  font-weight: normal;
+  line-height: 1.2;
+  margin-bottom: 15px;
+}
+
+/* Form styles */
+.profile-form {
+  display: flex;
+  flex-direction: column;
+  gap: .25rem; /* Similar to the padding between inputs in login form */
+  flex: 1;
+}
+
+/* Label styling */
+.profile-form label {
+  font-family: 'Inter';
+  font-size: 14px; /* Match font size */
+  font-weight: normal;
+  line-height: 20px;
+  margin-bottom: 10px;
+  color: #3B3C3D; /* Match text color */
+  display: block;
+  text-align: left;
+}
+
+/* Input and textarea styling */
+.profile-form input,
+.profile-form textarea {
+  width: 100%;
+  height: 25px; /* Similar to the input height in login form */
+  margin-bottom: 10px;
+  padding: 5px; /* Match padding */
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+/* Profile picture section */
+.profile-picture {
+  flex: 0.5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Upload button */
+.upload-button {
+  background-color: #ffcf43;
+  color: black;
+  font-size: 14px; /* Match font size */
+  font-weight: 400;
+  border: none;
+  border-radius: 50%;
+  width: 300px;
+  height:300px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  text-align: center;
+  transition: transform 0.2s;
+}
+
+.upload-button:hover {
+  transform: scale(1.05);
+}
+
+/* Profile buttons section */
+.profile-buttons {
+  display: flex;
+  justify-content: space-between;
+  width: 100%; /* Adjust to take up full width */
+  margin-top: 20px;
+  gap: 1rem; /* Add spacing between buttons */
+}
+
+/* Button styling */
+.back-button,
+.save-button {
+  width: 100%;
+  background-color: #00668C; /* Match button color from login */
+  color: white;
+  font-size: 14px; /* Match font size */
+  font-weight: 500;
+  padding: 0.5rem 1.5rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.back-button:hover,
+.save-button:hover {
+  background-color: #004f6a; /* Darker shade for hover */
+}
