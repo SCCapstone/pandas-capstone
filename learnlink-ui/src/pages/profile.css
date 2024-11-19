@@ -44,8 +44,15 @@
   margin-bottom: 15px;
 }
 
-/* Form styles */
 .profile-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem; /* Similar to the padding between inputs in login form */
+  flex: 1;
+}
+
+/* Form styles */
+.profile-side {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -54,7 +61,7 @@
 }
 
 /* Label styling */
-.profile-form label {
+.profile-side label {
   font-family: 'Inter';
   font-size: 14px; /* Match font size */
   font-weight: normal;
@@ -66,14 +73,28 @@
 }
 
 /* Input and textarea styling */
-.profile-form input,
-.profile-form textarea {
+.profile-side input,
+.profile-side textarea,
+.profile-side select {
   width: 100%;
-  height: 25px; /* Similar to the input height in login form */
+  height: 35px; /* Similar to the input height in login form */
   margin-bottom: 10px;
   padding: 5px; /* Match padding */
   border: 1px solid #ccc;
   border-radius: 4px;
+  box-sizing: border-box; /* Include padding and border in total height */
+
+
+}
+
+.profile-side select {
+  width: 100%;
+  -webkit-appearance: none; /* Remove default browser style */
+  -moz-appearance: none;
+  appearance: none;
+  background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12"><polyline points="2,4 6,8 10,4" style="fill:none;stroke:%23333;stroke-width:2"/></svg>');
+  background-repeat: no-repeat;
+  background-position: right 10px center;
 }
 
 /* Profile picture section */

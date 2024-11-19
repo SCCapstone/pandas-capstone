@@ -13,6 +13,22 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Grade {
+  Freshman
+  Sophomore
+  Junior
+  Senior
+  Graduate_Student
+}
+
+enum Gender {
+  Woman
+  Man
+  Nonbinary
+  Other
+  Prefer_not_to_say
+}
+
 model User {
   id                  Int            @id @default(autoincrement())
   firstName           String
@@ -92,20 +108,4 @@ model Notification {
   created_at DateTime @default(now())
 
   user User @relation(fields: [user_id], references: [id])
-}
-
-enum Grade {
-  Freshman
-  Sophomore
-  Junior
-  Senior
-  Graduate_Student
-}
-
-enum Gender {
-  Woman
-  Man
-  Nonbinary
-  Other
-  Prefer_not_to_say
 }

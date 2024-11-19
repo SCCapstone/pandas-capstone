@@ -2,7 +2,7 @@ import express from "express";
 import cors from "cors";
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, Grade, Gender } from "@prisma/client";
 import { env } from "process";
 import { Request, Response } from 'express';
 
@@ -79,6 +79,62 @@ app.post('/api/login', async (req, res): Promise<any> => {
 
   } catch (error) {
     console.error('Error during login:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Endpoint to retrieve enum values
+app.get('/api/enums', async (req, res) => {
+  try {
+    // Manually define enum values by accessing them from the generated Prisma types
+    const gradeEnum = Object.values(Grade); // Fetches ['UNDERGRAD', 'GRAD']
+    const genderEnum = Object.values(Gender); // Fetches ['MALE', 'FEMALE', 'OTHER']
+
+    res.status(200).json({ grade: gradeEnum, gender: genderEnum });
+  } catch (error) {
+    console.error('Error fetching enum values:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Update user profile
+app.put('/api/users/update', async (req, res): Promise<any> => {
+  const { age, college, major, grade, relevant_courses, study_method, gender, bio } = req.body;
+  console.log('Received data:', req.body); // Log incoming data for debugging
+
+
+  // Get the token from the request headers
+  const token = req.headers.authorization?.split(' ')[1]; // Expecting the token to be in the format "Bearer <token>"
+
+  if (!token) {
+    return res.status(401).json({ error: 'No token provided' });
+  }
+
+  try {
+    // Verify the token and get the user data
+    const decoded: any = jwt.verify(token, JWT_SECRET);
+    const userId = decoded.userId; // Get userId from the token payload
+    console.log('userId:', userId);
+
+    // Update the user's profile information in the database
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: {
+        age: age || undefined, // Use undefined to keep the existing value if not provided
+        college: college || undefined,
+        major: major || undefined,
+        grade: grade || undefined,
+        relevant_courses: relevant_courses || undefined,
+        study_method: study_method || undefined,
+        gender: gender || undefined,
+        bio: bio || undefined,
+      },
+    });
+
+    // Send back the updated user information
+    res.status(200).json(updatedUser);
+  } catch (error) {
+    console.error('Error updating profile:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
