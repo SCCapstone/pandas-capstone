@@ -14,70 +14,73 @@ datasource db {
 }
 
 model User {
-  id                   Int              @id @default(autoincrement())
-  firstName                 String
-  lastName                 String
-  email                String           @unique
-  username             String           @unique
-  password             String
-  profile_preferences  Json?
-  created_at           DateTime         @default(now())
-  updated_at           DateTime         @updatedAt
-  studyGroups          StudyGroup[]     @relation("UserStudyGroups")
-  createdStudyGroups   StudyGroup[]     @relation("CreatedStudyGroups")
-  matches              Match[]
-  messages             Message[]
-  notifications        Notification[]
+  id                  Int            @id @default(autoincrement())
+  firstName           String
+  lastName            String
+  email               String         @unique
+  username            String         @unique
+  password            String
+  profile_preferences Json?
+  created_at          DateTime       @default(now())
+  updated_at          DateTime       @updatedAt
+  studyGroups         StudyGroup[]   @relation("UserStudyGroups")
+  createdStudyGroups  StudyGroup[]   @relation("CreatedStudyGroups")
+  matches             Match[]
+  chats               Chat[]         @relation("ChatUsers")
+  messages            Message[]
+  notifications       Notification[]
 }
 
 model StudyGroup {
-  id             Int              @id @default(autoincrement())
-  name           String
-  subject        String
-  description    String?
-  created_by     Int
-  created_at     DateTime         @default(now())
-  creator         User             @relation("CreatedStudyGroups", fields: [created_by], references: [id])
-  users           User[]           @relation("UserStudyGroups")
-  matches        Match[]
-  messages       Message[]
+  id          Int       @id @default(autoincrement())
+  name        String
+  subject     String
+  description String?
+  created_by  Int
+  created_at  DateTime  @default(now())
+  creator     User      @relation("CreatedStudyGroups", fields: [created_by], references: [id])
+  users       User[]    @relation("UserStudyGroups")
+  matches     Match[]
+  messages    Message[]
 }
 
 model Match {
-  id              Int         @id @default(autoincrement())
-  user_id         Int
-  study_group_id  Int
-  matched_at      DateTime    @default(now())
+  id             Int      @id @default(autoincrement())
+  user_id        Int
+  study_group_id Int
+  matched_at     DateTime @default(now())
 
-  user            User        @relation(fields: [user_id], references: [id])
-  studyGroup      StudyGroup  @relation(fields: [study_group_id], references: [id])
+  user       User       @relation(fields: [user_id], references: [id])
+  studyGroup StudyGroup @relation(fields: [study_group_id], references: [id])
 }
 
 model Chat {
   id        Int       @id @default(autoincrement())
   name      String
   createdAt DateTime  @default(now())
-  users     User[]    @relation("User")
-  messages  Message[] @relation("Message")
+  users     User[]    @relation("ChatUsers") // One-to-many through the join table
+  messages  Message[] // One-to-many relationship to Message
 }
 
 model Message {
-  id        Int       @id @default(autoincrement())
-  content   String
-  createdAt DateTime  @default(now())
-  userId    Int
-  chatId    Int
-  user      User      @relation(fields: [userId], references: [id])
-  chat      Chat      @relation(fields: [chatId], references: [id])
+  id           Int         @id @default(autoincrement())
+  content      String
+  createdAt    DateTime    @default(now())
+  userId       Int
+  chatId       Int
+  user         User        @relation(fields: [userId], references: [id]) // One-to-many relation to User
+  chat         Chat        @relation(fields: [chatId], references: [id]) // One-to-many relation to Chat
+  StudyGroup   StudyGroup? @relation(fields: [studyGroupId], references: [id])
+  studyGroupId Int?
 }
 
 model Notification {
-  id              Int         @id @default(autoincrement())
-  user_id         Int
-  type            String
-  message         String
-  read            Boolean     @default(false)
-  created_at      DateTime    @default(now())
+  id         Int      @id @default(autoincrement())
+  user_id    Int
+  type       String
+  message    String
+  read       Boolean  @default(false)
+  created_at DateTime @default(now())
 
-  user            User        @relation(fields: [user_id], references: [id])
+  user User @relation(fields: [user_id], references: [id])
 }
