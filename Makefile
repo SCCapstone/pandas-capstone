@@ -4,13 +4,13 @@ UI_DIR = learnlink-ui
 CURRENT_DIR = $(shell pwd)
 
 # Commands
-START_SERVER = cd $(CURRENT_DIR)/$(SERVER_DIR) && npm start 
+START_SERVER = cd $(CURRENT_DIR)/$(SERVER_DIR) && npm start
 START_UI = cd $(CURRENT_DIR)/$(UI_DIR) && npm start
 # Start both server and UI
 start:
 	@echo "INFO Starting both server and UI..."
-	osascript -e 'tell application "Terminal" to do script "$(START_SERVER)"
-	osascript -e 'tell application "Terminal" to do script "$(START_UI)"
+	osascript -e 'tell application "Terminal" to do script "$(START_SERVER)"'
+	osascript -e 'tell application "Terminal" to do script "$(START_UI)"'
 
 start-server:
 	@echo "INFO Starting server..."
