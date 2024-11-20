@@ -2,7 +2,6 @@ import React from 'react';
 import Navbar from '../../components/Navbar';
 import ResourcesNavBar from '../../components/ResourcesNavBar';
 import './resources.css';
-import './externalResources.css';
 import CopyrightFooter from '../../components/CopyrightFooter';
 
 const ExternalResources: React.FC = () => {
