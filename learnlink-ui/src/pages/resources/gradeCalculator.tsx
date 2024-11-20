@@ -132,12 +132,17 @@ const GradeCalculator: React.FC = () => {
                       />
                     </td>
                     <td>
-                      <input
-                        type="text"
-                        placeholder="Category"
-                        value={assignment.category}
-                        onChange={(e) => handleAssignmentChange(index, 'category', e.target.value)}
-                      />
+                    <select
+                          value={assignment.category}
+                          onChange={(e) => handleAssignmentChange(index, 'category', e.target.value)}
+                        >
+                          <option value="">Select Category</option>
+                          {categories.map((category, idx) => (
+                            <option key={idx} value={category.name}>
+                              {category.name}
+                            </option>
+                          ))}
+                        </select>
                     </td>
                     <td>
                       <input

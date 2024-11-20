@@ -25,8 +25,18 @@
     border: 1px solid black;
 }
 
-.grade-calculator table td input {
+.grade-calculator table td input, .grade-calculator table td select {
     width: auto;
+}
+
+.grade-calculator table td select {
+    display: block;
+    height: 35px;
+    margin-bottom: 15px;
+    padding: 8px;
+    padding-right: 10px;
+    border: .7px solid #3B3C3D;
+    border-radius: 1px;
 }
 
 .final-calculation {
