@@ -196,6 +196,20 @@ app.put('/api/users/update', async (req, res): Promise<any> => {
 
 
 //chat endpoints
+app.get('/api/users', async (req, res) => {
+  try {
+    // Fetch users from the database using Prisma
+    const users = await prisma.user.findMany();
+    
+    // Respond with the users in JSON format
+    res.status(200).json(users);
+  } catch (error) {
+    // Log the error and send a response with a 500 status code in case of error
+    console.error('Error fetching users:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 
 
 // Get all chats

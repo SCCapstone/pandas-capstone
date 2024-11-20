@@ -1,17 +1,25 @@
 
 
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './messaging.css'
 import Navbar from '../components/Navbar';
 import CopyrightFooter from '../components/CopyrightFooter';
 import './LandingPage.css';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios'; 
 
 interface Chat {
   id: number;
   name: string;
   messages: string[];
+}
+
+interface User {
+  id: number;
+  username: string;
+  firstName: string;
+  lastName: string;
 }
 
 const Messaging: React.FC = () => {
@@ -21,6 +29,21 @@ const Messaging: React.FC = () => {
   ]);
   const [selectedChat, setSelectedChat] = useState<Chat | null>(chats[0]);
   const [currentMessage, setCurrentMessage] = useState<string>('');
+  const [users, setUsers] = useState<User[]>([]); // Store users
+  const [searchTerm, setSearchTerm] = useState<string>(''); // Store search term
+  const [showDropdown, setShowDropdown] = useState<boolean>(false); // Control dropdown visibility
+
+
+  useEffect(() => {
+    // Fetch users when the component mounts
+    axios.get('http://localhost:2020/api/users')  // Replace with your backend URL
+      .then(response => {
+        setUsers(response.data);  // Update state with the fetched users
+      })
+      .catch(error => {
+        console.error('Error fetching users:', error);  // Handle error
+      });
+  }, []); 
 
   const handleSendMessage = () => {
     if (currentMessage.trim() && selectedChat) {
@@ -40,45 +63,67 @@ const Messaging: React.FC = () => {
     }
   };
 
-  const createNewChat = () => {
+  const createNewChat = (user: User) => {
     const newChat = {
       id: chats.length + 1,
-      name: `New Chat ${chats.length + 1}`,
+      name: `${user.firstName} ${user.lastName}`,
       messages: [],
     };
     setChats([...chats, newChat]);
     setSelectedChat(newChat);
+    setShowDropdown(false);  // Hide dropdown after selecting a user
   };
+
+  const filteredUsers = users.filter(user =>
+    `${user.firstName} ${user.lastName}`.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <div className="Messaging">
       <Navbar />
-
-      
-      <div className = "Chat">
-
-      <div className = "ChatOptions">
-      <button onClick={createNewChat} className="NewChatButton">
+      <div className="Chat">
+        <div className="ChatOptions">
+          <button
+            onClick={() => setShowDropdown(!showDropdown)}
+            className="NewChatButton"
+          >
             + New Chat
           </button>
+          {showDropdown && (
+            <div className="Dropdown">
+              <input
+                type="text"
+                placeholder="Search users..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+              <ul className="UserList">
+                {filteredUsers.map(user => (
+                  <li
+                    key={user.id}
+                    className="UserItem"
+                    onClick={() => createNewChat(user)}
+                  >
+                    {user.firstName} {user.lastName}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
           <ul className="ChatList">
             {chats.map((chat) => (
               <li
                 key={chat.id}
-                className={`ChatListItem ${
-                  selectedChat?.id === chat.id ? 'active' : ''
-                }`}
+                className={`ChatListItem ${selectedChat?.id === chat.id ? 'active' : ''}`}
                 onClick={() => setSelectedChat(chat)}
               >
                 {chat.name}
               </li>
             ))}
           </ul>
-        
-      </div>
-      <div className="ChatSection">
-       
-      {selectedChat ? (
+        </div>
+        <div className="ChatSection">
+          {selectedChat ? (
             <>
               <h2 className="ChatHeader">{selectedChat.name}</h2>
               <div className="ChatWindow">
@@ -102,20 +147,17 @@ const Messaging: React.FC = () => {
           ) : (
             <div className="NoChatSelected">Select a chat to start messaging</div>
           )}
-       
-      </div>
-
-
+        </div>
       </div>
       <footer>
-      <CopyrightFooter />
-
+        <CopyrightFooter />
       </footer>
     </div>
   );
 };
 
 export default Messaging;
+
 
 
 
