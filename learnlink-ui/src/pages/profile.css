@@ -110,8 +110,9 @@
 .upload-button {
   background-color: #ffcf43;
   color: black;
+  font-family: 'Inter';
   font-size: 14px; /* Match font size */
-  font-weight: 400;
+  font-weight: 600;
   border: none;
   border-radius: 50%;
   width: 300px;
