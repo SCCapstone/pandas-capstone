@@ -5,6 +5,8 @@ import jwt from 'jsonwebtoken';
 import { PrismaClient, Grade, Gender } from "@prisma/client";
 import { env } from "process";
 import { Request, Response } from 'express';
+import { User } from '@prisma/client';
+
 
 const app = express();
 const prisma = new PrismaClient();
@@ -13,6 +15,23 @@ const JWT_SECRET = env.JWT_SECRET || 'your_default_jwt_secret';
 
 app.use(express.json());
 app.use(cors());
+
+// Middleware to authenticate the user
+const authenticate = (req: Request, res: Response, next: Function) => {
+  const token = req.headers.authorization?.split(' ')[1]; // Expecting the token to be in the format "Bearer <token>"
+
+  if (!token) {
+    return res.status(401).json({ error: 'No token provided' });
+  }
+
+  try {
+    const decoded: any = jwt.verify(token, JWT_SECRET);
+    res.locals.userId = decoded.userId; // Attach userId to request object -- maybe change this for security???
+    return next();
+  } catch (error) {
+    res.status(401).json({ error: 'Invalid token' });
+  }
+};
 
 // Signup endpoint
 app.post("/api/users", async (req, res) => {
@@ -94,6 +113,41 @@ app.get('/api/enums', async (req, res) => {
   } catch (error) {
     console.error('Error fetching enum values:', error);
     res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Fetch user profile data
+app.get('/api/users/profile', authenticate, async (req, res):Promise<any> => {
+  const userId = res.locals.userId;  // Use res.locals to get the userId set by the authenticate middleware
+
+  if (!userId) {
+    return res.status(401).json({ message: 'User not authenticated' });
+  }
+
+  try {
+    // Fetch the user from the database by userId
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Return the profile data
+    res.json({
+      age: user.age,
+      college: user.college,
+      major: user.major,
+      grade: user.grade,
+      relevant_courses: user.relevant_courses,
+      study_method: user.study_method,
+      gender: user.gender,
+      bio: user.bio,
+    });
+  } catch (error) {
+    console.error('Error fetching user profile:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 });
 

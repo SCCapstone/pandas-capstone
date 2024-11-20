@@ -23,20 +23,43 @@ const Profile: React.FC = () => {
 
   // Fetch enum values on component mount
   useEffect(() => {
-    const fetchEnums = async () => {
+    const fetchData = async () => {
+
       try {
-        const response = await fetch('http://localhost:2020/api/enums');
-        const data = await response.json();
+        // Fetch enum options
+        const enumsResponse = await fetch('http://localhost:2020/api/enums');
+        const enumsData = await enumsResponse.json();
         setEnumOptions({
-          grade: data.grade,
-          gender: data.gender,
+          grade: enumsData.grade,
+          gender: enumsData.gender,
         });
+
+        // Fetch the current user profile data
+        const token = localStorage.getItem('token');
+        if (token) {
+          const userResponse = await fetch('http://localhost:2020/api/users/profile', {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+            },
+          });
+          const userData = await userResponse.json();
+          setFormData({
+            age: userData.age || '',
+            college: userData.college || '',
+            major: userData.major || '',
+            grade: userData.grade || '',
+            relevant_courses: userData.relevant_courses || [],
+            study_method: userData.study_method || '',
+            gender: userData.gender || '',
+            bio: userData.bio || '',
+          });
+        }
       } catch (error) {
-        console.error('Error fetching enum values:', error);
+        console.error('Error fetching data:', error);
       }
     };
 
-    fetchEnums();
+    fetchData();
   }, []);
 
   // Handle form input changes
