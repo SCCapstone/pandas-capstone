@@ -11,24 +11,18 @@ const GradeCalculator: React.FC = () => {
       <header>
         <Navbar />
       </header>
-
-
       <div className='resources-content'>
         <ResourcesNavBar />
+        <main className="main-content">
+          {/* main-content is already set up to handle being 
+          within the sidebar-header-footer space*/}
 
+          {/* Add anything additional within this*/}
 
-        {/* <div className="resources-tabs">
-        <button className="tab active">STUDY TIPS</button>
-        <button className="tab">EXTERNAL RESOURCES</button>
-        <button className="tab">GRADE CALC</button>
-        </div> */}
-        <main className="study-tips-content">
-          <h1>study tips here:</h1>
-          <div className="tip-icon">
-          </div>
+          
         </main>
       </div>
-      <footer className="footer-placeholder">
+      <footer>
         <CopyrightFooter />
       </footer>
     </div>

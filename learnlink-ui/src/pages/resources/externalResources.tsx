@@ -22,7 +22,7 @@ const ExternalResources: React.FC = () => {
           <a href="http://example.com">Link to Resource #1</a>
         </main>
       </div>
-      <footer className="footer-placeholder">
+      <footer>
         <CopyrightFooter />
       </footer>
     </div>
