@@ -80,7 +80,9 @@ const Profile: React.FC = () => {
     const dataToSend = {
       ...formData,
       age: formData.age ? parseInt(formData.age) : undefined,
-      relevant_courses: formData.relevant_courses.split(',').map((course) => course.trim()), // Split relevant courses by comma 
+      relevant_courses: formData.relevant_courses ?
+        (Array.isArray(formData.relevant_courses) ? formData.relevant_courses : [formData.relevant_courses]) : [],
+
     };
 
     try {

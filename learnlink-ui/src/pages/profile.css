@@ -62,7 +62,9 @@
 }
 
 /* Label styling */
-.profile-side label {
+.profile-side label,
+.profile-side textarea
+{
   font-family: 'Inter';
   font-size: 14px; /* Match font size */
   font-weight: normal;
@@ -84,8 +86,6 @@
   border: 1px solid #ccc;
   border-radius: 4px;
   box-sizing: border-box; /* Include padding and border in total height */
-
-
 }
 
 .profile-side select {
