@@ -21,7 +21,7 @@ const Navbar: React.FC = () => {
         
         <a href="/profile">Profile</a>
         <a href="/messaging" onClick={handleMessaging} >Messaging</a>
-        <a href="/resources">Resources</a>
+        <a href="/resources/studyTips">Resources</a>
       </nav>
       <div className="nav-icons">
         <div className="search-bar">
