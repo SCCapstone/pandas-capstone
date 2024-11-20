@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
+import { formatEnum } from '../utils/format';
 import './profile.css';
 import CopyrightFooter from '../components/CopyrightFooter';
 
@@ -19,14 +20,6 @@ const Profile: React.FC = () => {
 
   // State to store enum options
   const [enumOptions, setEnumOptions] = useState({ grade: [], gender: [] });
-
-  function formatEnum(value: string) {
-    // Convert value to lowercase, replace underscores with spaces, and capitalize the first letter of each word
-    return value
-      .toLowerCase()
-      .replace(/_/g, ' ') // Replace underscores with spaces
-      .replace(/\b\w/g, (char: string) => char.toUpperCase()); // Capitalize each word
-  }
 
   // Fetch enum values on component mount
   useEffect(() => {
@@ -48,6 +41,7 @@ const Profile: React.FC = () => {
 
   // Handle form input changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+
     const { name, value } = e.target;
     setFormData((prevData) => ({
       ...prevData,
@@ -63,6 +57,7 @@ const Profile: React.FC = () => {
     const dataToSend = {
       ...formData,
       age: formData.age ? parseInt(formData.age) : undefined,
+      relevant_courses: formData.relevant_courses.split(',').map((course) => course.trim()), // Split relevant courses by comma 
     };
 
     try {
@@ -118,7 +113,7 @@ const Profile: React.FC = () => {
                   Major: <input type="text" name="major" value={formData.major} onChange={handleChange} />
                 </label>
                 <label>
-                  Grade: <br />
+                  Grade:<br />
                   <select name="grade" value={formData.grade} onChange={handleChange}>
                     <option value="">Select Grade</option>
                     {enumOptions.grade.map((option) => (
@@ -135,7 +130,7 @@ const Profile: React.FC = () => {
                   Fav Study Method: <input type="text" name="study_method" value={formData.study_method} onChange={handleChange} />
                 </label>
                 <label>
-                  Gender:
+                  Gender:<br />
                   <select name="gender" value={formData.gender} onChange={handleChange}>
                     <option value="">Select Gender</option>
                     {enumOptions.gender.map((option) => (
@@ -152,7 +147,7 @@ const Profile: React.FC = () => {
                   <button className="upload-button">CLICK TO ADD PICTURE</button>
                 </div>
                 <label>
-                  Bio: <textarea name="bio" value={formData.bio} onChange={handleChange} />
+                  Bio:<br /><textarea name="bio" value={formData.bio} onChange={handleChange} />
                 </label>
                 <div className="profile-buttons">
                   <button type="button" className="back-button">BACK</button>

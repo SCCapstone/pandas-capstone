@@ -53,6 +53,7 @@
 
 /* Form styles */
 .profile-side {
+  max-width: 50%;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
