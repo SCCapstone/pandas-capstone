@@ -39,7 +39,7 @@ body{
 .deleteAccount {
     width: 500px;
     height: 90px;
-    background-color: #00668C;
+    background-color: #00668C; /* mabye make this red? */
     color: white;
     border-color: #00668C;
     font-size: 36px;

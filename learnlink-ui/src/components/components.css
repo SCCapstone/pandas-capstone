@@ -78,3 +78,42 @@
   color: #00668C;
   cursor: pointer;
 }
+
+.sidenav {
+  margin-top: 92px;
+  margin-bottom: 50px;
+  height: 77.65vh;
+  width: 250px;
+  position: fixed;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  background-color: #D9D9D9;
+  overflow-x: hidden;
+  padding-top: 20px;
+  text-align: left;
+}
+
+.sidenav a {
+  padding: 8px 8px 8px 8px;
+  margin-right: 15px;
+  margin-left: 15px;
+  text-decoration: none;
+  font-size: 20px;
+  color: #313D44;
+  display: block;
+  transition: 0.3s;
+}
+
+/* When you mouse over the navigation links, change their color */
+.sidenav a.active,  .sidenav a:hover{
+  background-color: white; /* White background on hover */
+  border-radius: 5px; /* Rounded corners on hover */
+  font-weight: bold; /* Bold text on hover */
+}
+
+/* On smaller screens, where height is less than 450px, change the style of the sidenav (less padding and a smaller font size) */
+@media screen and (max-height: 450px) {
+  .sidenav {padding-top: 15px;}
+  .sidenav a {font-size: 18px;}
+}
