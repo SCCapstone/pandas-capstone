@@ -35,6 +35,7 @@ install-server:
 install-ui:
 	@echo "INFO Installing UI dependencies..."
 	cd $(UI_DIR) && npm install
+	
 # Clean both server and UI
 clean: clean-server clean-ui
 	@echo "INFO Cleaning both server and UI..."
