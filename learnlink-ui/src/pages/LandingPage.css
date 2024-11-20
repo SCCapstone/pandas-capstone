@@ -3,12 +3,19 @@
   flex-direction: column;
   height: 100vh;
 }
+
 .content {
   flex-grow: 1;
+  /* Allows .content to take up remaining space */
   display: flex;
-  align-items: center;
   justify-content: center;
+  /* Centers horizontally */
+  align-items: center;
+  /* Centers vertically */
   font-size: 1.25rem;
-  color: #0077b6;
 }
 
+.content p {
+  text-align: center;
+  padding: 0;
+}
