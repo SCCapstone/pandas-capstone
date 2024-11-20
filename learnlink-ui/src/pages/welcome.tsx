@@ -27,10 +27,10 @@ function Welcome() {
               <button className="getStarted" onClick={handleGetStarted}>Get<br></br>Started</button>
             </div>
             <div className='menuButtonContainer'>
-              <button className="menuButtons">Study Groups</button> <br></br>
-              <button className="menuButtons">Study Resources</button> <br></br>
-              <button className="menuButtons">Messaging</button> <br></br>
-              <button className="menuButtons">Grade Calculator</button> 
+              <div className="menuButtons">Study Groups</div> <br></br>
+              <div className="menuButtons">Study Resources</div> <br></br>
+              <div className="menuButtons">Messaging</div> <br></br>
+              <div className="menuButtons">Grade Calculator</div> 
             </div>
           </div>
         </div>

@@ -136,13 +136,12 @@ button:hover {
   align-items: center;
   gap: 0;
   justify-content: space-between;
-
 }
 /* Specific buttons */
 .menuButtons {
   font-size: 25px;
   font-weight: 700;
-  width: 100%;
+  width: 80%;
   min-width: 400px;
   max-width: 600px;
   margin-left: 10%;
@@ -150,14 +149,9 @@ button:hover {
   border-radius: 5px;
   padding: 20px;
   margin-bottom: 20px;
-  cursor: pointer;
   transition: background-color 0.3s ease-in-out, transform 0.2s ease;
   background-color: #00668C;
-}
-
-.menuButtons:hover {
-  background-color: #004c72;
-  transform: scale(1.05);
+  color: #FFFEFB;
 }
 
 /* Responsive behavior: Ensure layout is mobile-friendly */
