@@ -17,9 +17,54 @@ const GradeCalculator: React.FC = () => {
           {/* main-content is already set up to handle being 
           within the sidebar-header-footer space*/}
 
-          {/* Add anything additional within this*/}
-
-          
+          <h1>Grade Calculator</h1>
+          <p>Calculate your grade based on the weights of each assignment.</p>
+          <div className="grade-calculator">
+            <table>
+              <tr>
+                <th>Category</th>
+                <th>Weight</th>
+              </tr>
+              <tr>
+                <td><input type="text" placeholder="Category Name" /></td>
+                <td><input type="text" placeholder="Weight" /> %</td>
+              </tr>
+              <tr>
+                <td><input type="text" placeholder="Category Name" /></td>
+                <td><input type="text" placeholder="Weight" /> %</td>
+              </tr>
+              <tr>
+                <td><input type="text" placeholder="Category Name" /></td>
+                <td><input type="text" placeholder="Weight" /> %</td>
+              </tr>
+            </table>
+            <table>
+              <tr>
+                <th>Assignment</th>
+                <th>Weight</th>
+                <th>Grade</th>
+              </tr>
+              <tr>
+              <td><input type="text" placeholder="Assignment Name" /></td>
+              <td><input type="text" placeholder="Percentage" /> %</td>
+              <td><input type="text" placeholder="Grade" /></td>
+              </tr>
+              <tr>
+                <td><input type="text" placeholder="Assignment Name" /></td>
+                <td><input type="text" placeholder="Percentage" /> %</td>
+                <td><input type="text" placeholder="Grade" /></td>
+              </tr>
+              <tr>
+                <td><input type="text" placeholder="Assignment Name" /></td>
+                <td><input type="text" placeholder="Percentage" /> %</td>
+                <td><input type="text" placeholder="Grade" /></td>
+              </tr>
+            </table>
+          </div>
+          <div className='final-calculation'>
+            <h2>Final Grade:</h2>
+            <button>Calculate</button>
+          </div>
         </main>
       </div>
       <footer>
@@ -30,3 +75,5 @@ const GradeCalculator: React.FC = () => {
 };
 
 export default GradeCalculator;
+
+
