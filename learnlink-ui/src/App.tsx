@@ -6,7 +6,10 @@ import LandingPage from './pages/LandingPage';
 import Settings from './pages/settings';
 import Messaging from './pages/messaging';
 import Profile from './pages/profile';
-import Resources from './pages/resources';
+import Resources from './pages/resources/resources';
+import StudyTips from './pages/resources/studyTips';
+import ExternalResources from './pages/resources/externalResources';
+import GradeCalculator from './pages/resources/gradeCalculator';
 
 //routes
 function App() {
@@ -23,6 +26,9 @@ function App() {
           <Route path="/messaging" element = {<Messaging/> }/>
           <Route path="/profile" element = {<Profile/> }/>
           <Route path="/resources" element = {<Resources/> }/>
+          <Route path="/resources/studyTips" element = {<StudyTips/> }/>
+          <Route path="/resources/externalResources" element = {<ExternalResources/> }/>
+          <Route path="/resources/gradeCalculator" element = {<GradeCalculator/> }/>
         </Routes> 
       </div>
     </Router>

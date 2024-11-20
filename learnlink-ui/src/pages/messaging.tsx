@@ -107,7 +107,10 @@ const Messaging: React.FC = () => {
 
 
       </div>
+      <footer>
       <CopyrightFooter />
+
+      </footer>
     </div>
   );
 };

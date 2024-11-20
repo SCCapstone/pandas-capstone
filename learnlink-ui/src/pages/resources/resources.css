@@ -1,8 +1,18 @@
 /* General Page Styles */
 .resources-page {
-    font-family: 'Arial', sans-serif;
-    color: black;
-  }
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.resources-content {
+  display: flex;
+  flex: 1; /* Take up all remaining space between header and footer */
+  flex-direction: row;
+  overflow-y: scroll;
+  margin-bottom: 50px; /* Space for the fixed footer */
+
+}
   
   /* Tabs Section */
   .resources-tabs {
@@ -34,14 +44,26 @@
   }
   
   /* Main Content */
-  .resources-content {
-    padding: 2rem;
-    text-align: center;
+  .main-content {
+    padding-top: 1rem;
+    padding-left: 3rem;
+    padding-right: 3rem;
+    flex-grow: 1;
+    text-align: left;
+    overflow-y: auto;
+  }
+
+  h1 {
+    font-size: 2.5rem;
+    font-weight: normal;
+    margin-bottom: 1rem;
   }
   
-  .tips {
+  p{
+    padding-left: 0  !important;
     font-size: 1.5rem;
-    font-weight: bold;
+    font-weight: lighter;
+    text-align: left;
   }
   
   .tip-icon img {
@@ -59,6 +81,6 @@
   
   /* Footer Placeholder */
   .footer-placeholder {
-    margin-top: 2rem;
+    margin-top: 50px;
   }
   

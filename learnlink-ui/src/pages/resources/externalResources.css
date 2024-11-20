@@ -1,0 +1,33 @@
+
+
+  h1 {
+    font-size: 2.5rem;
+    font-weight: normal;
+    margin-bottom: 1rem;
+  }
+  
+  p{
+    padding-left: 0  !important;
+    font-size: 1.5rem;
+    font-weight: lighter;
+    text-align: left;
+  }
+  
+  .tip-icon img {
+    margin-top: 1rem;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s;
+  }
+  
+  .tip-icon img:hover {
+    transform: scale(1.1);
+  }
+  
+  /* Footer Placeholder */
+  .footer-placeholder {
+    margin-top: 50px;
+  }
+  
