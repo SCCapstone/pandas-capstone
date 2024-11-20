@@ -19,7 +19,11 @@ const ExternalResources: React.FC = () => {
           <h1>External Resources</h1>
           <h2>Resource #1</h2>
           <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque commodo.</p>
-          <a href="http://example.com">Link to Resource #1</a>
+          <a href="http://example.com">Link to Resource</a>
+
+          <h2>Resource #2</h2>
+          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque commodo.</p>
+          <a href="http://example.com">Link to Resource</a>
         </main>
       </div>
       <footer>

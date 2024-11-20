@@ -59,11 +59,21 @@
     margin-bottom: 1rem;
   }
   
-  p{
+  p {
     padding-left: 0  !important;
-    font-size: 1.5rem;
-    font-weight: lighter;
-    text-align: left;
+    font-size: 1.25rem  !important;
+    text-align: left  !important;
+  }
+
+  a:link {
+    font-size: 1.25rem;
+    font-weight: 400;
+    color: #FEAD2B;
+    text-decoration:none;
+  }
+
+  a:hover {
+    text-decoration:underline;
   }
   
   .tip-icon img {
@@ -78,9 +88,3 @@
   .tip-icon img:hover {
     transform: scale(1.1);
   }
-  
-  /* Footer Placeholder */
-  .footer-placeholder {
-    margin-top: 50px;
-  }
-  
