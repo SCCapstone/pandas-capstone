@@ -4,41 +4,46 @@ UI_DIR = learnlink-ui
 CURRENT_DIR = $(shell pwd)
 
 # Commands
-START_SERVER = cd $(CURRENT_DIR)/$(SERVER_DIR) && npm start
+START_SERVER = cd $(CURRENT_DIR)/$(SERVER_DIR) && npm start 
 START_UI = cd $(CURRENT_DIR)/$(UI_DIR) && npm start
-
 # Start both server and UI
 start:
-	osascript -e 'tell application "Terminal" to do script "$(START_SERVER)"'
-	osascript -e 'tell application "Terminal" to do script "$(START_UI)"'
-
+	@echo "[INFO] Starting both server and UI..."
+	osascript -e 'tell application "Terminal" to do script "$(START_SERVER)"
+	osascript -e 'tell application "Terminal" to do script "$(START_UI)"
 
 start-server:
-	@echo "Starting server..."
+	@echo "[INFO] Starting server..."
 	$(START_SERVER)
 
 start-ui:
-	@echo "Starting UI..."
+	@echo "[INFO] Starting UI..."
 	$(START_UI)
+
+# Reset Server & UI Dependencies
+reset: clean install
+	@echo "[INFO] Resetting server and UI dependencies..."
 
 # Install dependencies for server and UI
 install: install-server install-ui
+	@echo "[INFO] Installing dependencies for both server and UI..."
 
 install-server:
-	@echo "Installing server dependencies..."
-	cd $(SERVER_DIR) && npm install
+	@echo "[INFO] Installing server dependencies..."
+	cd $(SERVER_DIR) && npm install || echo "[ERROR] Failed to install server dependencies!"
 
 install-ui:
-	@echo "Installing UI dependencies..."
-	cd $(UI_DIR) && npm install
+	@echo "[INFO] Installing UI dependencies..."
+	cd $(UI_DIR) && npm install || echo "[ERROR] Failed to install UI dependencies!"
 
 # Clean both server and UI
 clean: clean-server clean-ui
+	@echo "[INFO] Cleaning both server and UI..."
 
 clean-server:
-	@echo "Cleaning server..."
-	cd $(SERVER_DIR) && npm run clean
+	@echo "[INFO] Cleaning server dependencies..."
+	cd $(SERVER_DIR) && rm -rf node_modules && npm cache clean --force || echo "[ERROR] Failed to clean server!"
 
 clean-ui:
-	@echo "Cleaning UI..."
-	cd $(UI_DIR) && npm run clean
+	@echo "[INFO] Cleaning UI dependencies..."
+	cd $(UI_DIR) && rm -rf node_modules && npm cache clean --force || echo "[ERROR] Failed to clean UI!"
