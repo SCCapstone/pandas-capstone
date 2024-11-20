@@ -1,6 +1,10 @@
 /* General styles */
 .profile-page {
-  background-color: #fff; /* Match background color */
+  background-color: #fff;
+  height: 100vh;
+  overflow: hidden; /* Prevent scrolling on the page */
+  display: flex;
+  flex-direction: column; /* Stack elements vertically */
 }
 
 /* Main container styles */
@@ -13,7 +17,6 @@
   flex-direction: column;
   text-align: left;
   overflow-y: scroll;
-  /* background-color: #ccc; */
 }
 
 .form-container {

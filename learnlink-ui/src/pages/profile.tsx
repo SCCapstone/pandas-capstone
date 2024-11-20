@@ -119,7 +119,9 @@ const Profile: React.FC = () => {
 
   return (
     <div className="profile-page">
-      <Navbar />
+      <header>
+        <Navbar />
+      </header>
       <div className='main-container'>
         <header className="profile-header">
           <h1 className="profile-title">Update Profile</h1>
@@ -183,7 +185,9 @@ const Profile: React.FC = () => {
           </form>
         </main>
       </div>
-      <CopyrightFooter />
+      <footer>
+        <CopyrightFooter />
+      </footer>
     </div>
   );
 };
