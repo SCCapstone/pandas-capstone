@@ -101,7 +101,7 @@ const Messaging: React.FC = () => {
       };
   
       // Check for duplicates before making the API call
-        const isDuplicateChat = chats.some(chat => chat.name === payload.name);
+      const isDuplicateChat = chats.some(chat => chat.name === payload.name);
         if (isDuplicateChat) {
           alert('A chat with this user already exists.');
           return; // Exit the function early if the chat already exists
