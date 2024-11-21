@@ -204,7 +204,7 @@ const Signup: React.FC = () => {
                         />
 
                         {/* Show error if there's any */}
-                        {error && <p className="error">Signup Failed.</p>}
+                        {error && <p className="error">Failed to sign up.</p>}
 
                         <button className="signUpButton" type="submit" disabled={loading}>
                             {loading ? 'Signing Up...' : 'Sign Up'}

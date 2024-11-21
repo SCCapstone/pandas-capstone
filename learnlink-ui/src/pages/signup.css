@@ -126,6 +126,10 @@ input {
   color:brown;
   font-size: 12px;
   font-weight: 500;
-  
+}
+
+.error {
+  text-align: left;
+  padding-left: 0;
 }
   
