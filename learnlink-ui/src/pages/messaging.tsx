@@ -23,10 +23,7 @@ interface User {
 }
 
 const Messaging: React.FC = () => {
-  const [chats, setChats] = useState<Chat[]>([
-    { id: 1, name: 'Alice', messages: ['Hi there!'] },
-    { id: 2, name: 'Bob', messages: ['Hello!'] },
-  ]);
+  const [chats, setChats] = useState<Chat[]>([]);
   const [selectedChat, setSelectedChat] = useState<Chat | null>(chats[0]);
   const [currentMessage, setCurrentMessage] = useState<string>('');
   const [users, setUsers] = useState<User[]>([]); // Store users
@@ -36,26 +33,82 @@ const Messaging: React.FC = () => {
 
   useEffect(() => {
     // Fetch users when the component mounts
-    axios.get('http://localhost:2020/api/users')  // Replace with your backend URL
+    axios.get('/api/users')  // Replace with your backend URL
       .then(response => {
         setUsers(response.data);  // Update state with the fetched users
       })
       .catch(error => {
         console.error('Error fetching users:', error);  // Handle error
       });
+    axios.get('/api/chats')  // Replace with your backend URL
+      .then(response => {
+        setChats(response.data);  // Update state with the fetched users
+      })
+      .catch(error => {
+        console.error('Error fetching chats:', error);  // Handle error
+    });
+
+
   }, []); 
 
-  const handleSendMessage = () => {
+  useEffect(() => {
+    const fetchMessages = async () => {
+      if (selectedChat) {
+        try {
+          const response = await axios.get(
+            `http://localhost:2020/api/chats/${selectedChat.id}/messages`,
+            {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`,
+              },
+            }
+          );
+          const updatedChat = chats.map((chat) =>
+            chat.id === selectedChat.id
+              ? { ...chat, messages: response.data }
+              : chat
+          );
+          setChats(updatedChat);
+        } catch (error) {
+          console.error('Error fetching messages:', error);
+        }
+      }
+    };
+  
+    // Poll for new messages every 5 seconds
+    const intervalId = setInterval(fetchMessages, 5000);
+  
+    return () => clearInterval(intervalId);
+  }, [selectedChat, chats]);
+
+  const handleSendMessage = async () => {
     if (currentMessage.trim() && selectedChat) {
-      const updatedChats = chats.map((chat) =>
-        chat.id === selectedChat.id
-          ? { ...chat, messages: [...chat.messages, currentMessage.trim()] }
-          : chat
-      );
-      setChats(updatedChats);
-      setCurrentMessage('');
+      try {
+        const response = await axios.post(
+          `/api/chats/${selectedChat.id}/messages`,
+          { content: currentMessage.trim() },
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('token')}`, // Ensure the user is authenticated
+            },
+          }
+        );
+  
+        // Append the new message to the selected chat
+        const newMessage = response.data;
+        const updatedChats = chats.map((chat) =>
+          chat.id === selectedChat.id
+            ? { ...chat, messages: [...chat.messages, newMessage.content] }
+            : chat
+        );
+        setChats(updatedChats);
+        setCurrentMessage('');
+      } catch (error) {
+        console.error('Error sending message:', error);
+      }
     }
   };
+  
 
   const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Enter') {

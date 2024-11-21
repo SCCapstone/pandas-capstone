@@ -235,6 +235,34 @@ app.get('/api/chats', async (req, res) => {
   }
 });
 
+// Add a message to a chat
+app.post('/api/chats/:chatId/messages', authenticate, async (req, res):Promise<any> => {
+  const { chatId } = req.params;
+  const { content } = req.body;
+  const userId = res.locals.userId;
+
+  if (!content.trim()) {
+    return res.status(400).json({ error: 'Message content cannot be empty' });
+  }
+
+  try {
+    // Save the new message to the database
+    const newMessage = await prisma.message.create({
+      data: {
+        content,
+        userId, // Associate the message with the sender
+        chatId: parseInt(chatId),
+      },
+    });
+
+    res.status(201).json(newMessage);
+  } catch (error) {
+    console.error('Error adding message:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
 /*
 // Get messages for a specific chat
 app.get('/api/chats/:chatId/messages', async (req, res) => {
@@ -264,7 +292,7 @@ app.get('/api/chats/:chatId/messages', async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
-/*
+*/
 // Create a new chat
 app.post('/api/chats', async (req, res) => {
   const { name, userId } = req.body; // Assuming the user is the creator of the chat
@@ -284,7 +312,7 @@ app.post('/api/chats', async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
-
+/*
 // Add a message to a chat
 app.post('/api/chats/:chatId/messages', async (req, res) => {
   const { chatId } = req.params;
