@@ -54,7 +54,7 @@ const Messaging: React.FC = () => {
   }, []); 
 
   
-  
+  //TODO add websockets/socket.io to this to provide for constant updates
 
   const handleSendMessage = async () => {
     if (currentMessage.trim() && selectedChat) {
@@ -100,6 +100,12 @@ const Messaging: React.FC = () => {
         userId: user.id, // Assuming user object contains an id property
       };
   
+      // Check for duplicates before making the API call
+        const isDuplicateChat = chats.some(chat => chat.name === payload.name);
+        if (isDuplicateChat) {
+          alert('A chat with this user already exists.');
+          return; // Exit the function early if the chat already exists
+      }
       // Make API call to create the new chat
       const response = await axios.post('http://localhost:2020/api/chats', payload);
   
