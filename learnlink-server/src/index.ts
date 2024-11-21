@@ -215,8 +215,23 @@ app.put('/api/users/update', async (req, res): Promise<any> => {
 
 //chat endpoints
 
+// WORKS
+app.get('/api/users', async (req, res) => {
+  try {
+    // Fetch users from the database using Prisma
+    const users = await prisma.user.findMany();
+    
+    // Respond with the users in JSON format
+    res.status(200).json(users);
+  } catch (error) {
+    // Log the error and send a response with a 500 status code in case of error
+    console.error('Error fetching users:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
 
 // Get all chats
+// WORKS
 app.get('/api/chats', async (req, res) => {
   try {
     const chats = await prisma.chat.findMany({
@@ -239,37 +254,39 @@ app.get('/api/chats', async (req, res) => {
   }
 });
 
-/*
-// Get messages for a specific chat
-app.get('/api/chats/:chatId/messages', async (req, res) => {
+
+// TODO
+// DOES NOT WORK YET
+// Add a message to a chat
+app.post('/api/chats/:chatId/messages', authenticate, async (req, res): Promise<any> => {
   const { chatId } = req.params;
+  const { content } = req.body;
+  const userId = res.locals.userId;
+
+  if (!content.trim()) {
+    return res.status(400).json({ error: 'Message content cannot be empty' });
+  }
 
   try {
-    const chat = await prisma.chat.findUnique({
-      where: { id: parseInt(chatId) },
-      include: {
-        messages: {
-          orderBy: { createdAt: 'asc' }, // Order messages by creation time in ascending order
-          include: {
-            user: true, // Include the user info for each message (optional)
-          },
-        },
-        users: true, // Optionally include users in the chat
+    // Save the new message to the database
+    const newMessage = await prisma.message.create({
+      data: {
+        content,
+        userId, // Associate the message with the sender
+        chatId: parseInt(chatId),
       },
     });
 
-    if (!chat) {
-      return res.status(404).json({ error: "Chat not found" });
-    }
-
-    res.json(chat.messages); // Return only the messages
+    res.status(201).json(newMessage);
   } catch (error) {
-    console.error("Error fetching messages:", error);
-    res.status(500).json({ error: "Internal server error" });
+    console.error('Error adding message:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
-/*
+
+
 // Create a new chat
+// WORKS
 app.post('/api/chats', async (req, res) => {
   const { name, userId } = req.body; // Assuming the user is the creator of the chat
 
@@ -289,27 +306,6 @@ app.post('/api/chats', async (req, res) => {
   }
 });
 
-// Add a message to a chat
-app.post('/api/chats/:chatId/messages', async (req, res) => {
-  const { chatId } = req.params;
-  const { userId, content } = req.body; // Assuming the user sending the message
-
-  try {
-    const newMessage = await prisma.chat.create({
-      data: {
-        id: parseInt(chatId),
-        content,
-        user_id: userId, // Link message to user who sent it
-      },
-    });
-    res.status(201).json(newMessage);
-  } catch (error) {
-    console.error("Error creating message:", error);
-    res.status(500).json({ error: "Internal server error" });
-  }
-});
-
-*/
 
 app.listen(PORT, () => {
   console.log(`server running on localhost:${PORT}`);

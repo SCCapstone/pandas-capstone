@@ -118,3 +118,78 @@
   background-color: #01506d;
 }
 
+
+/* Basic Styles for Dropdown */
+.DropdownContainer {
+  position: relative;
+  display: inline-block;
+}
+
+.NewChatButton {
+  background-color: #007bff;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  border-radius: 4px;
+}
+
+.NewChatButton:hover {
+  background-color: #0056b3;
+}
+
+/* Dropdown Menu */
+.DropdownMenu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background-color: white;
+  border: 1px solid #ccc;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  z-index: 1;
+  max-height: 300px;
+  overflow-y: auto;
+  padding: 10px 0;
+  border-radius: 4px;
+}
+
+.DropdownMenu.open {
+  display: block;
+}
+
+.SearchInput {
+  width: 100%;
+  padding: 8px 12px;
+  margin-bottom: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+.UserList {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.UserListItem {
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.UserListItem:hover {
+  background-color: #f1f1f1;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .DropdownMenu {
+    width: 100%;
+  }
+}
