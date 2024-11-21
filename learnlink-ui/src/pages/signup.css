@@ -120,4 +120,12 @@ input {
 .loginRedirect{
   padding-top: 10px;
 }
+
+.alert {
+  float:right;
+  color:brown;
+  font-size: 12px;
+  font-weight: 500;
+  
+}
   

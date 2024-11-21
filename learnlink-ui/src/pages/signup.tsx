@@ -85,12 +85,12 @@ const Signup: React.FC = () => {
             
             // Handle unique warnings
             if (errorData.error === 'UsernameAlreadyExists') {
-                setError('Username is already taken.');
-                throw new Error('Username is already taken.');
+                setError('Username is already taken');
+                throw new Error('Username is already taken');
 
             } else if (errorData.error === 'EmailAlreadyExists') {
-                setError('Email is already registered.');
-                throw new Error('Email is already registered.');
+                setError('Email is already registered');
+                throw new Error('Email is already registered');
             } else {
                 throw new Error('Failed to create user');
             }
@@ -163,8 +163,8 @@ const Signup: React.FC = () => {
                             onChange={handleChange}
                         />
                         <label>&nbsp;
-                            {error === 'Username is already taken.' && (
-                                <span className="alert">{error}</span>
+                            {error === 'Username is already taken' && (
+                                <span className="alert">* {error}</span>
                             )}
                         </label>
 
@@ -178,9 +178,11 @@ const Signup: React.FC = () => {
                             onChange={handleChange}
                             required
                         />
-                        {error === 'Email is already registered.' && (
-                                <span className="alert">{error}</span>
+                        <label>&nbsp;
+                        {error === 'Email is already registered' && (
+                                <span className="alert">* {error}</span>
                             )}
+                        </label>
 
                         <label>Password</label>
                         <input
