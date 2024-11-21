@@ -34,10 +34,28 @@ const authenticate = (req: Request, res: Response, next: Function) => {
 };
 
 // Signup endpoint
-app.post("/api/users", async (req, res) => {
+app.post("/api/users", async (req, res): Promise<any> => {
   const { firstName, lastName, email, username, password, profile_preferences } = req.body;
 
   try {
+      // Check if username or email already exists
+      // Check if email already exists
+    const emailExists = await prisma.user.findUnique({
+      where: { email: email }
+    });
+
+    if (emailExists) {
+      return res.status(400).json({ error: "EmailAlreadyExists" });
+    }
+
+    // Check if username already exists
+    const usernameExists = await prisma.user.findUnique({
+      where: { username: username }
+    });
+
+    if (usernameExists) {
+      return res.status(400).json({ error: "UsernameAlreadyExists" });
+    }
     // Hash the password before storing it in the database -> for security
     const hashedPassword = await bcrypt.hash(password, 10);
 

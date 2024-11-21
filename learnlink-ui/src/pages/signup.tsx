@@ -81,7 +81,19 @@ const Signup: React.FC = () => {
             });
 
             if (!response.ok) {
+                const errorData = await response.json();
+            
+            // Handle unique warnings
+            if (errorData.error === 'UsernameAlreadyExists') {
+                setError('Username is already taken.');
+                throw new Error('Username is already taken.');
+
+            } else if (errorData.error === 'EmailAlreadyExists') {
+                setError('Email is already registered.');
+                throw new Error('Email is already registered.');
+            } else {
                 throw new Error('Failed to create user');
+            }
             }
 
             // Clear form
@@ -96,12 +108,12 @@ const Signup: React.FC = () => {
                 updated_at: '',
             });
             setConfirmPassword('');
-            setError(null);
+            // setError(null);
 
             // Navigate to landing page after successful signup
             navigate('/LandingPage');
         } catch (error) {
-            setError('Failed to sign up. Please try again later.');
+            //setError('Failed to sign up. Please try again later.');
         } finally {
             setLoading(false);
         }
@@ -150,6 +162,12 @@ const Signup: React.FC = () => {
                             value={formData.username}
                             onChange={handleChange}
                         />
+                        <label>&nbsp;
+                            {error === 'Username is already taken.' && (
+                                <span className="alert">{error}</span>
+                            )}
+                        </label>
+
 
                         <label>Email</label>
                         <input
@@ -160,6 +178,9 @@ const Signup: React.FC = () => {
                             onChange={handleChange}
                             required
                         />
+                        {error === 'Email is already registered.' && (
+                                <span className="alert">{error}</span>
+                            )}
 
                         <label>Password</label>
                         <input
@@ -181,7 +202,7 @@ const Signup: React.FC = () => {
                         />
 
                         {/* Show error if there's any */}
-                        {error && <p className="error">{error}</p>}
+                        {error && <p className="error">Signup Failed.</p>}
 
                         <button className="signUpButton" type="submit" disabled={loading}>
                             {loading ? 'Signing Up...' : 'Sign Up'}
