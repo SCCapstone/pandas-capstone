@@ -30,17 +30,19 @@ const Messaging: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState<string>(''); // Store search term
   const [showDropdown, setShowDropdown] = useState<boolean>(false); // Control dropdown visibility
 
+  const [messages, setMessages] = useState([]); // Initialize as an empty array
+
 
   useEffect(() => {
     // Fetch users when the component mounts
-    axios.get('/api/users')  // Replace with your backend URL
+    axios.get('http://localhost:2020/api/users')  // Replace with your backend URL
       .then(response => {
         setUsers(response.data);  // Update state with the fetched users
       })
       .catch(error => {
         console.error('Error fetching users:', error);  // Handle error
       });
-    axios.get('/api/chats')  // Replace with your backend URL
+    axios.get('http://localhost:2020/api/chats')  // Replace with your backend URL
       .then(response => {
         setChats(response.data);  // Update state with the fetched users
       })
@@ -51,35 +53,8 @@ const Messaging: React.FC = () => {
 
   }, []); 
 
-  useEffect(() => {
-    const fetchMessages = async () => {
-      if (selectedChat) {
-        try {
-          const response = await axios.get(
-            `http://localhost:2020/api/chats/${selectedChat.id}/messages`,
-            {
-              headers: {
-                Authorization: `Bearer ${localStorage.getItem('token')}`,
-              },
-            }
-          );
-          const updatedChat = chats.map((chat) =>
-            chat.id === selectedChat.id
-              ? { ...chat, messages: response.data }
-              : chat
-          );
-          setChats(updatedChat);
-        } catch (error) {
-          console.error('Error fetching messages:', error);
-        }
-      }
-    };
   
-    // Poll for new messages every 5 seconds
-    const intervalId = setInterval(fetchMessages, 5000);
   
-    return () => clearInterval(intervalId);
-  }, [selectedChat, chats]);
 
   const handleSendMessage = async () => {
     if (currentMessage.trim() && selectedChat) {
@@ -116,16 +91,31 @@ const Messaging: React.FC = () => {
     }
   };
 
-  const createNewChat = (user: User) => {
-    const newChat = {
-      id: chats.length + 1,
-      name: `${user.firstName} ${user.lastName}`,
-      messages: [],
-    };
-    setChats([...chats, newChat]);
-    setSelectedChat(newChat);
-    setShowDropdown(false);  // Hide dropdown after selecting a user
+
+  const createNewChat = async (user: User) => {
+    try {
+      // Prepare the request payload
+      const payload = {
+        name: `${user.firstName} ${user.lastName}`,
+        userId: user.id, // Assuming user object contains an id property
+      };
+  
+      // Make API call to create the new chat
+      const response = await axios.post('http://localhost:2020/api/chats', payload);
+  
+      // Extract the created chat from the response
+      const newChat = response.data;
+  
+      // Update state with the new chat
+      setChats((prevChats) => [...prevChats, newChat]);
+      setSelectedChat(newChat);
+      setShowDropdown(false); // Hide dropdown after selecting a user
+    } catch (error) {
+      console.error('Error creating new chat:', error);
+      alert('Failed to create chat. Please try again.');
+    }
   };
+
 
   const filteredUsers = users.filter(user =>
     `${user.firstName} ${user.lastName}`.toLowerCase().includes(searchTerm.toLowerCase())
@@ -164,15 +154,15 @@ const Messaging: React.FC = () => {
             </div>
           )}
           <ul className="ChatList">
-            {chats.map((chat) => (
-              <li
-                key={chat.id}
-                className={`ChatListItem ${selectedChat?.id === chat.id ? 'active' : ''}`}
-                onClick={() => setSelectedChat(chat)}
-              >
-                {chat.name}
-              </li>
-            ))}
+          {Array.isArray(chats) && chats.map((chat) => (
+            <li
+              key={chat.id}
+              className={`ChatListItem ${selectedChat?.id === chat.id ? 'active' : ''}`}
+              onClick={() => setSelectedChat(chat)}
+            >
+              {chat.name}
+            </li>
+          ))}
           </ul>
         </div>
         <div className="ChatSection">
@@ -180,11 +170,11 @@ const Messaging: React.FC = () => {
             <>
               <h2 className="ChatHeader">{selectedChat.name}</h2>
               <div className="ChatWindow">
-                {selectedChat.messages.map((message, index) => (
-                  <div key={index} className="MessageBubble">
-                    {message}
-                  </div>
-                ))}
+              {selectedChat?.messages?.map((message, index) => (
+                <div key={index} className="MessageBubble">
+                  {message}
+                </div>
+              ))}
               </div>
               <div className="ChatInput">
                 <input
