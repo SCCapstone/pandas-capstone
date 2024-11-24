@@ -87,7 +87,7 @@ const Login: React.FC = () => {
                         />
                         {error && <p className="error">{error}</p>}
 
-                        <div className="fpp">
+                        <div className="fpp" onClick={() => navigate('/forgotpassword')}>
                             Forgot password?
                         </div>
 

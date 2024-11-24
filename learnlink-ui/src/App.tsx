@@ -10,6 +10,7 @@ import Resources from './pages/resources/resources';
 import StudyTips from './pages/resources/studyTips';
 import ExternalResources from './pages/resources/externalResources';
 import GradeCalculator from './pages/resources/gradeCalculator';
+import ForgotPassword from './pages/forgotPassword';
 
 //routes
 function App() {
@@ -29,6 +30,7 @@ function App() {
           <Route path="/resources/studyTips" element = {<StudyTips/> }/>
           <Route path="/resources/externalResources" element = {<ExternalResources/> }/>
           <Route path="/resources/gradeCalculator" element = {<GradeCalculator/> }/>
+          <Route path="/forgotpassword" element={<ForgotPassword />} />
         </Routes> 
       </div>
     </Router>
