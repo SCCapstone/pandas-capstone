@@ -232,6 +232,7 @@ app.get('/api/users', async (req, res) => {
 });
 
 // Get all chats
+/*
 // WORKS
 app.get('/api/chats', async (req, res) => {
   try {
@@ -254,6 +255,40 @@ app.get('/api/chats', async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
+*/
+
+// Get chats for the logged-in user
+app.get('/api/chats', authenticate, async (req, res) => {
+  const userId = res.locals.userId;
+
+  try {
+    // Fetch chats where the logged-in user is a participant
+    const chats = await prisma.chat.findMany({
+      where: {
+        users: {
+          some: { id: userId }, // Filter chats where the user is a participant
+        },
+      },
+      include: {
+        messages: {
+          include: {
+            user: true, // Include user info for each message (optional)
+          },
+        },
+        users: true, // Include users in the chat (optional)
+      },
+      orderBy: {
+        createdAt: 'desc', // Order by chat creation time
+      },
+    });
+
+    res.status(200).json(chats);
+  } catch (error) {
+    console.error("Error fetching user's chats:", error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 
 // Delete a chat
 app.delete('/api/chats/:chatId', async (req, res):Promise<any> => {
@@ -316,17 +351,36 @@ app.post('/api/chats/:chatId/messages', authenticate, async (req, res): Promise<
 });
 
 
+
 // Create a new chat
 // WORKS
-app.post('/api/chats', async (req, res) => {
-  const { name, userId } = req.body; // Assuming the user is the creator of the chat
+app.post('/api/chats', async (req, res):Promise<any> => {
+  //const { name, userId } = req.body; // Assuming the user is the creator of the chat
+  const { recipientUserId, chatName } = req.body; // The user they are messaging (recipient)
+  const userId = res.locals.userId; // The authenticated user (sender)
 
   try {
+
+    const recipient = await prisma.user.findUnique({
+      where: { id: recipientUserId },
+    });
+
+    if (!recipient) {
+      return res.status(404).json({ error: 'Recipient user not found' });
+    }
+
+    // Use a default chat name if not provided in the request
+    const name = chatName || `${userId} and ${recipientUserId}`; // Default chat name: e.g., 'User 1 and User 2'
+
+
     const newChat = await prisma.chat.create({
       data: {
         name,
         users: {
-          connect: { id: userId }, // Assuming a user creates the chat
+          connect: [
+            { id: userId },
+            { id: recipientUserId }, 
+          ], // Assuming a user creates the chat
         },
       },
     });
@@ -337,6 +391,50 @@ app.post('/api/chats', async (req, res) => {
   }
 });
 
+/*
+// Create a new chat between the logged-in user and another user
+app.post('/api/chats', authenticate, async (req, res):Promise<any> => {
+  const { recipientUserId, chatName } = req.body; // The user they are messaging (recipient)
+  const userId = res.locals.userId; // The authenticated user (sender)
+
+  if (!recipientUserId) {
+    return res.status(400).json({ error: 'Recipient user ID is required' });
+  }
+
+  try {
+    // Ensure the recipient user exists
+    const recipient = await prisma.user.findUnique({
+      where: { id: recipientUserId },
+    });
+
+    if (!recipient) {
+      return res.status(404).json({ error: 'Recipient user not found' });
+    }
+
+    // Use a default chat name if not provided in the request
+    const name = chatName || `${userId} and ${recipientUserId}`; // Default chat name: e.g., 'User 1 and User 2'
+
+    // Create a new chat that includes both the sender and the recipient
+    const newChat = await prisma.chat.create({
+      data: {
+        name, // Set the name of the chat
+        users: {
+          connect: [
+            { id: userId }, // Connect the authenticated user (sender)
+            { id: recipientUserId }, // Connect the recipient user (receiver)
+          ],
+        },
+      },
+    });
+
+    // Return the newly created chat details
+    res.status(201).json(newChat);
+  } catch (error) {
+    console.error("Error creating chat:", error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+*/
 
 app.listen(PORT, () => {
   console.log(`server running on localhost:${PORT}`);
