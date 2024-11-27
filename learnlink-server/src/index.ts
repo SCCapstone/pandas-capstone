@@ -353,7 +353,7 @@ app.post('/api/chats/:chatId/messages', authenticate, async (req, res): Promise<
 
 
 // Create a new chat
-// WORKS
+// no longer works :(
 app.post('/api/chats', async (req, res):Promise<any> => {
   //const { name, userId } = req.body; // Assuming the user is the creator of the chat
   const { recipientUserId, chatName } = req.body; // The user they are messaging (recipient)
