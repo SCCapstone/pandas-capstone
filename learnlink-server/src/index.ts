@@ -215,6 +215,7 @@ app.put('/api/users/update', async (req, res): Promise<any> => {
 
 //chat endpoints
 
+
 // WORKS
 app.get('/api/users', async (req, res) => {
   try {
@@ -251,6 +252,36 @@ app.get('/api/chats', async (req, res) => {
   } catch (error) {
     console.error("Error fetching chats:", error);
     res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// Delete a chat
+app.delete('/api/chats/:chatId', async (req, res):Promise<any> => {
+  const { chatId } = req.params;
+  const userId = res.locals.userId;
+
+  try {
+    // Ensure the user is part of the chat
+    const chat = await prisma.chat.findUnique({
+      where: { id: parseInt(chatId) },
+      include: { users: true },
+    });
+
+    if (!chat) {
+      return res.status(404).json({ error: 'Chat not found' });
+    }
+
+    //const isUserInChat = chat.users.some((user) => user.id === userId);
+
+    // Delete the chat
+    await prisma.chat.delete({
+      where: { id: parseInt(chatId) },
+    });
+
+    res.status(200).json({ message: 'Chat deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting chat:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 

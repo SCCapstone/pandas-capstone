@@ -29,7 +29,6 @@ const Messaging: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]); // Store users
   const [searchTerm, setSearchTerm] = useState<string>(''); // Store search term
   const [showDropdown, setShowDropdown] = useState<boolean>(false); // Control dropdown visibility
-
   const [messages, setMessages] = useState([]); // Initialize as an empty array
 
 
@@ -84,6 +83,61 @@ const Messaging: React.FC = () => {
     }
   };
   
+  const handleDeleteChat = async (chatId:number) => {
+    try {
+        // Ensure there's a token for authentication
+        const token = localStorage.getItem('token'); // Replace with your auth storage mechanism if different
+        if (!token) {
+            alert('You need to be logged in to delete a chat.');
+            return;
+        }
+
+        // Make DELETE request to the API
+        const response = await axios.delete(`http://localhost:2020/api/chats/${chatId}`, {
+            headers: {
+                Authorization: `Bearer ${token}`, // Pass the token for authentication
+            },
+        });
+
+        // Check if the response indicates success
+        if (response.status === 200) {
+            console.log('Chat deleted successfully:', response.data);
+            alert('Chat deleted successfully.');
+            // Optionally update the UI (e.g., remove the chat from the list)
+        } else {
+            console.warn('Unexpected response:', response);
+            alert('Unexpected issue deleting the chat.');
+        }
+    } catch (error) {
+        // Handle errors more robustly
+        if (axios.isAxiosError(error)) {
+            if (error.response) {
+                const { status, data } = error.response;
+
+                // Specific error cases
+                if (status === 403) {
+                    alert('You do not have permission to delete this chat.');
+                } else if (status === 404) {
+                    alert('Chat not found. It might have already been deleted.');
+                } else if (status === 400) {
+                    alert('Bad request. Please check the chat ID and try again.');
+                } else {
+                    alert(`Error: ${data.message || 'Something went wrong'}`);
+                }
+            } else {
+                // Error does not have a response object
+                console.error('Network or configuration error:', error.message);
+                alert('Unable to connect to the server. Please check your network or server configuration.');
+            }
+        } else {
+            // Handle non-Axios errors
+            console.error('Unexpected error:', error);
+            alert('An unexpected error occurred. Please try again.');
+        }
+    }
+};
+
+
 
   const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Enter') {
@@ -159,17 +213,23 @@ const Messaging: React.FC = () => {
               </ul>
             </div>
           )}
-          <ul className="ChatList">
-          {Array.isArray(chats) && chats.map((chat) => (
-            <li
-              key={chat.id}
-              className={`ChatListItem ${selectedChat?.id === chat.id ? 'active' : ''}`}
-              onClick={() => setSelectedChat(chat)}
-            >
-              {chat.name}
-            </li>
-          ))}
-          </ul>
+         <ul className="ChatList">
+          {Array.isArray(chats) &&
+            chats.map((chat) => (
+              <li
+                key={chat.id}
+                className={`ChatListItem ${selectedChat?.id === chat.id ? 'active' : ''}`}
+              >
+                <span onClick={() => setSelectedChat(chat)}>{chat.name}</span>
+                <button
+                  className="DeleteButton"
+                  onClick={() => handleDeleteChat(chat.id)}
+                >
+                  X
+                </button>
+              </li>
+            ))}
+        </ul>
         </div>
         <div className="ChatSection">
           {selectedChat ? (
