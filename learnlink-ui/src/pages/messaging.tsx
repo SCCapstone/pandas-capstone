@@ -21,7 +21,7 @@ interface User {
 }
 
 // Connect to the Socket.IO server
-const socket = io('http://localhost:5000'); // Replace with your server URL
+const socket = io('http://localhost:2020'); // Replace with your server URL
 
 const Messaging: React.FC = () => {
   const [chats, setChats] = useState<Chat[]>([]);
@@ -94,16 +94,11 @@ const Messaging: React.FC = () => {
         return;
       }
   
-      // Log payload for debugging
-      console.log('Payload:', payload);
-  
       const response = await axios.post('http://localhost:2020/api/chats', payload, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`, // Pass the token
         },
       });
-  
-      console.log('API Response:', response.data);
   
       const newChat = response.data;
   
@@ -113,7 +108,6 @@ const Messaging: React.FC = () => {
       setShowDropdown(false); // Hide dropdown
     } catch (error) {
       console.error('Error creating new chat:', error);
-  
       if (axios.isAxiosError(error) && error.response) {
         alert(`Error: ${error.response.status} - ${error.response.data.message}`);
       } else {
@@ -121,7 +115,6 @@ const Messaging: React.FC = () => {
       }
     }
   };
-  
 
   const handleDeleteChat = async (chatId: number) => {
     try {
@@ -173,12 +166,17 @@ const Messaging: React.FC = () => {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
+              
               <ul className="UserList">
+                
                 {filteredUsers.map((user) => (
                   <li
                     key={user.id}
                     className="UserItem"
-                    onClick={() => createNewChat(user)}
+                    onClick={() => { 
+                      createNewChat(user); 
+                      setSearchTerm(''); // Clear search term after selecting
+                    }}
                   >
                     {user.firstName} {user.lastName}
                   </li>
@@ -208,11 +206,11 @@ const Messaging: React.FC = () => {
             <>
               <h2 className="ChatHeader">{selectedChat.name}</h2>
               <div className="ChatWindow">
-                {selectedChat.messages.map((message, index) => (
-                  <div key={index} className="MessageBubble">
-                    {message}
-                  </div>
-                ))}
+              {selectedChat?.messages?.map((message, index) => (
+                <div key={index} className="MessageBubble">
+                  {message}
+                </div>
+              ))}
               </div>
               <div className="ChatInput">
                 <input
@@ -224,6 +222,7 @@ const Messaging: React.FC = () => {
                 />
                 <button onClick={handleSendMessage}>Send</button>
               </div>
+              
             </>
           ) : (
             <div className="NoChatSelected">Select a chat to start messaging</div>

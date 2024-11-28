@@ -353,6 +353,27 @@ app.post('/api/chats/:chatId/messages', authenticate, async (req, res): Promise<
 
 
 // Create a new chat
+// WORKS
+app.post('/api/chats', async (req, res) => {
+  const { name, userId } = req.body; // Assuming the user is the creator of the chat
+
+  try {
+    const newChat = await prisma.chat.create({
+      data: {
+        name,
+        users: {
+          connect: { id: userId }, // Assuming a user creates the chat
+        },
+      },
+    });
+    res.status(201).json(newChat);
+  } catch (error) {
+    console.error("Error creating chat:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+/*
+// Create a new chat
 app.post('/api/chats', async (req: Request, res: Response): Promise<any> => {
   const { recipientUserId, chatName } = req.body; // The user they are messaging (recipient)
   const userId = res.locals.userId; // The authenticated user (sender)
@@ -461,17 +482,16 @@ io.on("connection", (socket) => {
     try {
       const decoded: any = jwt.verify(token, JWT_SECRET);
       const userId = decoded.userId;
-
-      // Check if user is part of the chat
+  
       const chat = await prisma.chat.findUnique({
         where: { id: chatId },
         include: { users: true },
       });
-
+  
       if (!chat || !chat.users.some((user) => user.id === userId)) {
         return socket.emit("error", { message: "Access denied to chat" });
       }
-
+  
       socket.join(`chat_${chatId}`);
       console.log(`User ${userId} joined chat ${chatId}`);
     } catch (error) {
@@ -479,34 +499,43 @@ io.on("connection", (socket) => {
       socket.emit("error", { message: "Invalid token or chat access error" });
     }
   });
-
+  
   socket.on("message", async ({ chatId, content, token }) => {
     try {
       const decoded: any = jwt.verify(token, JWT_SECRET);
       const userId = decoded.userId;
-
-      if (!content.trim()) {
-        return socket.emit("error", { message: "Message content cannot be empty" });
+  
+      // Ensure the user is part of the chat
+      const chat = await prisma.chat.findUnique({
+        where: { id: chatId },
+        include: { users: true },
+      });
+  
+      if (!chat || !chat.users.some((user) => user.id === userId)) {
+        return socket.emit("error", { message: "Access denied to chat" });
       }
-
-      // Save the message to the database
+  
+      // Create a new message in the database
       const newMessage = await prisma.message.create({
         data: {
           content,
-          userId,
-          chatId,
+          userId, // Associate the message with the sender
+          chatId: parseInt(chatId),
         },
-        include: { user: true },
       });
-
-      // Broadcast the message to all users in the chat
-      io.to(`chat_${chatId}`).emit("message", newMessage);
+  
+      // Emit the new message to other clients in the chat
+      io.to(`chat_${chatId}`).emit("newMessage", {
+        message: newMessage,
+        userId, // Optionally send user info
+      });
+  
     } catch (error) {
-      console.error("Error in message event:", error);
-      socket.emit("error", { message: "Failed to send message" });
+      console.error("Error sending message:", error);
+      socket.emit("error", { message: "Message sending error" });
     }
   });
-
+  
   socket.on("disconnect", () => {
     console.log("User disconnected");
   });
