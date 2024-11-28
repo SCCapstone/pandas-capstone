@@ -5,28 +5,29 @@ import jwt from 'jsonwebtoken';
 import { PrismaClient, Grade, Gender } from "@prisma/client";
 import { env } from "process";
 import { Request, Response } from 'express';
-import { User } from '@prisma/client';
-
+import http from "http";
+import { Server } from "socket.io";
 
 const app = express();
 const prisma = new PrismaClient();
+const server = http.createServer(app);
+const io = new Server(server);
+
 const PORT = env.SERVER_PORT || 2020;
 const JWT_SECRET = env.JWT_SECRET || 'your_default_jwt_secret';
 
 app.use(express.json());
 app.use(cors());
 
-// Middleware to authenticate the user
+// Middleware for authentication
 const authenticate = (req: Request, res: Response, next: Function) => {
-  const token = req.headers.authorization?.split(' ')[1]; // Expecting the token to be in the format "Bearer <token>"
-
+  const token = req.headers.authorization?.split(' ')[1];
   if (!token) {
     return res.status(401).json({ error: 'No token provided' });
   }
-
   try {
     const decoded: any = jwt.verify(token, JWT_SECRET);
-    res.locals.userId = decoded.userId; // Attach userId to request object -- maybe change this for security???
+    res.locals.userId = decoded.userId;
     return next();
   } catch (error) {
     res.status(401).json({ error: 'Invalid token' });
@@ -351,46 +352,61 @@ app.post('/api/chats/:chatId/messages', authenticate, async (req, res): Promise<
 });
 
 
-
 // Create a new chat
-// no longer works :(
-app.post('/api/chats', async (req, res):Promise<any> => {
-  //const { name, userId } = req.body; // Assuming the user is the creator of the chat
+app.post('/api/chats', async (req: Request, res: Response): Promise<any> => {
   const { recipientUserId, chatName } = req.body; // The user they are messaging (recipient)
   const userId = res.locals.userId; // The authenticated user (sender)
 
   try {
+    if (!userId) {
+      return res.status(400).json({ error: 'User not authenticated' });
+    }
 
+    if (!recipientUserId) {
+      return res.status(400).json({ error: 'Recipient user ID is required' });
+    }
+
+    // Find the recipient user in the database
     const recipient = await prisma.user.findUnique({
       where: { id: recipientUserId },
     });
 
     if (!recipient) {
+      console.error(`Recipient not found: ${recipientUserId}`);
       return res.status(404).json({ error: 'Recipient user not found' });
     }
 
     // Use a default chat name if not provided in the request
     const name = chatName || `${userId} and ${recipientUserId}`; // Default chat name: e.g., 'User 1 and User 2'
 
-
+    // Create the new chat
     const newChat = await prisma.chat.create({
       data: {
         name,
         users: {
           connect: [
             { id: userId },
-            { id: recipientUserId }, 
-          ], // Assuming a user creates the chat
+            { id: recipientUserId },
+          ], // Connect both the sender and recipient to the chat
         },
       },
     });
+
+    // Emit the event to all connected clients when a new chat is created
+    console.log(`New chat created: ${newChat.id}, Name: ${newChat.name}`);
+    io.emit('new-chat', {
+      chatId: newChat.id,
+      chatName: newChat.name,
+      users: [userId, recipientUserId],
+    });
+
+    // Respond to the client with the created chat details
     res.status(201).json(newChat);
   } catch (error) {
     console.error("Error creating chat:", error);
-    res.status(500).json({ error: "Internal server error" });
+    res.status(500).json({ error: "Internal server error", message: error});
   }
 });
-
 /*
 // Create a new chat between the logged-in user and another user
 app.post('/api/chats', authenticate, async (req, res):Promise<any> => {
@@ -435,6 +451,68 @@ app.post('/api/chats', authenticate, async (req, res):Promise<any> => {
   }
 });
 */
+
+
+// Real-time WebSocket chat functionality
+io.on("connection", (socket) => {
+  console.log("User connected");
+
+  socket.on("joinChat", async ({ chatId, token }) => {
+    try {
+      const decoded: any = jwt.verify(token, JWT_SECRET);
+      const userId = decoded.userId;
+
+      // Check if user is part of the chat
+      const chat = await prisma.chat.findUnique({
+        where: { id: chatId },
+        include: { users: true },
+      });
+
+      if (!chat || !chat.users.some((user) => user.id === userId)) {
+        return socket.emit("error", { message: "Access denied to chat" });
+      }
+
+      socket.join(`chat_${chatId}`);
+      console.log(`User ${userId} joined chat ${chatId}`);
+    } catch (error) {
+      console.error("Error in joinChat:", error);
+      socket.emit("error", { message: "Invalid token or chat access error" });
+    }
+  });
+
+  socket.on("message", async ({ chatId, content, token }) => {
+    try {
+      const decoded: any = jwt.verify(token, JWT_SECRET);
+      const userId = decoded.userId;
+
+      if (!content.trim()) {
+        return socket.emit("error", { message: "Message content cannot be empty" });
+      }
+
+      // Save the message to the database
+      const newMessage = await prisma.message.create({
+        data: {
+          content,
+          userId,
+          chatId,
+        },
+        include: { user: true },
+      });
+
+      // Broadcast the message to all users in the chat
+      io.to(`chat_${chatId}`).emit("message", newMessage);
+    } catch (error) {
+      console.error("Error in message event:", error);
+      socket.emit("error", { message: "Failed to send message" });
+    }
+  });
+
+  socket.on("disconnect", () => {
+    console.log("User disconnected");
+  });
+});
+
+
 
 app.listen(PORT, () => {
   console.log(`server running on localhost:${PORT}`);
