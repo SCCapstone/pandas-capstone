@@ -372,9 +372,11 @@ app.post('/api/chats', async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
-/*
-// Create a new chat
-app.post('/api/chats', async (req: Request, res: Response): Promise<any> => {
+
+
+
+// Create a new chat linked to each user
+app.post('/api/chats/:userId', async (req: Request, res: Response): Promise<any> => {
   const { recipientUserId, chatName } = req.body; // The user they are messaging (recipient)
   const userId = res.locals.userId; // The authenticated user (sender)
 
