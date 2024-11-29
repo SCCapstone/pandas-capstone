@@ -46,6 +46,8 @@ const Messaging: React.FC = () => {
       .then((response) => setChats(response.data))
       .catch((error) => console.error('Error fetching chats:', error));
 
+
+      
     // Listen for real-time updates on new messages
     socket.on('message', (message) => {
       if (selectedChat) {
@@ -86,6 +88,7 @@ const Messaging: React.FC = () => {
     }
   };
 
+  // i am not sure if this necessarily does what i want it to do where it connects it to the users but i think it does?
 
   const createNewChat = async (user: User) => {
     try {
