@@ -234,7 +234,7 @@ app.get('/api/users', async (req, res) => {
 });
 
 // Get all chats
-/*
+
 // WORKS
 app.get('/api/chats', async (req, res) => {
   try {
@@ -257,8 +257,10 @@ app.get('/api/chats', async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
-*/
 
+
+
+//TODO
 // Get chats for the logged-in user
 app.get('/api/chats/:userId', authenticate,  async (req, res): Promise<any>=> {
 
@@ -402,7 +404,12 @@ app.post('/api/chats/:userId', authenticate, async (req: Request, res: Response)
   }
 });
 
+
+
 /*************** WEBSOCKETS */
+
+//TODO there is a get console error happening in socket.io seen below 
+// GET http://localhost:2020/socket.io/?EIO=4&transport=polling&t=877a3it0 404 (Not Found)
 
 
 // Real-time WebSocket chat functionality
@@ -472,6 +479,12 @@ io.on("connection", (socket) => {
   });
 });
 
+
+
+
+
+
+/********* LISTEN FUNCT */
 
 
 app.listen(PORT, () => {

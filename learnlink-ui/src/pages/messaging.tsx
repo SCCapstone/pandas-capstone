@@ -37,7 +37,9 @@ const Messaging: React.FC = () => {
       .then((response) => setUsers(response.data))
       .catch((error) => console.error('Error fetching users:', error));
 
-    axios.get('http://localhost:2020/api/chats/:userId')
+
+    //TODO make this the endpoint for chats/userid
+    axios.get(`http://localhost:2020/api/chats`)
       .then((response) => setChats(response.data))
       .catch((error) => console.error('Error fetching chats:', error));
 
