@@ -38,6 +38,9 @@ const Messaging: React.FC = () => {
       .catch((error) => console.error('Error fetching users:', error));
 
 
+    // Make the API request to fetch chats for the user
+  
+
     //TODO make this the endpoint for chats/userid
     axios.get(`http://localhost:2020/api/chats`)
       .then((response) => setChats(response.data))
@@ -61,6 +64,7 @@ const Messaging: React.FC = () => {
     };
   }, [selectedChat]);
 
+  //TODO fix this 
   const handleSendMessage = async () => {
     if (currentMessage.trim() && selectedChat) {
       try {
@@ -81,6 +85,8 @@ const Messaging: React.FC = () => {
       }
     }
   };
+
+
   const createNewChat = async (user: User) => {
     try {
       const payload = {
