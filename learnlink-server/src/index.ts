@@ -236,6 +236,7 @@ app.get('/api/users', async (req, res) => {
 // Get all chats
 
 // WORKS
+// should eventually not be used, but for rn it works for just getting all chats on the system
 app.get('/api/chats', async (req, res) => {
   try {
     const chats = await prisma.chat.findMany({
@@ -261,14 +262,14 @@ app.get('/api/chats', async (req, res) => {
 
 
 //TODO
-// Get all chats that are associate with the user whether it be the person who started it
+// Get all chats that are associated with the user whether it be the person who started it
 
 app.get('/api/chats/:userId', authenticate, async (req, res): Promise<any> => {
   
 });
 
 
-
+//WORKS
 // Delete a chat
 app.delete('/api/chats/:chatId', async (req, res):Promise<any> => {
   const { chatId } = req.params;
