@@ -214,7 +214,8 @@ app.put('/api/users/update', async (req, res): Promise<any> => {
 
 
 
-//chat endpoints
+
+/*************** MESSAGING END POINTS */
 
 
 // WORKS
@@ -259,36 +260,10 @@ app.get('/api/chats', async (req, res) => {
 */
 
 // Get chats for the logged-in user
-app.get('/api/chats', authenticate, async (req, res) => {
-  const userId = res.locals.userId;
+app.get('/api/chats/:userId', authenticate,  async (req, res): Promise<any>=> {
 
-  try {
-    // Fetch chats where the logged-in user is a participant
-    const chats = await prisma.chat.findMany({
-      where: {
-        users: {
-          some: { id: userId }, // Filter chats where the user is a participant
-        },
-      },
-      include: {
-        messages: {
-          include: {
-            user: true, // Include user info for each message (optional)
-          },
-        },
-        users: true, // Include users in the chat (optional)
-      },
-      orderBy: {
-        createdAt: 'desc', // Order by chat creation time
-      },
-    });
-
-    res.status(200).json(chats);
-  } catch (error) {
-    console.error("Error fetching user's chats:", error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
 });
+
 
 
 // Delete a chat
@@ -374,35 +349,34 @@ app.post('/api/chats', async (req, res) => {
 });
 
 
+//WORKS
+app.post('/api/chats/:userId', authenticate, async (req: Request, res: Response): Promise<any> => {
+  const { recipientUserId, chatName } = req.body;
+  const userId = res.locals.userId;
 
-// Create a new chat linked to each user
-app.post('/api/chats/:userId', async (req: Request, res: Response): Promise<any> => {
-  const { recipientUserId, chatName } = req.body; // The user they are messaging (recipient)
-  const userId = res.locals.userId; // The authenticated user (sender)
+  // Log the userId extracted from middleware
+  console.log('Authenticated User ID (from middleware):', userId);
 
+  if (!userId) {
+    console.error('User not authenticated');
+    return res.status(401).json({ error: 'User not authenticated' });
+  }
+
+  if (!recipientUserId) {
+    return res.status(400).json({ error: 'Recipient user ID is required' });
+  }
   try {
-    if (!userId) {
-      return res.status(400).json({ error: 'User not authenticated' });
-    }
 
-    if (!recipientUserId) {
-      return res.status(400).json({ error: 'Recipient user ID is required' });
-    }
-
-    // Find the recipient user in the database
     const recipient = await prisma.user.findUnique({
       where: { id: recipientUserId },
     });
 
     if (!recipient) {
-      console.error(`Recipient not found: ${recipientUserId}`);
       return res.status(404).json({ error: 'Recipient user not found' });
     }
 
-    // Use a default chat name if not provided in the request
-    const name = chatName || `${userId} and ${recipientUserId}`; // Default chat name: e.g., 'User 1 and User 2'
+    const name = chatName || `${userId} and ${recipientUserId}`;
 
-    // Create the new chat
     const newChat = await prisma.chat.create({
       data: {
         name,
@@ -410,70 +384,25 @@ app.post('/api/chats/:userId', async (req: Request, res: Response): Promise<any>
           connect: [
             { id: userId },
             { id: recipientUserId },
-          ], // Connect both the sender and recipient to the chat
+          ],
         },
       },
     });
 
-    // Emit the event to all connected clients when a new chat is created
-    console.log(`New chat created: ${newChat.id}, Name: ${newChat.name}`);
     io.emit('new-chat', {
       chatId: newChat.id,
       chatName: newChat.name,
       users: [userId, recipientUserId],
     });
 
-    // Respond to the client with the created chat details
     res.status(201).json(newChat);
   } catch (error) {
-    console.error("Error creating chat:", error);
-    res.status(500).json({ error: "Internal server error", message: error});
+    console.error('Error creating chat:', error);
+    res.status(500).json({ error: 'Internal server error', message: error });
   }
 });
-/*
-// Create a new chat between the logged-in user and another user
-app.post('/api/chats', authenticate, async (req, res):Promise<any> => {
-  const { recipientUserId, chatName } = req.body; // The user they are messaging (recipient)
-  const userId = res.locals.userId; // The authenticated user (sender)
 
-  if (!recipientUserId) {
-    return res.status(400).json({ error: 'Recipient user ID is required' });
-  }
-
-  try {
-    // Ensure the recipient user exists
-    const recipient = await prisma.user.findUnique({
-      where: { id: recipientUserId },
-    });
-
-    if (!recipient) {
-      return res.status(404).json({ error: 'Recipient user not found' });
-    }
-
-    // Use a default chat name if not provided in the request
-    const name = chatName || `${userId} and ${recipientUserId}`; // Default chat name: e.g., 'User 1 and User 2'
-
-    // Create a new chat that includes both the sender and the recipient
-    const newChat = await prisma.chat.create({
-      data: {
-        name, // Set the name of the chat
-        users: {
-          connect: [
-            { id: userId }, // Connect the authenticated user (sender)
-            { id: recipientUserId }, // Connect the recipient user (receiver)
-          ],
-        },
-      },
-    });
-
-    // Return the newly created chat details
-    res.status(201).json(newChat);
-  } catch (error) {
-    console.error("Error creating chat:", error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
-*/
+/*************** WEBSOCKETS */
 
 
 // Real-time WebSocket chat functionality

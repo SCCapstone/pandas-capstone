@@ -37,7 +37,7 @@ const Messaging: React.FC = () => {
       .then((response) => setUsers(response.data))
       .catch((error) => console.error('Error fetching users:', error));
 
-    axios.get('http://localhost:2020/api/chats')
+    axios.get('http://localhost:2020/api/chats/:userId')
       .then((response) => setChats(response.data))
       .catch((error) => console.error('Error fetching chats:', error));
 
@@ -79,26 +79,39 @@ const Messaging: React.FC = () => {
       }
     }
   };
-
   const createNewChat = async (user: User) => {
     try {
       const payload = {
-        name: `${user.firstName} ${user.lastName}`,
-        userId: user.id,
+        recipientUserId: user.id, // Use the correct key
+        chatName: `${user.firstName} ${user.lastName}`, // Optional, used as default if provided
       };
   
       // Check for duplicate chats
-      const isDuplicateChat = chats.some((chat) => chat.name === payload.name);
+      const isDuplicateChat = chats.some((chat) => chat.name === payload.chatName);
       if (isDuplicateChat) {
         alert('A chat with this user already exists.');
         return;
       }
+      
+      const token = localStorage.getItem('token');
+
   
-      const response = await axios.post('http://localhost:2020/api/chats', payload, {
+      if (!token) {
+        console.error('Token is missing. User might not be authenticated.');
+        alert('Please log in again.');
+        return;
+      }
+      console.log(token);
+      
+      const response = await axios.post(`http://localhost:2020/api/chats/${user.id}`, payload, {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`, // Pass the token
+          Authorization: `Bearer ${token}`, // Pass the token
         },
       });
+      
+      
+
+      //console.log('Authorization Token:', localStorage.getItem('token'));
   
       const newChat = response.data;
   
@@ -109,12 +122,13 @@ const Messaging: React.FC = () => {
     } catch (error) {
       console.error('Error creating new chat:', error);
       if (axios.isAxiosError(error) && error.response) {
-        alert(`Error: ${error.response.status} - ${error.response.data.message}`);
+        alert(`Error: ${error.response.status} - ${error.response.data.error}`);
       } else {
         alert('An unexpected error occurred.');
       }
     }
   };
+  
 
   const handleDeleteChat = async (chatId: number) => {
     try {
