@@ -261,12 +261,35 @@ app.get('/api/chats', async (req, res) => {
 
 
 
-//TODO
-// Get all chats that are associated with the user whether it be the person who started it
+//WORKS YAYYAYAYAY
+app.get('/api/chats/:userId', authenticate, async (req: Request, res: Response): Promise<any> => {
+  const userId = parseInt(req.params.userId, 10); // Convert to number // Access the userId from the URL
+  console.log('User ID:', userId); // Log it for debugging
 
-app.get('/api/chats/:userId', authenticate, async (req, res): Promise<any> => {
-  
+  try {
+    // Fetch chats related to the user
+    const userChats = await prisma.chat.findMany({
+      where: {
+        users: {
+          some: { id: userId }, // Use the extracted userId
+        },
+      },
+      include: {
+        users: {
+          select: {
+            id: true,
+          },
+        },
+      },
+    });
+
+    res.status(200).json(userChats);
+  } catch (error) {
+    console.error('Error retrieving chats:', error);
+    res.status(500).json({ error: 'Internal server error', message: error });
+  }
 });
+
 
 
 //WORKS

@@ -30,6 +30,7 @@ const Messaging: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]); // Store users
   const [searchTerm, setSearchTerm] = useState<string>(''); // Store search term
   const [showDropdown, setShowDropdown] = useState<boolean>(false); // Control dropdown visibility
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     // Fetch users and chats from the API when the component mounts
@@ -39,13 +40,13 @@ const Messaging: React.FC = () => {
 
 
     // Make the API request to fetch chats for the user
-  
+    
 
+    
     //TODO make this the endpoint for chats/userid
     axios.get(`http://localhost:2020/api/chats`)
       .then((response) => setChats(response.data))
       .catch((error) => console.error('Error fetching chats:', error));
-
 
       
     // Listen for real-time updates on new messages
@@ -64,6 +65,7 @@ const Messaging: React.FC = () => {
     return () => {
       socket.off('message');
     };
+    
   }, [selectedChat]);
 
   //TODO fix this 
