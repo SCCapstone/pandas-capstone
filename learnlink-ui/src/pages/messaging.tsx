@@ -20,6 +20,10 @@ interface User {
   lastName: string;
 }
 
+//TODO make the name of the chat flip when the other user sees it 
+// TODO (ie rn its created by one person and named for the other but when the other logs in they see their own name)
+
+
 // Connect to the Socket.IO server
 const socket = io('http://localhost:2020'); // Replace with your server URL
 
