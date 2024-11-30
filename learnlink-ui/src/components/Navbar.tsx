@@ -18,7 +18,7 @@ const Navbar: React.FC = () => {
     <header className="navbar">
       <div className="nav-logo"><Logo/></div>
       <nav className="nav-links">
-        
+        <a href="/swiping">Match</a>
         <a href="/profile">Profile</a>
         <a href="/messaging" onClick={handleMessaging} >Messaging</a>
         <a href="/resources/studyTips">Resources</a>

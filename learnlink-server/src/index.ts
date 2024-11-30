@@ -219,6 +219,160 @@ app.put('/api/users/update', async (req, res): Promise<any> => {
 });
 
 
+// MATCHING LOGIC
+
+// Endpoint to handle swipe action and create a match if applicable
+app.post('/api/swipe', async (req, res) => {
+  const { userId, targetId, direction, isStudyGroup } = req.body;
+
+  try {
+    // Store the swipe in the database
+    const swipe = await prisma.swipe.create({
+      data: {
+        userId,
+        direction,
+        targetUserId: isStudyGroup ? null : targetId,  // If study group, nullify targetUserId
+        targetGroupId: isStudyGroup ? targetId : null,  // If user, nullify targetGroupId
+      },
+    });
+
+    // If the swipe was 'Yes', check if it's a match
+    if (direction === 'Yes') {
+      if (isStudyGroup) {
+        // Check for a mutual swipe with the study group
+        await createMatchForStudyGroup(userId, targetId);
+      } else {
+        // Check for a mutual swipe with another user
+        await createMatchForUsers(userId, targetId);
+      }
+    }
+
+    res.status(200).json({ message: 'Swipe recorded successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Something went wrong' });
+  }
+});
+
+// Helper function to create user-to-user matches
+const createMatchForUsers = async (userId: number, targetUserId: number) => {
+  const targetUserSwipe = await prisma.swipe.findFirst({
+    where: {
+      userId: targetUserId,
+      targetUserId: userId,  // Check if the target user has swiped on the user
+      direction: 'Yes',
+    },
+  });
+
+  if (targetUserSwipe) {
+    await prisma.match.create({
+      data: {
+        user1Id: userId,
+        user2Id: targetUserId,
+        isStudyGroupMatch: false,
+      },
+    });
+  }
+};
+
+// Helper function to create user-to-study-group matches
+const createMatchForStudyGroup = async (userId: number, targetGroupId: number) => {
+  const studyGroupSwipe = await prisma.swipe.findFirst({
+    where: {
+      userId: targetGroupId,
+      targetUserId: userId,  // Check if the group has swiped on the user
+      direction: 'Yes',
+    },
+  });
+
+  if (studyGroupSwipe) {
+    await prisma.match.create({
+      data: {
+        user1Id: userId,
+        studyGroupId: targetGroupId,
+        isStudyGroupMatch: true,
+      },
+    });
+  }
+};
+
+// Endpoint to retrieve matches for a user
+app.get('/api/profiles', authenticate, async (req: Request, res: Response) => {
+  const userId = res.locals.userId; // Retrieved from the token  const userId = parseInt(req.params.userId);
+
+  try {
+    const matches = await prisma.match.findMany({
+      where: {
+        OR: [
+          { user1Id: userId },
+          { user2Id: userId },
+        ],
+      },
+      include: {
+        user1: true,
+        user2: true,
+        studyGroup: true,
+      },
+    });
+
+    res.status(200).json(matches);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Something went wrong' });
+  }
+});
+
+app.get('/api/profiles/:userId', async (req, res) => {
+  const userId = parseInt(req.params.userId);
+
+  try {
+    // Fetch users and study groups that the current user has not swiped on yet
+    const usersToSwipeOn = await prisma.user.findMany({
+      where: {
+        NOT: {
+          id: userId,  // Exclude the current user from the profiles
+        },
+        // You can add additional filters here like matching preferences, etc.
+      },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        username: true,
+        profilePic: true,
+        bio: true,
+        major: true,
+        relevant_courses: true,
+        study_method: true,
+        gender: true,
+        age: true,
+      },
+    });
+
+    const studyGroupsToSwipeOn = await prisma.studyGroup.findMany({
+      where: {
+        // Add any conditions to exclude study groups the user has already swiped on
+      },
+      select: {
+        id: true,
+        name: true,
+        subject: true,
+        description: true,
+        creator: true,
+        users: true,
+      },
+    });
+
+    res.status(200).json({
+      users: usersToSwipeOn,
+      studyGroups: studyGroupsToSwipeOn,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Something went wrong' });
+  }
+});
+
 
 
 /*************** MESSAGING END POINTS */
