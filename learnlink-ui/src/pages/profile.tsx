@@ -7,6 +7,9 @@ import CopyrightFooter from '../components/CopyrightFooter';
 const Profile: React.FC = () => {
 
   const [formData, setFormData] = useState({
+    first_name: '',
+    last_name: '',
+    username: '',
     age: '',
     college: '',
     major: '',
@@ -44,6 +47,9 @@ const Profile: React.FC = () => {
           });
           const userData = await userResponse.json();
           setFormData({
+            first_name: userData.first_name || '',
+            last_name: userData.last_name || '',
+            username: userData.username || '',
             age: userData.age || '',
             college: userData.college || '',
             major: userData.major || '',
@@ -173,6 +179,17 @@ const Profile: React.FC = () => {
                 <div className="profile-picture">
                   <button className="upload-button">CLICK TO ADD PICTURE</button>
                 </div>
+                <div className="profile-name">
+                  <label>
+                    First Name <input type="text" name="first_name" value={formData.first_name} onChange={handleChange} />
+                  </label>
+                  <label>
+                    Last Name <input type="text" name="last_name" value={formData.last_name} onChange={handleChange} />
+                  </label>
+                </div>
+                <label>
+                  Username: <input type="text" name="username" value={formData.username} onChange={handleChange} />
+                </label>
                 <label>
                   Bio:<br /><textarea name="bio" value={formData.bio} onChange={handleChange} />
                 </label>

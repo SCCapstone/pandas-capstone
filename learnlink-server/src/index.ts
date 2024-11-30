@@ -155,6 +155,9 @@ app.get('/api/users/profile', authenticate, async (req, res):Promise<any> => {
 
     // Return the profile data
     res.json({
+      first_name: user.firstName,
+      last_name: user.lastName,
+      username: user.username,
       age: user.age,
       college: user.college,
       major: user.major,
@@ -172,7 +175,7 @@ app.get('/api/users/profile', authenticate, async (req, res):Promise<any> => {
 
 // Update user profile
 app.put('/api/users/update', async (req, res): Promise<any> => {
-  const { age, college, major, grade, relevant_courses, study_method, gender, bio } = req.body;
+  const { first_name, last_name, username, age, college, major, grade, relevant_courses, study_method, gender, bio } = req.body;
   console.log('Received data:', req.body); // Log incoming data for debugging
 
 
@@ -193,6 +196,9 @@ app.put('/api/users/update', async (req, res): Promise<any> => {
     const updatedUser = await prisma.user.update({
       where: { id: userId },
       data: {
+        firstName: first_name || undefined, // Use undefined to keep the existing value if not provided
+        lastName: last_name || undefined,
+        username: username || undefined,
         age: age || undefined, // Use undefined to keep the existing value if not provided
         college: college || undefined,
         major: major || undefined,

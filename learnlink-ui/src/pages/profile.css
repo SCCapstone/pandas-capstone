@@ -159,3 +159,15 @@
 .save-button:hover {
   background-color: #004f6a; /* Darker shade for hover */
 }
+
+.profile-name {
+  margin-top: 15px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.profile-name input {
+  width: 100%;
+  
+}
