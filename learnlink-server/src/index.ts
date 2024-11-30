@@ -237,25 +237,36 @@ app.get('/api/users', async (req, res) => {
 
 // WORKS
 // should eventually not be used, but for rn it works for just getting all chats on the system
-app.get('/api/chats', async (req, res) => {
+app.get('/api/chats', authenticate,  async (req, res):Promise<any> => {
+  const userId = res.locals.userId;  // Use res.locals to get the userId set by the authenticate middleware
+
+  if (!userId) {
+    return res.status(401).json({ message: 'User not authenticated' });
+  }
+
   try {
-    const chats = await prisma.chat.findMany({
-      include: {
-        messages: {
-          include: {
-            user: true, // Include user info for each message (optional)
-          },
+    // Fetch the user from the database by userId
+    const userChats = await prisma.chat.findMany({
+      where: {
+        users: {
+          some: { id: userId }, // Use the extracted userId
         },
-        users: true, // Include users in the chat (optional)
       },
-      orderBy: {
-        createdAt: 'desc', // Order by chat creation time
+      include: {
+        users: true,
       },
     });
-    res.json(chats);
+
+    if (!userChats) {
+      return res.status(404).json({ message: 'chats not found' });
+    }
+
+    // Return the profile data
+    res.json(userChats);
+  
   } catch (error) {
-    console.error("Error fetching chats:", error);
-    res.status(500).json({ error: "Internal server error" });
+    console.error('Error fetching user profile:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 });
 
@@ -352,6 +363,7 @@ app.post('/api/chats/:chatId/messages', authenticate, async (req, res): Promise<
 
 // Create a new chat
 // WORKS
+// Technically should not be called
 app.post('/api/chats', async (req, res) => {
   const { name, userId } = req.body; // Assuming the user is the creator of the chat
 
