@@ -236,7 +236,7 @@ app.get('/api/users', async (req, res) => {
 // Get all chats
 
 // WORKS
-// should eventually not be used, but for rn it works for just getting all chats on the system
+// pulls up the chats with the users authentication code
 app.get('/api/chats', authenticate,  async (req, res):Promise<any> => {
   const userId = res.locals.userId;  // Use res.locals to get the userId set by the authenticate middleware
 
@@ -265,37 +265,14 @@ app.get('/api/chats', authenticate,  async (req, res):Promise<any> => {
     res.json(userChats);
   
   } catch (error) {
-    console.error('Error fetching user profile:', error);
+    console.error('Error retrieving chats for user:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });
 
 
 
-//WORKS YAYYAYAYAY
-app.get('/api/chats/:userId', authenticate, async (req: Request, res: Response): Promise<any> => {
-  const userId = parseInt(req.params.userId, 10); // Convert to number // Access the userId from the URL
-  console.log('User ID:', userId); // Log it for debugging
 
-  try {
-    // Fetch chats related to the user
-    const userChats = await prisma.chat.findMany({
-      where: {
-        users: {
-          some: { id: userId }, // Use the extracted userId
-        },
-      },
-      include: {
-        users: true,
-      },
-    });
-
-    res.status(200).json(userChats);
-  } catch (error) {
-    console.error('Error retrieving chats:', error);
-    res.status(500).json({ error: 'Internal server error', message: error });
-  }
-});
 
 
 
