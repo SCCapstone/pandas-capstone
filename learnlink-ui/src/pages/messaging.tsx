@@ -40,8 +40,7 @@ const Messaging: React.FC = () => {
 
 
     // Make the API request to fetch chats for the user
-    
-
+  
     
     //TODO make this the endpoint for chats/userid
     axios.get(`http://localhost:2020/api/chats`)

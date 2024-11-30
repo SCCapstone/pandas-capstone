@@ -275,11 +275,7 @@ app.get('/api/chats/:userId', authenticate, async (req: Request, res: Response):
         },
       },
       include: {
-        users: {
-          select: {
-            id: true,
-          },
-        },
+        users: true,
       },
     });
 
