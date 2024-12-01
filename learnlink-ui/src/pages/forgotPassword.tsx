@@ -13,6 +13,11 @@ const ForgotPassword: React.FC = () => {
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setEmail(e.target.value);
     };
+    // Email validation function
+    const validateEmail = (email: string): boolean => {
+        const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        return regex.test(email);
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -20,6 +25,12 @@ const ForgotPassword: React.FC = () => {
             setError('Enter your email');
             return;
         }
+
+        if (!validateEmail(email)) {
+            setError('Enter a valid email address');
+            return;
+        }
+
         setLoading(true);
         setSuccess(null);
         setError(null);
@@ -34,14 +45,16 @@ const ForgotPassword: React.FC = () => {
             });
 
             if(!response.ok){
-                throw new Error("Failed to send reser link");
+                const errorData = await response.json();
+                throw new Error("Failed to send reset link");
             }
 
-            setSuccess('Password reset link sent! Check Your Email.')
+            setSuccess('Password reset link sent! Check Your Email.');
             setEmail('');
 
         } catch (err) {
-            setError('Could not send the reset link. Please try again.');
+            console.error(err);  // Log the error for debugging purposes
+            setError(err instanceof Error ? err.message : 'Could not send the reset link. Please try again.');
         } finally {
             setLoading(false);
         }
