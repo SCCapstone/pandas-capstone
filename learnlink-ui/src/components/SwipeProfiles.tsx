@@ -52,7 +52,7 @@ const SwipeProfiles = ({ userId }: { userId: number }) => {
         {currentProfile ? (
           <>
           <div className='swipe-main-container'>
-            <div className='left-side'>
+            <div className='swipe-left-side'>
                 <img src={currentProfile.profilePic} alt={`${currentProfile.firstName} ${currentProfile.lastName}`} className='profile-pic'/>
                 <div className='bio'>
                 <h3>Bio:</h3>
@@ -60,17 +60,17 @@ const SwipeProfiles = ({ userId }: { userId: number }) => {
                 </div>
 
             </div>
-            <div className='right-side'>
+            <div className='swipe-right-side'>
                 <h1>{currentProfile.firstName} {currentProfile.lastName}</h1>
                 <h3>@{currentProfile.username}</h3>
                 <div className='profile-details-container'>
-                <div className='profile-details'>
+                <div className='swipe-profile-details'>
                 <p><span className="bold-first-word">Age: </span>{currentProfile.age}</p>
                 <p><span className="bold-first-word">College: </span>{currentProfile.college}</p>
                 <p><span className="bold-first-word">Major: </span>{currentProfile.major}</p>
                 <p><span className="bold-first-word">Gender: </span>{currentProfile.gender}</p>
                 </div>
-                <div className='profile-details'>
+                <div className='swipe-profile-details'>
                 <p><span className="bold-first-word">Grade: </span>{currentProfile.grade}</p>
                 <p><span className="bold-first-word">Relevant Coursework: </span>{currentProfile.relevant_courses}</p>
                 <p><span className="bold-first-word">Fav Study Method: </span>{currentProfile.study_method}</p>

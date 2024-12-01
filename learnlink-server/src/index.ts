@@ -76,7 +76,16 @@ app.post("/api/users", async (req, res): Promise<any> => {
       },
     });
 
-    res.status(201).json(newUser); // create in json format
+    // Create a JWT token
+    const token = jwt.sign(
+      { userId: newUser.id, username: newUser.username },
+      process.env.JWT_SECRET!,
+      { expiresIn: "1h" } // Token expires in 1 hour
+    );
+
+    // Send back the token
+    return res.status(201).json({ token, user: { id: newUser.id, username: newUser.username } });
+  
   } catch (error) {
     console.error("Error creating user:", error);
     res.status(500).json({ error: "Internal server error" });
