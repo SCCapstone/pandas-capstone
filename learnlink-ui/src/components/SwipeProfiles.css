@@ -4,6 +4,7 @@
     flex-direction: row;
     justify-content: flex-start;
     gap: 3rem;
+    overflow-y: scroll;
     /* background-color: tomato; */
 }
 

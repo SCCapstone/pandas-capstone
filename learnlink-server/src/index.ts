@@ -359,6 +359,7 @@ app.get('/api/profiles/:userId', async (req, res) => {
         username: true,
         profilePic: true,
         bio: true,
+        grade: true,
         major: true,
         relevant_courses: true,
         study_method: true,
