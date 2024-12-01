@@ -219,4 +219,15 @@ const Signup: React.FC = () => {
                     </form>
 
                     <div className="loginRedirect">
-                        <label>Already have an account
+                        <label>Already have an account? <a href="/login">Log in</a></label>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <Copyright />
+            </div>
+        </div>
+    );
+};
+
+export default Signup;
