@@ -17,13 +17,16 @@ const Settings: React.FC = () => {
       navigate('/updateEmail');
   };
 
+  const handleChangePassword = () => {
+    navigate('/changePassword');
+};
   return (
     <div className="settings">
       <Navbar />
       <div className="settings-content">
         <button onClick={logout}>Log Out</button>
         <button onClick={handleUpdateEmail}>Update Email</button>
-        <button>Change Password</button>
+        <button onClick={handleChangePassword}>Change Password</button>
         <button>Delete Account</button>
       </div>
       <div>

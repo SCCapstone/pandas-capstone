@@ -265,6 +265,44 @@ app.post('/api/update-email', authenticate, async (req, res):Promise<any> => {
   }
 });
 
+
+app.post('/api/update-password', authenticate, async (req, res):Promise<any> => {
+  const { oldPassword, newPassword } = req.body;
+  const userId = res.locals.userId; 
+
+  try {
+    // Fetch current user's email from the database
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Check if the old email matches the current email
+    const isPasswordValid = await bcrypt.compare(oldPassword, user.password);
+    if (!isPasswordValid) {
+      return res.status(400).json({ error: 'Old password does not match current password' });
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+
+    // Update the email
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: { password: hashedPassword },
+    });
+
+    return res.status(200).json({ message: 'Password updated successfully', updatedUser });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
 // MATCHING LOGIC
 
 // Endpoint to handle swipe action and create a match if applicable

@@ -14,6 +14,8 @@ import ForgotPassword from './pages/forgotPassword';
 import Swiping from './pages/swiping';
 import UpdateEmail from './pages/updateEmail';
 import ResetPassword from './pages/resetPassword';
+import ChangePassword from './pages/changePassword';
+
 
 //routes
 function App() {
@@ -37,6 +39,7 @@ function App() {
           <Route path="/resetpassword" element={<ResetPassword />} />
           <Route path="/swiping" element={<Swiping />} />
           <Route path="/updateEmail" element={<UpdateEmail />} />
+          <Route path="/changepassword" element={<ChangePassword />} />
         </Routes> 
       </div>
     </Router>
