@@ -110,6 +110,13 @@ const Signup: React.FC = () => {
             setConfirmPassword('');
             // setError(null);
 
+            const responseData = await response.json();
+            const token = responseData.token;
+          
+            // Store the JWT in localStorage
+            localStorage.setItem('token', token);
+
+            
             // Navigate to landing page after successful signup
             navigate('/LandingPage');
         } catch (error) {

@@ -179,7 +179,7 @@ const Profile: React.FC = () => {
                 <div className="profile-picture">
                   <button className="upload-button">CLICK TO ADD PICTURE</button>
                 </div>
-                <div className="profile-name">
+                <div className="update-profile-name">
                   <label>
                     First Name <input type="text" name="first_name" value={formData.first_name} onChange={handleChange} />
                   </label>
