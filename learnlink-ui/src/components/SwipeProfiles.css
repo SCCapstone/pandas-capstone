@@ -1,0 +1,106 @@
+.swipe-main-container {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 3rem;
+    /* background-color: tomato; */
+}
+
+  .swipe-main-container h1 {
+    font-size: 64px ;
+    font-weight: normal;
+    margin-bottom: 1rem;
+  }
+  
+  .swipe-main-container h2 {
+    font-size: 30px;
+    font-weight: normal;
+    margin-bottom: 1rem ;
+    margin-top: 2rem;
+  }
+  
+  .swipe-main-container p {
+    padding-left: 0;
+    font-size: 1.25rem;
+    font-weight: 300;
+    text-align: left;
+    color: black;
+  
+  }
+
+   .swipe-main-container a:link {
+    font-size: 1.25rem;
+    font-weight: 400;
+    color: #FEAD2B;
+    text-decoration:none;
+  }
+
+  .swipe-main-container a:hover {
+    text-decoration:underline;
+  }
+
+  .right-side {
+    flex-grow: 1;
+  }
+
+  .left-side {
+    width: 20%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+
+  .profile-details-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 1rem;
+    width: 80%;
+    
+  }
+
+  .profile-details {
+    display:block;
+  }
+  
+  .profile-pic {
+    width: 100%;
+    height: auto;
+    border-radius: 50%;
+    margin-bottom: 1rem;
+    margin-top: 2.5rem;
+  }
+
+  .bold-first-word {
+    font-weight: bold;
+  }
+
+  .right-side h3 {
+    font-size: 1.5rem;
+    font-weight: 400;
+    margin-bottom: 1rem;
+    font-weight: bold;
+    color: #00668C;
+  }
+
+  .swipe-buttons {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .swipe-buttons button {
+    align-self:flex-end;
+    padding-left: 40px;
+    padding-right: 40px;
+    color: white;
+    background-color: #00668C;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 15px;
+    height: 50px;
+    margin-bottom: 20px;
+}

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import './SwipeProfiles.css';
 
 const SwipeProfiles = ({ userId }: { userId: number }) => {
   const [profiles, setProfiles] = useState<any>({ users: [], studyGroups: [] });
@@ -50,11 +51,35 @@ const SwipeProfiles = ({ userId }: { userId: number }) => {
       <div className="profile-card">
         {currentProfile ? (
           <>
-            {/*<img src={currentProfile.profilePic} alt={`${currentProfile.firstName} ${currentProfile.lastName}`} />*/}
-            <h3>{currentProfile.firstName} {currentProfile.lastName}</h3>
-            <p>{currentProfile.bio}</p>
-            <p>{currentProfile.major}</p>
+          <div className='swipe-main-container'>
+            <div className='left-side'>
+                <img src={currentProfile.profilePic} alt={`${currentProfile.firstName} ${currentProfile.lastName}`} className='profile-pic'/>
+                <div className='bio'>
+                <h3>Bio:</h3>
+                <p>{currentProfile.bio}</p>
+                </div>
+
+            </div>
+            <div className='right-side'>
+                <h1>{currentProfile.firstName} {currentProfile.lastName}</h1>
+                <h3>@{currentProfile.username}</h3>
+                <div className='profile-details-container'>
+                <div className='profile-details'>
+                <p><span className="bold-first-word">Age: </span>{currentProfile.age}</p>
+                <p><span className="bold-first-word">College: </span>{currentProfile.college}</p>
+                <p><span className="bold-first-word">Major: </span>{currentProfile.major}</p>
+                <p><span className="bold-first-word">Gender: </span>{currentProfile.gender}</p>
+                </div>
+                <div className='profile-details'>
+                <p><span className="bold-first-word">Grade: </span>{currentProfile.grade}</p>
+                <p><span className="bold-first-word">Relevant Coursework: </span>{currentProfile.relevant_courses}</p>
+                <p><span className="bold-first-word">Fav Study Method: </span>{currentProfile.study_method}</p>
+                <p><span className="bold-first-word">Study Preference: </span>{}</p>
+              </div>
+              </div>
+            </div>
             {/* Render more profile details as needed */}
+            </div>
           </>
         ) : (
           <div>No more profiles to swipe on!</div>

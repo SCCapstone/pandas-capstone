@@ -15,12 +15,11 @@ const Swiping: React.FC = () => {
   }, []);
 
   return (
-    <div className="landing-page">
-      <div>
+    <div className="swiping-page">
+      <header>
         <Navbar />
-      </div>
-      <main className="content">
-        <p>{userId}</p>
+      </header>
+      <main className="swipe-content">
         {/* Show a message if the user is not logged in */}
         {!userId ? (
           <p>Loading user profile...</p>
@@ -30,9 +29,9 @@ const Swiping: React.FC = () => {
           </>
         )}
       </main>
-      <div>
+      <footer>
         <CopyrightFooter />
-      </div>
+      </footer>
     </div>
   );
 };

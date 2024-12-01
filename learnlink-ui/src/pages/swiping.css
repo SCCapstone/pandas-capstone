@@ -1,0 +1,15 @@
+.swiping-page {
+    height: 100vh;
+    background-color: #ffff;
+    display: flex;
+    flex-direction: column;
+}
+
+.swipe-content {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    width: 80%;
+    align-self: center;
+}
+
