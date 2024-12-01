@@ -12,6 +12,7 @@ import ExternalResources from './pages/resources/externalResources';
 import GradeCalculator from './pages/resources/gradeCalculator';
 import ForgotPassword from './pages/forgotPassword';
 import Swiping from './pages/swiping';
+import UpdateEmail from './pages/updateEmail';
 
 //routes
 function App() {
@@ -33,6 +34,7 @@ function App() {
           <Route path="/resources/gradeCalculator" element = {<GradeCalculator/> }/>
           <Route path="/forgotpassword" element={<ForgotPassword />} />
           <Route path="/swiping" element={<Swiping />} />
+          <Route path="/updateEmail" element={<UpdateEmail />} />
         </Routes> 
       </div>
     </Router>

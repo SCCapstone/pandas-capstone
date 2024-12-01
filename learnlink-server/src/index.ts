@@ -232,6 +232,38 @@ app.put('/api/users/update', async (req, res): Promise<any> => {
   }
 });
 
+// Update email route
+app.post('/api/update-email', authenticate, async (req, res):Promise<any> => {
+  const { oldEmail, newEmail } = req.body;
+  const userId = res.locals.userId; 
+
+  try {
+    // Fetch current user's email from the database
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Check if the old email matches the current email
+    if (user.email !== oldEmail) {
+      return res.status(400).json({ error: 'Old email does not match current email' });
+    }
+
+    // Update the email
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: { email: newEmail },
+    });
+
+    return res.status(200).json({ message: 'Email updated successfully', updatedUser });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+});
 
 // MATCHING LOGIC
 

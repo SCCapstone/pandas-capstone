@@ -12,13 +12,19 @@ const Settings: React.FC = () => {
     const handleLogOut = () => {
         navigate('/welcome');
     };
+
+    const handleUpdateEmail = () => {
+      navigate('/updateEmail');
+  };
+
   return (
     <div className="settings">
       <Navbar />
-      <div className="content">
-        <button className="logOut" onClick={logout}>Log Out</button>
-        <button className="changePassword">Change Password</button>
-        <button className="deleteAccount">Delete Account</button>
+      <div className="settings-content">
+        <button onClick={logout}>Log Out</button>
+        <button onClick={handleUpdateEmail}>Update Email</button>
+        <button>Change Password</button>
+        <button>Delete Account</button>
       </div>
       <div>
         <CopyrightFooter />
