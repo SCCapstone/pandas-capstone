@@ -15,6 +15,7 @@ import Swiping from './pages/swiping';
 import UpdateEmail from './pages/updateEmail';
 import ResetPassword from './pages/resetPassword';
 import ChangePassword from './pages/changePassword';
+import AccountDetails from './pages/accountDetails';
 
 
 //routes
@@ -40,6 +41,7 @@ function App() {
           <Route path="/swiping" element={<Swiping />} />
           <Route path="/updateEmail" element={<UpdateEmail />} />
           <Route path="/changepassword" element={<ChangePassword />} />
+          <Route path="/accountDetails" element={<AccountDetails />} />
         </Routes> 
       </div>
     </Router>

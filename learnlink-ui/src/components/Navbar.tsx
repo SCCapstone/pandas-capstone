@@ -14,6 +14,9 @@ const Navbar: React.FC = () => {
     const handleMessaging = () => {
         navigate('/messaging');
     };
+    const handleAccountDetails = () => { 
+        navigate('/accountDetails');
+    }
   return (
     <header className="navbar">
       <div className="nav-logo"><Logo/></div>
@@ -32,7 +35,7 @@ const Navbar: React.FC = () => {
         <FaBell className="icon" />
         {/*create an onclick function to go to settings page*/}
         <FaCog className="icon" onClick={handleSettings} />
-        <FaUserCircle className="icon profile-icon" />
+        <FaUserCircle className="icon profile-icon" onClick={handleAccountDetails}/>
         {/* create a drag down menu for the profile and resources*/}
       </div>
     </header>
