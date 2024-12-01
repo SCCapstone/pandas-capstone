@@ -46,7 +46,7 @@ const ForgotPassword: React.FC = () => {
 
             if(!response.ok){
                 const errorData = await response.json();
-                throw new Error("Failed to send reset link");
+                throw new Error(errorData.message || "Failed to send reset link");
             }
 
             setSuccess('Password reset link sent! Check Your Email.');
