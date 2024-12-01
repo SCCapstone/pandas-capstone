@@ -19,6 +19,12 @@ const SwipeProfiles = ({ userId }: { userId: number }) => {
     fetchProfiles();
   }, [userId]);
 
+  const handleBack = () => {
+    if (currentProfileIndex > 0) {
+      setCurrentProfileIndex(currentProfileIndex - 1); // Move to the previous profile
+    }
+  };
+
   const handleSwipe = async (direction: 'Yes' | 'No', targetId: number, isStudyGroup: boolean) => {
     try {
       await fetch('http://localhost:2020/api/swipe', {
@@ -81,13 +87,20 @@ const SwipeProfiles = ({ userId }: { userId: number }) => {
 
               {/* Render more profile details as needed */}
             </div>
-            <div className="swipe-buttons">
-              <button onClick={() => handleSwipe('No', currentProfile.id, !!currentProfile.studyGroupId)}>
-                No
+            <div className="swipe-buttons-container">
+              <button onClick={handleBack} disabled={currentProfileIndex === 0}    
+              style={{ visibility: currentProfileIndex > 0 ? 'visible' : 'hidden' }}>
+                Back
               </button>
-              <button onClick={() => handleSwipe('Yes', currentProfile.id, !!currentProfile.studyGroupId)}>
-                Yes
-              </button>
+              
+              <div className="swipe-action-buttons">
+                <button onClick={() => handleSwipe('Yes', currentProfile.id, !!currentProfile.studyGroupId)}>
+                  Match
+                </button>
+                <button onClick={() => handleSwipe('No', currentProfile.id, !!currentProfile.studyGroupId)}>
+                  Skip
+                </button>
+              </div>
             </div>
           </>
         ) : (

@@ -85,14 +85,21 @@
     color: #00668C;
   }
 
-  .swipe-buttons {
+  .swipe-buttons-container {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     gap: 1rem;
   }
 
-  .swipe-buttons button {
+  .swipe-action-buttons {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .swipe-action-buttons button, .swipe-buttons-container button {
     align-self:flex-end;
     padding-left: 40px;
     padding-right: 40px;
