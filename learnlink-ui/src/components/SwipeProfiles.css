@@ -105,3 +105,12 @@
     height: 50px;
     margin-bottom: 20px;
 }
+
+.swipe-info {
+  display: flex;
+  justify-content: center; /* Horizontal centering */
+  align-items: center; /* Vertical centering */
+  text-align: center; /* Ensures text alignment if there's multi-line text */
+  flex-grow: 1; /* Ensure parent container has a defined height */
+}
+

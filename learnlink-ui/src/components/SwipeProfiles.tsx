@@ -41,7 +41,7 @@ const SwipeProfiles = ({ userId }: { userId: number }) => {
   };
 
   if (profiles.users.length === 0 && profiles.studyGroups.length === 0) {
-    return <div>Loading profiles...</div>;
+    return <div className='swipe-info'><p>Loading profiles...</p></div>;
   }
 
   const currentProfile = profiles.users[currentProfileIndex] || profiles.studyGroups[currentProfileIndex];
@@ -51,48 +51,50 @@ const SwipeProfiles = ({ userId }: { userId: number }) => {
       <div className="profile-card">
         {currentProfile ? (
           <>
-          <div className='swipe-main-container'>
-            <div className='swipe-left-side'>
-                <img src={currentProfile.profilePic} alt={`${currentProfile.firstName} ${currentProfile.lastName}`} className='profile-pic'/>
+            <div className='swipe-main-container'>
+              <div className='swipe-left-side'>
+                <img src={currentProfile.profilePic} alt={`${currentProfile.firstName} ${currentProfile.lastName}`} className='profile-pic' />
                 <div className='bio'>
-                <h3>Bio:</h3>
-                <p>{currentProfile.bio}</p>
+                  <h3>Bio:</h3>
+                  <p>{currentProfile.bio}</p>
                 </div>
 
-            </div>
-            <div className='swipe-right-side'>
+              </div>
+              <div className='swipe-right-side'>
                 <h1>{currentProfile.firstName} {currentProfile.lastName}</h1>
                 <h3>@{currentProfile.username}</h3>
                 <div className='profile-details-container'>
-                <div className='swipe-profile-details'>
-                <p><span className="bold-first-word">Age: </span>{currentProfile.age}</p>
-                <p><span className="bold-first-word">College: </span>{currentProfile.college}</p>
-                <p><span className="bold-first-word">Major: </span>{currentProfile.major}</p>
-                <p><span className="bold-first-word">Gender: </span>{currentProfile.gender}</p>
+                  <div className='swipe-profile-details'>
+                    <p><span className="bold-first-word">Age: </span>{currentProfile.age}</p>
+                    <p><span className="bold-first-word">College: </span>{currentProfile.college}</p>
+                    <p><span className="bold-first-word">Major: </span>{currentProfile.major}</p>
+                    <p><span className="bold-first-word">Gender: </span>{currentProfile.gender}</p>
+                  </div>
+                  <div className='swipe-profile-details'>
+                    <p><span className="bold-first-word">Grade: </span>{currentProfile.grade}</p>
+                    <p><span className="bold-first-word">Relevant Coursework: </span>{currentProfile.relevant_courses}</p>
+                    <p><span className="bold-first-word">Fav Study Method: </span>{currentProfile.study_method}</p>
+                    <p><span className="bold-first-word">Study Preference: </span>{ }</p>
+                  </div>
                 </div>
-                <div className='swipe-profile-details'>
-                <p><span className="bold-first-word">Grade: </span>{currentProfile.grade}</p>
-                <p><span className="bold-first-word">Relevant Coursework: </span>{currentProfile.relevant_courses}</p>
-                <p><span className="bold-first-word">Fav Study Method: </span>{currentProfile.study_method}</p>
-                <p><span className="bold-first-word">Study Preference: </span>{}</p>
               </div>
-              </div>
+
+              {/* Render more profile details as needed */}
             </div>
-            {/* Render more profile details as needed */}
+            <div className="swipe-buttons">
+              <button onClick={() => handleSwipe('No', currentProfile.id, !!currentProfile.studyGroupId)}>
+                No
+              </button>
+              <button onClick={() => handleSwipe('Yes', currentProfile.id, !!currentProfile.studyGroupId)}>
+                Yes
+              </button>
             </div>
           </>
         ) : (
-          <div>No more profiles to swipe on!</div>
+          <div className='swipe-info'>
+            <p>No more profiles to swipe on!</p>
+          </div>
         )}
-      </div>
-
-      <div className="swipe-buttons">
-        <button onClick={() => handleSwipe('No', currentProfile.id, !!currentProfile.studyGroupId)}>
-          No
-        </button>
-        <button onClick={() => handleSwipe('Yes', currentProfile.id, !!currentProfile.studyGroupId)}>
-          Yes
-        </button>
       </div>
     </div>
   );
