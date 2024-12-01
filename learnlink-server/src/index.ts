@@ -180,6 +180,7 @@ app.get('/api/users/profile', authenticate, async (req, res):Promise<any> => {
       study_method: user.study_method,
       gender: user.gender,
       bio: user.bio,
+      email:user.email
     });
   } catch (error) {
     console.error('Error fetching user profile:', error);

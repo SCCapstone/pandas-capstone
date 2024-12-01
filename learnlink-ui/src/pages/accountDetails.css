@@ -1,0 +1,23 @@
+.user-details {
+    background-color: white;
+    padding: 20px;
+    margin: 20px auto;
+    max-width: 600px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .user-details p {
+    font-size: 18px;
+    margin: 10px 0;
+  }
+  
+  .user-details strong {
+    color: #333;
+  }
+
+h1 {
+    text-align:center;
+    color: #00668C;
+}
+  
