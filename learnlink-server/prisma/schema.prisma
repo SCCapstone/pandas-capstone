@@ -22,8 +22,8 @@ enum Grade {
 }
 
 enum Gender {
-  Woman
-  Man
+  Female
+  Male
   Nonbinary
   Other
   Prefer_not_to_say

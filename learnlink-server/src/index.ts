@@ -7,17 +7,22 @@ import { env } from "process";
 import { Request, Response } from 'express';
 import http from "http";
 import { Server } from "socket.io";
+import path from 'path';
 
 const app = express();
 const prisma = new PrismaClient();
 const server = http.createServer(app);
 const io = new Server(server);
 
+
 const PORT = env.SERVER_PORT || 2020;
 const JWT_SECRET = env.JWT_SECRET || 'your_default_jwt_secret';
 
 app.use(express.json());
 app.use(cors());
+
+// access images for website in public folder
+app.use('/public', express.static(path.join(__dirname, '..', 'learnlink-ui', 'public')));
 
 // Middleware for authentication
 const authenticate = (req: Request, res: Response, next: Function) => {
@@ -301,6 +306,7 @@ app.get('/api/profiles', authenticate, async (req: Request, res: Response) => {
   const userId = res.locals.userId; // Retrieved from the token  const userId = parseInt(req.params.userId);
 
   try {
+
     const matches = await prisma.match.findMany({
       where: {
         OR: [
@@ -326,6 +332,9 @@ app.get('/api/profiles/:userId', async (req, res) => {
   const userId = parseInt(req.params.userId);
 
   try {
+
+    const placeholderImage = "https://learnlink-public.s3.us-east-2.amazonaws.com/AvatarPlaceholder.svg"; // Replace with your placeholder image URL
+
     // Fetch users and study groups that the current user has not swiped on yet
     const usersToSwipeOn = await prisma.user.findMany({
       where: {
@@ -349,6 +358,11 @@ app.get('/api/profiles/:userId', async (req, res) => {
       },
     });
 
+    const usersWithPlaceholder = usersToSwipeOn.map(user => ({
+      ...user,
+      profilePic: user.profilePic || placeholderImage,
+    }));
+
     const studyGroupsToSwipeOn = await prisma.studyGroup.findMany({
       where: {
         // Add any conditions to exclude study groups the user has already swiped on
@@ -364,7 +378,7 @@ app.get('/api/profiles/:userId', async (req, res) => {
     });
 
     res.status(200).json({
-      users: usersToSwipeOn,
+      users: usersWithPlaceholder,
       studyGroups: studyGroupsToSwipeOn,
     });
   } catch (error) {
