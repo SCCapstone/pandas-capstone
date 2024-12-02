@@ -122,6 +122,16 @@ const Profile: React.FC = () => {
     }
   };
 
+  const [image, setImage] = useState<File | null>(null);
+
+  // Function to handle file selection
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files ? e.target.files[0] : null;
+    if (file) {
+      setImage(file); // Store the selected file
+    }
+  };
+
 
   return (
     <div className="profile-page">
@@ -177,7 +187,36 @@ const Profile: React.FC = () => {
 
               <div className="profile-side">
                 <div className="profile-picture">
-                  <button className="upload-button">CLICK TO ADD PICTURE</button>
+
+                <div className="profile-picture">
+                  {/* If an image is selected, display it; otherwise, show the button */}
+                  {image ? (
+                    <img
+                      src={URL.createObjectURL(image)}
+                      alt="Selected Profile"
+                      onClick={() => document.getElementById("image-upload")?.click()} // Allow re-selecting an image
+                      style={{ width: "200px", height: "200px", objectFit: "cover", cursor: "pointer" }}
+                    />
+                  ) : (
+                    <button
+                      className="upload-button"
+                      onClick={() => document.getElementById("image-upload")?.click()}
+                    >
+                      CLICK TO ADD PICTURE
+                    </button>
+                  )}
+
+                  {/* Hidden file input */}
+                  <input
+                    id="image-upload"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    style={{ display: "none" }}
+                  />
+                </div>
+
+
                 </div>
                 <div className="update-profile-name">
                   <label>
