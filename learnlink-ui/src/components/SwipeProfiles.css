@@ -12,6 +12,8 @@
     font-size: 64px ;
     font-weight: normal;
     margin-bottom: 1rem;
+    color: black;
+    text-align: left;
   }
   
   .swipe-main-container h2 {
