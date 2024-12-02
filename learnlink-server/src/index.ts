@@ -473,6 +473,35 @@ app.get('/api/profiles/:userId', async (req, res) => {
 /*************** MESSAGING END POINTS */
 
 
+// Route to get the current user's details
+app.get('/api/currentUser', authenticate, async (req, res): Promise<any> => {
+  try {
+    const userId = res.locals.userId; // Retrieved from the token payload
+
+    // Correctly use findUnique with a where clause
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Respond with the user's basic details
+    res.json({
+      id: user.id,
+      username: user.username,
+      firstName: user.firstName,
+      lastName: user.lastName,
+    });
+  } catch (error) {
+    console.error('Error fetching current user:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
+
 // WORKS
 app.get('/api/users', async (req, res) => {
   try {

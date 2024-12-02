@@ -11,6 +11,7 @@ interface Chat {
   id: number;
   name: string;
   messages: string[];
+  users: User[]; 
 }
 
 interface User {
@@ -19,10 +20,6 @@ interface User {
   firstName: string;
   lastName: string;
 }
-
-//TODO make the name of the chat flip when the other user sees it 
-// TODO (ie rn its created by one person and named for the other but when the other logs in they see their own name)
-
 
 // Connect to the Socket.IO server
 const socket = io('http://localhost:2020'); // Replace with your server URL
@@ -35,6 +32,7 @@ const Messaging: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState<string>(''); // Store search term
   const [showDropdown, setShowDropdown] = useState<boolean>(false); // Control dropdown visibility
   const [error, setError] = useState<string | null>(null);
+  const [currentUserId, setCurrentUserId] = useState<number | null>(null);
 
   useEffect(() => {
     // Fetch users and chats from the API when the component mounts
@@ -67,11 +65,22 @@ const Messaging: React.FC = () => {
       }
     });
 
+
+
+    if (token) {
+      axios.get('http://localhost:2020/api/currentUser', {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+        .then((response) => setCurrentUserId(response.data.id))
+        .catch((error) => console.error('Error fetching current user:', error));
+    }
+
     return () => {
       socket.off('message');
     };
     
   }, [selectedChat]);
+
 
   //TODO fix this 
   const handleSendMessage = async () => {
@@ -104,7 +113,8 @@ const Messaging: React.FC = () => {
       };
   
       // Check for duplicate chats
-      const isDuplicateChat = chats.some((chat) => chat.name === payload.chatName);
+      
+      const isDuplicateChat = chats.some((chat) => getChatName(chat) === payload.chatName);
       if (isDuplicateChat) {
         alert('A chat with this user already exists.');
         return;
@@ -146,6 +156,15 @@ const Messaging: React.FC = () => {
     }
   };
   
+  const getChatName = (chat: Chat): string => {
+    if (currentUserId) {
+      // Find the other user in the participants list
+      const otherUser = chat.users.find((user) => user.id !== currentUserId);
+      return otherUser ? `${otherUser.firstName} ${otherUser.lastName}` : 'Unknown User';
+    }
+    return chat.name; // Default fallback
+  };
+
 
   const handleDeleteChat = async (chatId: number) => {
     try {
@@ -221,7 +240,7 @@ const Messaging: React.FC = () => {
                 key={chat.id}
                 className={`ChatListItem ${selectedChat?.id === chat.id ? 'active' : ''}`}
               >
-                <span onClick={() => setSelectedChat(chat)}>{chat.name}</span>
+                <span onClick={() => setSelectedChat(chat)}>{getChatName(chat)}</span>
                 <button
                   className="DeleteButton"
                   onClick={() => handleDeleteChat(chat.id)}
@@ -235,7 +254,7 @@ const Messaging: React.FC = () => {
         <div className="ChatSection">
           {selectedChat ? (
             <>
-              <h2 className="ChatHeader">{selectedChat.name}</h2>
+              <h2 className="ChatHeader">{getChatName(selectedChat)}</h2>
               <div className="ChatWindow">
               {selectedChat?.messages?.map((message, index) => (
                 <div key={index} className="MessageBubble">
