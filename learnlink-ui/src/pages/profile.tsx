@@ -76,15 +76,28 @@ const Profile: React.FC = () => {
   }, []);
 
   // Handle form input changes
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-
-    const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
+    const { name, value, multiple } = e.target as HTMLSelectElement;
+    const selectedOptions = multiple ? (e.target as HTMLSelectElement).selectedOptions : undefined;
+  
+    if (e.target instanceof HTMLSelectElement && multiple) {
+      // If the field is a multi-select, capture the selected options as an array
+      const selectedValues = selectedOptions ? Array.from(selectedOptions, (option) => option.value) : [];
+      setFormData((prevData) => ({
+        ...prevData,
+        [name]: selectedValues, // Store the selected values as an array
+      }));
+    } else {
+      // For regular inputs (non-multi-selects), store the single value
+      setFormData((prevData) => ({
+        ...prevData,
+        [name]: value,
+      }));
+    }
   };
-
+  
   // const handleSelectChange = (newValue: MultiValue<{ value: string; label: string }>, actionMeta: ActionMeta<{ value: string; label: string }>) => {
   //   // Update the formData state with the selected values
   //   setFormData((prevData) => ({
@@ -262,6 +275,7 @@ const Profile: React.FC = () => {
                     onChange={handleChange}
                     // multiple
                   >
+                    <option value="">Select Tags</option>
                     {enumOptions.studyHabitTags.map((option) => (
                       <option key={option} value={option}>
                         {formatEnum(option)}

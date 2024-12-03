@@ -190,7 +190,7 @@ app.get('/api/users/profile', authenticate, async (req, res):Promise<any> => {
 
 // Update user profile
 app.put('/api/users/update', async (req, res): Promise<any> => {
-  const { first_name, last_name, username, age, college, major, grade, relevant_courses, study_method, gender, bio } = req.body;
+  const { first_name, last_name, username, age, college, major, grade, relevant_courses, study_method, gender, bio, studyHabitTags } = req.body;
   console.log('Received data:', req.body); // Log incoming data for debugging
 
 
@@ -222,6 +222,7 @@ app.put('/api/users/update', async (req, res): Promise<any> => {
         study_method: study_method || undefined,
         gender: gender || undefined,
         bio: bio || undefined,
+        studyHabitTags: studyHabitTags || undefined,
       },
     });
 
