@@ -102,7 +102,7 @@ model StudyGroup {
   // Swipe relation: Users can swipe on a study group.
   swipesGiven  Swipe[]  @relation("StudyGroupSwipes")
 
-  messages    Message[]
+
 }
 
 model Swipe {
@@ -136,6 +136,7 @@ model Chat {
   id        Int       @id @default(autoincrement())
   name      String
   createdAt DateTime  @default(now())
+  updatedAt DateTime  @default(now())
   users     User[]    @relation("ChatUsers") // One-to-many through the join table
   messages  Message[] // One-to-many relationship to Message
 }
@@ -148,8 +149,6 @@ model Message {
   chatId       Int
   user         User        @relation(fields: [userId], references: [id]) // One-to-many relation to User
   chat         Chat        @relation(fields: [chatId], references: [id]) // One-to-many relation to Chat
-  StudyGroup   StudyGroup? @relation(fields: [studyGroupId], references: [id])
-  studyGroupId Int?
 }
 
 model Notification {
