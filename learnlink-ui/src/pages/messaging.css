@@ -250,11 +250,7 @@
 }
 
 
-.ChatList {
-  list-style: none; /* Removes default list bullets */
-  padding: 0; /* Removes padding from the list */
-  margin: 0; /* Removes margin from the list */
-}
+
 
 .ChatListHeader {
   font-size: 1.5rem; /* Sets a larger font size */
@@ -270,15 +266,25 @@
   margin-top: 20px;
 }
 
-.ChatListItem {
-  padding: 10px 15px; /* Adds padding for each list item */
-  cursor: pointer; /* Changes the cursor to pointer on hover */
-  transition: background-color 0.3s ease; /* Smooth transition for background color change */
+.ChatList {
+  max-height: 500px; /* Adjust height as needed */
+  overflow-y: auto; /* Enables vertical scrolling */
+  padding-right: 10px; /* Optional: prevent scrollbar from overlapping content */
 }
 
-.ChatListItem:hover {
-  background-color: #f1f1f1; /* Changes background on hover */
+.ChatListItem {
+  padding: 10px;
+  border-bottom: 1px solid #ccc;
+  cursor: pointer;
 }
+
+.ChatListItem.active {
+  background-color: #e3e3e3; /* Highlight active chat */
+}
+
+
+
+
 
 
 .ChatNameActions button:first-child {
