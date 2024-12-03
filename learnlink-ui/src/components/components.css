@@ -66,6 +66,7 @@
 .search-bar {
   position: relative;
   margin-right: 1rem;
+  padding-right: 20px;
   flex-grow: 1;
   min-width: 100px; /* Set a minimum width before it fully disappears */
   overflow: hidden; /* Prevent overflow */
