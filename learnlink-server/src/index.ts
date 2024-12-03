@@ -803,7 +803,7 @@ io.on('connection', (socket) => {
 // Real-time WebSocket chat functionality
 io.on("connection", (socket) => {
   console.log("User connected");
-
+  /*
   socket.on("joinChat", async ({ chatId, token }) => {
     if (!chatId || !token) {
       return socket.emit("error", { message: "Invalid chatId or token" });
@@ -830,42 +830,35 @@ io.on("connection", (socket) => {
       socket.emit("error", { message: "Invalid token or chat access error" });
     }
   });
-  
+  */
 
-  
-  socket.on("message", async ({ chatId, content, token }) => {
+  socket.on('message', async (data, callback) => {
     try {
-      const decoded: any = jwt.verify(token, JWT_SECRET);
-      const userId = decoded.userId;
-  
-      // Ensure the user is part of the chat
-      const chat = await prisma.chat.findUnique({
-        where: { id: chatId },
-        include: { users: true },
-      });
-  
-      if (!chat || !chat.users.some((user) => user.id === userId)) {
-        return socket.emit("error", { message: "Access denied to chat" });
+      // Validate the incoming data
+      if (!data.content || !data.chatId || !data.userId) {
+        throw new Error('Missing required fields: content, chatId, or userId');
       }
   
-      // Create a new message in the database
+      // Create a new message in the database using Prisma
       const newMessage = await prisma.message.create({
         data: {
-          content,
-          userId, // Associate the message with the sender
-          chatId: parseInt(chatId),
+          content: data.content,
+          userId: data.userId,
+          chatId: data.chatId,
+          createdAt: new Date(),
         },
       });
   
-      // Emit the new message to other clients in the chat
-      io.to(`chat_${chatId}`).emit("newMessage", {
-        message: newMessage,
-        userId, // Optionally send user info
-      });
+      console.log('Message saved to database:', newMessage);
   
+      // Emit the new message to all clients (broadcasting to all connected clients)
+      socket.broadcast.emit('newMessage', newMessage);
+  
+      // Send success callback to the sender
+      callback({ success: true, message: 'Message sent successfully!' });
     } catch (error) {
-      console.error("Error sending message:", error);
-      socket.emit("error", { message: "Message sending error" });
+      console.error('Error handling message:', error);
+      callback({ success: false, error: error });
     }
   });
   
