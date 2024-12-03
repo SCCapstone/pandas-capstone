@@ -196,6 +196,7 @@ app.get('/api/users/profile', authenticate, async (req, res):Promise<any> => {
       bio: user.bio,
       email:user.email,
       ideal_match_factor: user.ideal_match_factor,
+      studyHabitTags: user.studyHabitTags,
     });
   } catch (error) {
     console.error('Error fetching user profile:', error);

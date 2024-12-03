@@ -18,7 +18,7 @@ const Profile: React.FC = () => {
     college: '',
     major: '',
     grade: '',
-    relevant_courses: '',
+    relevant_courses: [] as string[],
     study_method: '',
     gender: '',
     bio: '',
@@ -53,6 +53,8 @@ const Profile: React.FC = () => {
             },
           });
           const userData = await userResponse.json();
+          console.log('Fetched user data:', userData); // Debug log
+
           setFormData({
             first_name: userData.first_name || '',
             last_name: userData.last_name || '',
@@ -69,6 +71,8 @@ const Profile: React.FC = () => {
             ideal_match_factor: userData.ideal_match_factor || '',
           });
         }
+        console.log('Form Data after set:', formData); // Debug log
+
       } catch (error) {
         console.error('Error fetching data:', error);
       }
@@ -126,7 +130,7 @@ const Profile: React.FC = () => {
       age: formData.age ? parseInt(formData.age) : undefined,
       relevant_courses: formData.relevant_courses ?
         (Array.isArray(formData.relevant_courses) ? formData.relevant_courses : [formData.relevant_courses]) : [],
-        studyHabitTags: formData.studyHabitTags ? formData.studyHabitTags : [],
+      studyHabitTags: formData.studyHabitTags ? formData.studyHabitTags : [],
       
 
     };
@@ -283,7 +287,6 @@ const Profile: React.FC = () => {
                 </div>
                 <label>
                   Study Habit Tags:<br />
-                  {formData.studyHabitTags}
                   <Select
                     isMulti
                     name="studyHabitTags"
@@ -291,9 +294,10 @@ const Profile: React.FC = () => {
                       value: tag,
                       label: formatEnum(tag), // Assuming formatEnum formats the tag as a readable label
                     }))}
-                    value={formData.studyHabitTags
-                      .filter((tag) => formData.studyHabitTags.includes(tag))
-                      .map((tag) => ({ value: tag, label: formatEnum(tag) }))}
+                    value={formData.studyHabitTags.map((tag) => ({
+                      value: tag,
+                      label: formatEnum(tag),
+                    }))}
                     onChange={handleSelectChange}
                     closeMenuOnSelect={false}
                     components={animatedComponents}
@@ -305,32 +309,9 @@ const Profile: React.FC = () => {
                   Bio:<br /><textarea name="bio" value={formData.bio} onChange={handleChange} />
                 </label>
                 <label>
-                  {/* Study Habit Tags:<br /> */}
-                  {/* <select
-                    name="studyHabitTags"
-                    value={formData.studyHabitTags}
-                    onChange={handleChange}
-                    multiple
-                  
-                  >
-                    <option value="">Select Tags</option>
-                    {enumOptions.studyHabitTags.map((option) => (
-                      <option key={option} value={option}>
-                        {formatEnum(option)}
-                      </option>
-                    ))}
-                  </select>
-                  const tagOptions = {enumOptions.studyHabitTags.map((option) => (
-                      <option key={option} value={option}>
-                        {formatEnum(option)}
-                      </option>
-                    ))} */}
-
-                </label>
-                <label>
                   Ideal Match Factor:<br />
                   <Select
-                    name="studyHabitTags"
+                    name="ideal_match_factor"
                     options={enumOptions.studyHabitTags.map((tag) => ({
                       value: tag,
                       label: formatEnum(tag), // Formats the tag into a readable label
