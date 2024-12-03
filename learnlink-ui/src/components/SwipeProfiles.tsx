@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import './SwipeProfiles.css';
+import { formatEnum } from '../utils/format';
 
 const SwipeProfiles = ({ userId }: { userId: number }) => {
   const [profiles, setProfiles] = useState<any>({ users: [], studyGroups: [] });
@@ -80,7 +81,17 @@ const SwipeProfiles = ({ userId }: { userId: number }) => {
                     <p><span className="bold-first-word">Grade: </span>{currentProfile.grade}</p>
                     <p><span className="bold-first-word">Relevant Coursework: </span>{currentProfile.relevant_courses}</p>
                     <p><span className="bold-first-word">Fav Study Method: </span>{currentProfile.study_method}</p>
-                    <p><span className="bold-first-word">Study Tags: </span>{currentProfile.studyHabitTags}</p>
+                    <p><span className="bold-first-word">Study Tags: </span>
+                        {currentProfile.studyHabitTags.length > 0 ? (
+                        currentProfile.studyHabitTags.map((tag: string, index: number) => (
+                          <span key={index} className="tag">
+                          {formatEnum(tag)}
+                          </span>
+                        ))
+                        ) : (
+                        <p>No study tags specified.</p>
+                        )}
+                    </p>
                   </div>
                 </div>
               </div>

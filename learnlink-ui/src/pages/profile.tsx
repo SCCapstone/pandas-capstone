@@ -285,6 +285,10 @@ const Profile: React.FC = () => {
                     Last Name <input type="text" name="last_name" value={formData.last_name} onChange={handleChange} />
                   </label>
                 </div>
+                
+                <label>
+                  Bio:<br /><textarea name="bio" value={formData.bio} onChange={handleChange} />
+                </label>
                 <label>
                   Study Habit Tags:<br />
                   <Select
@@ -304,9 +308,6 @@ const Profile: React.FC = () => {
                     className="basic-multi-select"
                     classNamePrefix="select"
                   />
-                </label>
-                <label>
-                  Bio:<br /><textarea name="bio" value={formData.bio} onChange={handleChange} />
                 </label>
                 <label>
                   Ideal Match Factor:<br />

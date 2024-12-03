@@ -124,3 +124,23 @@
   flex-grow: 1; /* Ensure parent container has a defined height */
 }
 
+.study-habit-tags {
+  display: flex;
+  flex-wrap: wrap; /* Allows tags to wrap to the next line if needed */
+  gap: 15px; /* Adds spacing between the tags */
+  margin: 10px 0; /* Adds space above and below the tags */
+  margin-bottom: 50px;
+}
+
+.tag {
+  background-color: hsl(0, 0%, 90%);
+  padding: 5px 10px;
+  border-radius: 2px;
+  font-size: 16px;
+  color: #333;
+  border: 2px;
+  font-weight: 400;
+  display: inline-block; /* Ensures tags are inline */
+  margin-right: 10px; /* Extra space between tags */
+  margin-bottom: 10px;
+}
