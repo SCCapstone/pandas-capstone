@@ -61,7 +61,7 @@ model User {
   password            String
 
 
-  profile_preferences Json?
+  ideal_match_factor  String?
   age                 Int?
   college             String?
   major               String?
