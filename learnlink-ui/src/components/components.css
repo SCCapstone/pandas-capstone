@@ -29,11 +29,19 @@
   justify-content: space-between;
   padding: 1rem 2rem;
   background-color: #D4EAF7;
+  box-sizing: border-box;
 }
 
 .nav-logo {
-  width: 300px; /* Set the desired width for the logo */
+  width: 200px; /* Set the desired width for the logo */
   height: auto; /* Adjust the height to maintain the aspect ratio */
+  flex-shrink: 1; /* Ensure logo doesn't shrink */
+}
+
+.nav-links {
+  display: flex;
+  flex-shrink: 1; /* Allow links to shrink */
+  overflow: hidden;
 }
 
 .nav-links a {
@@ -41,8 +49,8 @@
   color: #00668C;
   text-decoration: none;
   font-weight: 500;
-  font-size:medium;
-
+  font-size: medium;
+  white-space: nowrap; /* Prevent links from wrapping */
 }
 
 .nav-links a:hover {
@@ -52,17 +60,23 @@
 .nav-icons {
   display: flex;
   align-items: center;
+  flex-shrink: 1; /* Prevent icons from shrinking */
 }
 
 .search-bar {
   position: relative;
   margin-right: 1rem;
+  flex-grow: 1;
+  min-width: 50px; /* Set a minimum width before it fully disappears */
+  overflow: hidden; /* Prevent overflow */
+  transition: opacity 0.3s ease; /* Smooth disappearance */
 }
 
 .search-bar input {
   padding: 0.5rem;
   border-radius: 5px;
   border: 1px solid #ddd;
+  width: 100%; /* Allow full shrinking */
 }
 
 .search-icon {
@@ -74,12 +88,27 @@
 }
 
 .icon {
+  flex-shrink: 1;
   font-size: 1.5rem;
   margin-left: 1rem;
   color: #00668C;
   cursor: pointer;
 }
 
+@media (max-width: 768px) {
+  .search-bar {
+    display: none; /* Hide search bar on small screens */
+  }
+  .nav-icons {
+    flex-shrink: 1;
+  }
+
+  .nav-links a {
+    font-size: small; /* Adjust font size of links for better fit */
+    margin: 0 0.5rem;
+  }
+
+}
 .sidenav {
   /* margin-top: 90px;
   margin-bottom: 50px; */

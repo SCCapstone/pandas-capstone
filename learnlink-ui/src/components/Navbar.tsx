@@ -26,11 +26,11 @@ const Navbar: React.FC = () => {
         <a href="/messaging" onClick={handleMessaging} >Messaging</a>
         <a href="/resources/studyTips">Resources</a>
       </nav>
-      <div className="nav-icons">
-        <div className="search-bar">
+      <div className="search-bar">
           <input type="text" placeholder="search" />
           <FaSearch className="search-icon" />
         </div>
+      <div className="nav-icons">
         {/*give user a notification*/}
         <FaBell className="icon" />
         {/*create an onclick function to go to settings page*/}
