@@ -8,7 +8,6 @@ import { Request, Response } from 'express';
 import http from "http";
 import { Server } from "socket.io";
 import path from 'path';
-import { deleteUserById } from '../../learnlink-ui/src/utils/userServices';
 
 const app = express();
 const prisma = new PrismaClient();
@@ -469,17 +468,50 @@ app.get('/api/profiles/:userId', async (req, res) => {
   }
 });
 
-app.delete('/users/:id', authenticate, async (req, res):Promise<any> => {
+// Tried putting this in snother file and no dice :(
+export const deleteUserById = async (userId: number) => {
+  try {
+    // Delete related records in explicit join tables
+    await prisma.chatUser.deleteMany({ where: { userId } });
+
+    // Delete swipes
+    await prisma.swipe.deleteMany({ where: { OR: [{ userId }, { targetUserId: userId }] } });
+
+    // Delete matches
+    await prisma.match.deleteMany({ where: { OR: [{ user1Id: userId }, { user2Id: userId }] } });
+
+    // Delete notifications
+    await prisma.notification.deleteMany({ where: { user_id: userId } });
+
+    // Delete messages
+    await prisma.message.deleteMany({ where: { userId } });
+
+    // Finally, delete the user
+    await prisma.user.delete({ where: { id: userId } });
+
+    console.log(`User ${userId} and related data deleted successfully.`);
+  } catch (error) {
+    console.error(`Error deleting user ${userId}:`, error);
+    if (error instanceof Error) {
+      throw new Error(`Failed to delete user: ${error.message}`);
+    } else {
+      throw new Error('Failed to delete user: Unknown error');
+    }
+  }
+};
+
+
+app.delete('/users/:id', authenticate, async (req, res): Promise<any> => {
   const userId = parseInt(req.params.id);
 
   if (isNaN(userId)) {
     return res.status(400).json({ error: 'Invalid user ID' });
   }
 
-  // Ensure the authenticated user has permission to delete
-  if (req.user.role !== 'admin' && req.user.id !== userId) {
-    return res.status(403).json({ error: 'Forbidden: Not authorized to delete this user' });
-  }
+  // // Ensure the authenticated user has permission to delete
+  // if (req.user.role !== 'admin' && req.user.id !== userId) {
+  //   return res.status(403).json({ error: 'Forbidden: Not authorized to delete this user' });
+  // }
 
   try {
     await deleteUserById(userId);
@@ -489,8 +521,7 @@ app.delete('/users/:id', authenticate, async (req, res):Promise<any> => {
     res.status(500).json({ error: 'Failed to delete user' });
   }
 });
-
-
+  
 
 /*************** MESSAGING END POINTS */
 

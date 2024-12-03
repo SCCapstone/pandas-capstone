@@ -107,7 +107,7 @@ model Match {
   user2Id       Int?
   studyGroupId  Int?
   user1         User     @relation("MatchUser1", fields: [user1Id], references: [id], onDelete: Cascade)
-  user2         User?    @relation("MatchUser2", fields: [user2Id], references: [id])
+  user2         User?    @relation("MatchUser2", fields: [user2Id], references: [id], onDelete: Cascade)
   studyGroup    StudyGroup? @relation("StudyGroupMatches", fields: [studyGroupId], references: [id], onDelete: Cascade)
   createdAt     DateTime @default(now())
 
