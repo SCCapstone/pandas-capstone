@@ -8,6 +8,7 @@ import { Request, Response } from 'express';
 import http from "http";
 import { Server } from "socket.io";
 import path from 'path';
+import { deleteUserById } from '../../learnlink-ui/src/utils/userServices';
 
 const app = express();
 const prisma = new PrismaClient();
@@ -465,6 +466,27 @@ app.get('/api/profiles/:userId', async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Something went wrong' });
+  }
+});
+
+app.delete('/users/:id', authenticate, async (req, res):Promise<any> => {
+  const userId = parseInt(req.params.id);
+
+  if (isNaN(userId)) {
+    return res.status(400).json({ error: 'Invalid user ID' });
+  }
+
+  // Ensure the authenticated user has permission to delete
+  if (req.user.role !== 'admin' && req.user.id !== userId) {
+    return res.status(403).json({ error: 'Forbidden: Not authorized to delete this user' });
+  }
+
+  try {
+    await deleteUserById(userId);
+    res.status(200).json({ message: `User with ID ${userId} deleted successfully.` });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to delete user' });
   }
 });
 

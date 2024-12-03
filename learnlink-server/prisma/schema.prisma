@@ -94,8 +94,8 @@ model Swipe {
   targetUserId Int?     // Optional field to reference the target User
   targetGroupId Int?    // Optional field to reference the target StudyGroup
   direction    SwipeAction
-  user         User     @relation("SwipesGiven", fields: [userId], references: [id])
-  targetUser   User?    @relation("SwipesReceived", fields: [targetUserId], references: [id])
+  user         User     @relation("SwipesGiven", fields: [userId], references: [id], onDelete: Cascade)
+  targetUser   User?    @relation("SwipesReceived", fields: [targetUserId], references: [id], onDelete: Cascade)
   targetGroup  StudyGroup? @relation("StudyGroupSwipes", fields: [targetGroupId], references: [id])
   createdAt    DateTime @default(now())
 }
@@ -106,9 +106,9 @@ model Match {
   user1Id       Int
   user2Id       Int?
   studyGroupId  Int?
-  user1         User     @relation("MatchUser1", fields: [user1Id], references: [id])
+  user1         User     @relation("MatchUser1", fields: [user1Id], references: [id], onDelete: Cascade)
   user2         User?    @relation("MatchUser2", fields: [user2Id], references: [id])
-  studyGroup    StudyGroup? @relation("StudyGroupMatches", fields: [studyGroupId], references: [id])
+  studyGroup    StudyGroup? @relation("StudyGroupMatches", fields: [studyGroupId], references: [id], onDelete: Cascade)
   createdAt     DateTime @default(now())
 
   // If the study group is null, this is a user-to-user match
@@ -143,5 +143,5 @@ model Notification {
   read       Boolean  @default(false)
   created_at DateTime @default(now())
 
-  user User @relation(fields: [user_id], references: [id])
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
 }
