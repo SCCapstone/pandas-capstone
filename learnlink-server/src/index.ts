@@ -8,15 +8,29 @@ import { Request, Response } from 'express';
 import http from "http";
 import { Server } from "socket.io";
 import path from 'path';
+import { JwtPayload } from "jsonwebtoken";
+
+interface CustomJwtPayload extends JwtPayload {
+  userId: number; // Make userId an integer
+}
 
 const app = express();
 const prisma = new PrismaClient();
+
 const server = http.createServer(app);
-const io = new Server(server);
+const io = new Server(server, {
+  cors: {
+    origin: "http://localhost:3000",
+    methods: ["GET", "POST"],
+  },
+});
+
+
 
 
 const PORT = env.SERVER_PORT || 2020;
 const JWT_SECRET = env.JWT_SECRET || 'your_default_jwt_secret';
+
 
 app.use(express.json());
 app.use(cors());
@@ -526,7 +540,9 @@ app.delete('/users/:id', authenticate, async (req, res): Promise<any> => {
 });
   
 
-/*************** MESSAGING END POINTS */
+
+
+/*************** MESSAGING END POINTS API */
 
 
 // Route to get the current user's details
@@ -534,7 +550,7 @@ app.get('/api/currentUser', authenticate, async (req, res): Promise<any> => {
   try {
     const userId = res.locals.userId; // Retrieved from the token payload
 
-    // Correctly use findUnique with a where clause
+  
     const user = await prisma.user.findUnique({
       where: { id: userId },
     });
@@ -573,8 +589,7 @@ app.get('/api/users', async (req, res) => {
   }
 });
 
-// Get all chats
-
+// Get all chats for a user
 // WORKS
 // pulls up the chats with the users authentication code
 app.get('/api/chats', authenticate,  async (req, res):Promise<any> => {
@@ -612,10 +627,6 @@ app.get('/api/chats', authenticate,  async (req, res):Promise<any> => {
 
 
 
-
-
-
-
 //WORKS
 // Delete a chat
 app.delete('/api/chats/:chatId', async (req, res):Promise<any> => {
@@ -648,8 +659,7 @@ app.delete('/api/chats/:chatId', async (req, res):Promise<any> => {
 });
 
 
-// TODO
-// DOES NOT WORK YET
+// WORKS
 // Add a message to a chat
 app.post('/api/chats/:chatId/messages', authenticate, async (req, res): Promise<any> => {
   const { chatId } = req.params;
@@ -758,18 +768,43 @@ app.post('/api/chats/:userId', authenticate, async (req: Request, res: Response)
 
 /*************** WEBSOCKETS */
 
+//app.use('/public', express.static(path.join(__dirname, '..', 'learnlink-ui', 'public')));
 //TODO there is a get console error happening in socket.io seen below 
 // GET http://localhost:2020/socket.io/?EIO=4&transport=polling&t=877a3it0 404 (Not Found)
 
+app.get('/socket-test', (req, res) => {
+  res.send('Socket Test');
+});
+
+// Set up a basic route
+app.get('/socket-io', (req, res) => {
+  res.send('Socket.IO server is running');
+});
+/*
+io.on('connection', (socket) => {
+  console.log('A user connected');
+  socket.emit('message', 'Hello from server'); // Test message to the client
+
+  socket.on('disconnect', () => {
+    console.log('User disconnected');
+  });
+});
+
+*/
 
 // Real-time WebSocket chat functionality
 io.on("connection", (socket) => {
   console.log("User connected");
 
   socket.on("joinChat", async ({ chatId, token }) => {
+    if (!chatId || !token) {
+      return socket.emit("error", { message: "Invalid chatId or token" });
+    }
+  
     try {
-      const decoded: any = jwt.verify(token, JWT_SECRET);
-      const userId = decoded.userId;
+      const decoded = jwt.verify(token, JWT_SECRET) as CustomJwtPayload;
+      const userId = decoded.userId; // Now `userId` is inferred as a number
+
   
       const chat = await prisma.chat.findUnique({
         where: { id: chatId },
@@ -787,6 +822,8 @@ io.on("connection", (socket) => {
       socket.emit("error", { message: "Invalid token or chat access error" });
     }
   });
+  
+
   
   socket.on("message", async ({ chatId, content, token }) => {
     try {
@@ -834,9 +871,12 @@ io.on("connection", (socket) => {
 
 
 
+
+
+
 /********* LISTEN FUNCT */
 
-
-app.listen(PORT, () => {
+// Start the server on port 2020
+server.listen(PORT, () => {
   console.log(`server running on localhost:${PORT}`);
 });

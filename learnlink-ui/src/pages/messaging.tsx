@@ -10,19 +10,31 @@ import axios from 'axios';
 interface Chat {
   id: number;
   name: string;
-  messages: string[];
+  messages: Message[];
   users: User[]; 
+  createdAt: string;
+  updatedAt: string;
 }
 
+interface Message{
+  id: number;
+  content: string;
+  createdAt: string;
+  userId: number;
+  chatId: number;
+  
+}
 interface User {
   id: number;
   username: string;
   firstName: string;
   lastName: string;
 }
+const socket = io("http://localhost:2020");
 
-// Connect to the Socket.IO server
-const socket = io('http://localhost:2020'); // Replace with your server URL
+
+
+
 
 const Messaging: React.FC = () => {
   const [chats, setChats] = useState<Chat[]>([]);
@@ -34,6 +46,8 @@ const Messaging: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [currentUserId, setCurrentUserId] = useState<number | null>(null);
 
+
+
   useEffect(() => {
     // Fetch users and chats from the API when the component mounts
     axios.get('http://localhost:2020/api/users')
@@ -44,28 +58,20 @@ const Messaging: React.FC = () => {
     // Make the API request to fetch chats for the user
   
     const token = localStorage.getItem('token');
-    axios.get(`http://localhost:2020/api/chats`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+    axios.get('http://localhost:2020/api/chats', {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((response) => {
+        const chatsWithMessages = response.data.map((chat: Chat) => ({
+          ...chat,
+          messages: chat.messages || [], // Ensure messages is always an array
+        }));
+        setChats(chatsWithMessages);
       })
-      .then((response) => setChats(response.data))
       .catch((error) => console.error('Error fetching chats:', error));
+    
 
-    // Listen for real-time updates on new messages
-    socket.on('message', (message) => {
-      if (selectedChat) {
-        setChats((prevChats) =>
-          prevChats.map((chat) =>
-            chat.id === selectedChat.id
-              ? { ...chat, messages: [...chat.messages, message] }
-              : chat
-          )
-        );
-      }
-    });
-
-
+     
 
     if (token) {
       axios.get('http://localhost:2020/api/currentUser', {
@@ -74,6 +80,27 @@ const Messaging: React.FC = () => {
         .then((response) => setCurrentUserId(response.data.id))
         .catch((error) => console.error('Error fetching current user:', error));
     }
+    socket.on('connect', () => {
+      console.log('Connected to server');
+    });
+
+    // Listen for real-time updates on new messages
+    socket.on('newMessage', (message) => {
+      if (selectedChat) {
+        setChats((prevChats) =>
+          prevChats.map((chat) =>
+            chat.id === selectedChat.id
+              ? { ...chat, messages: [...(chat.messages || []), message] } // Safely append message
+              : chat
+          )
+        );
+      }
+    });
+    
+
+    
+    
+    
 
     return () => {
       socket.off('message');
@@ -84,25 +111,36 @@ const Messaging: React.FC = () => {
 
   //TODO fix this 
   const handleSendMessage = async () => {
+    const token = localStorage.getItem('token');
     if (currentMessage.trim() && selectedChat) {
       try {
+        const messageData: Message = {
+          id: Date.now(), // Use a unique ID generator
+          content: currentMessage.trim(),
+          createdAt: new Date().toISOString(),
+          userId: currentUserId || 0, // Add a fallback for currentUserId
+          chatId: selectedChat.id,
+        };
+  
         // Emit the message via Socket.IO
-        socket.emit('message', { chatId: selectedChat.id, content: currentMessage.trim() });
-
+        socket.emit('message', { ...messageData, token });
+  
         // Update the chat's messages in state
         setChats((prevChats) =>
           prevChats.map((chat) =>
             chat.id === selectedChat.id
-              ? { ...chat, messages: [...chat.messages, currentMessage.trim()] }
+              ? { ...chat, messages: [...(chat.messages || []), messageData] }
               : chat
           )
         );
+  
         setCurrentMessage('');
       } catch (error) {
         console.error('Error sending message:', error);
       }
     }
   };
+  
 
 
   const createNewChat = async (user: User) => {
@@ -114,7 +152,7 @@ const Messaging: React.FC = () => {
   
       // Check for duplicate chats
       
-      const isDuplicateChat = chats.some((chat) => getChatName(chat) === payload.chatName);
+      const isDuplicateChat = chats.some((chat) => chat.name === payload.chatName);
       if (isDuplicateChat) {
         alert('A chat with this user already exists.');
         return;
@@ -158,12 +196,14 @@ const Messaging: React.FC = () => {
   
   const getChatName = (chat: Chat): string => {
     if (currentUserId) {
-      // Find the other user in the participants list
-      const otherUser = chat.users.find((user) => user.id !== currentUserId);
-      return otherUser ? `${otherUser.firstName} ${otherUser.lastName}` : 'Unknown User';
+      const otherUser = chat.users?.find((user) => user.id !== currentUserId);
+      if (otherUser){
+        return otherUser ? `${otherUser.firstName} ${otherUser.lastName}` : 'Unknown User';
+      }
     }
-    return chat.name; // Default fallback
+    return chat.name || 'Unnamed Chat'; // Provide a default fallback
   };
+  
 
 
   const handleDeleteChat = async (chatId: number) => {
@@ -235,20 +275,27 @@ const Messaging: React.FC = () => {
             </div>
           )}
           <ul className="ChatList">
-            {chats.map((chat) => (
-              <li
-                key={chat.id}
-                className={`ChatListItem ${selectedChat?.id === chat.id ? 'active' : ''}`}
-              >
-                <span onClick={() => setSelectedChat(chat)}>{getChatName(chat)}</span>
-                <button
-                  className="DeleteButton"
-                  onClick={() => handleDeleteChat(chat.id)}
+            {chats
+              .slice()
+              .sort((a, b) => {
+                const dateA = new Date(a.updatedAt || a.createdAt || 0).getTime();
+                const dateB = new Date(b.updatedAt || b.createdAt || 0).getTime();
+                return dateB - dateA; // Sort in descending order
+              })
+              .map((chat) => (
+                <li
+                  key={chat.id}
+                  className={`ChatListItem ${selectedChat?.id === chat.id ? 'active' : ''}`}
                 >
-                  X
-                </button>
-              </li>
-            ))}
+                  <span onClick={() => setSelectedChat(chat)}>{getChatName(chat)}</span>
+                  <button
+                    className="DeleteButton"
+                    onClick={() => handleDeleteChat(chat.id)}
+                  >
+                    X
+                  </button>
+                </li>
+              ))}
           </ul>
         </div>
         <div className="ChatSection">
@@ -256,12 +303,16 @@ const Messaging: React.FC = () => {
             <>
               <h2 className="ChatHeader">{getChatName(selectedChat)}</h2>
               <div className="ChatWindow">
-              {selectedChat?.messages?.map((message, index) => (
-                <div key={index} className="MessageBubble">
-                  {message}
-                </div>
-              ))}
+                {Array.isArray(selectedChat?.messages)
+                  ? selectedChat.messages.map((message, index) => (
+                      <div key={index} className="MessageBubble">
+                        {typeof message === 'string' ? message : message.content}
+                      </div>
+                    ))
+                  : <div>No messages to display.</div>}
               </div>
+
+
               <div className="ChatInput">
                 <input
                   type="text"
