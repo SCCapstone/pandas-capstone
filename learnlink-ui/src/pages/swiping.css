@@ -3,6 +3,7 @@
     background-color: #ffff;
     display: flex;
     flex-direction: column;
+    overflow-y: scroll;
 }
 
 .swipe-content {
