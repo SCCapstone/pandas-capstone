@@ -12,6 +12,8 @@ interface Chat {
   name: string;
   messages: string[];
   users: User[]; 
+  createdAt: string;
+  updatedAt: string;
 }
 
 interface User {
@@ -239,20 +241,27 @@ const Messaging: React.FC = () => {
             </div>
           )}
           <ul className="ChatList">
-            {chats.map((chat) => (
-              <li
-                key={chat.id}
-                className={`ChatListItem ${selectedChat?.id === chat.id ? 'active' : ''}`}
-              >
-                <span onClick={() => setSelectedChat(chat)}>{getChatName(chat)}</span>
-                <button
-                  className="DeleteButton"
-                  onClick={() => handleDeleteChat(chat.id)}
+            {chats
+              .slice()
+              .sort((a, b) => {
+                const dateA = new Date(a.updatedAt || a.createdAt || 0).getTime();
+                const dateB = new Date(b.updatedAt || b.createdAt || 0).getTime();
+                return dateB - dateA; // Sort in descending order
+              })
+              .map((chat) => (
+                <li
+                  key={chat.id}
+                  className={`ChatListItem ${selectedChat?.id === chat.id ? 'active' : ''}`}
                 >
-                  X
-                </button>
-              </li>
-            ))}
+                  <span onClick={() => setSelectedChat(chat)}>{getChatName(chat)}</span>
+                  <button
+                    className="DeleteButton"
+                    onClick={() => handleDeleteChat(chat.id)}
+                  >
+                    X
+                  </button>
+                </li>
+              ))}
           </ul>
         </div>
         <div className="ChatSection">
