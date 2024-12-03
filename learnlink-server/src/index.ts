@@ -846,6 +846,8 @@ io.on("connection", (socket) => {
           userId: data.userId,
           chatId: data.chatId,
           createdAt: new Date(),
+          user: data.userId,
+          chat: data.chatId
         },
       });
   
