@@ -3,6 +3,10 @@ import Navbar from '../components/Navbar';
 import { formatEnum } from '../utils/format';
 import './profile.css';
 import CopyrightFooter from '../components/CopyrightFooter';
+import makeAnimated from 'react-select/animated';
+import Select, { MultiValue, ActionMeta } from 'react-select';
+
+const animatedComponents = makeAnimated();
 
 const Profile: React.FC = () => {
 
@@ -18,11 +22,12 @@ const Profile: React.FC = () => {
     study_method: '',
     gender: '',
     bio: '',
+    studyHabitTags: [] as string[],
   });
 
 
   // State to store enum options
-  const [enumOptions, setEnumOptions] = useState({ grade: [], gender: [] });
+  const [enumOptions, setEnumOptions] = useState({ grade: [], gender: [], studyHabitTags: [] });
 
   // Fetch enum values on component mount
   useEffect(() => {
@@ -35,6 +40,7 @@ const Profile: React.FC = () => {
         setEnumOptions({
           grade: enumsData.grade,
           gender: enumsData.gender,
+          studyHabitTags: enumsData.studyHabitTags,
         });
 
         // Fetch the current user profile data
@@ -58,6 +64,7 @@ const Profile: React.FC = () => {
             study_method: userData.study_method || '',
             gender: userData.gender || '',
             bio: userData.bio || '',
+            studyHabitTags: userData.studyHabitTags || '',
           });
         }
       } catch (error) {
@@ -78,6 +85,22 @@ const Profile: React.FC = () => {
     }));
   };
 
+  // const handleSelectChange = (newValue: MultiValue<{ value: string; label: string }>, actionMeta: ActionMeta<{ value: string; label: string }>) => {
+  //   // Update the formData state with the selected values
+  //   setFormData((prevData) => ({
+  //     ...prevData,
+  //     studyHabitTags: newValue ? newValue.map((option) => option.value) : [],
+  //   }));
+  // };
+
+  // // Handle Select component changes
+  // const handleSelectChange = (newValue: any, actionMeta: any) => {
+  //   setFormData((prevData) => ({
+  //     ...prevData,
+  //     studyHabitTags: newValue ? newValue.map((option: any) => option.value) : [],
+  //   }));
+  // };
+
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -88,6 +111,8 @@ const Profile: React.FC = () => {
       age: formData.age ? parseInt(formData.age) : undefined,
       relevant_courses: formData.relevant_courses ?
         (Array.isArray(formData.relevant_courses) ? formData.relevant_courses : [formData.relevant_courses]) : [],
+      studyHabitTags: formData.studyHabitTags ?
+        (Array.isArray(formData.studyHabitTags) ? formData.studyHabitTags : [formData.studyHabitTags]) : [],
 
     };
 
@@ -188,33 +213,33 @@ const Profile: React.FC = () => {
               <div className="profile-side">
                 <div className="profile-picture">
 
-                <div className="profile-picture">
-                  {/* If an image is selected, display it; otherwise, show the button */}
-                  {image ? (
-                    <img
-                      src={URL.createObjectURL(image)}
-                      alt="Selected Profile"
-                      onClick={() => document.getElementById("image-upload")?.click()} // Allow re-selecting an image
-                      style={{ width: "200px", height: "200px", objectFit: "cover", cursor: "pointer" }}
-                    />
-                  ) : (
-                    <button
-                      className="upload-button"
-                      onClick={() => document.getElementById("image-upload")?.click()}
-                    >
-                      CLICK TO ADD PICTURE
-                    </button>
-                  )}
+                  <div className="profile-picture">
+                    {/* If an image is selected, display it; otherwise, show the button */}
+                    {image ? (
+                      <img
+                        src={URL.createObjectURL(image)}
+                        alt="Selected Profile"
+                        onClick={() => document.getElementById("image-upload")?.click()} // Allow re-selecting an image
+                        style={{ width: "200px", height: "200px", objectFit: "cover", cursor: "pointer" }}
+                      />
+                    ) : (
+                      <button
+                        className="upload-button"
+                        onClick={() => document.getElementById("image-upload")?.click()}
+                      >
+                        CLICK TO ADD PICTURE
+                      </button>
+                    )}
 
-                  {/* Hidden file input */}
-                  <input
-                    id="image-upload"
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageChange}
-                    style={{ display: "none" }}
-                  />
-                </div>
+                    {/* Hidden file input */}
+                    <input
+                      id="image-upload"
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageChange}
+                      style={{ display: "none" }}
+                    />
+                  </div>
 
 
                 </div>
@@ -227,10 +252,22 @@ const Profile: React.FC = () => {
                   </label>
                 </div>
                 <label>
-                  Username: <input type="text" name="username" value={formData.username} onChange={handleChange} />
+                  Bio:<br /><textarea name="bio" value={formData.bio} onChange={handleChange} />
                 </label>
                 <label>
-                  Bio:<br /><textarea name="bio" value={formData.bio} onChange={handleChange} />
+                  Study Habit Tags:<br />
+                  <select
+                    name="studyHabitTags"
+                    value={formData.studyHabitTags}
+                    onChange={handleChange}
+                    // multiple
+                  >
+                    {enumOptions.studyHabitTags.map((option) => (
+                      <option key={option} value={option}>
+                        {formatEnum(option)}
+                      </option>
+                    ))}
+                  </select>
                 </label>
                 <div className="profile-buttons">
                   <button type="button" className="back-button">BACK</button>
