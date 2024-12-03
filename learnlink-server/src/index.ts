@@ -2,7 +2,7 @@ import express from "express";
 import cors from "cors";
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { PrismaClient, Grade, Gender } from "@prisma/client";
+import { PrismaClient, Grade, Gender, StudyTags } from "@prisma/client";
 import { env } from "process";
 import { Request, Response } from 'express';
 import http from "http";
@@ -141,8 +141,8 @@ app.get('/api/enums', async (req, res) => {
     // Manually define enum values by accessing them from the generated Prisma types
     const gradeEnum = Object.values(Grade); // Fetches ['UNDERGRAD', 'GRAD']
     const genderEnum = Object.values(Gender); // Fetches ['MALE', 'FEMALE', 'OTHER']
-
-    res.status(200).json({ grade: gradeEnum, gender: genderEnum });
+    const studyHabitTags = Object.values(StudyTags); 
+    res.status(200).json({ grade: gradeEnum, gender: genderEnum, studyHabitTags });
   } catch (error) {
     console.error('Error fetching enum values:', error);
     res.status(500).json({ error: 'Internal server error' });

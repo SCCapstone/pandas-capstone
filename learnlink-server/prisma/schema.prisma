@@ -13,6 +13,21 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum StudyTags {
+  Quiet
+  Background_Noise
+  Music_Allowed
+  Solo_Study
+  Group_Discussion
+  Pair_Work
+  Morning
+  Afternoon
+  Evening
+  Night
+  Visual_Learner
+  Auditory_Learner
+}
+
 enum Grade {
   Freshman
   Sophomore
@@ -56,7 +71,7 @@ model User {
   bio                 String?
   gender              Gender?
   profilePic          String?
-  studyHabitTags      String[]       // Array of tags for study habits
+  studyHabitTags      StudyTags[]       // Array of tags for study habits
 
 
   studyGroups         StudyGroup[]   @relation("UserStudyGroups")
