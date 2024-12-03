@@ -10,21 +10,31 @@ import axios from 'axios';
 interface Chat {
   id: number;
   name: string;
-  messages: string[];
+  messages: Message[];
   users: User[]; 
   createdAt: string;
   updatedAt: string;
 }
 
+interface Message{
+  id: number;
+  content: string;
+  createdAt: string;
+  userId: number;
+  chatId: number;
+  
+}
 interface User {
   id: number;
   username: string;
   firstName: string;
   lastName: string;
 }
+const socket = io("http://localhost:2020");
 
-// Connect to the Socket.IO server
-const socket = io('http://localhost:2020');
+
+
+
 
 const Messaging: React.FC = () => {
   const [chats, setChats] = useState<Chat[]>([]);
@@ -36,6 +46,8 @@ const Messaging: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [currentUserId, setCurrentUserId] = useState<number | null>(null);
 
+
+
   useEffect(() => {
     // Fetch users and chats from the API when the component mounts
     axios.get('http://localhost:2020/api/users')
@@ -46,28 +58,20 @@ const Messaging: React.FC = () => {
     // Make the API request to fetch chats for the user
   
     const token = localStorage.getItem('token');
-    axios.get(`http://localhost:2020/api/chats`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+    axios.get('http://localhost:2020/api/chats', {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((response) => {
+        const chatsWithMessages = response.data.map((chat: Chat) => ({
+          ...chat,
+          messages: chat.messages || [], // Ensure messages is always an array
+        }));
+        setChats(chatsWithMessages);
       })
-      .then((response) => setChats(response.data))
       .catch((error) => console.error('Error fetching chats:', error));
+    
 
-    // Listen for real-time updates on new messages
-    socket.on('newMessage', (message) => {
-      if (selectedChat) {
-        setChats((prevChats) =>
-          prevChats.map((chat) =>
-            chat.id === selectedChat.id
-              ? { ...chat, messages: [...chat.messages, message] }
-              : chat
-          )
-        );
-      }
-    });
-
-
+     
 
     if (token) {
       axios.get('http://localhost:2020/api/currentUser', {
@@ -76,6 +80,27 @@ const Messaging: React.FC = () => {
         .then((response) => setCurrentUserId(response.data.id))
         .catch((error) => console.error('Error fetching current user:', error));
     }
+    socket.on('connect', () => {
+      console.log('Connected to server');
+    });
+
+    // Listen for real-time updates on new messages
+    socket.on('newMessage', (message) => {
+      if (selectedChat) {
+        setChats((prevChats) =>
+          prevChats.map((chat) =>
+            chat.id === selectedChat.id
+              ? { ...chat, messages: [...(chat.messages || []), message] } // Safely append message
+              : chat
+          )
+        );
+      }
+    });
+    
+
+    
+    
+    
 
     return () => {
       socket.off('message');
@@ -89,24 +114,33 @@ const Messaging: React.FC = () => {
     const token = localStorage.getItem('token');
     if (currentMessage.trim() && selectedChat) {
       try {
+        const messageData: Message = {
+          id: Date.now(), // Use a unique ID generator
+          content: currentMessage.trim(),
+          createdAt: new Date().toISOString(),
+          userId: currentUserId || 0, // Add a fallback for currentUserId
+          chatId: selectedChat.id,
+        };
+  
         // Emit the message via Socket.IO
-        socket.emit('message', { chatId: selectedChat.id, content: currentMessage.trim(), token });
-
-
+        socket.emit('message', { ...messageData, token });
+  
         // Update the chat's messages in state
         setChats((prevChats) =>
           prevChats.map((chat) =>
             chat.id === selectedChat.id
-              ? { ...chat, messages: [...chat.messages, currentMessage.trim()] }
+              ? { ...chat, messages: [...(chat.messages || []), messageData] }
               : chat
           )
         );
+  
         setCurrentMessage('');
       } catch (error) {
         console.error('Error sending message:', error);
       }
     }
   };
+  
 
 
   const createNewChat = async (user: User) => {
@@ -269,12 +303,16 @@ const Messaging: React.FC = () => {
             <>
               <h2 className="ChatHeader">{getChatName(selectedChat)}</h2>
               <div className="ChatWindow">
-              {selectedChat?.messages?.map((message, index) => (
-                <div key={index} className="MessageBubble">
-                  {message}
-                </div>
-              ))}
+                {Array.isArray(selectedChat?.messages)
+                  ? selectedChat.messages.map((message, index) => (
+                      <div key={index} className="MessageBubble">
+                        {typeof message === 'string' ? message : message.content}
+                      </div>
+                    ))
+                  : <div>No messages to display.</div>}
               </div>
+
+
               <div className="ChatInput">
                 <input
                   type="text"

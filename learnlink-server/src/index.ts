@@ -17,10 +17,16 @@ interface CustomJwtPayload extends JwtPayload {
 const app = express();
 const prisma = new PrismaClient();
 
-//const http = require('http');
 const server = http.createServer(app);
-//const { Server } = require('socket.io');
-const io = new Server(server);
+const io = new Server(server, {
+  cors: {
+    origin: "http://localhost:3000",
+    methods: ["GET", "POST"],
+  },
+});
+
+
+
 
 const PORT = env.SERVER_PORT || 2020;
 const JWT_SECRET = env.JWT_SECRET || 'your_default_jwt_secret';
@@ -762,9 +768,29 @@ app.post('/api/chats/:userId', authenticate, async (req: Request, res: Response)
 
 /*************** WEBSOCKETS */
 
+//app.use('/public', express.static(path.join(__dirname, '..', 'learnlink-ui', 'public')));
 //TODO there is a get console error happening in socket.io seen below 
 // GET http://localhost:2020/socket.io/?EIO=4&transport=polling&t=877a3it0 404 (Not Found)
 
+app.get('/socket-test', (req, res) => {
+  res.send('Socket Test');
+});
+
+// Set up a basic route
+app.get('/socket-io', (req, res) => {
+  res.send('Socket.IO server is running');
+});
+/*
+io.on('connection', (socket) => {
+  console.log('A user connected');
+  socket.emit('message', 'Hello from server'); // Test message to the client
+
+  socket.on('disconnect', () => {
+    console.log('User disconnected');
+  });
+});
+
+*/
 
 // Real-time WebSocket chat functionality
 io.on("connection", (socket) => {
@@ -847,9 +873,10 @@ io.on("connection", (socket) => {
 
 
 
+
 /********* LISTEN FUNCT */
 
-
-app.listen(PORT, () => {
+// Start the server on port 2020
+server.listen(PORT, () => {
   console.log(`server running on localhost:${PORT}`);
 });
