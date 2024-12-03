@@ -1,13 +1,16 @@
+/* Chat Layout */
 .chat {
   display: flex;
   flex-direction: column;
   height: 100vh;
 }
+
 .content {
   flex-direction: column;
   align-items: center;
   text-align: center;
 }
+
 .Chat {
   display: flex;
   height: calc(100vh - 140px);
@@ -21,7 +24,7 @@
 
 .NewChatButton {
   font-weight: 700;
-  font-size:large;
+  font-size: large;
   width: 100%;
   padding: 10px;
   margin-bottom: 10px;
@@ -32,7 +35,6 @@
   cursor: pointer;
 }
 
-
 .NewChatButton:hover {
   background-color: #01506d;
 }
@@ -41,6 +43,7 @@
   list-style: none;
   padding: 0;
   margin: 0;
+  margin-top: 20px; /* Adds space above the chat list */
 }
 
 .ChatListItem {
@@ -104,39 +107,25 @@
 
 .ChatInput button {
   font-weight: 700;
-  font-size:large;
+  font-size: large;
   padding: 10px 20px;
   background-color: #00668C;
   color: white;
   border: none;
   border-radius: 5px;
   cursor: pointer;
-
 }
 
 .ChatInput button:hover {
   background-color: #01506d;
 }
 
-
-/* Basic Styles for Dropdown */
+/* Dropdown Container */
 .DropdownContainer {
   position: relative;
   display: inline-block;
-}
-
-.NewChatButton {
-  background-color: #007bff;
-  color: white;
-  padding: 10px 20px;
-  border: none;
-  cursor: pointer;
-  font-size: 16px;
-  border-radius: 4px;
-}
-
-.NewChatButton:hover {
-  background-color: #0056b3;
+  width: 100%;
+  margin-bottom: 20px; /* Adds space below the dropdown */
 }
 
 /* Dropdown Menu */
@@ -161,30 +150,152 @@
   display: block;
 }
 
+/* Search Input */
 .SearchInput {
   width: 100%;
+  max-width: 100px;
   padding: 8px 12px;
-  margin-bottom: 10px;
+  margin: 0 auto 10px;
   border: 1px solid #ddd;
   border-radius: 4px;
   font-size: 14px;
   box-sizing: border-box;
 }
 
+/* User List */
 .UserList {
   list-style-type: none;
   padding: 0;
   margin: 0;
+  max-height: 300px;
+  overflow-y: auto;
 }
 
-.UserListItem {
-  padding: 10px 20px;
+.UserItem {
+  padding: 10px 15px;
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
 
-.UserListItem:hover {
+.UserItem:hover {
   background-color: #f1f1f1;
+}
+
+.UserItem.active {
+  background-color: #e0e0e0;
+  font-weight: bold;
+}
+
+.UserItem:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(0, 102, 140, 0.3);
+}
+
+/* Chat Name Input Section */
+.ChatNameInput {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background-color: #f9f9f9;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  margin-top: 20px; /* Adds space above the chat name input */
+}
+
+.GroupNameInput {
+  width: 80%;
+  max-width: 350px;
+  padding: 10px 15px;
+  margin: 0 auto 15px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+  background-color: #fff;
+  outline: none;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  box-sizing: border-box;
+}
+
+.GroupNameInput:focus {
+  border-color: #00668C;
+  box-shadow: 0 0 5px rgba(0, 102, 140, 0.3);
+}
+
+.ChatNameActions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.ChatNameActions button {
+  font-size: medium;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.DeleteButton {
+  background-color: transparent;
+  border: none;
+  color: red;
+  font-size: 1.2rem;
+  cursor: pointer;
+  margin-left: 10px;
+}
+
+.DeleteButton:hover {
+  color: darkred;
+}
+
+
+.ChatList {
+  list-style: none; /* Removes default list bullets */
+  padding: 0; /* Removes padding from the list */
+  margin: 0; /* Removes margin from the list */
+}
+
+.ChatListHeader {
+  font-size: 1.5rem; /* Sets a larger font size */
+  font-weight: bold; /* Makes the text bold */
+  padding-top: 50px;
+  padding: 15px; /* Adds padding around the header */
+  background-color: #00668C; /* Gives the header a blue background */
+  color: white; /* White text color */
+  text-align: center; /* Centers the text */
+  border-top-left-radius: 10px; /* Rounded corners for top left */
+  border-top-right-radius: 10px; /* Rounded corners for top right */
+  margin-bottom: 10px; /* Adds some space below the header */
+  margin-top: 20px;
+}
+
+.ChatListItem {
+  padding: 10px 15px; /* Adds padding for each list item */
+  cursor: pointer; /* Changes the cursor to pointer on hover */
+  transition: background-color 0.3s ease; /* Smooth transition for background color change */
+}
+
+.ChatListItem:hover {
+  background-color: #f1f1f1; /* Changes background on hover */
+}
+
+
+.ChatNameActions button:first-child {
+  background-color: #00668C;
+  color: white;
+}
+
+.ChatNameActions button:first-child:hover {
+  background-color: #01506d;
+}
+
+.ChatNameActions button:last-child {
+  background-color: #ccc;
+}
+
+.ChatNameActions button:last-child:hover {
+  background-color: #aaa;
 }
 
 /* Responsive Adjustments */
@@ -194,15 +305,3 @@
   }
 }
 
-.DeleteButton {
-  background-color: transparent;
-  border: none;
-  color: red;
-  font-size: 1.2rem;
-  margin-left: 10px;
-  cursor: pointer;
-}
-
-.DeleteButton:hover {
-  color: darkred;
-}

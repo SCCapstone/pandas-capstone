@@ -45,6 +45,9 @@ const Messaging: React.FC = () => {
   const [showDropdown, setShowDropdown] = useState<boolean>(false); // Control dropdown visibility
   const [error, setError] = useState<string | null>(null);
   const [currentUserId, setCurrentUserId] = useState<number | null>(null);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null); // Track selected user
+  const [customChatName, setCustomChatName] = useState<string>(''); // Track custom chat name
+  const [showGroupNameInput, setShowGroupNameInput] = useState<boolean>(false);
 
 
 
@@ -96,17 +99,14 @@ const Messaging: React.FC = () => {
         );
       }
     });
-    
-
-    
-    
-    
 
     return () => {
       socket.off('message');
     };
     
   }, [selectedChat]);
+
+  
 
 
   //TODO fix this 
@@ -143,47 +143,44 @@ const Messaging: React.FC = () => {
   
 
 
-  const createNewChat = async (user: User) => {
+  const createNewChat = async (user: User, chatName: string) => {
     try {
-      const payload = {
-        recipientUserId: user.id, // Use the correct key
-        chatName: `${user.firstName} ${user.lastName}`, // Optional, used as default if provided
-      };
-  
-      // Check for duplicate chats
-      
-      const isDuplicateChat = chats.some((chat) => chat.name === payload.chatName);
-      if (isDuplicateChat) {
-        alert('A chat with this user already exists.');
+      // Ensure user and chatName are properly passed to the function
+      if (!user || !chatName.trim()) {
+        alert('Please provide both a user and a chat name!');
         return;
       }
-      
-      const token = localStorage.getItem('token');
-
   
+      // Check if a chat already exists with this user
+      const existingChat = chats.find(chat => 
+        chat.users.some(u => u.id === user.id)
+      );
+  
+      if (existingChat) {
+        alert('A chat with this user already exists!');
+        return; // Prevent creating a duplicate chat
+      }
+  
+      const payload = {
+        recipientUserId: user.id,
+        chatName, // Use the custom chat name
+      };
+  
+      const token = localStorage.getItem('token');
       if (!token) {
-        console.error('Token is missing. User might not be authenticated.');
         alert('Please log in again.');
         return;
       }
-      console.log(token);
-      
-      const response = await axios.post(`http://localhost:2020/api/chats/${user.id}`, payload, {
-        headers: {
-          Authorization: `Bearer ${token}`, // Pass the token
-        },
-      });
-      
-      
-
-      //console.log('Authorization Token:', localStorage.getItem('token'));
+  
+      const response = await axios.post(
+        `http://localhost:2020/api/chats/${user.id}`,
+        payload,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
   
       const newChat = response.data;
-  
-      // Update state with the new chat
       setChats((prevChats) => [...prevChats, newChat]);
       setSelectedChat(newChat);
-      setShowDropdown(false); // Hide dropdown
     } catch (error) {
       console.error('Error creating new chat:', error);
       if (axios.isAxiosError(error) && error.response) {
@@ -194,15 +191,25 @@ const Messaging: React.FC = () => {
     }
   };
   
+  
   const getChatName = (chat: Chat): string => {
+    // Use the custom chat name if it exists
+    if (chat.name && chat.name.trim() !== '') {
+      return chat.name;
+    }
+  
+    // If no custom name, derive name based on other users
     if (currentUserId) {
       const otherUser = chat.users?.find((user) => user.id !== currentUserId);
-      if (otherUser){
-        return otherUser ? `${otherUser.firstName} ${otherUser.lastName}` : 'Unknown User';
+      if (otherUser) {
+        return `${otherUser.firstName} ${otherUser.lastName}`;
       }
     }
-    return chat.name || 'Unnamed Chat'; // Provide a default fallback
+  
+    // Fallback if no other user found or no name is set
+    return 'Unnamed Chat';
   };
+  
   
 
 
@@ -246,26 +253,26 @@ const Messaging: React.FC = () => {
             onClick={() => setShowDropdown(!showDropdown)}
             className="NewChatButton"
           >
-            + New Chat
+            + New Group
           </button>
           {showDropdown && (
             <div className="Dropdown">
-              <input
+              <input className = "SearchBox"
                 type="text"
                 placeholder="Search users..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
-              
               <ul className="UserList">
-                
                 {filteredUsers.map((user) => (
                   <li
                     key={user.id}
                     className="UserItem"
-                    onClick={() => { 
-                      createNewChat(user); 
-                      setSearchTerm(''); // Clear search term after selecting
+                    onClick={() => {
+                      setSelectedUser(user); // Store the selected user
+                      setShowDropdown(false); // Hide the dropdown
+                      setShowGroupNameInput(true); // Show the group name input
+                      setSearchTerm(''); // Clear search term
                     }}
                   >
                     {user.firstName} {user.lastName}
@@ -274,7 +281,49 @@ const Messaging: React.FC = () => {
               </ul>
             </div>
           )}
+
+          {/* Show the group name input */}
+          {showGroupNameInput && selectedUser && (
+            <div className="ChatNameInput">
+              <p>Creating chat with: {selectedUser.firstName} {selectedUser.lastName}</p>
+              <input className = "GroupNameInput"
+                type="text"
+                placeholder="Enter a group name..."
+                value={customChatName}
+                onChange={(e) => setCustomChatName(e.target.value)}
+              />
+              <div className="ChatNameActions">
+                <button
+                  onClick={() => {
+                    if (customChatName.trim()) {
+                      createNewChat(selectedUser, customChatName.trim() + " with " + selectedUser.firstName + " " + selectedUser.lastName); // Pass the chat name
+                      setSelectedUser(null); // Clear selected user
+                      setCustomChatName(''); // Clear custom chat name
+                      setShowGroupNameInput(false); // Hide group name input
+                    } else {
+                      alert('Please enter a chat name!');
+                    }
+                  }}
+                >
+                  Create Chat
+                </button>
+                <button
+                  onClick={() => {
+                    setShowGroupNameInput(false); // Hide group name input
+                    setSelectedUser(null); // Clear selected user
+                    setCustomChatName(''); // Clear custom chat name
+                  }}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          )}
+
           <ul className="ChatList">
+          <li className="ChatListHeader">
+            Groups
+          </li>
             {chats
               .slice()
               .sort((a, b) => {
@@ -338,3 +387,4 @@ const Messaging: React.FC = () => {
 };
 
 export default Messaging;
+
