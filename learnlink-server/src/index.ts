@@ -539,6 +539,11 @@ app.delete('/users/:id', authenticate, async (req, res): Promise<any> => {
   }
 });
   
+/********* STUDY GROUPS */
+app.post('/api/study-groups', async (req, res) => {
+  
+});
+
 
 
 
