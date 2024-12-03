@@ -80,7 +80,7 @@ const SwipeProfiles = ({ userId }: { userId: number }) => {
                     <p><span className="bold-first-word">Grade: </span>{currentProfile.grade}</p>
                     <p><span className="bold-first-word">Relevant Coursework: </span>{currentProfile.relevant_courses}</p>
                     <p><span className="bold-first-word">Fav Study Method: </span>{currentProfile.study_method}</p>
-                    <p><span className="bold-first-word">Study Preference: </span>{ }</p>
+                    <p><span className="bold-first-word">Study Tags: </span>{currentProfile.studyHabitTags}</p>
                   </div>
                 </div>
               </div>

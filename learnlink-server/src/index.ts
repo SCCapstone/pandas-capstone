@@ -436,6 +436,8 @@ app.get('/api/profiles/:userId', async (req, res) => {
         study_method: true,
         gender: true,
         age: true,
+        college: true,
+        studyHabitTags: true,
       },
     });
 
