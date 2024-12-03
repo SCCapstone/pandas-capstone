@@ -14,12 +14,13 @@
   font-size: 14px;
   color: #00668C;
   text-align: center;
-  vertical-align: center;
   width: 100%;
   position: fixed;
   line-height: 50px;
   bottom: 0;
-  background-color: #D4EAF7 ;
+  background-color: #D4EAF7;
+  height: 50px; /* Define a fixed height for the footer */
+  z-index: 1000; /* Ensure it stays on top of other elements */
 }
 
 .navbar {

@@ -4,21 +4,23 @@
   margin: 0;
   padding: 0;
   height: 100vh;
-  overflow-y: scroll;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
+
 }
 
 .container {
-  width: 700px;
-  height: 600px;
+  width: 80%;
+  flex-grow: 1;
   padding: 20px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   text-align: left;
   overflow-y: scroll;
+  margin-bottom: 50px;
 }
 
 .l1 {

@@ -109,9 +109,9 @@ const Login: React.FC = () => {
                     </form>
                 </div>
             </div>
-            <div>
+            <footer>
                 <CopyrightFooter />
-            </div>
+            </footer>
 
         </div>
         
