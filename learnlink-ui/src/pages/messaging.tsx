@@ -1,3 +1,5 @@
+
+
 import React, { useState, useEffect } from 'react';
 import io from 'socket.io-client';
 import './messaging.css';
@@ -6,6 +8,12 @@ import CopyrightFooter from '../components/CopyrightFooter';
 import './LandingPage.css';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+
+interface Response {
+  success: boolean;
+  message?: string;
+  error?: string;
+}
 
 interface Chat {
   id: number;
@@ -48,7 +56,8 @@ const Messaging: React.FC = () => {
   const [selectedUser, setSelectedUser] = useState<User | null>(null); // Track selected user
   const [customChatName, setCustomChatName] = useState<string>(''); // Track custom chat name
   const [showGroupNameInput, setShowGroupNameInput] = useState<boolean>(false);
-
+  const [messages, setMessages] = useState([]);
+  const [newMessage, setNewMessage] = useState("");
 
 
   useEffect(() => {
@@ -84,12 +93,16 @@ const Messaging: React.FC = () => {
         .then((response) => setCurrentUserId(response.data.id))
         .catch((error) => console.error('Error fetching current user:', error));
     }
+
     socket.on('connect', () => {
       console.log('Connected to server');
     });
 
+    
+    
     // Listen for real-time updates on new messages
-    socket.on('newMessage', (message) => {
+    socket.on('message', (message) => {
+      console.log("message recieved:", message);
       if (selectedChat) {
         setChats((prevChats) =>
           prevChats.map((chat) =>
@@ -101,9 +114,36 @@ const Messaging: React.FC = () => {
       }
     });
 
+  
+
+    socket.on('newMessage', (message) => {
+      console.log('New message received:', message);
+    
+      // Ensure selectedChat exists
+      if (selectedChat) {
+        setChats((prevChats) =>
+          prevChats.map((chat) =>
+            chat.id === selectedChat.id
+              ? { ...chat, messages: [...(chat.messages || []), message] }
+              : chat
+          )
+        );
+      }
+    });
+    
+
     return () => {
+      socket.off('connect');
+      socket.off('joinedChat');
       socket.off('message');
+      socket.off('recieveMessage');
     };
+    
+    
+
+    
+
+    
     
   }, [selectedChat]);
 
@@ -123,8 +163,22 @@ const Messaging: React.FC = () => {
           chatId: selectedChat.id,
         };
   
-        // Emit the message via Socket.IO
-        socket.emit('message', { ...messageData, token });
+        
+        socket.emit(
+          'message',
+          { chatId: selectedChat.id, content: currentMessage, token },
+          (response: { success: boolean; message?: string; error?: string }) => {
+            //console.log('Received response:', response);
+            if (response.success) {
+              console.log('Message sent from client successfully:', response.message);
+            } else {
+              console.log('Message send from client failed:', response.error);
+            }
+          }
+        );
+        setCurrentMessage('');
+        
+        
   
         // Update the chat's messages in state
         setChats((prevChats) =>
@@ -377,14 +431,21 @@ const Messaging: React.FC = () => {
             <>
               <h2 className="ChatHeader">{getChatName(selectedChat)}</h2>
               <div className="ChatWindow">
-                {Array.isArray(selectedChat?.messages)
-                  ? selectedChat.messages.map((message, index) => (
+                {selectedChat && Array.isArray(selectedChat.messages) ? (
+                  selectedChat.messages.length > 0 ? (
+                    selectedChat.messages.map((message, index) => (
                       <div key={index} className="MessageBubble">
                         {typeof message === 'string' ? message : message.content}
                       </div>
                     ))
-                  : <div>No messages to display.</div>}
+                  ) : (
+                    <div className="NoMessages">No messages to display.</div>
+                  )
+                ) : (
+                  <div className="NoChatSelected">Please select a chat.</div>
+                )}
               </div>
+
 
 
               <div className="ChatInput">
@@ -412,4 +473,5 @@ const Messaging: React.FC = () => {
 };
 
 export default Messaging;
+
 
