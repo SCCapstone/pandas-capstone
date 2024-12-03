@@ -54,7 +54,7 @@ const SwipeProfiles = ({ userId }: { userId: number }) => {
   const currentProfile = profiles.users[currentProfileIndex] || profiles.studyGroups[currentProfileIndex];
 
   return (
-    <div>
+    <div className='whole-swipe-component'>
       <div className="profile-card">
         {currentProfile ? (
           <>

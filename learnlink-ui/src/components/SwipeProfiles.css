@@ -1,3 +1,6 @@
+.whole-swipe-component {
+  overflow-y: scroll;
+}
 .swipe-main-container {
     width: 100%;
     display: flex;
