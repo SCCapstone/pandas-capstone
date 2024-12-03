@@ -67,7 +67,7 @@
   position: relative;
   margin-right: 1rem;
   flex-grow: 1;
-  min-width: 50px; /* Set a minimum width before it fully disappears */
+  min-width: 100px; /* Set a minimum width before it fully disappears */
   overflow: hidden; /* Prevent overflow */
   transition: opacity 0.3s ease; /* Smooth disappearance */
 }
@@ -88,19 +88,21 @@
 }
 
 .icon {
-  flex-shrink: 1;
   font-size: 1.5rem;
   margin-left: 1rem;
   color: #00668C;
   cursor: pointer;
 }
 
-@media (max-width: 768px) {
-  .search-bar {
-    display: none; /* Hide search bar on small screens */
+@media (max-width: 900px) {
+  .navbar {
+    padding: 1rem; /* Adjust padding for smaller screens */
   }
-  .nav-icons {
-    flex-shrink: 1;
+  .nav-logo {
+    display: none; /* Adjust logo size for smaller screens */
+  }
+  .nav-icons .icon{
+    font-size: small;
   }
 
   .nav-links a {
@@ -108,6 +110,12 @@
     margin: 0 0.5rem;
   }
 
+}
+
+@media (max-width: 400px) {
+  .search-bar {
+    display: none; /* Hide search bar on small screens */
+  }
 }
 .sidenav {
   /* margin-top: 90px;
