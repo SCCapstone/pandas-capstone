@@ -55,7 +55,7 @@ const authenticate = (req: Request, res: Response, next: Function) => {
 
 // Signup endpoint
 app.post("/api/users", async (req, res): Promise<any> => {
-  const { firstName, lastName, email, username, password, profile_preferences } = req.body;
+  const { firstName, lastName, email, username, password, ideal_match_factor } = req.body;
 
   try {
       // Check if username or email already exists
@@ -86,7 +86,7 @@ app.post("/api/users", async (req, res): Promise<any> => {
         email,
         username,
         password: hashedPassword, // Store hashed ver in prod
-        profile_preferences: profile_preferences || null, // Preferences can be null for now? might change later
+        ideal_match_factor: ideal_match_factor || null, // Preferences can be null for now? might change later
       },
     });
 
