@@ -15,9 +15,10 @@
   .user-details strong {
     color: #333;
   }
+.detailHeader {
+  text-align: center ;
+  color: #00668C;
+  font-size: 36px;
+  font-weight: 600;
 
-h1 {
-    text-align:center;
-    color: #00668C;
 }
-  

@@ -7,6 +7,11 @@
   flex-direction: column; /* Stack elements vertically */
 }
 
+.h1 {
+  color: black;
+  text-align: left;
+}
+
 /* Main container styles */
 .main-container {
   width: 80%; /* Same width as login container */

@@ -50,7 +50,7 @@ const AccountDetails: React.FC = () => {
     <div>
       <Navbar />
 
-      <h1>Account</h1>
+      <div className='detailHeader'>Account</div>
       <div className="user-details">
         <p><strong>First Name:</strong> {formData.first_name}</p>
         <p><strong>Last Name:</strong> {formData.last_name}</p>
