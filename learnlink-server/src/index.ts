@@ -472,7 +472,7 @@ app.get('/api/profiles/:userId', async (req, res) => {
 export const deleteUserById = async (userId: number) => {
   try {
     // Delete related records in explicit join tables
-    await prisma.chatUser.deleteMany({ where: { userId } });
+    // await prisma.chat.deleteMany({ where: { users } });
 
     // Delete swipes
     await prisma.swipe.deleteMany({ where: { OR: [{ userId }, { targetUserId: userId }] } });
