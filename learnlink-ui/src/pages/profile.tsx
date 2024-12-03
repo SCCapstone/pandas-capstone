@@ -23,6 +23,7 @@ const Profile: React.FC = () => {
     gender: '',
     bio: '',
     studyHabitTags: [] as string[],
+    ideal_match_factor: '',
   });
 
 
@@ -65,6 +66,7 @@ const Profile: React.FC = () => {
             gender: userData.gender || '',
             bio: userData.bio || '',
             studyHabitTags: userData.studyHabitTags || [],
+            ideal_match_factor: userData.ideal_match_factor || '',
           });
         }
       } catch (error) {
@@ -124,7 +126,8 @@ const Profile: React.FC = () => {
       age: formData.age ? parseInt(formData.age) : undefined,
       relevant_courses: formData.relevant_courses ?
         (Array.isArray(formData.relevant_courses) ? formData.relevant_courses : [formData.relevant_courses]) : [],
-        studyHabitTags: [] as string[],
+        studyHabitTags: formData.studyHabitTags ? formData.studyHabitTags : [],
+      
 
     };
 
@@ -174,6 +177,13 @@ const Profile: React.FC = () => {
     setFormData((prevData) => ({
       ...prevData,
       studyHabitTags: selectedOptions ? selectedOptions.map((option: any) => option.value) : [],
+    }));
+  };
+
+  const handleMatchSelectChange = (selectedOption: { value: string; label: string }) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      ideal_match_factor: selectedOption ? selectedOption.value : '',
     }));
   };
 
@@ -273,6 +283,7 @@ const Profile: React.FC = () => {
                 </div>
                 <label>
                   Study Habit Tags:<br />
+                  {formData.studyHabitTags}
                   <Select
                     isMulti
                     name="studyHabitTags"
@@ -280,7 +291,7 @@ const Profile: React.FC = () => {
                       value: tag,
                       label: formatEnum(tag), // Assuming formatEnum formats the tag as a readable label
                     }))}
-                    value={enumOptions.studyHabitTags
+                    value={formData.studyHabitTags
                       .filter((tag) => formData.studyHabitTags.includes(tag))
                       .map((tag) => ({ value: tag, label: formatEnum(tag) }))}
                     onChange={handleSelectChange}
@@ -316,6 +327,35 @@ const Profile: React.FC = () => {
                     ))} */}
 
                 </label>
+                <label>
+                  Ideal Match Factor:<br />
+                  <Select
+                    name="studyHabitTags"
+                    options={enumOptions.studyHabitTags.map((tag) => ({
+                      value: tag,
+                      label: formatEnum(tag), // Formats the tag into a readable label
+                    }))}
+                    value={
+                      formData.ideal_match_factor
+                        ? { value: formData.ideal_match_factor, label: formatEnum(formData.ideal_match_factor) }
+                        : null
+                    }
+                    onChange={(newValue) => {
+                      // Type assertion for SingleValue
+                      const selectedOption = newValue as { value: string; label: string } | null;
+                      setFormData((prevData) => ({
+                        ...prevData,
+                        ideal_match_factor: selectedOption?.value || '', // Save the single selected value
+                      }));
+                    }}
+                    closeMenuOnSelect={true} // Close menu on select since it's single-select
+                    components={animatedComponents}
+                    className="basic-single-select"
+                    classNamePrefix="select"
+                    isMulti={false}
+                  />
+                </label>
+
                 <div className="profile-buttons">
                   <button type="button" className="back-button">BACK</button>
                   <button type="submit" className="save-button">SAVE</button>
