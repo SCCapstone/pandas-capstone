@@ -64,7 +64,7 @@ const Profile: React.FC = () => {
             study_method: userData.study_method || '',
             gender: userData.gender || '',
             bio: userData.bio || '',
-            studyHabitTags: userData.studyHabitTags || '',
+            studyHabitTags: userData.studyHabitTags || [],
           });
         }
       } catch (error) {
@@ -124,8 +124,7 @@ const Profile: React.FC = () => {
       age: formData.age ? parseInt(formData.age) : undefined,
       relevant_courses: formData.relevant_courses ?
         (Array.isArray(formData.relevant_courses) ? formData.relevant_courses : [formData.relevant_courses]) : [],
-      studyHabitTags: formData.studyHabitTags ?
-        (Array.isArray(formData.studyHabitTags) ? formData.studyHabitTags : [formData.studyHabitTags]) : [],
+        studyHabitTags: [] as string[],
 
     };
 
@@ -168,6 +167,14 @@ const Profile: React.FC = () => {
     if (file) {
       setImage(file); // Store the selected file
     }
+  };
+
+  // Handle multi-select changes
+  const handleSelectChange = (selectedOptions: any) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      studyHabitTags: selectedOptions ? selectedOptions.map((option: any) => option.value) : [],
+    }));
   };
 
 
@@ -265,15 +272,35 @@ const Profile: React.FC = () => {
                   </label>
                 </div>
                 <label>
+                  Study Habit Tags:<br />
+                  <Select
+                    isMulti
+                    name="studyHabitTags"
+                    options={enumOptions.studyHabitTags.map((tag) => ({
+                      value: tag,
+                      label: formatEnum(tag), // Assuming formatEnum formats the tag as a readable label
+                    }))}
+                    value={enumOptions.studyHabitTags
+                      .filter((tag) => formData.studyHabitTags.includes(tag))
+                      .map((tag) => ({ value: tag, label: formatEnum(tag) }))}
+                    onChange={handleSelectChange}
+                    closeMenuOnSelect={false}
+                    components={animatedComponents}
+                    className="basic-multi-select"
+                    classNamePrefix="select"
+                  />
+                </label>
+                <label>
                   Bio:<br /><textarea name="bio" value={formData.bio} onChange={handleChange} />
                 </label>
                 <label>
-                  Study Habit Tags:<br />
-                  <select
+                  {/* Study Habit Tags:<br /> */}
+                  {/* <select
                     name="studyHabitTags"
                     value={formData.studyHabitTags}
                     onChange={handleChange}
-                    // multiple
+                    multiple
+                  
                   >
                     <option value="">Select Tags</option>
                     {enumOptions.studyHabitTags.map((option) => (
@@ -282,6 +309,12 @@ const Profile: React.FC = () => {
                       </option>
                     ))}
                   </select>
+                  const tagOptions = {enumOptions.studyHabitTags.map((option) => (
+                      <option key={option} value={option}>
+                        {formatEnum(option)}
+                      </option>
+                    ))} */}
+
                 </label>
                 <div className="profile-buttons">
                   <button type="button" className="back-button">BACK</button>
