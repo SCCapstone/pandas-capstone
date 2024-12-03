@@ -61,6 +61,7 @@ const Messaging: React.FC = () => {
     // Make the API request to fetch chats for the user
   
     const token = localStorage.getItem('token');
+    console.log(token);
     axios.get('http://localhost:2020/api/chats', {
       headers: { Authorization: `Bearer ${token}` },
     })
@@ -252,6 +253,9 @@ const Messaging: React.FC = () => {
       }
     } catch (error) {
       console.error('Error deleting chat:', error);
+      if (axios.isAxiosError(error) && error.response) {
+        console.error('Server responded with:', error.response.data);
+      }
     }
   };
 
