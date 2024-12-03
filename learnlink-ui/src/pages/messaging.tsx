@@ -22,7 +22,7 @@ interface User {
 }
 
 // Connect to the Socket.IO server
-const socket = io('http://localhost:2020'); // Replace with your server URL
+const socket = io('http://localhost:2020');
 
 const Messaging: React.FC = () => {
   const [chats, setChats] = useState<Chat[]>([]);
@@ -53,7 +53,7 @@ const Messaging: React.FC = () => {
       .catch((error) => console.error('Error fetching chats:', error));
 
     // Listen for real-time updates on new messages
-    socket.on('message', (message) => {
+    socket.on('newMessage', (message) => {
       if (selectedChat) {
         setChats((prevChats) =>
           prevChats.map((chat) =>
@@ -84,10 +84,12 @@ const Messaging: React.FC = () => {
 
   //TODO fix this 
   const handleSendMessage = async () => {
+    const token = localStorage.getItem('token');
     if (currentMessage.trim() && selectedChat) {
       try {
         // Emit the message via Socket.IO
-        socket.emit('message', { chatId: selectedChat.id, content: currentMessage.trim() });
+        socket.emit('message', { chatId: selectedChat.id, content: currentMessage.trim(), token });
+
 
         // Update the chat's messages in state
         setChats((prevChats) =>
@@ -114,7 +116,7 @@ const Messaging: React.FC = () => {
   
       // Check for duplicate chats
       
-      const isDuplicateChat = chats.some((chat) => getChatName(chat) === payload.chatName);
+      const isDuplicateChat = chats.some((chat) => chat.name === payload.chatName);
       if (isDuplicateChat) {
         alert('A chat with this user already exists.');
         return;
@@ -158,12 +160,14 @@ const Messaging: React.FC = () => {
   
   const getChatName = (chat: Chat): string => {
     if (currentUserId) {
-      // Find the other user in the participants list
-      const otherUser = chat.users.find((user) => user.id !== currentUserId);
-      return otherUser ? `${otherUser.firstName} ${otherUser.lastName}` : 'Unknown User';
+      const otherUser = chat.users?.find((user) => user.id !== currentUserId);
+      if (otherUser){
+        return otherUser ? `${otherUser.firstName} ${otherUser.lastName}` : 'Unknown User';
+      }
     }
-    return chat.name; // Default fallback
+    return chat.name || 'Unnamed Chat'; // Provide a default fallback
   };
+  
 
 
   const handleDeleteChat = async (chatId: number) => {

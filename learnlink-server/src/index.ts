@@ -8,15 +8,23 @@ import { Request, Response } from 'express';
 import http from "http";
 import { Server } from "socket.io";
 import path from 'path';
+import { JwtPayload } from "jsonwebtoken";
+
+interface CustomJwtPayload extends JwtPayload {
+  userId: number; // Make userId an integer
+}
 
 const app = express();
 const prisma = new PrismaClient();
-const server = http.createServer(app);
-const io = new Server(server);
 
+//const http = require('http');
+const server = http.createServer(app);
+//const { Server } = require('socket.io');
+const io = new Server(server);
 
 const PORT = env.SERVER_PORT || 2020;
 const JWT_SECRET = env.JWT_SECRET || 'your_default_jwt_secret';
+
 
 app.use(express.json());
 app.use(cors());
@@ -526,7 +534,9 @@ app.delete('/users/:id', authenticate, async (req, res): Promise<any> => {
 });
   
 
-/*************** MESSAGING END POINTS */
+
+
+/*************** MESSAGING END POINTS API */
 
 
 // Route to get the current user's details
@@ -534,7 +544,7 @@ app.get('/api/currentUser', authenticate, async (req, res): Promise<any> => {
   try {
     const userId = res.locals.userId; // Retrieved from the token payload
 
-    // Correctly use findUnique with a where clause
+  
     const user = await prisma.user.findUnique({
       where: { id: userId },
     });
@@ -573,8 +583,7 @@ app.get('/api/users', async (req, res) => {
   }
 });
 
-// Get all chats
-
+// Get all chats for a user
 // WORKS
 // pulls up the chats with the users authentication code
 app.get('/api/chats', authenticate,  async (req, res):Promise<any> => {
@@ -612,10 +621,6 @@ app.get('/api/chats', authenticate,  async (req, res):Promise<any> => {
 
 
 
-
-
-
-
 //WORKS
 // Delete a chat
 app.delete('/api/chats/:chatId', async (req, res):Promise<any> => {
@@ -648,8 +653,7 @@ app.delete('/api/chats/:chatId', async (req, res):Promise<any> => {
 });
 
 
-// TODO
-// DOES NOT WORK YET
+// WORKS
 // Add a message to a chat
 app.post('/api/chats/:chatId/messages', authenticate, async (req, res): Promise<any> => {
   const { chatId } = req.params;
@@ -767,9 +771,14 @@ io.on("connection", (socket) => {
   console.log("User connected");
 
   socket.on("joinChat", async ({ chatId, token }) => {
+    if (!chatId || !token) {
+      return socket.emit("error", { message: "Invalid chatId or token" });
+    }
+  
     try {
-      const decoded: any = jwt.verify(token, JWT_SECRET);
-      const userId = decoded.userId;
+      const decoded = jwt.verify(token, JWT_SECRET) as CustomJwtPayload;
+      const userId = decoded.userId; // Now `userId` is inferred as a number
+
   
       const chat = await prisma.chat.findUnique({
         where: { id: chatId },
@@ -787,6 +796,8 @@ io.on("connection", (socket) => {
       socket.emit("error", { message: "Invalid token or chat access error" });
     }
   });
+  
+
   
   socket.on("message", async ({ chatId, content, token }) => {
     try {
@@ -828,6 +839,8 @@ io.on("connection", (socket) => {
     console.log("User disconnected");
   });
 });
+
+
 
 
 
