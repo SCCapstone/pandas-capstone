@@ -951,21 +951,31 @@ io.on("connection", (socket) => {
       const newMessage = await prisma.message.create({
         data: {
           content: data.content,
-          userId: data.userId,
-          chatId: data.chatId,
           createdAt: new Date(),
-          user: data.userId,
-          chat: data.chatId
+          user: {
+            connect: { id: data.userId }, // Connect the User by its ID
+          },
+          chat: {
+            connect: { id: data.chatId }, // Connect the Chat by its ID
+          },
         },
       });
+      
+      const savedMessage = await prisma.message.findUnique({
+        where: { id: newMessage.id },
+      });
+      console.log('Saved message in database:', savedMessage);
+      
   
-      console.log('Message saved to database:', newMessage);
+      //console.log('Message saved to database:', newMessage);
   
       // Emit the new message to all clients (broadcasting to all connected clients)
       socket.broadcast.emit('newMessage', newMessage);
-  
+      //ocket.broadcast.emit('newMessage', newMessage);
+      console.log('Broadcasting message:', newMessage);
+
       // Send success callback to the sender
-      callback({ success: true, message: 'Message sent successfully!' });
+      callback({ success: true, message: 'Message sent from server successfully!' });
     } catch (error) {
       console.error('Error handling message:', error);
       callback({ success: false, error: error });
@@ -996,7 +1006,14 @@ const sendEmail = async (to: string, subject: string, text: string, html: string
     text,
     html
   };
-  await transport.sendMail(mailOptions);
+
+  try {
+    await transport.sendMail(mailOptions);
+  } catch (error) {
+    console.error("Error in sending the email" , error);
+    throw new Error("Failed to send email");
+  }
+  
 };
 
 /**API endpoint for the forgot password */
