@@ -16,6 +16,7 @@ import UpdateEmail from './pages/updateEmail';
 import ResetPassword from './pages/resetPassword';
 import ChangePassword from './pages/changePassword';
 import AccountDetails from './pages/accountDetails';
+import PublicProfile from './pages/publicProfile';
 
 
 //routes
@@ -42,6 +43,7 @@ function App() {
           <Route path="/updateEmail" element={<UpdateEmail />} />
           <Route path="/changepassword" element={<ChangePassword />} />
           <Route path="/accountDetails" element={<AccountDetails />} />
+          <Route path="/user-profile/:id" element={<PublicProfile />} />
         </Routes> 
       </div>
     </Router>

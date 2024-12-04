@@ -10,6 +10,7 @@ import { Server } from "socket.io";
 import path, { parse } from 'path';
 import { JwtPayload } from "jsonwebtoken";
 import nodemailer from "nodemailer";
+import { profile } from "console";
 
 interface CustomJwtPayload extends JwtPayload {
   userId: number; // Make userId an integer
@@ -199,6 +200,52 @@ app.get('/api/users/profile', authenticate, async (req, res):Promise<any> => {
       ideal_match_factor: user.ideal_match_factor,
       studyHabitTags: user.studyHabitTags,
     });
+  } catch (error) {
+    console.error('Error fetching user profile:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Fetch user profile data
+app.get('/api/users/profile/:userId', authenticate, async (req, res):Promise<any> => {
+  const userId = parseInt(req.params.userId);
+  const placeholderImage = "https://learnlink-public.s3.us-east-2.amazonaws.com/AvatarPlaceholder.svg";
+
+
+  if (!userId) {
+    return res.status(401).json({ message: 'User not authenticated' });
+  }
+
+  try {
+    // Fetch the user from the database by userId
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Return the profile data
+    res.json({
+      first_name: user.firstName,
+      last_name: user.lastName,
+      username: user.username,
+      age: user.age,
+      college: user.college,
+      major: user.major,
+      grade: user.grade,
+      relevant_courses: user.relevant_courses,
+      study_method: user.study_method,
+      gender: user.gender,
+      bio: user.bio,
+      email:user.email,
+      ideal_match_factor: user.ideal_match_factor,
+      studyHabitTags: user.studyHabitTags,
+      profilePic: user.profilePic || placeholderImage,
+    });
+
+
   } catch (error) {
     console.error('Error fetching user profile:', error);
     res.status(500).json({ message: 'Server error' });
@@ -432,7 +479,7 @@ app.get('/api/profiles/:userId', async (req, res) => {
 
   try {
 
-    const placeholderImage = "https://learnlink-public.s3.us-east-2.amazonaws.com/AvatarPlaceholder.svg"; // Replace with your placeholder image URL
+    const placeholderImage = "https://learnlink-public.s3.us-east-2.amazonaws.com/AvatarPlaceholder.svg";
 
     // Fetch users and study groups that the current user has not swiped on yet
     const usersToSwipeOn = await prisma.user.findMany({
@@ -488,6 +535,7 @@ app.get('/api/profiles/:userId', async (req, res) => {
     res.status(500).json({ error: 'Something went wrong' });
   }
 });
+
 
 // Tried putting this in snother file and no dice :(
 export const deleteUserById = async (userId: number) => {
