@@ -17,6 +17,7 @@
 }
 
 .whole-public-component {
+    width: 80%;
     overflow-y: scroll;
     justify-content: center;
     align-items: center;
