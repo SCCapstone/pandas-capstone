@@ -58,6 +58,13 @@ const Messaging: React.FC = () => {
   const [showGroupNameInput, setShowGroupNameInput] = useState<boolean>(false);
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
+  const chatWindowRef = React.useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (chatWindowRef.current) {
+      chatWindowRef.current.scrollTop = chatWindowRef.current.scrollHeight;
+    }
+  }, [selectedChat?.messages]);
 
 
   useEffect(() => {
@@ -99,35 +106,26 @@ const Messaging: React.FC = () => {
     });
 
     
-    
-    // Listen for real-time updates on new messages
-    socket.on('message', (message) => {
-      console.log("message recieved:", message);
-      if (selectedChat) {
-        setChats((prevChats) =>
-          prevChats.map((chat) =>
-            chat.id === selectedChat.id
-              ? { ...chat, messages: [...(chat.messages || []), message] } // Safely append message
-              : chat
-          )
-        );
-      }
-    });
-
-  
-
     socket.on('newMessage', (message) => {
       console.log('New message received:', message);
-    
-      // Ensure selectedChat exists
-      if (selectedChat) {
-        setChats((prevChats) =>
-          prevChats.map((chat) =>
-            chat.id === selectedChat.id
-              ? { ...chat, messages: [...(chat.messages || []), message] }
-              : chat
-          )
-        );
+  
+      // Update the correct chat in the state
+      setChats((prevChats) =>
+        prevChats.map((chat) =>
+          chat.id === message.chatId
+            ? { ...chat, messages: [...chat.messages, message] }
+            : chat
+        )
+      );
+  
+      // Automatically scroll if the message belongs to the selected chat
+      if (selectedChat?.id === message.chatId && chatWindowRef.current) {
+        setTimeout(() => {
+          chatWindowRef.current?.scrollTo({
+            top: chatWindowRef.current.scrollHeight,
+            behavior: 'smooth',
+          });
+        }, 100);
       }
     });
     
@@ -166,7 +164,7 @@ const Messaging: React.FC = () => {
         
         socket.emit(
           'message',
-          { chatId: selectedChat.id, content: currentMessage, token },
+          { chatId: selectedChat.id, content: currentMessage, userId: currentUserId, token },
           (response: { success: boolean; message?: string; error?: string }) => {
             //console.log('Received response:', response);
             if (response.success) {
@@ -369,7 +367,7 @@ const Messaging: React.FC = () => {
           {/* Show the group name input */}
           {showGroupNameInput && selectedUser && (
             <div className="ChatNameInput">
-              <p>Creating chat with: {selectedUser.firstName} {selectedUser.lastName}</p>
+              <p>Creating group with: {selectedUser.firstName} {selectedUser.lastName}</p>
               <input className = "GroupNameInput"
                 type="text"
                 placeholder="Enter a group name..."
@@ -389,7 +387,7 @@ const Messaging: React.FC = () => {
                     }
                   }}
                 >
-                  Create Chat
+                  Create Group
                 </button>
                 <button
                   onClick={() => {
@@ -435,11 +433,16 @@ const Messaging: React.FC = () => {
           {selectedChat ? (
             <>
               <h2 className="ChatHeader">{getChatName(selectedChat)}</h2>
-              <div className="ChatWindow">
+              <div className="ChatWindow" ref={chatWindowRef}>
                 {selectedChat && Array.isArray(selectedChat.messages) ? (
                   selectedChat.messages.length > 0 ? (
                     selectedChat.messages.map((message, index) => (
-                      <div key={index} className="MessageBubble">
+                      <div
+                        key={index}
+                        className={`MessageBubble ${
+                          message.userId === currentUserId ? 'MyMessage' : 'OtherMessage'
+                        }`}
+                      >
                         {typeof message === 'string' ? message : message.content}
                       </div>
                     ))

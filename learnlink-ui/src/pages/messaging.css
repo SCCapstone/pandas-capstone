@@ -311,6 +311,26 @@
   background-color: #aaa;
 }
 
+.Online::after {
+  content: '•';
+  color: green;
+  margin-left: 5px;
+}
+.Offline::after {
+  content: '•';
+  color: red;
+  margin-left: 5px;
+}
+.MyMessage {
+  background-color: #daf8cb; /* light green */
+  align-self: flex-end;
+}
+.OtherMessage {
+  background-color: #f0f0f0; /* light gray */
+  align-self: flex-start;
+}
+
+
 /* Responsive Adjustments */
 @media (max-width: 768px) {
   .DropdownMenu {
