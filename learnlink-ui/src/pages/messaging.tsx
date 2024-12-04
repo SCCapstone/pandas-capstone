@@ -9,12 +9,6 @@ import './LandingPage.css';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-interface Response {
-  success: boolean;
-  message?: string;
-  error?: string;
-}
-
 interface Chat {
   id: number;
   name: string;
@@ -60,12 +54,6 @@ const Messaging: React.FC = () => {
   const [newMessage, setNewMessage] = useState("");
   const chatWindowRef = React.useRef<HTMLDivElement | null>(null);
 
-  useEffect(() => {
-    if (chatWindowRef.current) {
-      chatWindowRef.current.scrollTop = chatWindowRef.current.scrollHeight;
-    }
-  }, [selectedChat?.messages]);
-
 
   useEffect(() => {
     // Fetch users and chats from the API when the component mounts
@@ -107,17 +95,26 @@ const Messaging: React.FC = () => {
 
     
     socket.on('newMessage', (message) => {
-      console.log('New message received:', message);
-  
-      // Update the correct chat in the state
-      setChats((prevChats) =>
-        prevChats.map((chat) =>
+      console.log('New message received!!!:', message);
+      
+      
+      setChats((prevChats) => {
+        const updatedChats = prevChats.map((chat) =>
           chat.id === message.chatId
-            ? { ...chat, messages: [...chat.messages, message] }
+            ? { ...chat, messages: [...(chat.messages || []), message] }
             : chat
-        )
-      );
-  
+        );
+        console.log('Updated Chats:', updatedChats);
+        return updatedChats;
+      });
+      
+      
+      console.log('Incoming Message Chat ID:', message.chatId);
+      console.log('Existing Chat IDs:', chats.map((chat) => chat.id));
+
+
+      console.log('Selected Chat:', selectedChat);
+      console.log('Messages:', selectedChat?.messages);
       // Automatically scroll if the message belongs to the selected chat
       if (selectedChat?.id === message.chatId && chatWindowRef.current) {
         setTimeout(() => {
@@ -129,12 +126,11 @@ const Messaging: React.FC = () => {
       }
     });
     
+    
 
     return () => {
       socket.off('connect');
-      socket.off('joinedChat');
-      socket.off('message');
-      socket.off('recieveMessage');
+      socket.off('newMessage');
     };
     
     
@@ -146,7 +142,42 @@ const Messaging: React.FC = () => {
   }, [selectedChat]);
 
   
-
+  useEffect(() => {
+    socket.on('newMessage', (message) => {
+      console.log('New message received!!!:', message);
+  
+      setChats((prevChats) => {
+        const updatedChats = prevChats.map((chat) =>
+          chat.id === message.chatId
+            ? { ...chat, messages: [...(chat.messages || []), message] }
+            : chat
+        );
+        console.log('Updated Chats:', updatedChats);
+        return updatedChats;
+      });
+      console.log('Selected Chat:', selectedChat);
+      console.log('Messages:', selectedChat?.messages);
+      console.log('Incoming Message Chat ID:', message.chatId);
+    });
+  
+    // Cleanup to avoid duplicate listeners
+    return () => {
+      socket.off('newMessage');
+    };
+  }, [selectedChat]); // Only run once on mount
+  
+  // Scroll logic in a separate useEffect
+  useEffect(() => {
+    if (chatWindowRef.current && selectedChat?.id) {
+      setTimeout(() => {
+        chatWindowRef.current?.scrollTo({
+          top: chatWindowRef.current.scrollHeight,
+          behavior: 'smooth',
+        });
+      }, 100); // Slight delay to ensure DOM updates
+    }
+  }, [selectedChat?.messages]); // Runs when messages update
+  
 
   //TODO fix this 
   const handleSendMessage = async () => {
@@ -433,7 +464,7 @@ const Messaging: React.FC = () => {
           {selectedChat ? (
             <>
               <h2 className="ChatHeader">{getChatName(selectedChat)}</h2>
-              <div className="ChatWindow" ref={chatWindowRef}>
+              <div className="ChatWindow">
                 {selectedChat && Array.isArray(selectedChat.messages) ? (
                   selectedChat.messages.length > 0 ? (
                     selectedChat.messages.map((message, index) => (
@@ -443,7 +474,11 @@ const Messaging: React.FC = () => {
                           message.userId === currentUserId ? 'MyMessage' : 'OtherMessage'
                         }`}
                       >
-                        {typeof message === 'string' ? message : message.content}
+                         {typeof message === 'string'
+                          ? message
+                          : typeof message.content === 'string'
+                          ? message.content
+                          : JSON.stringify(message)}
                       </div>
                     ))
                   ) : (
@@ -453,6 +488,7 @@ const Messaging: React.FC = () => {
                   <div className="NoChatSelected">Please select a chat.</div>
                 )}
               </div>
+
 
 
 
