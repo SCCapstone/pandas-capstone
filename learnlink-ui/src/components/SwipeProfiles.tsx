@@ -89,7 +89,7 @@ const SwipeProfiles = ({ userId }: { userId: number }) => {
                           </span>
                         ))
                         ) : (
-                        <p>No study tags specified.</p>
+                          "No study tags specified."
                         )}
                     </p>
                   </div>

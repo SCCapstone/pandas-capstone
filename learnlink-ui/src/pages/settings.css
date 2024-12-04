@@ -8,6 +8,7 @@ body {
     flex-direction: column;
     justify-content: center; /* Vertically centers the content */
     height: 100vh; /* Full height of the viewport */
+    padding-bottom: 50px;
   }
   
   .settings-content {

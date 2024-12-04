@@ -7,7 +7,7 @@ import { env } from "process";
 import { Request, Response } from 'express';
 import http from "http";
 import { Server } from "socket.io";
-import path from 'path';
+import path, { parse } from 'path';
 import { JwtPayload } from "jsonwebtoken";
 
 interface CustomJwtPayload extends JwtPayload {
@@ -492,7 +492,7 @@ app.get('/api/profiles/:userId', async (req, res) => {
 export const deleteUserById = async (userId: number) => {
   try {
     // Delete related records in explicit join tables
-    // await prisma.chat.deleteMany({ where: { users } });
+    await prisma.chat.deleteMany({ where: { users: { some: { id: userId } } } });
 
     // Delete swipes
     await prisma.swipe.deleteMany({ where: { OR: [{ userId }, { targetUserId: userId }] } });
@@ -521,10 +521,11 @@ export const deleteUserById = async (userId: number) => {
 };
 
 
-app.delete('/users/:id', authenticate, async (req, res): Promise<any> => {
+app.delete('/api/users/:id', authenticate, async (req, res): Promise<any> => {
   const userId = parseInt(req.params.id);
+  console.log('Deleting user with ID:', userId);
 
-  if (isNaN(userId)) {
+  if (!userId) {
     return res.status(400).json({ error: 'Invalid user ID' });
   }
 
