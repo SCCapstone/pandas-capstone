@@ -89,11 +89,10 @@ const Messaging: React.FC = () => {
         .catch((error) => console.error('Error fetching current user:', error));
     }
 
-    socket.on('connect', () => {
-      console.log('Connected to server');
-    });
-
     
+    
+
+    /*
     socket.on('newMessage', (message) => {
       console.log('New message received!!!:', message);
       
@@ -127,22 +126,35 @@ const Messaging: React.FC = () => {
     });
     
     
+    */
+   
+    
+    
 
+    
+
+    
+    
+  }, []);
+
+  
+  useEffect(() =>{
+    socket.on('connect', () => {
+      console.log('Connected to server');
+    });
+    
+    socket.on('newMessage', (message) => {
+      console.log('New message received from server:', message);
+    });
+    
+    socket.on('error', (error) => {
+      console.error('Socket error:', error);
+    });
     return () => {
       socket.off('connect');
       socket.off('newMessage');
     };
-    
-    
-
-    
-
-    
-    
-  }, [selectedChat]);
-
-  
-
+  },[]);
   
   // Scroll logic in a separate useEffect
   useEffect(() => {
