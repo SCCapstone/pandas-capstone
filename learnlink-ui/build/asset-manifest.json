@@ -1,20 +1,20 @@
 {
   "files": {
-    "main.css": "/pandas-capstone/static/css/main.bc9e4b15.css",
-    "main.js": "/pandas-capstone/static/js/main.ae373239.js",
-    "static/js/453.b7bf2ace.chunk.js": "/pandas-capstone/static/js/453.b7bf2ace.chunk.js",
-    "static/media/LearnLink.svg": "/pandas-capstone/static/media/LearnLink.3b71cc26677ee8f56af57e44bd180a9e.svg",
-    "static/media/study-groups.png": "/pandas-capstone/static/media/study-groups.d51112122fb817f0dd1d.png",
-    "static/media/resources.png": "/pandas-capstone/static/media/resources.69b73f418f19977b2043.png",
-    "static/media/calculator.png": "/pandas-capstone/static/media/calculator.bb4bd151832e7b59e0ea.png",
-    "index.html": "/pandas-capstone/index.html",
-    "static/media/Curve.svg": "/pandas-capstone/static/media/Curve.3475d0ea864ec8930fe5.svg",
-    "main.bc9e4b15.css.map": "/pandas-capstone/static/css/main.bc9e4b15.css.map",
-    "main.ae373239.js.map": "/pandas-capstone/static/js/main.ae373239.js.map",
-    "453.b7bf2ace.chunk.js.map": "/pandas-capstone/static/js/453.b7bf2ace.chunk.js.map"
+    "main.css": "/pandas-capstone/learnlink-ui/static/css/main.23b89bf9.css",
+    "main.js": "/pandas-capstone/learnlink-ui/static/js/main.5ba866b9.js",
+    "static/js/453.b7bf2ace.chunk.js": "/pandas-capstone/learnlink-ui/static/js/453.b7bf2ace.chunk.js",
+    "static/media/LearnLink.svg": "/pandas-capstone/learnlink-ui/static/media/LearnLink.3b71cc26677ee8f56af57e44bd180a9e.svg",
+    "static/media/study-groups.png": "/pandas-capstone/learnlink-ui/static/media/study-groups.d51112122fb817f0dd1d.png",
+    "static/media/resources.png": "/pandas-capstone/learnlink-ui/static/media/resources.69b73f418f19977b2043.png",
+    "static/media/calculator.png": "/pandas-capstone/learnlink-ui/static/media/calculator.bb4bd151832e7b59e0ea.png",
+    "index.html": "/pandas-capstone/learnlink-ui/index.html",
+    "static/media/Curve.svg": "/pandas-capstone/learnlink-ui/static/media/Curve.3475d0ea864ec8930fe5.svg",
+    "main.23b89bf9.css.map": "/pandas-capstone/learnlink-ui/static/css/main.23b89bf9.css.map",
+    "main.5ba866b9.js.map": "/pandas-capstone/learnlink-ui/static/js/main.5ba866b9.js.map",
+    "453.b7bf2ace.chunk.js.map": "/pandas-capstone/learnlink-ui/static/js/453.b7bf2ace.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.bc9e4b15.css",
-    "static/js/main.ae373239.js"
+    "static/css/main.23b89bf9.css",
+    "static/js/main.5ba866b9.js"
   ]
 }
