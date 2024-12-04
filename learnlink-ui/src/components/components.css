@@ -30,7 +30,6 @@
   padding: 1rem 2rem;
   background-color: #D4EAF7;
   box-sizing: border-box;
-  position: relative;
   z-index: 10; /* Make sure it's below the dropdown */
   overflow: visible; /* Ensure overflow is visible, so the dropdown shows up */
 
