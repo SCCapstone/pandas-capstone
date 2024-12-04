@@ -272,15 +272,19 @@ const Messaging: React.FC = () => {
   
   const getChatName = (chat: Chat): string => {
     // Use the custom chat name if it exists
-    if (chat.name && chat.name.trim() !== '') {
-      return chat.name;
-    }
+    
   
     // If no custom name, derive name based on other users
     if (currentUserId) {
       const otherUser = chat.users?.find((user) => user.id !== currentUserId);
+      
       if (otherUser) {
-        return `${otherUser.firstName} ${otherUser.lastName}`;
+        if (chat.name && chat.name.trim() !== '') {
+          return chat.name + " with " +  `${otherUser.firstName} ${otherUser.lastName}` ;
+        }
+        else{
+          return `${otherUser.firstName} ${otherUser.lastName}`;
+        }
       }
     }
   
@@ -377,7 +381,7 @@ const Messaging: React.FC = () => {
                 <button
                   onClick={() => {
                     if (customChatName.trim()) {
-                      createNewChat(selectedUser, customChatName.trim() + " with " + selectedUser.firstName + " " + selectedUser.lastName); // Pass the chat name
+                      createNewChat(selectedUser, customChatName.trim()); // Pass the chat name
                       setSelectedUser(null); // Clear selected user
                       setCustomChatName(''); // Clear custom chat name
                       setShowGroupNameInput(false); // Hide group name input
