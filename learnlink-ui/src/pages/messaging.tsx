@@ -9,12 +9,6 @@ import './LandingPage.css';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-interface Response {
-  success: boolean;
-  message?: string;
-  error?: string;
-}
-
 interface Chat {
   id: number;
   name: string;
@@ -58,6 +52,7 @@ const Messaging: React.FC = () => {
   const [showGroupNameInput, setShowGroupNameInput] = useState<boolean>(false);
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
+  const chatWindowRef = React.useRef<HTMLDivElement | null>(null);
 
 
   useEffect(() => {
@@ -94,61 +89,85 @@ const Messaging: React.FC = () => {
         .catch((error) => console.error('Error fetching current user:', error));
     }
 
+    
+    
+
+    /*
+    socket.on('newMessage', (message) => {
+      console.log('New message received!!!:', message);
+      
+      
+      setChats((prevChats) => {
+        const updatedChats = prevChats.map((chat) =>
+          chat.id === message.chatId
+            ? { ...chat, messages: [...(chat.messages || []), message] }
+            : chat
+        );
+        console.log('Updated Chats:', updatedChats);
+        return updatedChats;
+      });
+      
+      
+      console.log('Incoming Message Chat ID:', message.chatId);
+      console.log('Existing Chat IDs:', chats.map((chat) => chat.id));
+
+
+      console.log('Selected Chat:', selectedChat);
+      console.log('Messages:', selectedChat?.messages);
+      // Automatically scroll if the message belongs to the selected chat
+      if (selectedChat?.id === message.chatId && chatWindowRef.current) {
+        setTimeout(() => {
+          chatWindowRef.current?.scrollTo({
+            top: chatWindowRef.current.scrollHeight,
+            behavior: 'smooth',
+          });
+        }, 100);
+      }
+    });
+    
+    
+    */
+   
+    
+    
+
+    
+
+    
+    
+  }, []);
+
+  
+  useEffect(() =>{
     socket.on('connect', () => {
       console.log('Connected to server');
     });
-
     
-    
-    // Listen for real-time updates on new messages
-    socket.on('message', (message) => {
-      console.log("message recieved:", message);
-      if (selectedChat) {
-        setChats((prevChats) =>
-          prevChats.map((chat) =>
-            chat.id === selectedChat.id
-              ? { ...chat, messages: [...(chat.messages || []), message] } // Safely append message
-              : chat
-          )
-        );
-      }
-    });
-
-  
-
     socket.on('newMessage', (message) => {
-      console.log('New message received:', message);
-    
-      // Ensure selectedChat exists
-      if (selectedChat) {
-        setChats((prevChats) =>
-          prevChats.map((chat) =>
-            chat.id === selectedChat.id
-              ? { ...chat, messages: [...(chat.messages || []), message] }
-              : chat
-          )
-        );
-      }
+      console.log('New message received from server:', message);
     });
     
-
+    socket.on('error', (error) => {
+      console.error('Socket error:', error);
+    });
     return () => {
       socket.off('connect');
-      socket.off('joinedChat');
-      socket.off('message');
-      socket.off('recieveMessage');
+      socket.off('newMessage');
     };
-    
-    
-
-    
-
-    
-    
-  }, [selectedChat]);
-
+  },[]);
   
-
+  // Scroll logic in a separate useEffect
+  useEffect(() => {
+    if (chatWindowRef.current && selectedChat?.id) {
+      setTimeout(() => {
+        chatWindowRef.current?.scrollTo({
+          top: chatWindowRef.current.scrollHeight,
+          behavior: 'smooth',
+        });
+      }, 100); // Slight delay to ensure DOM updates
+    }
+  }, [selectedChat?.messages]); // Runs when messages update
+  
 
   //TODO fix this 
   const handleSendMessage = async () => {
@@ -166,7 +185,7 @@ const Messaging: React.FC = () => {
         
         socket.emit(
           'message',
-          { chatId: selectedChat.id, content: currentMessage, token },
+          { chatId: selectedChat.id, content: currentMessage, userId: currentUserId, token },
           (response: { success: boolean; message?: string; error?: string }) => {
             //console.log('Received response:', response);
             if (response.success) {
@@ -271,21 +290,24 @@ const Messaging: React.FC = () => {
   
   
   const getChatName = (chat: Chat): string => {
-    // Use the custom chat name if it exists
-    if (chat.name && chat.name.trim() !== '') {
-      return chat.name;
-    }
   
-    // If no custom name, derive name based on other users
     if (currentUserId) {
       const otherUser = chat.users?.find((user) => user.id !== currentUserId);
+      
       if (otherUser) {
-        return `${otherUser.firstName} ${otherUser.lastName}`;
+        if (chat.name && chat.name.trim() !== '') {
+          return chat.name + " with " +  `${otherUser.firstName} ${otherUser.lastName}` ;
+        }
+        else{
+          return `${otherUser.firstName} ${otherUser.lastName}`;
+        }
       }
     }
+    if (chat.name && chat.name.trim() !== '') {
+      return chat.name ;
+    }
   
-    // Fallback if no other user found or no name is set
-    return 'Unnamed Chat';
+    return " ";
   };
   
   
@@ -366,7 +388,7 @@ const Messaging: React.FC = () => {
           {/* Show the group name input */}
           {showGroupNameInput && selectedUser && (
             <div className="ChatNameInput">
-              <p>Creating chat with: {selectedUser.firstName} {selectedUser.lastName}</p>
+              <p>Creating group with: {selectedUser.firstName} {selectedUser.lastName}</p>
               <input className = "GroupNameInput"
                 type="text"
                 placeholder="Enter a group name..."
@@ -377,7 +399,7 @@ const Messaging: React.FC = () => {
                 <button
                   onClick={() => {
                     if (customChatName.trim()) {
-                      createNewChat(selectedUser, customChatName.trim() + " with " + selectedUser.firstName + " " + selectedUser.lastName); // Pass the chat name
+                      createNewChat(selectedUser, customChatName.trim()); // Pass the chat name
                       setSelectedUser(null); // Clear selected user
                       setCustomChatName(''); // Clear custom chat name
                       setShowGroupNameInput(false); // Hide group name input
@@ -386,7 +408,7 @@ const Messaging: React.FC = () => {
                     }
                   }}
                 >
-                  Create Chat
+                  Create Group
                 </button>
                 <button
                   onClick={() => {
@@ -436,8 +458,17 @@ const Messaging: React.FC = () => {
                 {selectedChat && Array.isArray(selectedChat.messages) ? (
                   selectedChat.messages.length > 0 ? (
                     selectedChat.messages.map((message, index) => (
-                      <div key={index} className="MessageBubble">
-                        {typeof message === 'string' ? message : message.content}
+                      <div
+                        key={index}
+                        className={`MessageBubble ${
+                          message.userId === currentUserId ? 'MyMessage' : 'OtherMessage'
+                        }`}
+                      >
+                         {typeof message === 'string'
+                          ? message
+                          : typeof message.content === 'string'
+                          ? message.content
+                          : JSON.stringify(message)}
                       </div>
                     ))
                   ) : (
@@ -447,6 +478,7 @@ const Messaging: React.FC = () => {
                   <div className="NoChatSelected">Please select a chat.</div>
                 )}
               </div>
+
 
 
 
