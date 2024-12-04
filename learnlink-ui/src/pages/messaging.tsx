@@ -243,18 +243,20 @@ const Messaging: React.FC = () => {
       // Then, create the study group
       const studyGroupPayload = {
         chatId: newChat.id, // Use the created chat ID
-        groupName: chatName, // Same name as the chat
-        members: [user.id, currentUserId], // Include both users in the study group
+        name: chatName, // Same name as the chat
+        subject: '',
+        description: '',
+        users: [user.id, currentUserId], // Include both users in the study group
       };
 
-      const studyGroupResponse = await axios.post(
-        'http://localhost:2020/api/study-groups', // Endpoint for study groups
-        studyGroupPayload,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      // const studyGroupResponse = await axios.post(
+      //   'http://localhost:2020/api/study-groups', // Endpoint for study groups
+      //   studyGroupPayload,
+      //   { headers: { Authorization: `Bearer ${token}` }}
+      // );
 
-      // Optionally, handle the response from the study group creation, e.g., update UI
-      console.log('Study group created:', studyGroupResponse.data);
+      // // Optionally, handle the response from the study group creation, e.g., update UI
+      // console.log('Study group created:', studyGroupResponse.data);
 
     } catch (error) {
       console.error('Error creating new chat and study group:', error);

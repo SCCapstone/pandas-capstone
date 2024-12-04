@@ -544,9 +544,35 @@ app.delete('/api/users/:id', authenticate, async (req, res): Promise<any> => {
 });
   
 /********* STUDY GROUPS */
-app.post('/api/study-groups', async (req, res) => {
-  
+app.post('/api/study-groups', authenticate, async (req, res): Promise<any> => {
+  const userId = res.locals.userId;
+  const { name, subject, description, users } = req.body;
+
+  try {
+    // Validate the input data (optional but recommended)
+    if (!name) {
+      return res.status(400).json({ error: 'Name is required' });
+    }
+
+    // Create the new study group
+    const newStudyGroup = await prisma.studyGroup.create({
+      data: {
+        name,
+        subject,
+        description,
+        users,
+        creator: { connect: { id: userId } },
+      },
+    });
+
+    // Send back the created study group as a response
+    return res.status(201).json({ message: 'Study group created successfully', studyGroup: newStudyGroup });
+  } catch (error) {
+    console.error('Error creating study group:', error);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
 });
+
 
 
 

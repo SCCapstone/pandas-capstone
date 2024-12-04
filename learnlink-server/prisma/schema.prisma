@@ -91,7 +91,7 @@ model User {
 model StudyGroup {
   id          Int       @id @default(autoincrement())
   name        String
-  subject     String
+  subject     String?
   description String?
   created_by  Int
   created_at  DateTime  @default(now())
