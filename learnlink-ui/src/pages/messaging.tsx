@@ -142,29 +142,7 @@ const Messaging: React.FC = () => {
   }, [selectedChat]);
 
   
-  useEffect(() => {
-    socket.on('newMessage', (message) => {
-      console.log('New message received!!!:', message);
-  
-      setChats((prevChats) => {
-        const updatedChats = prevChats.map((chat) =>
-          chat.id === message.chatId
-            ? { ...chat, messages: [...(chat.messages || []), message] }
-            : chat
-        );
-        console.log('Updated Chats:', updatedChats);
-        return updatedChats;
-      });
-      console.log('Selected Chat:', selectedChat);
-      console.log('Messages:', selectedChat?.messages);
-      console.log('Incoming Message Chat ID:', message.chatId);
-    });
-  
-    // Cleanup to avoid duplicate listeners
-    return () => {
-      socket.off('newMessage');
-    };
-  }, [selectedChat]); // Only run once on mount
+
   
   // Scroll logic in a separate useEffect
   useEffect(() => {
