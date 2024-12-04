@@ -271,10 +271,7 @@ const Messaging: React.FC = () => {
   
   
   const getChatName = (chat: Chat): string => {
-    // Use the custom chat name if it exists
-    
   
-    // If no custom name, derive name based on other users
     if (currentUserId) {
       const otherUser = chat.users?.find((user) => user.id !== currentUserId);
       
@@ -287,9 +284,11 @@ const Messaging: React.FC = () => {
         }
       }
     }
+    if (chat.name && chat.name.trim() !== '') {
+      return chat.name ;
+    }
   
-    // Fallback if no other user found or no name is set
-    return 'Unnamed Chat';
+    return " ";
   };
   
   
