@@ -9,6 +9,7 @@ import http from "http";
 import { Server } from "socket.io";
 import path, { parse } from 'path';
 import { JwtPayload } from "jsonwebtoken";
+import nodemailer from "nodemailer";
 
 interface CustomJwtPayload extends JwtPayload {
   userId: number; // Make userId an integer
@@ -928,6 +929,54 @@ io.on("connection", (socket) => {
   });
 });
 
+/** Code for forget password */
+
+const sendEmail = async (to: String, subject: String, text: String, html: String): Promise<void> => {
+  const transport = nodemailer.createTransport(
+    {
+      service: "icloud",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_Password,
+      },
+    }
+  );
+  const mailOptions = {
+    from: `"LearnLink" <${process.env.EMAIL_USER,}>`,
+    to,
+    subject,
+    text,
+    html
+  };
+  await transport.sendMail(mailOptions);
+};
+
+/**API endpoint for the forgot password */
+
+app.post ('/api/forgotpassword', async (req, res) => {
+  const {email} = req.body;
+  if (!email) {
+    return res.status(400).json({ error: "Email is required" });
+  }
+
+  try {
+    const resetToken = jwt.sign({ email }, process.env.JWT_SECRET!, { expiresIn: '1h' });
+    const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`;
+
+    // Send the email
+    await sendEmail(
+      email,
+      "Password Reset Request",
+      `Click the link to reset your password: ${resetLink}`,
+      `<p>Click the link to reset your password:</p><a href="${resetLink}">${resetLink}</a>`
+    );
+
+    res.status(200).json({ message: "Email sent successfully" });
+  } catch (error) {
+    console.error("Error sending email:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
 
 
 
