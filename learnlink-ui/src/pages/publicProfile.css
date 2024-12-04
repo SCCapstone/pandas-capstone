@@ -6,6 +6,7 @@
 }
 
 .public-profile-container {
+    justify-self: center;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -13,4 +14,159 @@
     gap: 1rem;
     width: 100%;
     padding: 1rem;
+}
+
+.whole-public-component {
+    overflow-y: scroll;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.public-main-container {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 3rem;
+    overflow-y: scroll;
+    /* background-color: tomato; */
+}
+
+.public-main-container h1 {
+    font-size: 64px;
+    font-weight: normal;
+    margin-bottom: 1rem;
+    color: black;
+    text-align: left;
+}
+
+.public-main-container h2 {
+    font-size: 30px;
+    font-weight: normal;
+    margin-bottom: 1rem;
+    margin-top: 2rem;
+}
+
+.public-main-container p {
+    padding-left: 0;
+    font-size: 1.25rem;
+    font-weight: 300;
+    text-align: left;
+    color: black;
+
+}
+
+.public-main-container a:link {
+    font-size: 1.25rem;
+    font-weight: 400;
+    color: #FEAD2B;
+    text-decoration: none;
+}
+
+.public-main-container a:hover {
+    text-decoration: underline;
+}
+
+.public-right-side {
+    flex-grow: 1;
+}
+
+.public-left-side {
+    width: 20%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+.profile-details-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 1rem;
+    width: 80%;
+
+}
+
+.public-profile-details {
+    display: block;
+    width: 50%;
+}
+
+.public-profile-pic {
+    width: 100%;
+    height: auto;
+    border-radius: 50%;
+    margin-bottom: 1rem;
+    margin-top: 2.5rem;
+}
+
+.bold-first-word {
+    font-weight: bold;
+}
+
+.public-right-side h3 {
+    font-size: 1.5rem;
+    font-weight: 400;
+    margin-bottom: 1rem;
+    font-weight: bold;
+    color: #00668C;
+}
+
+.public-action-buttons {
+    width:100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+}
+
+.public-action-buttons button {
+    padding-left: 40px;
+    padding-right: 40px;
+    color: white;
+    background-color: #00668C;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 15px;
+    height: 50px;
+    margin-bottom: 20px;
+}
+
+.public-info {
+    display: flex;
+    justify-content: center;
+    /* Horizontal centering */
+    align-items: center;
+    /* Vertical centering */
+    text-align: center;
+    /* Ensures text alignment if there's multi-line text */
+    flex-grow: 1;
+    /* Ensure parent container has a defined height */
+}
+
+.study-habit-tags {
+    display: flex;
+    flex-wrap: wrap;
+    /* Allows tags to wrap to the next line if needed */
+    gap: 15px;
+    /* Adds spacing between the tags */
+    margin: 10px 0;
+    /* Adds space above and below the tags */
+    margin-bottom: 50px;
+}
+
+.tag {
+    background-color: hsl(0, 0%, 90%);
+    padding: 5px 10px;
+    border-radius: 2px;
+    font-size: 16px;
+    color: #333;
+    border: 2px;
+    font-weight: 400;
+    display: inline-block;
+    /* Ensures tags are inline */
+    margin-right: 10px;
+    /* Extra space between tags */
+    margin-bottom: 10px;
 }
