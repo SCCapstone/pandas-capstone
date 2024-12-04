@@ -573,6 +573,38 @@ app.post('/api/study-groups', authenticate, async (req, res): Promise<any> => {
   }
 });
 
+// SEARCH FEATURE
+app.get('/api/users/search', authenticate, async (req, res): Promise<any> => {
+  const { query } = req.query;
+
+  if (!query) {
+    return res.status(400).json({ error: 'Query parameter is required' });
+  }
+
+  try {
+    const users = await prisma.user.findMany({
+      where: {
+        OR: [
+          { username: { contains: query as string, mode: 'insensitive' } },
+          { firstName: { contains: query as string, mode: 'insensitive' } },
+          { lastName: { contains: query as string, mode: 'insensitive' } },
+        ],
+      },
+      select: {
+        id: true,
+        username: true,
+        firstName: true,
+        lastName: true,
+      },
+    });
+
+    return res.json({ users });
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 
 
 
