@@ -931,7 +931,7 @@ io.on("connection", (socket) => {
 
 /** Code for forget password */
 
-const sendEmail = async (to: String, subject: String, text: String, html: String): Promise<void> => {
+const sendEmail = async (to: string, subject: string, text: string, html: string): Promise<void> => {
   const transport = nodemailer.createTransport(
     {
       service: "icloud",
@@ -942,7 +942,7 @@ const sendEmail = async (to: String, subject: String, text: String, html: String
     }
   );
   const mailOptions = {
-    from: `"LearnLink" <${process.env.EMAIL_USER,}>`,
+    from: `"LearnLink" <${process.env.EMAIL_USER}>`,
     to,
     subject,
     text,
@@ -953,7 +953,7 @@ const sendEmail = async (to: String, subject: String, text: String, html: String
 
 /**API endpoint for the forgot password */
 
-app.post ('/api/forgotpassword', async (req, res) => {
+app.post ('/api/forgotpassword', async (req, res):Promise<any> => {
   const {email} = req.body;
   if (!email) {
     return res.status(400).json({ error: "Email is required" });
