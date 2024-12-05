@@ -989,7 +989,7 @@ io.on("connection", (socket) => {
 
 /** Code for forget password */
 
-const sendEmail = async (to: string, subject: string, text: string, html: string): Promise<void> => {
+/**const sendEmail = async (to: string, subject: string, text: string, html: string): Promise<void> => {
   const transport = nodemailer.createTransport(
     {
       service: "icloud",
@@ -1014,6 +1014,11 @@ const sendEmail = async (to: string, subject: string, text: string, html: string
     throw new Error("Failed to send email");
   }
   
+};*/
+
+const findUserByEmail = async (email: string): Promise<boolean> => {
+  const mockDatabase = ["test@example.com", "user@learnlink.com"]; // Example emails
+  return mockDatabase.includes(email);
 };
 
 /**API endpoint for the forgot password */
@@ -1025,16 +1030,21 @@ app.post ('/api/forgotpassword', async (req, res):Promise<any> => {
   }
 
   try {
-    const resetToken = jwt.sign({ email }, process.env.JWT_SECRET!, { expiresIn: '1h' });
-    const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`;
+    //const resetToken = jwt.sign({ email }, process.env.JWT_SECRET!, { expiresIn: '15s' });
+    //const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`;
+    const emailExists = await findUserByEmail(email);
+
+    if (!emailExists) {
+      return res.status(404).json({ error: "Email not found" });
+    }
 
     // Send the email
-    await sendEmail(
+    /**await sendEmail(
       email,
       "Password Reset Request",
       `Click the link to reset your password: ${resetLink}`,
       `<p>Click the link to reset your password:</p><a href="${resetLink}">${resetLink}</a>`
-    );
+    );*/
 
     res.status(200).json({ message: "Email sent successfully" });
   } catch (error) {
