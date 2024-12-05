@@ -31,6 +31,7 @@ function Welcome() {
                         <button className="getStarted" onClick={handleGetStarted}>Get Started</button>
                     </div>
                 </div>
+                //web app features
                 <div className="menuButtonGroup">
                     <div className="menuButtons">Study Groups
                       <img src={studyGroupsImage} alt="Study Groups" />
