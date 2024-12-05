@@ -7,6 +7,7 @@ const UpdateEmail = () => {
   const [newEmail, setNewEmail] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const API_URL = 'https://learnlinkserverhost.zapto.org';
 
   const handleOldEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setOldEmail(e.target.value);
@@ -23,7 +24,7 @@ const UpdateEmail = () => {
     setError('');
 
     try {
-      const response = await fetch('http://localhost:2020/api/update-email', {
+      const response = await fetch(`${API_URL}/api/update-email`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

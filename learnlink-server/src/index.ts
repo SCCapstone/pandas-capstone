@@ -11,31 +11,57 @@ import path, { parse } from 'path';
 import { JwtPayload } from "jsonwebtoken";
 import nodemailer from "nodemailer";
 import { profile } from "console";
+import fs from 'fs';
+import https from 'https';
+
 
 interface CustomJwtPayload extends JwtPayload {
   userId: number; // Make userId an integer
 }
 
+const privateKey = fs.readFileSync('/etc/letsencrypt/live/learnlinkserverhost.zapto.org/privkey.pem', 'utf8');
+const certificate = fs.readFileSync('/etc/letsencrypt/live/learnlinkserverhost.zapto.org/fullchain.pem', 'utf8');
+const credentials = { key: privateKey, cert: certificate };
+
+
 const app = express();
 const prisma = new PrismaClient();
 
-const server = http.createServer(app);
+const server = https.createServer(credentials, app);
+
+const httpApp = express();
+httpApp.use((req, res) => {
+  const host = req.headers.host?.replace(/:80$/, ''); // Handle cases where ":80" might be appended
+  res.redirect(`https://${host}${req.url}`);
+});
+
+http.createServer(httpApp).listen(80, () => {
+  console.log('Redirecting HTTP traffic to HTTPS...');
+});
+
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:3000",
-    methods: ["GET", "POST"],
+    // origin: "https://main.d37jjc6afovpjz.amplifyapp.com",
+    origin: '*',
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
   },
 });
 
+const corsOptions = {
+  origin: 'https://main.d37jjc6afovpjz.amplifyapp.com',  // Your Amplify frontend URL
+  methods: ["GET", "POST", "PUT", "DELETE"], // Methods you want to allow
+  allowedHeaders: ['Content-Type', 'Authorization'], // Headers you want to allow
+};
 
 
-
-const PORT = env.SERVER_PORT || 2020;
+const REACT_APP_API_URL = 2020;
 const JWT_SECRET = env.JWT_SECRET || 'your_default_jwt_secret';
 
 
 app.use(express.json());
-app.use(cors());
+app.use(cors(corsOptions));
+app.options('*', cors());  // Preflight request
 
 // access images for website in public folder
 app.use('/public', express.static(path.join(__dirname, '..', 'learnlink-ui', 'public')));
@@ -966,7 +992,7 @@ io.on("connection", (socket) => {
 
 /****** Code for forget password */
 
-/**const sendEmail = async (to: string, subject: string, text: string, html: string): Promise<void> => {
+const sendEmail = async (to: string, subject: string, text: string, html: string): Promise<void> => {
   const transport = nodemailer.createTransport(
     {
       service: "icloud",
@@ -991,11 +1017,6 @@ io.on("connection", (socket) => {
     throw new Error("Failed to send email");
   }
   
-};*/
-
-const findUserByEmail = async (email: string): Promise<boolean> => {
-  const mockDatabase = ["test@example.com", "user@learnlink.com"]; // Example emails
-  return mockDatabase.includes(email);
 };
 
 
@@ -1009,21 +1030,16 @@ app.post ('/api/forgotpassword', async (req, res):Promise<any> => {
   }
 
   try {
-    //const resetToken = jwt.sign({ email }, process.env.JWT_SECRET!, { expiresIn: '15s' });
-    //const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`;
-    const emailExists = await findUserByEmail(email);
-
-    if (!emailExists) {
-      return res.status(404).json({ error: "Email not found" });
-    }
+    const resetToken = jwt.sign({ email }, process.env.JWT_SECRET!, { expiresIn: '1h' });
+    const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`;
 
     // Send the email
-    /**await sendEmail(
+    await sendEmail(
       email,
       "Password Reset Request",
       `Click the link to reset your password: ${resetLink}`,
       `<p>Click the link to reset your password:</p><a href="${resetLink}">${resetLink}</a>`
-    );*/
+    );
 
     res.status(200).json({ message: "Email sent successfully" });
   } catch (error) {
@@ -1032,16 +1048,11 @@ app.post ('/api/forgotpassword', async (req, res):Promise<any> => {
   }
 });
 
-
-
-
-
-
-
-
 /********* LISTEN FUNCT */
 
-// Start the server on port 2020
-server.listen(PORT, () => {
-  console.log(`server running on localhost:${PORT}`);
+server.listen(2020, '0.0.0.0', () => {
+  console.log('HTTPS Server running on port 443');
 });
+
+
+

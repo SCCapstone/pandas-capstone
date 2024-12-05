@@ -9,6 +9,8 @@ import Select, { MultiValue, ActionMeta } from 'react-select';
 const animatedComponents = makeAnimated();
 
 const Profile: React.FC = () => {
+  const API_URL = 'https://learnlinkserverhost.zapto.org';
+
 
   const [formData, setFormData] = useState({
     first_name: '',
@@ -36,7 +38,7 @@ const Profile: React.FC = () => {
 
       try {
         // Fetch enum options
-        const enumsResponse = await fetch('http://localhost:2020/api/enums');
+        const enumsResponse = await fetch(`${API_URL}/api/enums`);
         const enumsData = await enumsResponse.json();
         setEnumOptions({
           grade: enumsData.grade,
@@ -47,7 +49,7 @@ const Profile: React.FC = () => {
         // Fetch the current user profile data
         const token = localStorage.getItem('token');
         if (token) {
-          const userResponse = await fetch('http://localhost:2020/api/users/profile', {
+          const userResponse = await fetch(`${API_URL}/api/users/profile`, {
             headers: {
               'Authorization': `Bearer ${token}`,
             },
@@ -143,7 +145,7 @@ const Profile: React.FC = () => {
         return;
       }
 
-      const response = await fetch('http://localhost:2020/api/users/update', {
+      const response = await fetch(`${API_URL}/api/users/update`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

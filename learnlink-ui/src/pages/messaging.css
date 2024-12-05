@@ -77,14 +77,10 @@
 }
 
 .ChatWindow {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  max-width: 1000px; /* Adjust to fit your design */
-  margin: 0 auto;
+  flex-grow: 1;
   padding: 10px;
+  overflow-y: auto;
   background-color: #f9f9f9;
-  border-radius: 8px;
 }
 
 .NoChatSelected {
@@ -326,17 +322,6 @@
   margin-left: 5px;
 }
 
-
-/* Individual message */
-.message {
-  max-width: 80%;
-  padding: 10px;
-  margin: 5px 0;
-  border-radius: 10px;
-  font-size: 14px;
-  line-height: 1.4;
-}
-
 .MyMessage {
   background-color: #daf8cb; /* light green */
   align-self: flex-end;
@@ -353,4 +338,3 @@
     width: 100%;
   }
 }
-

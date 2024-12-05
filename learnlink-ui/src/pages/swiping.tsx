@@ -8,6 +8,7 @@ import { getLoggedInUserId } from '../utils/auth';
 
 const Swiping: React.FC = () => {
   const [userId, setUserId] = useState<number | null>(null);  // State to store the user's ID
+  const API_URL = 'https://learnlinkserverhost.zapto.org';
 
   useEffect(() => {
     // Here, you'd normally fetch the user ID from authentication or session

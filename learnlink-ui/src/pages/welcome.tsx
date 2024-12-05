@@ -1,6 +1,5 @@
 import './welcome.css';
 import '../index.css';
-
 import {useNavigate} from 'react-router-dom';
 import Logo from '../components/Logo';
 import Copyright from '../components/CopyrightFooter';
@@ -31,7 +30,6 @@ function Welcome() {
                         <button className="getStarted" onClick={handleGetStarted}>Get Started</button>
                     </div>
                 </div>
-                //web app features
                 <div className="menuButtonGroup">
                     <div className="menuButtons">Study Groups
                       <img src={studyGroupsImage} alt="Study Groups" />

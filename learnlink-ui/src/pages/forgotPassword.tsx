@@ -9,6 +9,7 @@ const ForgotPassword: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
     const [success, setSuccess] = useState<string | null>(null);
+    const API_URL = 'https://learnlinkserverhost.zapto.org';
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setEmail(e.target.value);
@@ -36,7 +37,7 @@ const ForgotPassword: React.FC = () => {
         setError(null);
 
         try {
-            const response = await fetch ('http://localhost:2020/api/forgotpassword', {
+            const response = await fetch (`${API_URL}/api/forgotpassword`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

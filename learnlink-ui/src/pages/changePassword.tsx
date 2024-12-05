@@ -8,6 +8,8 @@ const ChangePassword = () => {
   const [newPassword, setNewPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const API_URL = 'https://learnlinkserverhost.zapto.org';
+
 
   const handleOldPasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setOldPassword(e.target.value);
@@ -24,7 +26,7 @@ const ChangePassword = () => {
     setError('');
 
     try {
-      const response = await fetch('http://localhost:2020/api/update-password', {
+      const response = await fetch(`${API_URL}/api/update-password`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

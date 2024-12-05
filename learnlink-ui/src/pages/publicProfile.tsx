@@ -11,6 +11,7 @@ const PublicProfile = () => {
     const [user, setUser] = useState<any>(null);
     const [error, setError] = useState<string | null>(null);
     const navigate = useNavigate();
+    const API_URL = 'https://learnlinkserverhost.zapto.org';
     
     const handleMessage = () => {
         navigate('/messaging');
@@ -19,7 +20,7 @@ const PublicProfile = () => {
     useEffect(() => {
         const fetchUser = async () => {
             try {
-                const response = await fetch(`http://localhost:2020/api/users/profile/${id}`, {
+                const response = await fetch(`${API_URL}/api/users/profile/${id}`, {
                     headers: {
                         Authorization: `Bearer ${localStorage.getItem('token')}`,
                     },

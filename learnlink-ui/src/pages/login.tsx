@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { login } from '../services/authService';
 import React, { useState } from 'react';
+const API_URL = 'https://learnlinkserverhost.zapto.org';
 
 type LoginInputs = {
     userName: string;
@@ -34,7 +35,8 @@ const Login: React.FC = () => {
         setLoading(true);
         try {
             // Send POST request to backend
-            const response = await fetch('http://localhost:2020/api/login', {
+            console.log('Request URL:', `${API_URL}/api/login`);
+            const response = await fetch(`${API_URL}/api/login`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

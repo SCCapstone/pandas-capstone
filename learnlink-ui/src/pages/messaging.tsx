@@ -1,5 +1,3 @@
-
-
 import React, { useState, useEffect } from 'react';
 import io from 'socket.io-client';
 import './messaging.css';
@@ -32,16 +30,14 @@ interface User {
   firstName: string;
   lastName: string;
 }
-//const socket = io("http://localhost:2020");
 
-const socket = io("http://localhost:2020", {
+const API_URL = 'https://learnlinkserverhost.zapto.org';
+
+const socket = io(API_URL, {
   transports: ["websocket"], // Ensure WebSocket is explicitly used
   reconnectionAttempts: 3,  // Retry if connection fails
   timeout: 10000 // 10 seconds timeout
 });
-
-
-
 
 
 //TODO next sem -- updatedAt so when a chat is sent have it move to the top -- im not messing with the code that works rn tho
@@ -64,7 +60,7 @@ const Messaging: React.FC = () => {
 
   useEffect(() => {
     // Fetch users and chats from the API when the component mounts
-    axios.get('http://localhost:2020/api/users')
+    axios.get(`${API_URL}/api/users`)
       .then((response) => setUsers(response.data))
       .catch((error) => console.error('Error fetching users:', error));
 
@@ -72,7 +68,7 @@ const Messaging: React.FC = () => {
     // Make the API request to fetch chats for the user
   
     const token = localStorage.getItem('token');
-    axios.get('http://localhost:2020/api/chats', {
+    axios.get(`${API_URL}/api/chats`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((response) => {
@@ -86,7 +82,7 @@ const Messaging: React.FC = () => {
     
 
     if (token) {
-      axios.get('http://localhost:2020/api/currentUser', {
+      axios.get(`${API_URL}/api/currentUser`, {
         headers: { Authorization: `Bearer ${token}` },
       })
         .then((response) => setCurrentUserId(response.data.id))
@@ -494,5 +490,3 @@ const Messaging: React.FC = () => {
 };
 
 export default Messaging;
-
-
