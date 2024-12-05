@@ -970,9 +970,12 @@ io.on("connection", (socket) => {
       //console.log('Message saved to database:', newMessage);
   
       // Emit the new message to all clients (broadcasting to all connected clients)
-      socket.broadcast.emit('newMessage', newMessage);
+      io.emit('newMessage', newMessage);
+      //socket.broadcast.emit('newMessage', newMessage);
       //ocket.broadcast.emit('newMessage', newMessage);
       console.log('Broadcasting message:', newMessage);
+
+
 
       // Send success callback to the sender
       callback({ success: true, message: 'Message sent from server successfully!' });
@@ -982,8 +985,8 @@ io.on("connection", (socket) => {
     }
   });
   
-  socket.on("disconnect", () => {
-    console.log("User disconnected");
+  socket.on('disconnect', () => {
+    console.log('A user disconnected:', socket.id);
   });
 });
 

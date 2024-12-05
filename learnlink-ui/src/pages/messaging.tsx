@@ -32,7 +32,14 @@ interface User {
   firstName: string;
   lastName: string;
 }
-const socket = io("http://localhost:2020");
+//const socket = io("http://localhost:2020");
+
+const socket = io("http://localhost:2020", {
+  transports: ["websocket"], // Ensure WebSocket is explicitly used
+  reconnectionAttempts: 3,  // Retry if connection fails
+  timeout: 10000 // 10 seconds timeout
+});
+
 
 
 
@@ -65,7 +72,6 @@ const Messaging: React.FC = () => {
     // Make the API request to fetch chats for the user
   
     const token = localStorage.getItem('token');
-    console.log(token);
     axios.get('http://localhost:2020/api/chats', {
       headers: { Authorization: `Bearer ${token}` },
     })
@@ -79,8 +85,6 @@ const Messaging: React.FC = () => {
       .catch((error) => console.error('Error fetching chats:', error));
     
 
-     
-
     if (token) {
       axios.get('http://localhost:2020/api/currentUser', {
         headers: { Authorization: `Bearer ${token}` },
@@ -88,16 +92,26 @@ const Messaging: React.FC = () => {
         .then((response) => setCurrentUserId(response.data.id))
         .catch((error) => console.error('Error fetching current user:', error));
     }
+    
+  }, []);
 
+  
+  
+  
+  useEffect(() => {
+    console.log("helloooooooooo");
+    
     socket.on('connect', () => {
       console.log('Connected to server');
     });
     
-  
+   
 
     
     socket.on('newMessage', (message) => {
       console.log('New message received!!!:', message);
+      //console.log('Received message:', JSON.stringify(message, null, 2));
+
       
       
       setChats((prevChats) => {
@@ -126,6 +140,7 @@ const Messaging: React.FC = () => {
           });
         }, 100);
       }
+        
     });
     
   
@@ -135,28 +150,9 @@ const Messaging: React.FC = () => {
       socket.off('connect');
       socket.off('newMessage');
     };
-
-    
-
-    
-    
-  }, [selectedChat]);
-
+  }, []); // Runs when messages update
   
-  /*
-  // Scroll logic in a separate useEffect
-  useEffect(() => {
-    if (chatWindowRef.current && selectedChat?.id) {
-      setTimeout(() => {
-        chatWindowRef.current?.scrollTo({
-          top: chatWindowRef.current.scrollHeight,
-          behavior: 'smooth',
-        });
-      }, 100); // Slight delay to ensure DOM updates
-    }
-  }, [selectedChat?.messages]); // Runs when messages update
   
-  */
   const handleSendMessage = async () => {
     const token = localStorage.getItem('token');
     if (currentMessage.trim() && selectedChat) {
