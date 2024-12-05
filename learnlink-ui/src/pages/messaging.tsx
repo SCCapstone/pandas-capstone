@@ -99,7 +99,7 @@ const Messaging: React.FC = () => {
   
   
   useEffect(() => {
-    console.log("helloooooooooo");
+    //console.log("helloooooooooo");
     
     socket.on('connect', () => {
       console.log('Connected to server');
@@ -150,7 +150,7 @@ const Messaging: React.FC = () => {
       socket.off('connect');
       socket.off('newMessage');
     };
-  }, []); // Runs when messages update
+  }, [selectedChat]); // Runs when messages update
   
   
   const handleSendMessage = async () => {
@@ -182,14 +182,12 @@ const Messaging: React.FC = () => {
         
         
   
-        // Update the chat's messages in state
-        setChats((prevChats) =>
-          prevChats.map((chat) =>
-            chat.id === selectedChat.id
-              ? { ...chat, messages: [...(chat.messages || []), messageData] }
-              : chat
-          )
-        );
+        // Update the selectedChat to include the new message
+      setSelectedChat((prevSelectedChat) =>
+        prevSelectedChat
+          ? { ...prevSelectedChat, messages: [...(prevSelectedChat.messages || []), messageData] }
+          : null
+      );
   
         setCurrentMessage('');
       } catch (error) {

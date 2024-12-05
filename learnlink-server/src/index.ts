@@ -708,38 +708,44 @@ app.get('/api/users', async (req, res) => {
 // Get all chats for a user
 // WORKS
 // pulls up the chats with the users authentication code
-app.get('/api/chats', authenticate,  async (req, res):Promise<any> => {
-  const userId = res.locals.userId;  // Use res.locals to get the userId set by the authenticate middleware
+// Pulls up the chats with the user's authentication code
+app.get('/api/chats', authenticate, async (req, res): Promise<any> => {
+  const userId = res.locals.userId; // Use res.locals to get the userId set by the authenticate middleware
 
   if (!userId) {
     return res.status(401).json({ message: 'User not authenticated' });
   }
 
   try {
-    // Fetch the user from the database by userId
+    // Fetch the user's chats and their messages
     const userChats = await prisma.chat.findMany({
       where: {
         users: {
-          some: { id: userId }, // Use the extracted userId
+          some: { id: userId }, // Filter chats by userId
         },
       },
       include: {
-        users: true,
+        users: true, // Include chat participants
+        messages: {  // Include messages for each chat
+          orderBy: {
+            createdAt: 'asc', // Sort messages by creation time (optional)
+          },
+        },
       },
     });
 
-    if (!userChats) {
-      return res.status(404).json({ message: 'chats not found' });
+    if (!userChats || userChats.length === 0) {
+      return res.status(404).json({ message: 'No chats found' });
     }
 
-    // Return the profile data
+    // Return the chats with their messages
     res.json(userChats);
-  
   } catch (error) {
-    console.error('Error retrieving chats for user:', error);
+    console.error('Error retrieving chats and messages for user:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });
+
 
 
 
