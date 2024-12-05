@@ -1,5 +1,6 @@
 import './welcome.css';
 import '../index.css';
+
 import {useNavigate} from 'react-router-dom';
 import Logo from '../components/Logo';
 import Copyright from '../components/CopyrightFooter';
