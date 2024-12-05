@@ -32,12 +32,19 @@ interface User {
   firstName: string;
   lastName: string;
 }
-const socket = io("http://localhost:2020");
+//const socket = io("http://localhost:2020");
+
+const socket = io("http://localhost:2020", {
+  transports: ["websocket"], // Ensure WebSocket is explicitly used
+  reconnectionAttempts: 3,  // Retry if connection fails
+  timeout: 10000 // 10 seconds timeout
+});
 
 
 
 
 
+//TODO next sem -- updatedAt so when a chat is sent have it move to the top -- im not messing with the code that works rn tho
 const Messaging: React.FC = () => {
   const [chats, setChats] = useState<Chat[]>([]);
   const [selectedChat, setSelectedChat] = useState<Chat | null>(null);
@@ -65,7 +72,6 @@ const Messaging: React.FC = () => {
     // Make the API request to fetch chats for the user
   
     const token = localStorage.getItem('token');
-    console.log(token);
     axios.get('http://localhost:2020/api/chats', {
       headers: { Authorization: `Bearer ${token}` },
     })
@@ -79,8 +85,6 @@ const Messaging: React.FC = () => {
       .catch((error) => console.error('Error fetching chats:', error));
     
 
-     
-
     if (token) {
       axios.get('http://localhost:2020/api/currentUser', {
         headers: { Authorization: `Bearer ${token}` },
@@ -88,13 +92,26 @@ const Messaging: React.FC = () => {
         .then((response) => setCurrentUserId(response.data.id))
         .catch((error) => console.error('Error fetching current user:', error));
     }
+    
+  }, []);
+
+  
+  
+  
+  useEffect(() => {
+    //console.log("helloooooooooo");
+    
+    socket.on('connect', () => {
+      console.log('Connected to server');
+    });
+    
+   
 
     
-    
-
-    /*
     socket.on('newMessage', (message) => {
       console.log('New message received!!!:', message);
+      //console.log('Received message:', JSON.stringify(message, null, 2));
+
       
       
       setChats((prevChats) => {
@@ -103,17 +120,18 @@ const Messaging: React.FC = () => {
             ? { ...chat, messages: [...(chat.messages || []), message] }
             : chat
         );
-        console.log('Updated Chats:', updatedChats);
+        //console.log('Updated Chats:', updatedChats);
         return updatedChats;
       });
       
       
-      console.log('Incoming Message Chat ID:', message.chatId);
-      console.log('Existing Chat IDs:', chats.map((chat) => chat.id));
+      //console.log('Incoming Message Chat ID:', message.chatId);
+      //console.log('Existing Chat IDs:', chats.map((chat) => chat.id));
 
 
-      console.log('Selected Chat:', selectedChat);
-      console.log('Messages:', selectedChat?.messages);
+      //console.log('Selected Chat:', selectedChat);
+     // console.log('Messages:', selectedChat?.messages);
+     
       // Automatically scroll if the message belongs to the selected chat
       if (selectedChat?.id === message.chatId && chatWindowRef.current) {
         setTimeout(() => {
@@ -123,53 +141,19 @@ const Messaging: React.FC = () => {
           });
         }, 100);
       }
+        
     });
     
-    
-    */
+  
    
     
-    
-
-    
-
-    
-    
-  }, []);
-
-  
-  useEffect(() =>{
-    socket.on('connect', () => {
-      console.log('Connected to server');
-    });
-    
-    socket.on('newMessage', (message) => {
-      console.log('New message received from server:', message);
-    });
-    
-    socket.on('error', (error) => {
-      console.error('Socket error:', error);
-    });
     return () => {
       socket.off('connect');
       socket.off('newMessage');
     };
-  },[]);
+  }, [selectedChat]); // Runs when messages update
   
-  // Scroll logic in a separate useEffect
-  useEffect(() => {
-    if (chatWindowRef.current && selectedChat?.id) {
-      setTimeout(() => {
-        chatWindowRef.current?.scrollTo({
-          top: chatWindowRef.current.scrollHeight,
-          behavior: 'smooth',
-        });
-      }, 100); // Slight delay to ensure DOM updates
-    }
-  }, [selectedChat?.messages]); // Runs when messages update
   
-
-  //TODO fix this 
   const handleSendMessage = async () => {
     const token = localStorage.getItem('token');
     if (currentMessage.trim() && selectedChat) {
@@ -199,14 +183,12 @@ const Messaging: React.FC = () => {
         
         
   
-        // Update the chat's messages in state
-        setChats((prevChats) =>
-          prevChats.map((chat) =>
-            chat.id === selectedChat.id
-              ? { ...chat, messages: [...(chat.messages || []), messageData] }
-              : chat
-          )
-        );
+        // Update the selectedChat to include the new message
+      setSelectedChat((prevSelectedChat) =>
+        prevSelectedChat
+          ? { ...prevSelectedChat, messages: [...(prevSelectedChat.messages || []), messageData] }
+          : null
+      );
   
         setCurrentMessage('');
       } catch (error) {
@@ -225,9 +207,15 @@ const Messaging: React.FC = () => {
         return;
       }
   
+      // Check if chats is defined and has users
+      if (!chats || chats.length === 0) {
+        alert('No chats available to check.');
+        return;
+      }
+  
       // Check if a chat already exists with this user
       const existingChat = chats.find(chat => 
-        chat.users.some(u => u.id === user.id)
+        chat.users?.some(u => u.id === user.id) // Safe check for undefined `users`
       );
   
       if (existingChat) {
@@ -252,14 +240,15 @@ const Messaging: React.FC = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
   
-      const newChat = response.data;
+      const newChat: Chat = {
+        ...response.data,
+        name: `${chatName} with ${user.firstName} ${user.lastName}`, // Format the name
+      };
       setChats((prevChats) => [...prevChats, newChat]);
       setSelectedChat(newChat);
-
-
+  
       // adding to study groups too eventually separate
-
-      // Then, create the study group
+  
       const studyGroupPayload = {
         chatId: newChat.id, // Use the created chat ID
         name: chatName, // Same name as the chat
@@ -267,16 +256,15 @@ const Messaging: React.FC = () => {
         description: '',
         users: [user.id, currentUserId], // Include both users in the study group
       };
-
+  
       // const studyGroupResponse = await axios.post(
-      //   'http://localhost:2020/api/study-groups', // Endpoint for study groups
+      //   'http://localhost:2020/api/study-groups',
       //   studyGroupPayload,
       //   { headers: { Authorization: `Bearer ${token}` }}
       // );
-
-      // // Optionally, handle the response from the study group creation, e.g., update UI
+  
       // console.log('Study group created:', studyGroupResponse.data);
-
+  
     } catch (error) {
       console.error('Error creating new chat and study group:', error);
       if (axios.isAxiosError(error) && error.response) {
@@ -284,7 +272,6 @@ const Messaging: React.FC = () => {
       } else {
         alert('An unexpected error occurred.');
       }
-    
     }
   };
   
@@ -475,7 +462,7 @@ const Messaging: React.FC = () => {
                     <div className="NoMessages">No messages to display.</div>
                   )
                 ) : (
-                  <div className="NoChatSelected">Please select a chat.</div>
+                  <div className="NoChatSelected"></div>
                 )}
               </div>
 

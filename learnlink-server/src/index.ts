@@ -708,38 +708,44 @@ app.get('/api/users', async (req, res) => {
 // Get all chats for a user
 // WORKS
 // pulls up the chats with the users authentication code
-app.get('/api/chats', authenticate,  async (req, res):Promise<any> => {
-  const userId = res.locals.userId;  // Use res.locals to get the userId set by the authenticate middleware
+// Pulls up the chats with the user's authentication code
+app.get('/api/chats', authenticate, async (req, res): Promise<any> => {
+  const userId = res.locals.userId; // Use res.locals to get the userId set by the authenticate middleware
 
   if (!userId) {
     return res.status(401).json({ message: 'User not authenticated' });
   }
 
   try {
-    // Fetch the user from the database by userId
+    // Fetch the user's chats and their messages
     const userChats = await prisma.chat.findMany({
       where: {
         users: {
-          some: { id: userId }, // Use the extracted userId
+          some: { id: userId }, // Filter chats by userId
         },
       },
       include: {
-        users: true,
+        users: true, // Include chat participants
+        messages: {  // Include messages for each chat
+          orderBy: {
+            createdAt: 'asc', // Sort messages by creation time (optional)
+          },
+        },
       },
     });
 
-    if (!userChats) {
-      return res.status(404).json({ message: 'chats not found' });
+    if (!userChats || userChats.length === 0) {
+      return res.status(404).json({ message: 'No chats found' });
     }
 
-    // Return the profile data
+    // Return the chats with their messages
     res.json(userChats);
-  
   } catch (error) {
-    console.error('Error retrieving chats for user:', error);
+    console.error('Error retrieving chats and messages for user:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });
+
 
 
 
@@ -751,6 +757,11 @@ app.delete('/api/chats/:chatId', async (req, res):Promise<any> => {
 
   try {
     // Ensure the user is part of the chat
+
+    if (!chatId || isNaN(parseInt(chatId))) {
+      return res.status(400).json({ error: "Invalid chat ID." });
+    }
+
     const chat = await prisma.chat.findUnique({
       where: { id: parseInt(chatId) },
       include: { users: true },
@@ -885,8 +896,6 @@ app.post('/api/chats/:userId', authenticate, async (req: Request, res: Response)
 /*************** WEBSOCKETS */
 
 //app.use('/public', express.static(path.join(__dirname, '..', 'learnlink-ui', 'public')));
-//TODO there is a get console error happening in socket.io seen below 
-// GET http://localhost:2020/socket.io/?EIO=4&transport=polling&t=877a3it0 404 (Not Found)
 
 app.get('/socket-test', (req, res) => {
   res.send('Socket Test');
@@ -896,49 +905,10 @@ app.get('/socket-test', (req, res) => {
 app.get('/socket-io', (req, res) => {
   res.send('Socket.IO server is running');
 });
-/*
-io.on('connection', (socket) => {
-  console.log('A user connected');
-  socket.emit('message', 'Hello from server'); // Test message to the client
-
-  socket.on('disconnect', () => {
-    console.log('User disconnected');
-  });
-});
-
-*/
 
 // Real-time WebSocket chat functionality
 io.on("connection", (socket) => {
   console.log("User connected");
-  /*
-  socket.on("joinChat", async ({ chatId, token }) => {
-    if (!chatId || !token) {
-      return socket.emit("error", { message: "Invalid chatId or token" });
-    }
-  
-    try {
-      const decoded = jwt.verify(token, JWT_SECRET) as CustomJwtPayload;
-      const userId = decoded.userId; // Now `userId` is inferred as a number
-
-  
-      const chat = await prisma.chat.findUnique({
-        where: { id: chatId },
-        include: { users: true },
-      });
-  
-      if (!chat || !chat.users.some((user) => user.id === userId)) {
-        return socket.emit("error", { message: "Access denied to chat" });
-      }
-  
-      socket.join(`chat_${chatId}`);
-      console.log(`User ${userId} joined chat ${chatId}`);
-    } catch (error) {
-      console.error("Error in joinChat:", error);
-      socket.emit("error", { message: "Invalid token or chat access error" });
-    }
-  });
-  */
 
   socket.on('message', async (data, callback) => {
     try {
@@ -964,15 +934,16 @@ io.on("connection", (socket) => {
       const savedMessage = await prisma.message.findUnique({
         where: { id: newMessage.id },
       });
-      console.log('Saved message in database:', savedMessage);
+      //console.log('Saved message in database:', savedMessage);
       
   
       //console.log('Message saved to database:', newMessage);
   
       // Emit the new message to all clients (broadcasting to all connected clients)
-      socket.broadcast.emit('newMessage', newMessage);
-      //ocket.broadcast.emit('newMessage', newMessage);
+      io.emit('newMessage', newMessage);
       console.log('Broadcasting message:', newMessage);
+
+
 
       // Send success callback to the sender
       callback({ success: true, message: 'Message sent from server successfully!' });
@@ -982,12 +953,18 @@ io.on("connection", (socket) => {
     }
   });
   
-  socket.on("disconnect", () => {
-    console.log("User disconnected");
+  socket.on('disconnect', () => {
+    console.log('A user disconnected:', socket.id);
   });
 });
 
-/** Code for forget password */
+
+
+
+
+
+
+/****** Code for forget password */
 
 /**const sendEmail = async (to: string, subject: string, text: string, html: string): Promise<void> => {
   const transport = nodemailer.createTransport(
@@ -1021,7 +998,9 @@ const findUserByEmail = async (email: string): Promise<boolean> => {
   return mockDatabase.includes(email);
 };
 
-/**API endpoint for the forgot password */
+
+
+/******API endpoint for the forgot password */
 
 app.post ('/api/forgotpassword', async (req, res):Promise<any> => {
   const {email} = req.body;
