@@ -44,7 +44,7 @@ const socket = io("http://localhost:2020", {
 
 
 
-
+//TODO next sem -- updatedAt so when a chat is sent have it move to the top -- im not messing with the code that works rn tho
 const Messaging: React.FC = () => {
   const [chats, setChats] = useState<Chat[]>([]);
   const [selectedChat, setSelectedChat] = useState<Chat | null>(null);
@@ -239,7 +239,10 @@ const Messaging: React.FC = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
   
-      const newChat = response.data;
+      const newChat: Chat = {
+        ...response.data,
+        name: `${chatName} with ${user.firstName} ${user.lastName}`, // Format the name
+      };
       setChats((prevChats) => [...prevChats, newChat]);
       setSelectedChat(newChat);
   
@@ -458,7 +461,7 @@ const Messaging: React.FC = () => {
                     <div className="NoMessages">No messages to display.</div>
                   )
                 ) : (
-                  <div className="NoChatSelected">Please select a chat.</div>
+                  <div className="NoChatSelected"></div>
                 )}
               </div>
 
