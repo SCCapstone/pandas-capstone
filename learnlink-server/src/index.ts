@@ -757,6 +757,11 @@ app.delete('/api/chats/:chatId', async (req, res):Promise<any> => {
 
   try {
     // Ensure the user is part of the chat
+
+    if (!chatId || isNaN(parseInt(chatId))) {
+      return res.status(400).json({ error: "Invalid chat ID." });
+    }
+    
     const chat = await prisma.chat.findUnique({
       where: { id: parseInt(chatId) },
       include: { users: true },
