@@ -206,9 +206,15 @@ const Messaging: React.FC = () => {
         return;
       }
   
+      // Check if chats is defined and has users
+      if (!chats || chats.length === 0) {
+        alert('No chats available to check.');
+        return;
+      }
+  
       // Check if a chat already exists with this user
       const existingChat = chats.find(chat => 
-        chat.users.some(u => u.id === user.id)
+        chat.users?.some(u => u.id === user.id) // Safe check for undefined `users`
       );
   
       if (existingChat) {
@@ -236,11 +242,9 @@ const Messaging: React.FC = () => {
       const newChat = response.data;
       setChats((prevChats) => [...prevChats, newChat]);
       setSelectedChat(newChat);
-
-
+  
       // adding to study groups too eventually separate
-
-      // Then, create the study group
+  
       const studyGroupPayload = {
         chatId: newChat.id, // Use the created chat ID
         name: chatName, // Same name as the chat
@@ -248,16 +252,15 @@ const Messaging: React.FC = () => {
         description: '',
         users: [user.id, currentUserId], // Include both users in the study group
       };
-
+  
       // const studyGroupResponse = await axios.post(
-      //   'http://localhost:2020/api/study-groups', // Endpoint for study groups
+      //   'http://localhost:2020/api/study-groups',
       //   studyGroupPayload,
       //   { headers: { Authorization: `Bearer ${token}` }}
       // );
-
-      // // Optionally, handle the response from the study group creation, e.g., update UI
+  
       // console.log('Study group created:', studyGroupResponse.data);
-
+  
     } catch (error) {
       console.error('Error creating new chat and study group:', error);
       if (axios.isAxiosError(error) && error.response) {
@@ -265,7 +268,6 @@ const Messaging: React.FC = () => {
       } else {
         alert('An unexpected error occurred.');
       }
-    
     }
   };
   
