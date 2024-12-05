@@ -987,7 +987,13 @@ io.on("connection", (socket) => {
   });
 });
 
-/** Code for forget password */
+
+
+
+
+
+
+/****** Code for forget password */
 
 const sendEmail = async (to: string, subject: string, text: string, html: string): Promise<void> => {
   const transport = nodemailer.createTransport(
@@ -1016,7 +1022,9 @@ const sendEmail = async (to: string, subject: string, text: string, html: string
   
 };
 
-/**API endpoint for the forgot password */
+
+
+/******API endpoint for the forgot password */
 
 app.post ('/api/forgotpassword', async (req, res):Promise<any> => {
   const {email} = req.body;
