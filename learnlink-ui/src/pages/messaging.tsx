@@ -120,17 +120,18 @@ const Messaging: React.FC = () => {
             ? { ...chat, messages: [...(chat.messages || []), message] }
             : chat
         );
-        console.log('Updated Chats:', updatedChats);
+        //console.log('Updated Chats:', updatedChats);
         return updatedChats;
       });
       
       
-      console.log('Incoming Message Chat ID:', message.chatId);
-      console.log('Existing Chat IDs:', chats.map((chat) => chat.id));
+      //console.log('Incoming Message Chat ID:', message.chatId);
+      //console.log('Existing Chat IDs:', chats.map((chat) => chat.id));
 
 
-      console.log('Selected Chat:', selectedChat);
-      console.log('Messages:', selectedChat?.messages);
+      //console.log('Selected Chat:', selectedChat);
+     // console.log('Messages:', selectedChat?.messages);
+     
       // Automatically scroll if the message belongs to the selected chat
       if (selectedChat?.id === message.chatId && chatWindowRef.current) {
         setTimeout(() => {
