@@ -29,7 +29,7 @@ const Settings: React.FC = () => {
       const token = localStorage.getItem('token');
       console.log('Token:', token);
   
-      if (!token) {
+      if (!token) { 
         setMessage('Authentication token not found. Please log in again.');
         return;
       }
