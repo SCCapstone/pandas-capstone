@@ -31,20 +31,17 @@ database for running your webapp locally.
 
 Navigate to the server directory and enter these commands in the command line of the terminal
 ```
-npm i ts-node typescript nodemon @types/cors @types/express @types/node @types/jsonwebtoken --save-dev
-npm i @prisma/client cors express prisma bcrypt
+npm i
 ```
 
 Navigate to the ui directory and enter these commands in the command line of the terminal
 ```
-npm install web-vitals
-npm install @testing-library/react @testing-library/jest-dom
-npm install --save-dev @types/testing-library__react @types/jest @types/react-dom
+npm i
 ```
 
 ## Running
 
-Specify the commands for a developer to run the app from the cloned repo.
+npm start
 
 # Deployment
 
