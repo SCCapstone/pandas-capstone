@@ -34,8 +34,7 @@ interface User {
 
 const API_URL = 'https://learnlinkserverhost.zapto.org';
 
-// TODO 
-// this shouldnt be api url it has to match the socket io url on the server side. same socket connection
+
 const socket = io(API_URL, {
   transports: ["websocket"], // Ensure WebSocket is explicitly used
   reconnectionAttempts: 3,  // Retry if connection fails
