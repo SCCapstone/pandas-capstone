@@ -46,7 +46,7 @@ npm start
 # Deployment
 Connected code to AWS Amplify. Deployed frontend through AWS Amplify within learnlink-ui folder. \
 \
-Containerized backend in learnlink-server folder in a Docker.\
+Containerized backend in learnlink-server folder in Docker.\
 Ran Docker conatiner in EC2 server and created domain name https://learnlinkserverhost.zapto.org to reference backend through API calls.
 
 # Testing
