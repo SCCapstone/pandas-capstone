@@ -53,7 +53,7 @@ npm start
 2. **Deploy via AWS Amplify**  
    - Connected the frontend repository to AWS Amplify.  
    - Configured Amplify to automatically build and deploy the application on updates.  
-   - The frontend is accessible at the Amplify-provided URL.
+   - The frontend is accessible at the Amplify-provided URL [here](https://main.d37jjc6afovpjz.amplifyapp.com).
 
 
 ### **Backend Deployment**
