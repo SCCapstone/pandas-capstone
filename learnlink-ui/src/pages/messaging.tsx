@@ -31,7 +31,9 @@ interface User {
   lastName: string;
 }
 
+
 const API_URL = 'https://learnlinkserverhost.zapto.org';
+
 
 const socket = io(API_URL, {
   transports: ["websocket"], // Ensure WebSocket is explicitly used
@@ -220,7 +222,6 @@ const Messaging: React.FC = () => {
       }
   
       const payload = {
-        recipientUserId: user.id,
         chatName, // Use the custom chat name
       };
   
@@ -231,7 +232,7 @@ const Messaging: React.FC = () => {
       }
   
       const response = await axios.post(
-        `http://localhost:2020/api/chats/${user.id}`,
+        `${API_URL}/api/chats/${user.id}`,
         payload,
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -304,7 +305,7 @@ const Messaging: React.FC = () => {
         return;
       }
 
-      await axios.delete(`http://localhost:2020/api/chats/${chatId}`, {
+      await axios.delete(`${API_URL}/api/chats/${chatId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
