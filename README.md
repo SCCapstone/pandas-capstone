@@ -44,10 +44,41 @@ npm i
 npm start
 
 # Deployment
-Connected code to AWS Amplify. Deployed frontend through AWS Amplify within learnlink-ui folder. \
-\
-Containerized backend in learnlink-server folder in Docker.\
-Ran Docker conatiner in EC2 server and created domain name https://learnlinkserverhost.zapto.org to reference backend through API calls.
+
+### **Frontend Deployment**
+1. **Setup Frontend Code**  
+   - The frontend application is located in the `learnlink-ui` folder.  
+   - It was built using React and configured for deployment through AWS Amplify.
+
+2. **Deploy via AWS Amplify**  
+   - Connected the frontend repository to AWS Amplify.  
+   - Configured Amplify to automatically build and deploy the application on updates.  
+   - The frontend is accessible at the Amplify-provided URL.
+
+
+### **Backend Deployment**
+1. **Containerization**  
+   - The backend application, located in the `learnlink-server` folder, was containerized using Docker.  
+   - A `Dockerfile` was created to define the container's environment and dependencies.  
+   - The backend listens on port `443` for HTTPS traffic.
+
+2. **Hosting on AWS EC2**  
+   - Deployed the Docker container to an AWS EC2 instance.  
+   - Ensured required ports (80 and 443) were opened in the EC2 security group.  
+   - Used Let's Encrypt to generate SSL certificates for secure HTTPS connections.
+
+3. **Domain Name Configuration**  
+   - Registered the domain name `https://learnlinkserverhost.zapto.org` via [No-IP](https://www.noip.com).  
+   - Configured the domain to point to the EC2 instance's public IP address.  
+   - Integrated the SSL certificates into the backend to ensure secure API calls.
+
+4. **Redirect from HTTP to HTTPS**  
+   - Configured the backend to redirect all HTTP traffic to HTTPS for security.
+
+
+### **Integration**  
+- The frontend communicates with the backend via the custom domain `https://learnlinkserverhost.zapto.org`.  
+- API calls are routed securely using HTTPS.
 
 # Testing
 
