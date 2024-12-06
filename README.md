@@ -44,17 +44,10 @@ npm i
 npm start
 
 # Deployment
-
-Webapps need a deployment section that explains how to get it deployed on the
-Internet. These should be detailed enough so anyone can re-deploy if needed
-. Note that you **do not put passwords in git**.
-
-Mobile apps will also sometimes need some instructions on how to build a
-"release" version, maybe how to sign it, and how to run that binary in an
-emulator or in a physical phone.
-
 Connected code to AWS Amplify. Deployed frontend through AWS Amplify within learnlink-ui folder. \
-Containerized backend in learnlink-server folder in a Docker. Ran Docker conatiner in EC2 server and created domain name https://learnlinkserverhost.zapto.org to reference backend through API calls.
+\
+Containerized backend in learnlink-server folder in a Docker.\
+Ran Docker conatiner in EC2 server and created domain name https://learnlinkserverhost.zapto.org to reference backend through API calls.
 
 # Testing
 
