@@ -206,7 +206,7 @@ const Messaging: React.FC = () => {
       }
   
       // Check if chats is defined and has users
-      if (!chats || chats.length === 0) {
+      if (!chats) {
         alert('No chats available to check.');
         return;
       }
@@ -222,6 +222,7 @@ const Messaging: React.FC = () => {
       }
   
       const payload = {
+        recipientUserId: user.id,
         chatName, // Use the custom chat name
       };
   
@@ -230,6 +231,10 @@ const Messaging: React.FC = () => {
         alert('Please log in again.');
         return;
       }
+
+      console.log('Creating new chat with:', user, 'and name:', chatName);
+      console.log('Payload:', payload);
+      console.log('userid',user.id);
   
       const response = await axios.post(
         `${REACT_APP_API_URL}/api/chats/${user.id}`,
