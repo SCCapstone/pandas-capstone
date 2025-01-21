@@ -6,7 +6,13 @@ WORKDIR /app
 
 # Step 3: Copy package.json and package-lock.json
 COPY package*.json ./
-COPY .env ./
+# COPY .env ./
+
+
+# replaced COPY .env ./ with this
+COPY .env.production ./
+
+
 
 
 # Step 4: Install dependencies

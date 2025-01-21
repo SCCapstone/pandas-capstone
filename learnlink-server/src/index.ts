@@ -13,51 +13,75 @@ import nodemailer from "nodemailer";
 import { profile } from "console";
 import fs from 'fs';
 import https from 'https';
+import dotenv from 'dotenv';
 
 
 interface CustomJwtPayload extends JwtPayload {
   userId: number; // Make userId an integer
 }
+const envFile = process.env.NODE_ENV === 'production' ? './.env.production' : './.env.development';
+dotenv.config({ path: envFile });
+console.log('Loaded environment variables:', process.env);
 
-const privateKey = fs.readFileSync('/etc/letsencrypt/live/learnlinkserverhost.zapto.org/privkey.pem', 'utf8');
-const certificate = fs.readFileSync('/etc/letsencrypt/live/learnlinkserverhost.zapto.org/fullchain.pem', 'utf8');
-const credentials = { key: privateKey, cert: certificate };
+// Load environment variables
+const NODE_ENV = process.env.NODE_ENV || 'development'; // default to 'development'
+const HTTPS_KEY_PATH = process.env.HTTPS_KEY_PATH || './certs/privkey.pem'; // Local default
+const HTTPS_CERT_PATH = process.env.HTTPS_CERT_PATH || './certs/fullchain.pem'; // Local default
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000'; // Local React app URL
+const SERVER_PORT = process.env.SERVER_PORT ? parseInt(process.env.SERVER_PORT, 10) : (NODE_ENV === 'production' ? 2020 : 2002);
+const JWT_SECRET = env.JWT_SECRET || 'your_default_jwt_secret';
+
+// Read certificates conditionally based on the environment
+const privateKey = NODE_ENV === 'production'
+  ? fs.readFileSync(HTTPS_KEY_PATH, 'utf8')
+  : null; // For development, you might not need HTTPS
+const certificate = NODE_ENV === 'production'
+  ? fs.readFileSync(HTTPS_CERT_PATH, 'utf8')
+  : null;
+
+const credentials = NODE_ENV === 'production' && privateKey && certificate
+  ? { key: privateKey, cert: certificate }
+  : undefined;
 
 
 const app = express();
 const prisma = new PrismaClient();
+let server: https.Server | http.Server;
 
-const server = https.createServer(credentials, app);
+// Use HTTPS in production and HTTP in development
+if (NODE_ENV === 'production' && credentials) {
+  server = https.createServer(credentials, app);
+} else {
+  console.log('Running in development mode with HTTP');
+  server = http.createServer(app);
+}
 
-const httpApp = express();
-httpApp.use((req, res) => {
-  const host = req.headers.host?.replace(/:80$/, ''); // Handle cases where ":80" might be appended
-  res.redirect(`https://${host}${req.url}`);
-});
+// Redirect HTTP to HTTPS in production
+if (NODE_ENV === 'production') {
+  const httpApp = express();
+  httpApp.use((req, res) => {
+    const host = req.headers.host?.replace(/:80$/, ''); // Handle cases where ":80" might be appended
+    res.redirect(`https://${host}${req.url}`);
+  });
 
-http.createServer(httpApp).listen(80, () => {
-  console.log('Redirecting HTTP traffic to HTTPS...');
-});
+  http.createServer(httpApp).listen(80, () => {
+    console.log('Redirecting HTTP traffic to HTTPS...');
+  });
+}
 
 const io = new Server(server, {
   cors: {
-    // origin: "https://main.d37jjc6afovpjz.amplifyapp.com",
-    origin: '*',
+    origin: FRONTEND_URL, // Dynamically set the frontend URL
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   },
 });
 
 const corsOptions = {
-  origin: 'https://main.d37jjc6afovpjz.amplifyapp.com',  // Your Amplify frontend URL
+  origin: FRONTEND_URL, // Your frontend URL
   methods: ["GET", "POST", "PUT", "DELETE"], // Methods you want to allow
   allowedHeaders: ['Content-Type', 'Authorization'], // Headers you want to allow
 };
-
-
-const REACT_APP_API_URL = 2020;
-const JWT_SECRET = env.JWT_SECRET || 'your_default_jwt_secret';
-
 
 app.use(express.json());
 app.use(cors(corsOptions));
@@ -1049,9 +1073,10 @@ app.post ('/api/forgotpassword', async (req, res):Promise<any> => {
 });
 
 /********* LISTEN FUNCT */
+const HOST: string = NODE_ENV === 'production' ? '0.0.0.0' : '127.0.0.1'; // Explicitly typed as string
 
-server.listen(2020, '0.0.0.0', () => {
-  console.log('HTTPS Server running on port 443');
+server.listen(SERVER_PORT, HOST, () => {
+  console.log(`${NODE_ENV === 'production' ? 'HTTPS' : 'HTTP'} Server running on ${HOST}:${SERVER_PORT}`);
 });
 
 
