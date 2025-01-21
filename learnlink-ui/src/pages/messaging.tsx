@@ -32,10 +32,10 @@ interface User {
 }
 
 
-const API_URL = 'https://learnlinkserverhost.zapto.org';
+const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
 
 
-const socket = io(API_URL, {
+const socket = io(REACT_APP_API_URL, {
   transports: ["websocket"], // Ensure WebSocket is explicitly used
   reconnectionAttempts: 3,  // Retry if connection fails
   timeout: 10000 // 10 seconds timeout
@@ -62,7 +62,7 @@ const Messaging: React.FC = () => {
 
   useEffect(() => {
     // Fetch users and chats from the API when the component mounts
-    axios.get(`${API_URL}/api/users`)
+    axios.get(`${REACT_APP_API_URL}/api/users`)
       .then((response) => setUsers(response.data))
       .catch((error) => console.error('Error fetching users:', error));
 
@@ -70,7 +70,7 @@ const Messaging: React.FC = () => {
     // Make the API request to fetch chats for the user
   
     const token = localStorage.getItem('token');
-    axios.get(`${API_URL}/api/chats`, {
+    axios.get(`${REACT_APP_API_URL}/api/chats`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((response) => {
@@ -84,7 +84,7 @@ const Messaging: React.FC = () => {
     
 
     if (token) {
-      axios.get(`${API_URL}/api/currentUser`, {
+      axios.get(`${REACT_APP_API_URL}/api/currentUser`, {
         headers: { Authorization: `Bearer ${token}` },
       })
         .then((response) => setCurrentUserId(response.data.id))
@@ -232,7 +232,7 @@ const Messaging: React.FC = () => {
       }
   
       const response = await axios.post(
-        `${API_URL}/api/chats/${user.id}`,
+        `${REACT_APP_API_URL}/api/chats/${user.id}`,
         payload,
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -305,7 +305,7 @@ const Messaging: React.FC = () => {
         return;
       }
 
-      await axios.delete(`${API_URL}/api/chats/${chatId}`, {
+      await axios.delete(`${REACT_APP_API_URL}/api/chats/${chatId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 

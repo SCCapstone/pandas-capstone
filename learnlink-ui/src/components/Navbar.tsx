@@ -18,7 +18,7 @@ const Navbar: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<User[]>([]);
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
-  const API_URL = 'https://learnlinkserverhost.zapto.org';
+  const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
   // Function to handle search and display results
   const handleSearch = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value;
@@ -33,7 +33,7 @@ const Navbar: React.FC = () => {
     try {
       const token = localStorage.getItem('token');
       if (token) {
-        const response = await fetch(`${API_URL}/api/users/search?query=${query}`, {
+        const response = await fetch(`${REACT_APP_API_URL}/api/users/search?query=${query}`, {
           headers: {
             'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,

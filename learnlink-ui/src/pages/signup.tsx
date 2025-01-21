@@ -35,7 +35,7 @@ const Signup: React.FC = () => {
     const [confirmPassword, setConfirmPassword] = useState<string>('');
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
-    const API_URL = 'https://learnlinkserverhost.zapto.org';
+    const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -67,7 +67,7 @@ const Signup: React.FC = () => {
 
         try {
             // POST request
-            const response = await fetch(`${API_URL}/api/users`, {
+            const response = await fetch(`${REACT_APP_API_URL}/api/users`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

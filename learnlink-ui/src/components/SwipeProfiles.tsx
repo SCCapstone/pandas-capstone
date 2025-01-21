@@ -5,12 +5,12 @@ import { formatEnum } from '../utils/format';
 const SwipeProfiles = ({ userId }: { userId: number }) => {
   const [profiles, setProfiles] = useState<any>({ users: [], studyGroups: [] });
   const [currentProfileIndex, setCurrentProfileIndex] = useState(0);
-  const API_URL = 'https://learnlinkserverhost.zapto.org';
+  const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
 
   useEffect(() => {
     const fetchProfiles = async () => {
       try {
-        const response = await fetch(`${API_URL}/api/profiles/${userId}`);
+        const response = await fetch(`${REACT_APP_API_URL}/api/profiles/${userId}`);
         const data = await response.json();
         setProfiles(data);
       } catch (error) {
@@ -29,7 +29,7 @@ const SwipeProfiles = ({ userId }: { userId: number }) => {
 
   const handleSwipe = async (direction: 'Yes' | 'No', targetId: number, isStudyGroup: boolean) => {
     try {
-      await fetch(`${API_URL}/api/swipe`, {
+      await fetch(`${REACT_APP_API_URL}/api/swipe`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

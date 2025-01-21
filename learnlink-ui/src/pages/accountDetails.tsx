@@ -4,7 +4,7 @@ import './accountDetails.css';
 import CopyrightFooter from '../components/CopyrightFooter';
 
 const AccountDetails: React.FC = () => {
-const API_URL = 'https://learnlinkserverhost.zapto.org';
+const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
 
 
   // State to store user profile data
@@ -22,7 +22,7 @@ const API_URL = 'https://learnlinkserverhost.zapto.org';
         const token = localStorage.getItem('token');
         console.log('Token:', token);
         if (token) {
-          const userResponse = await fetch(`${API_URL}/api/users/profile`, {
+          const userResponse = await fetch(`${REACT_APP_API_URL}/api/users/profile`, {
             headers: {
               'Authorization': `Bearer ${token}`,
             },
