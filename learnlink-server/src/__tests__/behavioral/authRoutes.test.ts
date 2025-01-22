@@ -1,6 +1,6 @@
 // __tests__/authRoutes.test.ts
 import request from 'supertest';
-import { app } from '../index';
+import { app } from '../../index';
 
 describe('POST /login', () => {
   it('responds with a token for valid credentials', async () => {

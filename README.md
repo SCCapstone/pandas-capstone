@@ -82,12 +82,15 @@ npm start
 
 # Testing
 
-In 492 you will write automated tests. When you do you will need to add a
-section that explains how to run them.
+## UI Tests
+The unit tests are in `learnlink-ui/src/__tests__/unit`.
 
-The unit tests are in `/test/unit`.
+The behavioral tests are in `learnlink-ui/src/__tests__/behavioral`.
 
-The behavioral tests are in `/test/casper/`.
+## Server Tests
+The unit tests are in `learnlink-server/src/__tests__/unit`.
+
+The behavioral tests are in `learnlink-server/src/__tests__/behavioral`.
 
 ## Testing Technology
 
@@ -95,7 +98,13 @@ In some cases you need to install test runners, etc. Explain how.
 
 ## Running Tests
 
-Explain how to run the automated tests.
+### Tesing UI
+Navigate to `learnlink-ui`
+run `npm test`
+
+### Testing Server
+Navigate to `learnlink-server`
+run `npm test`
 
 # Authors
 

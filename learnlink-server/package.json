@@ -37,5 +37,16 @@
     "socket.io": "^4.8.1",
     "socket.io-client": "^4.8.1",
     "supertest": "^7.0.0"
+  },
+  "jest": {
+  "testMatch": [
+    "**/__tests__/**/*.[jt]s?(x)",
+    "**/?(*.)+(spec|test).[jt]s?(x)"
+  ],
+  "coverageThreshold": {
+        "global": {
+            "lines": 80
+        }
+    }
   }
 }
