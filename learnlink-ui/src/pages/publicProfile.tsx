@@ -6,7 +6,7 @@ import './LandingPage.css';
 import './publicProfile.css';
 import { formatEnum } from '../utils/format';
 
-const PublicProfile = () => {
+const PublicProfile: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const [user, setUser] = useState<any>(null);
     const [error, setError] = useState<string | null>(null);

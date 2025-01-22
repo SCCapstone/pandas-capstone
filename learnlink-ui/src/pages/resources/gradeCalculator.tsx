@@ -7,18 +7,18 @@ import CopyrightFooter from '../../components/CopyrightFooter';
 
 const GradeCalculator: React.FC = () => {
   // State for categories and assignments
-  const [categories, setCategories] = useState([{ name: '', weight: '' }]);
-  const [assignments, setAssignments] = useState([{ name: '', category: '', grade: '' }]);
-  const [finalGrade, setFinalGrade] = useState<number | null>(null);
+  const [categories, setCategories] = useState([{ name: '', weight: undefined as number | undefined }]);
+  const [assignments, setAssignments] = useState([{ name: '', category: '', grade: undefined as number | undefined }]);
+  const [finalGrade, setFinalGrade] = useState<number | string | null>(null);
 
   // Handler to add a new category row
   const addCategory = () => {
-    setCategories([...categories, { name: '', weight: '' }]);
+    setCategories([...categories, { name: '', weight: undefined }]);
   };
 
   // Handler to add a new assignment row
   const addAssignment = () => {
-    setAssignments([...assignments, { name: '', category: '', grade: '' }]);
+    setAssignments([...assignments, { name: '', category: '', grade: undefined }]);
   };
 
   // Handler to update category values
@@ -41,19 +41,30 @@ const GradeCalculator: React.FC = () => {
   const calculateFinalGrade = () => {
     let totalWeight = 0;
     let weightedSum = 0;
+
+    categories.forEach((category) => {
+      if (category.weight !== undefined) {
+        totalWeight += Number(category.weight); // Add category weight to total weight
   
-    assignments.forEach((assignment) => {
-      // Find the corresponding category
-      const category = categories.find(cat => cat.name === assignment.category);
-      const weight = category ? parseFloat(category.weight) : 0; // Get the weight
-      const grade = parseFloat(assignment.grade) || 0;
+        // Filter assignments for the current category
+        const categoryAssignments = assignments.filter(
+          (assignment) => assignment.category === category.name && assignment.grade !== undefined
+        );
   
-      weightedSum += weight * (grade / 100);
-      totalWeight += weight;
+        if (categoryAssignments.length > 0) {
+          // Calculate the average grade for the category
+          const averageGrade = categoryAssignments.reduce((sum, assignment) => {
+            return sum + Number(assignment.grade);
+          }, 0) / categoryAssignments.length;
+  
+          // Add the weighted grade for the category
+          weightedSum += (averageGrade / 100) * Number(category.weight);
+        }
+      }
     });
   
     // Calculate the final grade as a percentage
-    const calculatedGrade = totalWeight > 0 ? (weightedSum / totalWeight) * 100 : 0;
+    const calculatedGrade = (totalWeight > 0 || weightedSum > 0) ? (weightedSum / totalWeight) * 100 : "null";
     setFinalGrade(calculatedGrade);
   };
 
@@ -69,11 +80,16 @@ const GradeCalculator: React.FC = () => {
           <p>Calculate your grade based on the weights of each assignment.</p>
           <div className="final-calculation">
             <button onClick={calculateFinalGrade}>Calculate</button>
-            {finalGrade !== null && (
+            {finalGrade !== null && typeof finalGrade !== 'string' &&(
               <div>
                 <h3>Your Final Grade: {finalGrade.toFixed(2)}%</h3>
               </div>
             )}
+            {typeof finalGrade === 'string' && (
+              <div>
+                <h3>Please ensure all weights and grades<br></br>have been entered.</h3>
+              </div>
+              )}
           </div>
           <div className="grade-calculator">
             <div className="table-region">
@@ -100,7 +116,7 @@ const GradeCalculator: React.FC = () => {
                       <input
                         type="text"
                         placeholder="Weight"
-                        value={category.weight}
+                        value={category.weight !== null ? category.weight : ''}
                         onChange={(e) => handleCategoryChange(index, 'weight', e.target.value)}
                       /> %
                     </td>
@@ -148,7 +164,7 @@ const GradeCalculator: React.FC = () => {
                       <input
                         type="text"
                         placeholder="Grade"
-                        value={assignment.grade}
+                        value={assignment.grade !== null ? assignment.grade : ''}
                         onChange={(e) => handleAssignmentChange(index, 'grade', e.target.value)}
                       />
                     </td>

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import Navbar from '../components/Navbar';
 import CopyrightFooter from '../components/CopyrightFooter'; 
 
-const UpdateEmail = () => {
+const UpdateEmail: React.FC = () => {
   const [oldEmail, setOldEmail] = useState('');
   const [newEmail, setNewEmail] = useState('');
   const [error, setError] = useState('');
