@@ -6,7 +6,7 @@ import { ReactComponent as MySvgFile } from './LearnLink.svg'
 function Logo(){
     return(
         <div className = "Logo">
-            <MySvgFile />
+            <MySvgFile data-testid="logo" aria-label="LearnLink Logo"/>
         </div>
     );
 

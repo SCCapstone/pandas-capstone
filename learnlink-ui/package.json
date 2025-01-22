@@ -27,7 +27,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
+    "test": "react-scripts test --watchAll --coverage",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
@@ -55,5 +55,16 @@
     "@types/jwt-decode": "^3.1.0",
     "@types/react-dom": "^18.3.1",
     "@types/testing-library__react": "^10.2.0"
+  },
+  "jest": {
+  "testMatch": [
+    "**/__tests__/**/*.[jt]s?(x)",
+    "**/?(*.)+(spec|test).[jt]s?(x)"
+  ],
+  "coverageThreshold": {
+        "global": {
+            "lines": 80
+        }
+    }
   }
 }

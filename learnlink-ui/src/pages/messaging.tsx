@@ -4,7 +4,6 @@ import './messaging.css';
 import Navbar from '../components/Navbar';
 import CopyrightFooter from '../components/CopyrightFooter';
 import './LandingPage.css';
-import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 interface Chat {

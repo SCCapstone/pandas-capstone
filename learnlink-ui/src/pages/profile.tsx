@@ -4,7 +4,7 @@ import { formatEnum } from '../utils/format';
 import './profile.css';
 import CopyrightFooter from '../components/CopyrightFooter';
 import makeAnimated from 'react-select/animated';
-import Select, { MultiValue, ActionMeta } from 'react-select';
+import Select from 'react-select';
 
 const animatedComponents = makeAnimated();
 
