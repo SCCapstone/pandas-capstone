@@ -1072,12 +1072,16 @@ app.post ('/api/forgotpassword', async (req, res):Promise<any> => {
   }
 });
 
-/********* LISTEN FUNCT */
-const HOST: string = NODE_ENV === 'production' ? '0.0.0.0' : '127.0.0.1'; // Explicitly typed as string
+export { app }; // Export the app for testing
 
-server.listen(SERVER_PORT, HOST, () => {
-  console.log(`${NODE_ENV === 'production' ? 'HTTPS' : 'HTTP'} Server running on ${HOST}:${SERVER_PORT}`);
-});
+if (require.main === module) {
+  /********* LISTEN FUNCT */
+  const HOST: string = NODE_ENV === 'production' ? '0.0.0.0' : '127.0.0.1'; // Explicitly typed as string
+
+  server.listen(SERVER_PORT, HOST, () => {
+    console.log(`${NODE_ENV === 'production' ? 'HTTPS' : 'HTTP'} Server running on ${HOST}:${SERVER_PORT}`);
+  });
+}
 
 
 
