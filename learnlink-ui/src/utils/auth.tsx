@@ -1,4 +1,6 @@
 import { jwtDecode } from 'jwt-decode';
+import { Navigate, Route, useLocation } from 'react-router-dom';
+import { JSX } from 'react/jsx-runtime';
 
 export const logout = () => {
     localStorage.removeItem('token'); // Remove the JWT from localStorage
@@ -46,5 +48,34 @@ export const getLoggedInUserIdString = (): string | null => {
   } catch (error) {
     console.error('Failed to decode token:', error);
     return null;
+  }
+};
+
+
+export const isTokenExpired = (): boolean => {
+  const token = localStorage.getItem('token');
+
+  // If there's no token, return true (indicating that the token is expired or invalid)
+  if (!token) {
+    console.log('No token found in localStorage');
+    return true;
+  }
+
+  try {
+    const decodedToken = jwtDecode(token);
+    const currentTime = Date.now() / 1000; // Current time in seconds
+
+    // Check if the token has expired
+    if (decodedToken.exp && decodedToken.exp < currentTime) {
+      console.log('Token expired');
+      localStorage.removeItem('token'); // Optional: remove the expired token
+      return true;
+    }
+
+    // If token is valid
+    return false;
+  } catch (error) {
+    console.error('Error decoding token:', error);
+    return true; // If there's an error decoding, treat the token as invalid
   }
 };

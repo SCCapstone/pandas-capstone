@@ -3,7 +3,7 @@ import Navbar from '../components/Navbar';
 import CopyrightFooter from '../components/CopyrightFooter'; 
 import './changePassword.css';
 
-const ChangePassword = () => {
+const ChangePassword: React.FC = () => {
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [error, setError] = useState('');
