@@ -18,6 +18,7 @@ import ChangePassword from './pages/changePassword';
 import AccountDetails from './pages/accountDetails';
 import PublicProfile from './pages/publicProfile';
 import {PrivateRoutes} from './utils/privateRoutes';
+import {MatchRoute} from './utils/matchRoute';
 
 function App() {
   return (
@@ -42,7 +43,9 @@ function App() {
             <Route path="/resources/externalResources" element = {<ExternalResources/> }/>
             <Route path="/resources/gradeCalculator" element = {<GradeCalculator/> }/>
             <Route path="/resetpassword" element={<ResetPassword />} />
-            <Route path="/swiping" element={<Swiping />} />
+            <Route element={<MatchRoute/>}>
+              <Route path="/swiping" element={<Swiping />} />
+            </Route>
             <Route path="/updateEmail" element={<UpdateEmail />} />
             <Route path="/changepassword" element={<ChangePassword />} />
             <Route path="/accountDetails" element={<AccountDetails />} />
