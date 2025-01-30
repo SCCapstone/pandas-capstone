@@ -11,7 +11,7 @@ const LandingPage: React.FC = () => {
       <Navbar />
       </div>
       <main className="content">
-        <p>To start searching please update your profile via top left corner!</p>
+        <p>To start matching, please update your ideal match factor via the profile tab!</p>
       </main>
       <div>
         <CopyrightFooter />
