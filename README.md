@@ -94,7 +94,7 @@ In some cases you need to install test runners, etc. Explain how.
 ## Running Tests
 
 ### Testing UI
-Navigate to `learnlink-ui`
+Navigate to `learnlink-ui` \
 run `npm test`
 
 # Authors
