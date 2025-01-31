@@ -54,7 +54,7 @@ const Signup: React.FC = () => {
         e.preventDefault();
 
         if (formData.password !== confirmPassword) {
-            setError('Passwords do not match.');
+            setError('Passwords do not match');
             return;
         }
 
@@ -197,6 +197,7 @@ const Signup: React.FC = () => {
                             type="password"
                             placeholder="**************"
                             name="password"
+                            data-testid="su-password"
                             value={formData.password}
                             onChange={handleChange}
                             required
@@ -206,15 +207,21 @@ const Signup: React.FC = () => {
                         <input
                             type="password"
                             placeholder="**************"
+                            data-testid="su-rt-password"
                             value={confirmPassword}
                             onChange={handleConfirmPasswordChange}
                             required
                         />
+                        <label>&nbsp;
+                            {error === 'Passwords do not match' && (
+                                <span className="alert">* {error}</span>
+                            )}
+                        </label>
 
                         {/* Show error if there's any */}
                         {error && <p className="error">Failed to sign up.</p>}
 
-                        <button className="signUpButton" type="submit" disabled={loading}>
+                        <button className="signUpButton" type="submit" disabled={loading} data-testid="su-button">
                             {loading ? 'Signing Up...' : 'Sign Up'}
                         </button>
                     </form>
