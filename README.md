@@ -35,7 +35,6 @@ Use the MakeFile provided.
 Navigate to the project main directory and type:
 ```
 make install
-
 ```
 
 ## Running locally
