@@ -87,23 +87,14 @@ The unit tests are in `learnlink-ui/src/__tests__/unit`.
 
 The behavioral tests are in `learnlink-ui/src/__tests__/behavioral`.
 
-## Server Tests
-The unit tests are in `learnlink-server/src/__tests__/unit`.
-
-The behavioral tests are in `learnlink-server/src/__tests__/behavioral`.
-
 ## Testing Technology
 
 In some cases you need to install test runners, etc. Explain how.
 
 ## Running Tests
 
-### Tesing UI
+### Testing UI
 Navigate to `learnlink-ui`
-run `npm test`
-
-### Testing Server
-Navigate to `learnlink-server`
 run `npm test`
 
 # Authors
