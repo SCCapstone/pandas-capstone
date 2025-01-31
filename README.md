@@ -21,7 +21,7 @@ can just cut-n-paste the commands and get everything setup.
 
 You only need to add instructions for the OS you are using.
 
-## Setup
+## Setup For Local
 
 
 Here you list all the one-time things the developer needs to do after cloning
@@ -29,19 +29,18 @@ your repo. Sometimes there is no need for this section, but some apps require
 some first-time configuration from the developer, for example: setting up a
 database for running your webapp locally.
 
-Navigate to the server directory and enter these commands in the command line of the terminal
-```
-npm i
+Use the MakeFile provided.
+
+
+Navigate to the project main directory and type:
+
+make install
+
 ```
 
-Navigate to the ui directory and enter these commands in the command line of the terminal
-```
-npm i
-```
+## Running locally
 
-## Running
-
-npm start
+make start
 
 # Deployment
 
