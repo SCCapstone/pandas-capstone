@@ -87,13 +87,12 @@ The behavioral tests are in `learnlink-ui/src/__tests__/behavioral`.
 
 ## Testing Technology
 
-In some cases you need to install test runners, etc. Explain how.
+run `make install` before testing
 
 ## Running Tests
 
-### Testing UI
-Navigate to `learnlink-ui` \
-run `npm test`
+Navigate to `pandas-capstone` \
+run `make test`
 
 # Authors
 
