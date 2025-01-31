@@ -1,6 +1,6 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
-import Signup from "../../pages/signup"; // Adjust the import path
+import Signup from "../../pages/signup";
 import * as ReactRouterDom from "react-router-dom";
 
 jest.mock("react-router-dom", () => ({
