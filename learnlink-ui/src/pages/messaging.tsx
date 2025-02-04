@@ -5,6 +5,7 @@ import Navbar from '../components/Navbar';
 import CopyrightFooter from '../components/CopyrightFooter';
 import './LandingPage.css';
 import axios from 'axios';
+import { useSearchParams } from 'react-router-dom';
 
 interface Chat {
   id: number;
@@ -51,13 +52,28 @@ const Messaging: React.FC = () => {
   const [showDropdown, setShowDropdown] = useState<boolean>(false); // Control dropdown visibility
   const [error, setError] = useState<string | null>(null);
   const [currentUserId, setCurrentUserId] = useState<number | null>(null);
-  const [selectedUser, setSelectedUser] = useState<User | null>(null); // Track selected user
   const [customChatName, setCustomChatName] = useState<string>(''); // Track custom chat name
   const [showGroupNameInput, setShowGroupNameInput] = useState<boolean>(false);
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const chatWindowRef = React.useRef<HTMLDivElement | null>(null);
+  const [hasStudyGroup, setHasStudyGroup] = useState(false);
 
+  const [selectedUser, setSelectedUser] = useState<User | null>(null); // Track selected user
+  const [searchParams] = useSearchParams();
+  const selectedUserId = searchParams.get('user'); // Get the matched user ID
+  
+  
+  useEffect(() => {
+    if (selectedUserId) {
+      const matchedUser = users.find(user => user.id === Number(selectedUserId)); // Convert to number
+      if (matchedUser) {
+        setSelectedUser(matchedUser);
+        console.log(matchedUser);
+        setShowGroupNameInput(true);
+      }
+    }
+  }, [selectedUserId, users]);
 
   useEffect(() => {
     // Fetch users and chats from the API when the component mounts
@@ -94,7 +110,7 @@ const Messaging: React.FC = () => {
 
   
   
-  
+  //used for sending messages
   useEffect(() => {
     //console.log("helloooooooooo");
     
@@ -325,6 +341,67 @@ const Messaging: React.FC = () => {
     }
   };
 
+  const handleCreateStudyGroup = async (chatId: number) => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        alert('You need to be logged in to create a study group.');
+        return;
+      }
+
+      const chat = chats.find((chat) => chat.id === chatId);
+      if (!chat) {
+        alert('Chat not found.');
+        return;
+      }
+
+      const studyGroupPayload = {
+        name: chat.name,
+        subject: '',
+        description: '',
+        users: chat.users.map((user) => user.id),
+      };
+
+      console.log('Creating study group with payload:', studyGroupPayload);
+
+      const response = await axios.post(
+        `${REACT_APP_API_URL}/api/study-groups`,
+        studyGroupPayload,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      console.log('Study group created:', response.data);
+    } catch (error) {
+      console.error('Error creating study group:', error);
+      if (axios.isAxiosError(error) && error.response) {
+        console.error('Server responded with:', error.response.data);
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (!selectedChat) return;
+  
+    const checkStudyGroup = async () => {
+      try {
+        const response = await fetch(`/api/study-groups/${selectedChat.id}`);
+        const data = await response.json();
+  
+        if (response.ok && data.exists) {
+          setHasStudyGroup(true);
+        } else {
+          setHasStudyGroup(false);
+        }
+      } catch (error) {
+        console.error("Error checking study group:", error);
+        setHasStudyGroup(false); // Assume no study group on error
+      }
+    };
+  
+    checkStudyGroup();
+  }, [selectedChat]); // Runs when selectedChat changes  
+  
+
   const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Enter') {
       handleSendMessage();
@@ -441,7 +518,16 @@ const Messaging: React.FC = () => {
         <div className="ChatSection">
           {selectedChat ? (
             <>
-              <h2 className="ChatHeader">{getChatName(selectedChat)}</h2>
+              <div className='ChatHeader'>
+                <h2 className="ChatTitle">{getChatName(selectedChat)}</h2>
+                <button
+                  className="CreateStudyGroupButton"
+                  onClick={() => handleCreateStudyGroup(selectedChat.id)}
+                >
+                  {hasStudyGroup ? "Edit Study Group" : "Create Study Group"}
+                </button>
+
+              </div>
               <div className="ChatWindow">
                 {selectedChat && Array.isArray(selectedChat.messages) ? (
                   selectedChat.messages.length > 0 ? (

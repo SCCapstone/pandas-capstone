@@ -71,9 +71,28 @@
 }
 
 .ChatHeader {
-  padding: 10px;
+  display:flex;
+  justify-content:space-between;
+  padding-right: 20px;
   border-bottom: 1px solid #ddd;
   background-color: #f9f9f9;
+}
+
+.CreateStudyGroupButton {
+  font-weight: 700;
+  font-size: large;
+  padding: 10px;
+  background-color: #FEAD2B;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  height:60%;
+  align-self: center;
+}
+
+.ChatTitle {
+  padding: 10px;
 }
 
 .ChatWindow {

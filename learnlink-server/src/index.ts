@@ -646,6 +646,8 @@ app.delete('/api/users/:id', authenticate, async (req, res): Promise<any> => {
 app.post('/api/study-groups', authenticate, async (req, res): Promise<any> => {
   const userId = res.locals.userId;
   const { name, subject, description, users } = req.body;
+  console.log('Received request:', req.body);
+
 
   try {
     // Validate the input data (optional but recommended)
@@ -653,13 +655,16 @@ app.post('/api/study-groups', authenticate, async (req, res): Promise<any> => {
       return res.status(400).json({ error: 'Name is required' });
     }
 
+    console.log('Creating study group with:', { name, subject, description, users });
+
+
     // Create the new study group
     const newStudyGroup = await prisma.studyGroup.create({
       data: {
         name,
         subject,
         description,
-        users,
+        users: { connect: users.map((id: number) => ({ id })) },
         creator: { connect: { id: userId } },
       },
     });
