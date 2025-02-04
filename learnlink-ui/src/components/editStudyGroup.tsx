@@ -1,4 +1,5 @@
 import './EditStudyGroup.css';
+import '../pages/messaging.css';
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
@@ -77,10 +78,10 @@ const EditStudyGroup = ({ chatID, onClose }: { chatID: number; onClose: () => vo
 
   return (
     <div className="edit-study-group-panel">
-      <h2>Edit Study Group</h2>
+      <h1>Edit Study Group</h1>
       <form onSubmit={(e) => e.preventDefault()}>
         <div>
-          <label>Name:</label>
+          <label>Study Group Name:</label>
           <input
             type="text"
             value={name}
@@ -88,7 +89,7 @@ const EditStudyGroup = ({ chatID, onClose }: { chatID: number; onClose: () => vo
           />
         </div>
         <div>
-          <label>Description:</label>
+          <label>Bio:</label>
           <input
             type="text"
             value={description}
@@ -96,7 +97,7 @@ const EditStudyGroup = ({ chatID, onClose }: { chatID: number; onClose: () => vo
           />
         </div>
         <div>
-          <label>Subject:</label>
+          <label>Relevant Course:</label>
           <input
             type="text"
             value={subject}
