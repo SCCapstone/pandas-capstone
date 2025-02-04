@@ -24,7 +24,8 @@ const SwipeProfiles = ({ userId }: { userId: number }) => {
   }, [userId]);
 
   const handleMessaging = () => {
-    navigate('/messaging');
+    navigate(`/messaging?user=${currentProfile.id}`);
+    
   };
 
   const handleBack = () => {
