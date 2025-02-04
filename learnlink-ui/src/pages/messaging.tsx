@@ -5,6 +5,7 @@ import Navbar from '../components/Navbar';
 import CopyrightFooter from '../components/CopyrightFooter';
 import './LandingPage.css';
 import axios from 'axios';
+import { useSearchParams } from 'react-router-dom';
 
 interface Chat {
   id: number;
@@ -51,7 +52,6 @@ const Messaging: React.FC = () => {
   const [showDropdown, setShowDropdown] = useState<boolean>(false); // Control dropdown visibility
   const [error, setError] = useState<string | null>(null);
   const [currentUserId, setCurrentUserId] = useState<number | null>(null);
-  const [selectedUser, setSelectedUser] = useState<User | null>(null); // Track selected user
   const [customChatName, setCustomChatName] = useState<string>(''); // Track custom chat name
   const [showGroupNameInput, setShowGroupNameInput] = useState<boolean>(false);
   const [messages, setMessages] = useState([]);
@@ -59,7 +59,21 @@ const Messaging: React.FC = () => {
   const chatWindowRef = React.useRef<HTMLDivElement | null>(null);
   const [hasStudyGroup, setHasStudyGroup] = useState(false);
 
-
+  const [selectedUser, setSelectedUser] = useState<User | null>(null); // Track selected user
+  const [searchParams] = useSearchParams();
+  const selectedUserId = searchParams.get('user'); // Get the matched user ID
+  
+  
+  useEffect(() => {
+    if (selectedUserId) {
+      const matchedUser = users.find(user => user.id === Number(selectedUserId)); // Convert to number
+      if (matchedUser) {
+        setSelectedUser(matchedUser);
+        console.log(matchedUser);
+        setShowGroupNameInput(true);
+      }
+    }
+  }, [selectedUserId, users]);
 
   useEffect(() => {
     // Fetch users and chats from the API when the component mounts
@@ -96,7 +110,7 @@ const Messaging: React.FC = () => {
 
   
   
-  
+  //used for sending messages
   useEffect(() => {
     //console.log("helloooooooooo");
     
