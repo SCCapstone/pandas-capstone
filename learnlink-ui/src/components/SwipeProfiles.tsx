@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import './SwipeProfiles.css';
 import { formatEnum } from '../utils/format';
 
@@ -6,6 +7,7 @@ const SwipeProfiles = ({ userId }: { userId: number }) => {
   const [profiles, setProfiles] = useState<any>({ users: [], studyGroups: [] });
   const [currentProfileIndex, setCurrentProfileIndex] = useState(0);
   const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchProfiles = async () => {
@@ -20,6 +22,10 @@ const SwipeProfiles = ({ userId }: { userId: number }) => {
 
     fetchProfiles();
   }, [userId]);
+
+  const handleMessaging = () => {
+    navigate('/messaging');
+  };
 
   const handleBack = () => {
     if (currentProfileIndex > 0) {
@@ -106,9 +112,12 @@ const SwipeProfiles = ({ userId }: { userId: number }) => {
               </button>
               
               <div className="swipe-action-buttons">
-                <button onClick={() => handleSwipe('Yes', currentProfile.id, !!currentProfile.studyGroupId)}>
+              
+                {/* takes the user to the messaging page*/}
+                <button onClick={() => { handleSwipe('Yes', currentProfile.id, !!currentProfile.studyGroupId); handleMessaging(); }}>
                   Match
                 </button>
+
                 <button onClick={() => handleSwipe('No', currentProfile.id, !!currentProfile.studyGroupId)}>
                   Skip
                 </button>
