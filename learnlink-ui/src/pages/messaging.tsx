@@ -57,6 +57,8 @@ const Messaging: React.FC = () => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const chatWindowRef = React.useRef<HTMLDivElement | null>(null);
+  const [hasStudyGroup, setHasStudyGroup] = useState(false);
+
 
 
   useEffect(() => {
@@ -363,6 +365,29 @@ const Messaging: React.FC = () => {
     }
   };
 
+  useEffect(() => {
+    if (!selectedChat) return;
+  
+    const checkStudyGroup = async () => {
+      try {
+        const response = await fetch(`/api/study-groups/${selectedChat.id}`);
+        const data = await response.json();
+  
+        if (response.ok && data.exists) {
+          setHasStudyGroup(true);
+        } else {
+          setHasStudyGroup(false);
+        }
+      } catch (error) {
+        console.error("Error checking study group:", error);
+        setHasStudyGroup(false); // Assume no study group on error
+      }
+    };
+  
+    checkStudyGroup();
+  }, [selectedChat]); // Runs when selectedChat changes  
+  
+
   const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Enter') {
       handleSendMessage();
@@ -481,9 +506,13 @@ const Messaging: React.FC = () => {
             <>
               <div className='ChatHeader'>
                 <h2 className="ChatTitle">{getChatName(selectedChat)}</h2>
-                <button className="CreateStudyGroupButton" onClick={() => handleCreateStudyGroup(selectedChat.id)}>
-                  Create Study Group {/* Workshop button text?? */}
+                <button
+                  className="CreateStudyGroupButton"
+                  onClick={() => handleCreateStudyGroup(selectedChat.id)}
+                >
+                  {hasStudyGroup ? "Edit Study Group" : "Create Study Group"}
                 </button>
+
               </div>
               <div className="ChatWindow">
                 {selectedChat && Array.isArray(selectedChat.messages) ? (
