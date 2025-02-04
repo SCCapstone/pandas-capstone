@@ -645,7 +645,7 @@ app.delete('/api/users/:id', authenticate, async (req, res): Promise<any> => {
 /********* STUDY GROUPS */
 app.post('/api/study-groups', authenticate, async (req, res): Promise<any> => {
   const userId = res.locals.userId;
-  const { name, subject, description, users } = req.body;
+  const { name, subject, description, users, chatID } = req.body;
   console.log('Received request:', req.body);
 
 
@@ -653,6 +653,18 @@ app.post('/api/study-groups', authenticate, async (req, res): Promise<any> => {
     // Validate the input data (optional but recommended)
     if (!name) {
       return res.status(400).json({ error: 'Name is required' });
+    }
+
+    const existingStudyGroup = await prisma.studyGroup.findFirst({
+      where: {
+        users: {
+          every: { id: { in: users } }, // Check if all users in the provided list are in the study group
+        },
+      },
+    });
+
+    if (existingStudyGroup) {
+      return res.json({ message: 'Study group already exists for these users.', studyGroupId: existingStudyGroup.id });
     }
 
     console.log('Creating study group with:', { name, subject, description, users });
@@ -666,6 +678,7 @@ app.post('/api/study-groups', authenticate, async (req, res): Promise<any> => {
         description,
         users: { connect: users.map((id: number) => ({ id })) },
         creator: { connect: { id: userId } },
+        chatID: chatID,
       },
     });
 
@@ -676,6 +689,31 @@ app.post('/api/study-groups', authenticate, async (req, res): Promise<any> => {
     return res.status(500).json({ error: 'Internal server error' });
   }
 });
+
+app.get("/api/study-groups/chat/:chatId", async (req, res): Promise<any> => {
+  const { chatId } = req.params;
+  console.log('Fetching study group for chat:', chatId);
+
+  try {
+    // Find the study group that is linked to the provided chat ID
+    const studyGroup = await prisma.studyGroup.findFirst({
+      where: { chatID: parseInt(chatId) }, // Use chatId to find the corresponding study group
+    });
+
+    // If a study group is found, return its ID; otherwise, return null
+    if (studyGroup) {
+      console.log('Study group found:', studyGroup);
+      return res.json({ studyGroupID: studyGroup.id });
+    } else {
+      return res.json({ studyGroupID: null }); // No study group found
+    }
+  } catch (error) {
+    console.error("Error fetching study group:", error);
+    return res.status(500).json({ error: "Server error" });
+  }
+});
+
+
 
 // SEARCH FEATURE
 app.get('/api/users/search', authenticate, async (req, res): Promise<any> => {

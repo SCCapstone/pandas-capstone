@@ -90,7 +90,18 @@
   height:60%;
   align-self: center;
 }
-
+.EditStudyGroupButton {
+  font-weight: 700;
+  font-size: large;
+  padding: 10px;
+  background-color: #00668C;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  height:60%;
+  align-self: center;
+}
 .ChatTitle {
   padding: 10px;
 }

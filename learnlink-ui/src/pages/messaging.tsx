@@ -66,6 +66,7 @@ const Messaging: React.FC = () => {
   
   useEffect(() => {
     if (selectedUserId) {
+
       const matchedUser = users.find(user => user.id === Number(selectedUserId)); // Convert to number
       if (matchedUser) {
         setSelectedUser(matchedUser);
@@ -74,6 +75,12 @@ const Messaging: React.FC = () => {
       }
     }
   }, [selectedUserId, users]);
+
+  useEffect(() => {
+    if (selectedChat) {
+      checkStudyGroup();
+    }
+  }, [selectedChat]);  
 
   useEffect(() => {
     // Fetch users and chats from the API when the component mounts
@@ -360,6 +367,7 @@ const Messaging: React.FC = () => {
         subject: '',
         description: '',
         users: chat.users.map((user) => user.id),
+        chatID: chat.id,
       };
 
       console.log('Creating study group with payload:', studyGroupPayload);
@@ -371,6 +379,7 @@ const Messaging: React.FC = () => {
       );
 
       console.log('Study group created:', response.data);
+
     } catch (error) {
       console.error('Error creating study group:', error);
       if (axios.isAxiosError(error) && error.response) {
@@ -378,29 +387,27 @@ const Messaging: React.FC = () => {
       }
     }
   };
-
-  useEffect(() => {
-    if (!selectedChat) return;
+  const checkStudyGroup = async () => {
+    console.log('Checking study group for chat:', selectedChat);
+    if(!selectedChat) {
+      return setHasStudyGroup(false);
+    }
+    try {
+      const response = await fetch(`${REACT_APP_API_URL}/api/study-groups/chat/${selectedChat.id}`); // Fetching chat details by chat ID
+      const data = await response.json();
+      console.log('Study group check result:', data);
   
-    const checkStudyGroup = async () => {
-      try {
-        const response = await fetch(`/api/study-groups/${selectedChat.id}`);
-        const data = await response.json();
-  
-        if (response.ok && data.exists) {
-          setHasStudyGroup(true);
-        } else {
-          setHasStudyGroup(false);
-        }
-      } catch (error) {
-        console.error("Error checking study group:", error);
-        setHasStudyGroup(false); // Assume no study group on error
+      // Check if studyGroupID is returned (i.e., chat is linked to a study group)
+      if (response.ok && data.studyGroupID) {
+        setHasStudyGroup(true); // There is a study group linked
+      } else {
+        setHasStudyGroup(false); // No study group linked to this chat
       }
-    };
-  
-    checkStudyGroup();
-  }, [selectedChat]); // Runs when selectedChat changes  
-  
+    } catch (error) {
+      console.error("Error checking study group:", error);
+      setHasStudyGroup(false); // Assume no study group if there's an error
+    }
+  };
 
   const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Enter') {
@@ -520,13 +527,19 @@ const Messaging: React.FC = () => {
             <>
               <div className='ChatHeader'>
                 <h2 className="ChatTitle">{getChatName(selectedChat)}</h2>
-                <button
-                  className="CreateStudyGroupButton"
-                  onClick={() => handleCreateStudyGroup(selectedChat.id)}
-                >
-                  {hasStudyGroup ? "Edit Study Group" : "Create Study Group"}
-                </button>
-
+                  {hasStudyGroup ?
+                    <button
+                    className="EditStudyGroupButton"
+                    onClick={() => handleCreateStudyGroup(selectedChat.id)}
+                  > Edit Study Group </button>
+                  :
+                    <button
+                      className="CreateStudyGroupButton"
+                      onClick={() => {
+                        handleCreateStudyGroup(selectedChat.id);
+                        setHasStudyGroup(true);
+                      }}
+                    > Create Study Group </button>}
               </div>
               <div className="ChatWindow">
                 {selectedChat && Array.isArray(selectedChat.messages) ? (
