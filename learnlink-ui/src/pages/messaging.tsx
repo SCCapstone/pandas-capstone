@@ -551,7 +551,7 @@ const Messaging: React.FC = () => {
                 <div className="study-group-panel">
                   <EditStudyGroup
                     // Pass necessary props to the EditStudyGroup component
-                    studyGroup={{ name: selectedChat.name, description: '', subject: '' , chatID: selectedChat.id}}
+                    chatID={selectedChat.id}
                     onClose={() => setIsPanelVisible(false)} // Close panel when done
                   />
                 </div>

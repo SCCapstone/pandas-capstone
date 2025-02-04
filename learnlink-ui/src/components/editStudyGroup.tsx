@@ -1,9 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import Navbar from './Navbar';
-import CopyrightFooter from './CopyrightFooter';
 import './EditStudyGroup.css';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-
 
 interface StudyGroup {
   name: string;
@@ -12,56 +9,78 @@ interface StudyGroup {
   chatID: number;
 }
 
-const EditStudyGroup = ({ studyGroup, onClose }: { studyGroup: StudyGroup; onClose: () => void }) => {
-  const [name, setName] = useState(studyGroup.name || '');
-  const [description, setDescription] = useState(studyGroup.description || '');
-  const [subject, setSubject] = useState(studyGroup.subject || '');
-  const [loading, setLoading] = useState(false); // Add loading state to disable save button during save operation
-  const [error, setError] = useState<string | null>(null); // Error handling state
+const EditStudyGroup = ({ chatID, onClose }: { chatID: number; onClose: () => void }) => {
+  const [studyGroup, setStudyGroup] = useState<StudyGroup | null>(null);
+  const [name, setName] = useState('');
+  const [description, setDescription] = useState('');
+  const [subject, setSubject] = useState('');
   const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
 
 
+  // Fetch the study group details when the component is mounted
+  useEffect(() => {
+    const fetchStudyGroup = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+          alert('You need to be logged in to edit the study group.');
+          return;
+        }
+
+        const response = await axios.get(
+          `${REACT_APP_API_URL}/api/study-groups/chat/${chatID}`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+
+        // Set the form fields with the existing study group values
+        const data = response.data;
+        setStudyGroup(data);
+        setName(data.name);
+        setDescription(data.description);
+        setSubject(data.subject);
+      } catch (error) {
+        console.error('Error fetching study group:', error);
+        alert('Failed to load study group details.');
+      }
+    };
+
+    fetchStudyGroup();
+  }, [chatID]);
+
+  // Handle form submission to save the changes
   const handleSave = async () => {
     try {
       const token = localStorage.getItem('token');
       if (!token) {
-        alert('You need to be logged in to create a study group.');
+        alert('You need to be logged in to save the study group.');
         return;
       }
 
-      // Disable button during the API call
-      setLoading(true);
-      setError(null); // Reset previous errors
+      const updatedStudyGroup = { name, description, subject, chatID };
 
-      const updatedStudyGroup = {
-        name,
-        description,
-        subject,
-      };
-
-      // Replace `studyGroup.chatID` to identify the study group to update
       const response = await axios.put(
-        `${REACT_APP_API_URL}/api/study-groups/chat/${studyGroup.chatID}`,
+        `${REACT_APP_API_URL}/api/study-groups/chat/${chatID}`,
         updatedStudyGroup,
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      console.log('Study group updated successfully:', response.data);
-      onClose(); // Close the panel upon successful update
-    } catch (err) {
-      setError('Failed to update the study group. Please try again.');
-      console.error('Error updating study group:', err);
-    } finally {
-      setLoading(false); // Re-enable button after operation is finished
+      console.log('Study group updated:', response.data);
+      // alert('Study group updated successfully!');
+      onClose(); // Close the panel or component after saving
+    } catch (error) {
+      console.error('Error saving study group:', error);
+      alert('Failed to save study group.');
     }
   };
+
+  if (!studyGroup) return <div>Loading...</div>; // Show loading message while fetching the study group data
 
   return (
     <div className="edit-study-group-panel">
       <h2>Edit Study Group</h2>
-      <form>
+      <form onSubmit={(e) => e.preventDefault()}>
         <div>
-          <label>Name</label>
+          <label>Name:</label>
           <input
             type="text"
             value={name}
@@ -69,29 +88,23 @@ const EditStudyGroup = ({ studyGroup, onClose }: { studyGroup: StudyGroup; onClo
           />
         </div>
         <div>
-          <label>Subject</label>
+          <label>Description:</label>
+          <input
+            type="text"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+          />
+        </div>
+        <div>
+          <label>Subject:</label>
           <input
             type="text"
             value={subject}
             onChange={(e) => setSubject(e.target.value)}
           />
         </div>
-        <div>
-          <label>Description</label>
-          <textarea
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-          />
-        </div>
-        {error && <p style={{ color: 'red' }}>{error}</p>} {/* Display error message */}
-        <div>
-          <button type="button" onClick={handleSave} disabled={loading}>
-            {loading ? 'Saving...' : 'Save'} {/* Show loading state */}
-          </button>
-          <button type="button" onClick={onClose}>
-            Cancel
-          </button>
-        </div>
+        <button type="button" onClick={handleSave}>Save</button>
+        <button type="button" onClick={onClose}>Cancel</button>
       </form>
     </div>
   );
