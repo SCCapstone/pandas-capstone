@@ -703,13 +703,47 @@ app.get("/api/study-groups/chat/:chatId", async (req, res): Promise<any> => {
     // If a study group is found, return its ID; otherwise, return null
     if (studyGroup) {
       console.log('Study group found:', studyGroup);
-      return res.json({ studyGroupID: studyGroup.id });
+      return res.json({ 
+        studyGroupID: studyGroup.id,
+        name: studyGroup.name,
+        subject: studyGroup.subject,
+        description: studyGroup.description,
+      });
     } else {
       return res.json({ studyGroupID: null }); // No study group found
     }
   } catch (error) {
     console.error("Error fetching study group:", error);
     return res.status(500).json({ error: "Server error" });
+  }
+});
+
+
+app.put('/api/study-groups/chat/:chatID', async (req, res) : Promise<any> =>  {
+  const { chatID } = req.params; // Extract chatID from the URL
+  const { name, description, subject } = req.body; // Extract new study group data from the request body
+
+  // Validate the input
+  if (!name || !subject) {
+    return res.status(400).json({ error: 'Name, and subject are required.' });
+  }
+
+  try {
+    // Update the study group in the database using Prisma
+    const updatedStudyGroup = await prisma.studyGroup.update({
+      where: { id: parseInt(chatID) }, // Match the study group by its chatID
+      data: {
+        name,
+        description,
+        subject,
+      },
+    });
+
+    // Return the updated study group
+    res.json(updatedStudyGroup);
+  } catch (error) {
+    console.error('Error updating study group:', error);
+    res.status(500).json({ error: 'Failed to update the study group' });
   }
 });
 
