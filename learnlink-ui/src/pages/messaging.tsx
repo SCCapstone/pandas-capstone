@@ -6,6 +6,7 @@ import CopyrightFooter from '../components/CopyrightFooter';
 import './LandingPage.css';
 import axios from 'axios';
 import { useSearchParams } from 'react-router-dom';
+import EditStudyGroup from '../components/EditStudyGroup';
 
 interface Chat {
   id: number;
@@ -58,7 +59,7 @@ const Messaging: React.FC = () => {
   const [newMessage, setNewMessage] = useState("");
   const chatWindowRef = React.useRef<HTMLDivElement | null>(null);
   const [hasStudyGroup, setHasStudyGroup] = useState(false);
-
+  const [isPanelVisible, setIsPanelVisible] = useState(false);  // To control panel visibility
   const [selectedUser, setSelectedUser] = useState<User | null>(null); // Track selected user
   const [searchParams] = useSearchParams();
   const selectedUserId = searchParams.get('user'); // Get the matched user ID
@@ -527,20 +528,34 @@ const Messaging: React.FC = () => {
             <>
               <div className='ChatHeader'>
                 <h2 className="ChatTitle">{getChatName(selectedChat)}</h2>
-                  {hasStudyGroup ?
-                    <button
+                {hasStudyGroup ?
+                  <button
                     className="EditStudyGroupButton"
-                    onClick={() => handleCreateStudyGroup(selectedChat.id)}
+                    onClick={() => {
+                      ;
+                      setIsPanelVisible(true);
+                    }}
                   > Edit Study Group </button>
                   :
-                    <button
-                      className="CreateStudyGroupButton"
-                      onClick={() => {
-                        handleCreateStudyGroup(selectedChat.id);
-                        setHasStudyGroup(true);
-                      }}
-                    > Create Study Group </button>}
+                  <button
+                    className="CreateStudyGroupButton"
+                    onClick={() => {
+                      handleCreateStudyGroup(selectedChat.id);
+                      setHasStudyGroup(true);
+                      setIsPanelVisible(true);
+                    }}
+                  > Create Study Group </button>}
+
               </div>
+              {isPanelVisible && (
+                <div className="study-group-panel">
+                  <EditStudyGroup
+                    // Pass necessary props to the EditStudyGroup component
+                    studyGroup={{ name: selectedChat.name, description: '', subject: '' }}
+                    onClose={() => setIsPanelVisible(false)} // Close panel when done
+                  />
+                </div>
+              )}
               <div className="ChatWindow">
                 {selectedChat && Array.isArray(selectedChat.messages) ? (
                   selectedChat.messages.length > 0 ? (
