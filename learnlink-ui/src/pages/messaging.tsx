@@ -325,6 +325,44 @@ const Messaging: React.FC = () => {
     }
   };
 
+  const handleCreateStudyGroup = async (chatId: number) => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        alert('You need to be logged in to create a study group.');
+        return;
+      }
+
+      const chat = chats.find((chat) => chat.id === chatId);
+      if (!chat) {
+        alert('Chat not found.');
+        return;
+      }
+
+      const studyGroupPayload = {
+        name: chat.name,
+        subject: '',
+        description: '',
+        users: chat.users.map((user) => user.id),
+      };
+
+      console.log('Creating study group with payload:', studyGroupPayload);
+
+      const response = await axios.post(
+        `${REACT_APP_API_URL}/api/study-groups`,
+        studyGroupPayload,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      console.log('Study group created:', response.data);
+    } catch (error) {
+      console.error('Error creating study group:', error);
+      if (axios.isAxiosError(error) && error.response) {
+        console.error('Server responded with:', error.response.data);
+      }
+    }
+  };
+
   const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Enter') {
       handleSendMessage();
@@ -441,7 +479,12 @@ const Messaging: React.FC = () => {
         <div className="ChatSection">
           {selectedChat ? (
             <>
-              <h2 className="ChatHeader">{getChatName(selectedChat)}</h2>
+              <div className='ChatHeader'>
+                <h2 className="ChatTitle">{getChatName(selectedChat)}</h2>
+                <button className="CreateStudyGroupButton" onClick={() => handleCreateStudyGroup(selectedChat.id)}>
+                  Create Study Group {/* Workshop button text?? */}
+                </button>
+              </div>
               <div className="ChatWindow">
                 {selectedChat && Array.isArray(selectedChat.messages) ? (
                   selectedChat.messages.length > 0 ? (
