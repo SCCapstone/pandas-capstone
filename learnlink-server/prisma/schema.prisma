@@ -102,7 +102,9 @@ model StudyGroup {
   // Swipe relation: Users can swipe on a study group.
   swipesGiven  Swipe[]  @relation("StudyGroupSwipes")
 
-
+  // Connection to Chat
+  chatID       Int?     // Link to a Chat table if each StudyGroup has its own chat
+  chat         Chat?    @relation("StudyGroupChat") // Optional, if you want a relation with the Chat model
 }
 
 model Swipe {
@@ -133,13 +135,16 @@ model Match {
 }
 
 model Chat {
-  id        Int       @id @default(autoincrement())
-  name      String
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @default(now())
-  users     User[]    @relation("ChatUsers") // One-to-many through the join table
-  messages  Message[] // One-to-many relationship to Message
+  id            Int       @id @default(autoincrement())
+  name          String
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @default(now())
+  users         User[]    @relation("ChatUsers") // One-to-many through the join table
+  messages      Message[] // One-to-many relationship to Message
+  studyGroupId  Int?      @unique// Add this line to define the studyGroupId field
+  studyGroup    StudyGroup? @relation("StudyGroupChat", fields: [studyGroupId], references: [id]) // Optional relation to StudyGroup
 }
+
 
 model Message {
   id           Int         @id @default(autoincrement())
