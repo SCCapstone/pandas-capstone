@@ -3,7 +3,7 @@ import Logo from '../components/Logo';
 import CopyrightFooter from '../components/CopyrightFooter';
 import { useNavigate } from 'react-router-dom';
 import React, { useState } from 'react';
-const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
+const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
 
 type LoginInputs = {
     userName: string;

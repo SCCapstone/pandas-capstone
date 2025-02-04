@@ -4,7 +4,7 @@ import './accountDetails.css';
 import CopyrightFooter from '../components/CopyrightFooter';
 
 const AccountDetails: React.FC = () => {
-const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
+const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
 
 
   // State to store user profile data

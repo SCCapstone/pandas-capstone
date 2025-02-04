@@ -1,5 +1,5 @@
 # LearnLink
-Our app is called LearnLink. This app is to match student with other students
+Our app is called LearnLink. This app is to match students with other students
 to create study groups for their course. The app will allow the user to create a login page. 
 If the user already has a login page then they can just sign in.
 Users can message eachother, create a profile and match with other users for what requirements they want with their study group. 
@@ -21,7 +21,7 @@ can just cut-n-paste the commands and get everything setup.
 
 You only need to add instructions for the OS you are using.
 
-## Setup
+## Setup For Local
 
 
 Here you list all the one-time things the developer needs to do after cloning
@@ -29,20 +29,18 @@ your repo. Sometimes there is no need for this section, but some apps require
 some first-time configuration from the developer, for example: setting up a
 database for running your webapp locally.
 
-Navigate to the server directory and enter these commands in the command line of the terminal
-```
-npm i
-```
+Use the MakeFile provided.
 
-Navigate to the ui directory and enter these commands in the command line of the terminal
+
+Navigate to the project main directory and type:
 ```
-npm i
+make install
 ```
 
-## Running
-
-npm start
-
+## Running locally
+```
+make start
+```
 # Deployment
 
 ### **Frontend Deployment**
@@ -89,13 +87,12 @@ The behavioral tests are in `learnlink-ui/src/__tests__/behavioral`.
 
 ## Testing Technology
 
-In some cases you need to install test runners, etc. Explain how.
+run `make install` before testing
 
 ## Running Tests
 
-### Testing UI
-Navigate to `learnlink-ui` \
-run `npm test`
+Navigate to `pandas-capstone` \
+run `make test`
 
 # Authors
 

@@ -31,7 +31,7 @@ interface User {
 }
 
 
-const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
+const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
 
 
 const socket = io(REACT_APP_API_URL, {

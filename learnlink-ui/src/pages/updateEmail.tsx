@@ -7,7 +7,7 @@ const UpdateEmail: React.FC = () => {
   const [newEmail, setNewEmail] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
+  const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
 
   const handleOldEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setOldEmail(e.target.value);

@@ -6,6 +6,8 @@ CURRENT_DIR = $(shell pwd)
 # Commands
 START_SERVER = cd $(CURRENT_DIR)/$(SERVER_DIR) && npm start
 START_UI = cd $(CURRENT_DIR)/$(UI_DIR) && npm start
+TEST_SERVER = cd $(CURRENT_DIR)/$(SERVER_DIR) && npm test 
+TEST_UI = cd $(CURRENT_DIR)/$(UI_DIR) && npm test 
 # Start both server and UI
 start:
 	@echo "INFO Starting both server and UI..."
@@ -19,6 +21,19 @@ start-server:
 start-ui:
 	@echo "INFO Starting UI..."
 	$(START_UI)
+
+test:
+	@echo "INFO testing both server and UI..."
+	osascript -e 'tell application "Terminal" to do script "$(TEST_SERVER)"'
+	osascript -e 'tell application "Terminal" to do script "$(TEST_UI)"'
+
+test-server:
+	@echo "INFO testing server..."
+	$(TEST_SERVER)
+
+test-ui:
+	@echo "INFO testing UI..."
+	$(TEST_UI)
 
 # Reset Server & UI Dependencies
 reset: clean install

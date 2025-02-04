@@ -9,7 +9,7 @@ const Settings: React.FC = () => {
   const [userId, setUserId] = useState<string | null>(null);
   const [message, setMessage] = useState('');
   const navigate = useNavigate();
-  const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
+  const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
 
 
   // Fetch the logged-in user ID

@@ -9,7 +9,7 @@ const ForgotPassword: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
     const [success, setSuccess] = useState<string | null>(null);
-    const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
+    const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setEmail(e.target.value);

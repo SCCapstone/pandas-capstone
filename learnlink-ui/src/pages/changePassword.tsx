@@ -8,7 +8,7 @@ const ChangePassword: React.FC = () => {
   const [newPassword, setNewPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
+  const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
 
 
   const handleOldPasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {

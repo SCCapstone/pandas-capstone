@@ -9,7 +9,7 @@ import Select from 'react-select';
 const animatedComponents = makeAnimated();
 
 const Profile: React.FC = () => {
-  const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
+  const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
 
 
   const [formData, setFormData] = useState({

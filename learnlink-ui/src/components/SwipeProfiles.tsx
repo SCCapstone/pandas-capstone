@@ -5,7 +5,7 @@ import { formatEnum } from '../utils/format';
 const SwipeProfiles = ({ userId }: { userId: number }) => {
   const [profiles, setProfiles] = useState<any>({ users: [], studyGroups: [] });
   const [currentProfileIndex, setCurrentProfileIndex] = useState(0);
-  const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
+  const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
 
   useEffect(() => {
     const fetchProfiles = async () => {

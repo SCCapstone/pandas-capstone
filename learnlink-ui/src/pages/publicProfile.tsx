@@ -11,7 +11,7 @@ const PublicProfile: React.FC = () => {
     const [user, setUser] = useState<any>(null);
     const [error, setError] = useState<string | null>(null);
     const navigate = useNavigate();
-    const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
+    const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
     
     const handleMessage = () => {
         navigate('/messaging');
