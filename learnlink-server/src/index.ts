@@ -564,15 +564,27 @@ app.get('/api/profiles/:userId', async (req, res) => {
 
     const studyGroupsToSwipeOn = await prisma.studyGroup.findMany({
       where: {
-        // Add any conditions to exclude study groups the user has already swiped on
+        NOT: {
+          users: {
+            some: {
+              id: userId, // Exclude study groups where the user is already a member
+            },
+          },
+        },
       },
       select: {
         id: true,
         name: true,
         subject: true,
         description: true,
+        created_by: true,
+        created_at: true,
         creator: true,
         users: true,
+        matches: true,
+        swipesGiven: true,
+        chatID: true,
+        chat: true,
       },
     });
 
@@ -585,7 +597,6 @@ app.get('/api/profiles/:userId', async (req, res) => {
     res.status(500).json({ error: 'Something went wrong' });
   }
 });
-
 
 // Tried putting this in snother file and no dice :(
 export const deleteUserById = async (userId: number) => {

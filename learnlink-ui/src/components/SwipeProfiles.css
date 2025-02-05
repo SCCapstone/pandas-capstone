@@ -147,3 +147,45 @@
   margin-right: 10px; /* Extra space between tags */
   margin-bottom: 10px;
 }
+
+.group-title {
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+}
+
+.group-subject {
+  font-size: 18px;
+  font-weight: 500;
+  color: #666;
+}
+
+.group-description {
+  font-size: 14px;
+  color: #444;
+  margin: 10px 0;
+}
+
+.group-members {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.member-card {
+  background: #fff;
+  padding: 8px;
+  border-radius: 8px;
+  text-align: center;
+  width: 100px;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.member-pic {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+}
