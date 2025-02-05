@@ -82,7 +82,7 @@ const SwipeProfiles = ({ userId }: { userId: number }) => {
           {currentProfile.chatID ? (
             <div className="group-container">
 
-            <h1 className='group-title'>Study Group: {currentProfile.name}</h1>
+            <h1 className='group-title'>Group: {currentProfile.name}</h1>
 
             <div className="group-info">
               
@@ -90,10 +90,11 @@ const SwipeProfiles = ({ userId }: { userId: number }) => {
               <div className="group-right">
                 <GroupLogo/>
                 <div className="group-description">
-                <span className="bold-first-word">Bio: </span><p>{currentProfile.subject}</p>
+                <span className="bold-first-word">Bio: </span>
+                <br></br>{currentProfile.description}
                 </div>
                 <div className='group-subject'>
-                  <span className="bold-first-word">Course: </span><p>{currentProfile.subject}</p>
+                  <span className="bold-first-word">Course: </span>{currentProfile.subject}
                   </div>
 
                 </div>
