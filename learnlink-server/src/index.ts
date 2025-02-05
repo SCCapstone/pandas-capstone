@@ -742,7 +742,7 @@ app.put('/api/study-groups/chat/:chatID', async (req, res) : Promise<any> =>  {
   try {
     // Update the study group in the database using Prisma
     const updatedStudyGroup = await prisma.studyGroup.update({
-      where: { id: parseInt(chatID) }, // Match the study group by its chatID
+      where: { chatID: parseInt(chatID) }, // Match the study group by its chatID
       data: {
         name,
         description,

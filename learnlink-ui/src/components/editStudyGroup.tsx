@@ -2,6 +2,7 @@ import './EditStudyGroup.css';
 import '../pages/messaging.css';
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { on } from 'events';
 
 interface StudyGroup {
   name: string;
