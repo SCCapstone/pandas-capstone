@@ -141,8 +141,8 @@ model Chat {
   updatedAt     DateTime  @default(now())
   users         User[]    @relation("ChatUsers") // One-to-many through the join table
   messages      Message[] // One-to-many relationship to Message
-  studyGroupId  Int?      @unique// Add this line to define the studyGroupId field
-  studyGroup    StudyGroup? @relation("StudyGroupChat", fields: [studyGroupId], references: [id]) // Optional relation to StudyGroup
+  studyGroupId  Int?      @unique // Add this line to define the studyGroupId field
+  studyGroup    StudyGroup? @relation("StudyGroupChat", fields: [studyGroupId], references: [id], onDelete: Cascade) // Optional relation to StudyGroup
 }
 
 
