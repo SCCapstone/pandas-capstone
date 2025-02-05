@@ -6,7 +6,7 @@ import CopyrightFooter from '../components/CopyrightFooter';
 import './LandingPage.css';
 import axios from 'axios';
 import { useSearchParams } from 'react-router-dom';
-import EditStudyGroup from '../components/EditStudyGroup';
+import EditStudyGroup from '../components/editStudyGroup';
 
 interface Chat {
   id: number;
