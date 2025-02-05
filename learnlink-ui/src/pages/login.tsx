@@ -51,7 +51,7 @@ const Login: React.FC = () => {
             localStorage.setItem('token', data.token); // Store the JWT in localStorage
 
             // Navigate to landing page after successful login
-            navigate('/LandingPage'); 
+            navigate('/swiping'); 
         } catch (error) {
             setError((error as Error).message);
         } finally {
