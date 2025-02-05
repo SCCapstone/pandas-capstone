@@ -564,15 +564,27 @@ app.get('/api/profiles/:userId', async (req, res) => {
 
     const studyGroupsToSwipeOn = await prisma.studyGroup.findMany({
       where: {
-        // Add any conditions to exclude study groups the user has already swiped on
+        NOT: {
+          users: {
+            some: {
+              id: userId, // Exclude study groups where the user is already a member
+            },
+          },
+        },
       },
       select: {
         id: true,
         name: true,
         subject: true,
         description: true,
+        created_by: true,
+        created_at: true,
         creator: true,
         users: true,
+        matches: true,
+        swipesGiven: true,
+        chatID: true,
+        chat: true,
       },
     });
 
@@ -585,7 +597,6 @@ app.get('/api/profiles/:userId', async (req, res) => {
     res.status(500).json({ error: 'Something went wrong' });
   }
 });
-
 
 // Tried putting this in snother file and no dice :(
 export const deleteUserById = async (userId: number) => {
@@ -645,7 +656,7 @@ app.delete('/api/users/:id', authenticate, async (req, res): Promise<any> => {
 /********* STUDY GROUPS */
 app.post('/api/study-groups', authenticate, async (req, res): Promise<any> => {
   const userId = res.locals.userId;
-  const { name, subject, description, users } = req.body;
+  const { name, subject, description, users, chatID } = req.body;
   console.log('Received request:', req.body);
 
 
@@ -653,6 +664,18 @@ app.post('/api/study-groups', authenticate, async (req, res): Promise<any> => {
     // Validate the input data (optional but recommended)
     if (!name) {
       return res.status(400).json({ error: 'Name is required' });
+    }
+
+    const existingStudyGroup = await prisma.studyGroup.findFirst({
+      where: {
+        users: {
+          every: { id: { in: users } }, // Check if all users in the provided list are in the study group
+        },
+      },
+    });
+
+    if (existingStudyGroup) {
+      return res.json({ message: 'Study group already exists for these users.', studyGroupId: existingStudyGroup.id });
     }
 
     console.log('Creating study group with:', { name, subject, description, users });
@@ -666,6 +689,7 @@ app.post('/api/study-groups', authenticate, async (req, res): Promise<any> => {
         description,
         users: { connect: users.map((id: number) => ({ id })) },
         creator: { connect: { id: userId } },
+        chatID: chatID,
       },
     });
 
@@ -676,6 +700,65 @@ app.post('/api/study-groups', authenticate, async (req, res): Promise<any> => {
     return res.status(500).json({ error: 'Internal server error' });
   }
 });
+
+app.get("/api/study-groups/chat/:chatId", async (req, res): Promise<any> => {
+  const { chatId } = req.params;
+  console.log('Fetching study group for chat:', chatId);
+
+  try {
+    // Find the study group that is linked to the provided chat ID
+    const studyGroup = await prisma.studyGroup.findFirst({
+      where: { chatID: parseInt(chatId) }, // Use chatId to find the corresponding study group
+    });
+
+    // If a study group is found, return its ID; otherwise, return null
+    if (studyGroup) {
+      console.log('Study group found:', studyGroup);
+      return res.json({ 
+        studyGroupID: studyGroup.id,
+        name: studyGroup.name,
+        subject: studyGroup.subject,
+        description: studyGroup.description,
+      });
+    } else {
+      return res.json({ studyGroupID: null }); // No study group found
+    }
+  } catch (error) {
+    console.error("Error fetching study group:", error);
+    return res.status(500).json({ error: "Server error" });
+  }
+});
+
+
+app.put('/api/study-groups/chat/:chatID', async (req, res) : Promise<any> =>  {
+  const { chatID } = req.params; // Extract chatID from the URL
+  const { name, description, subject } = req.body; // Extract new study group data from the request body
+
+  // Validate the input
+  if (!name || !subject) {
+    return res.status(400).json({ error: 'Name, and subject are required.' });
+  }
+
+  try {
+    // Update the study group in the database using Prisma
+    const updatedStudyGroup = await prisma.studyGroup.update({
+      where: { chatID: parseInt(chatID) }, // Match the study group by its chatID
+      data: {
+        name,
+        description,
+        subject,
+      },
+    });
+
+    // Return the updated study group
+    res.json(updatedStudyGroup);
+  } catch (error) {
+    console.error('Error updating study group:', error);
+    res.status(500).json({ error: 'Failed to update the study group' });
+  }
+});
+
+
 
 // SEARCH FEATURE
 app.get('/api/users/search', authenticate, async (req, res): Promise<any> => {

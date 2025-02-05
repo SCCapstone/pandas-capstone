@@ -10,7 +10,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url      = "postgresql://postgres:KzutHhFD5pYppDa6@uniformly-animating-catbird.data-1.use1.tembo.io:5432/postgres"
 }
 
 enum StudyTags {
@@ -103,7 +103,7 @@ model StudyGroup {
   swipesGiven  Swipe[]  @relation("StudyGroupSwipes")
 
   // Connection to Chat
-  chatID       Int?     // Link to a Chat table if each StudyGroup has its own chat
+  chatID       Int?     @unique // Link to a Chat table if each StudyGroup has its own chat
   chat         Chat?    @relation("StudyGroupChat") // Optional, if you want a relation with the Chat model
 }
 

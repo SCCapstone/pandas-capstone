@@ -1,68 +1,115 @@
-import React, { useState, useEffect } from 'react';
-import Navbar from '../components/Navbar';
-import './accountDetails.css';
-import CopyrightFooter from '../components/CopyrightFooter';
+import './EditStudyGroup.css';
+import '../pages/messaging.css';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import { on } from 'events';
 
-const AccountDetails: React.FC = () => {
-const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
+interface StudyGroup {
+  name: string;
+  description: string;
+  subject: string;
+  chatID: number;
+}
+
+const EditStudyGroup = ({ chatID, onClose }: { chatID: number; onClose: () => void }) => {
+  const [studyGroup, setStudyGroup] = useState<StudyGroup | null>(null);
+  const [name, setName] = useState('');
+  const [description, setDescription] = useState('');
+  const [subject, setSubject] = useState('');
+  const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
 
 
-  // State to store user profile data
-  const [formData, setFormData] = useState({
-    first_name: '',
-    last_name: '',
-    email: '',
-    username: ''
-  });
-
+  // Fetch the study group details when the component is mounted
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchStudyGroup = async () => {
       try {
-        // Fetch the current user profile data
         const token = localStorage.getItem('token');
-        console.log('Token:', token);
-        if (token) {
-          const userResponse = await fetch(`${REACT_APP_API_URL}/api/users/profile`, {
-            headers: {
-              'Authorization': `Bearer ${token}`,
-            },
-          });
-
-          const userData = await userResponse.json();
-          console.log('User data:', userData);
-
-          setFormData({
-            first_name: userData.first_name || '',
-            last_name: userData.last_name || '',
-            email: userData.email || '',
-            username: userData.username || ''
-          });
-
-          
+        if (!token) {
+          alert('You need to be logged in to edit the study group.');
+          return;
         }
+
+        const response = await axios.get(
+          `${REACT_APP_API_URL}/api/study-groups/chat/${chatID}`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+
+        // Set the form fields with the existing study group values
+        const data = response.data;
+        setStudyGroup(data);
+        setName(data.name);
+        setDescription(data.description);
+        setSubject(data.subject);
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error('Error fetching study group:', error);
+        alert('Failed to load study group details.');
       }
     };
 
-    fetchData();
-  }, []);
+    fetchStudyGroup();
+  }, [chatID]);
+
+  // Handle form submission to save the changes
+  const handleSave = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        alert('You need to be logged in to save the study group.');
+        return;
+      }
+
+      const updatedStudyGroup = { name, description, subject, chatID };
+
+      const response = await axios.put(
+        `${REACT_APP_API_URL}/api/study-groups/chat/${chatID}`,
+        updatedStudyGroup,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      console.log('Study group updated:', response.data);
+      // alert('Study group updated successfully!');
+      onClose(); // Close the panel or component after saving
+    } catch (error) {
+      console.error('Error saving study group:', error);
+      alert('Failed to save study group.');
+    }
+  };
+
+  if (!studyGroup) return <div>Loading...</div>; // Show loading message while fetching the study group data
 
   return (
-    <div>
-      <Navbar />
-
-      <div className='detailHeader'>Account</div>
-      <div className="user-details">
-        <p><strong>First Name:</strong> {formData.first_name}</p>
-        <p><strong>Last Name:</strong> {formData.last_name}</p>
-        <p><strong>Username:</strong> {formData.username}</p>
-        <p><strong>Email:</strong> {formData.email || 'No email available'}</p>
-      </div>
-
-      <CopyrightFooter />
+    <div className="edit-study-group-panel">
+      <h1>Edit Study Group</h1>
+      <form onSubmit={(e) => e.preventDefault()}>
+        <div>
+          <label>Study Group Name:</label>
+          <input
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+        </div>
+        <div>
+          <label>Bio:</label>
+          <input
+            type="text"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+          />
+        </div>
+        <div>
+          <label>Relevant Course:</label>
+          <input
+            type="text"
+            value={subject}
+            onChange={(e) => setSubject(e.target.value)}
+          />
+        </div>
+        <button type="button" onClick={handleSave}>Save</button>
+        <button type="button" onClick={onClose}>Cancel</button>
+      </form>
     </div>
   );
 };
 
-export default AccountDetails;
+export default EditStudyGroup;

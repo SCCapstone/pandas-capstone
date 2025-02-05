@@ -6,6 +6,7 @@ import CopyrightFooter from '../components/CopyrightFooter';
 import './LandingPage.css';
 import axios from 'axios';
 import { useSearchParams } from 'react-router-dom';
+import EditStudyGroup from '../components/EditStudyGroup';
 
 interface Chat {
   id: number;
@@ -58,7 +59,7 @@ const Messaging: React.FC = () => {
   const [newMessage, setNewMessage] = useState("");
   const chatWindowRef = React.useRef<HTMLDivElement | null>(null);
   const [hasStudyGroup, setHasStudyGroup] = useState(false);
-
+  const [isPanelVisible, setIsPanelVisible] = useState(false);  // To control panel visibility
   const [selectedUser, setSelectedUser] = useState<User | null>(null); // Track selected user
   const [searchParams] = useSearchParams();
   const selectedUserId = searchParams.get('user'); // Get the matched user ID
@@ -66,6 +67,7 @@ const Messaging: React.FC = () => {
   
   useEffect(() => {
     if (selectedUserId) {
+
       const matchedUser = users.find(user => user.id === Number(selectedUserId)); // Convert to number
       if (matchedUser) {
         setSelectedUser(matchedUser);
@@ -74,6 +76,12 @@ const Messaging: React.FC = () => {
       }
     }
   }, [selectedUserId, users]);
+
+  useEffect(() => {
+    if (selectedChat) {
+      checkStudyGroup();
+    }
+  }, [selectedChat]);  
 
   useEffect(() => {
     // Fetch users and chats from the API when the component mounts
@@ -360,6 +368,7 @@ const Messaging: React.FC = () => {
         subject: '',
         description: '',
         users: chat.users.map((user) => user.id),
+        chatID: chat.id,
       };
 
       console.log('Creating study group with payload:', studyGroupPayload);
@@ -371,6 +380,7 @@ const Messaging: React.FC = () => {
       );
 
       console.log('Study group created:', response.data);
+
     } catch (error) {
       console.error('Error creating study group:', error);
       if (axios.isAxiosError(error) && error.response) {
@@ -378,29 +388,27 @@ const Messaging: React.FC = () => {
       }
     }
   };
-
-  useEffect(() => {
-    if (!selectedChat) return;
+  const checkStudyGroup = async () => {
+    console.log('Checking study group for chat:', selectedChat);
+    if(!selectedChat) {
+      return setHasStudyGroup(false);
+    }
+    try {
+      const response = await fetch(`${REACT_APP_API_URL}/api/study-groups/chat/${selectedChat.id}`); // Fetching chat details by chat ID
+      const data = await response.json();
+      console.log('Study group check result:', data);
   
-    const checkStudyGroup = async () => {
-      try {
-        const response = await fetch(`/api/study-groups/${selectedChat.id}`);
-        const data = await response.json();
-  
-        if (response.ok && data.exists) {
-          setHasStudyGroup(true);
-        } else {
-          setHasStudyGroup(false);
-        }
-      } catch (error) {
-        console.error("Error checking study group:", error);
-        setHasStudyGroup(false); // Assume no study group on error
+      // Check if studyGroupID is returned (i.e., chat is linked to a study group)
+      if (response.ok && data.studyGroupID) {
+        setHasStudyGroup(true); // There is a study group linked
+      } else {
+        setHasStudyGroup(false); // No study group linked to this chat
       }
-    };
-  
-    checkStudyGroup();
-  }, [selectedChat]); // Runs when selectedChat changes  
-  
+    } catch (error) {
+      console.error("Error checking study group:", error);
+      setHasStudyGroup(false); // Assume no study group if there's an error
+    }
+  };
 
   const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Enter') {
@@ -520,14 +528,34 @@ const Messaging: React.FC = () => {
             <>
               <div className='ChatHeader'>
                 <h2 className="ChatTitle">{getChatName(selectedChat)}</h2>
-                <button
-                  className="CreateStudyGroupButton"
-                  onClick={() => handleCreateStudyGroup(selectedChat.id)}
-                >
-                  {hasStudyGroup ? "Edit Study Group" : "Create Study Group"}
-                </button>
+                {hasStudyGroup ?
+                  <button
+                    className="EditStudyGroupButton"
+                    onClick={() => {
+                      ;
+                      setIsPanelVisible(true);
+                    }}
+                  > Edit Study Group </button>
+                  :
+                  <button
+                    className="CreateStudyGroupButton"
+                    onClick={() => {
+                      handleCreateStudyGroup(selectedChat.id);
+                      setHasStudyGroup(true);
+                      setIsPanelVisible(true);
+                    }}
+                  > Create Study Group </button>}
 
               </div>
+              {isPanelVisible && (
+                <div className="study-group-panel">
+                  <EditStudyGroup
+                    // Pass necessary props to the EditStudyGroup component
+                    chatID={selectedChat.id}
+                    onClose={() => setIsPanelVisible(false)} // Close panel when done
+                  />
+                </div>
+              )}
               <div className="ChatWindow">
                 {selectedChat && Array.isArray(selectedChat.messages) ? (
                   selectedChat.messages.length > 0 ? (
