@@ -1,6 +1,6 @@
 :root {
   font-family: Inter, sans-serif;
-  font-feature-settings: 'liga' 1, 'calt' 1;
+  font-feature-settings: 'liga' 1, 'calt' 1; /* Fix for Chrome */
 }
 @supports (font-variation-settings: normal) {
   :root { font-family: InterVariable, sans-serif; }
@@ -124,41 +124,25 @@ p {
   margin: 0 auto; /* Centers the image inside the div */
 }
 
-/* Minimal adjustments for mobile-friendly design */
+/* Responsive behavior: Ensure layout is mobile-friendly */
 @media (max-width: 768px) {
   .welcome {
-    gap: 30px; /* Slight reduction */
+      gap: 5px;
   }
 
-  .well {
-    font-size: 40px; /* Slightly smaller for better fit */
+  .well, p, .getStarted, button {
+      font-size: 50px;
   }
 
-  p {
-    font-size: 18px;
-  }
-
-  .getStarted {
-    width: 60%; /* Adjust button width */
+  .Logo {
+      width: 80%;
   }
 
   .menuButtonGroup {
-    gap: 15px; /* Maintain better spacing */
+      gap: 10px; /* Reduce gap on smaller screens */
   }
 
   .menuButtons {
-    width: 45%; /* Ensure buttons fit side-by-side on small screens */
-    max-width: 160px;
-    padding: 15px;
+      width: 120px; /* Smaller button size for mobile */
   }
 }
-
-@media (max-width: 480px) {
-  .menuButtons {
-    width: 100%;
-  }
-  .well {
-    margin-top: 30px; /* Bring down the title */
-  }
-}
-
