@@ -583,6 +583,8 @@ app.get('/api/profiles/:userId', async (req, res) => {
         users: true,
         matches: true,
         swipesGiven: true,
+        chatID: true,
+        chat: true,
       },
     });
 
@@ -687,7 +689,7 @@ app.post('/api/study-groups', authenticate, async (req, res): Promise<any> => {
         description,
         users: { connect: users.map((id: number) => ({ id })) },
         creator: { connect: { id: userId } },
-        id: chatID,
+        chatID: chatID,
       },
     });
 
@@ -706,7 +708,7 @@ app.get("/api/study-groups/chat/:chatId", async (req, res): Promise<any> => {
   try {
     // Find the study group that is linked to the provided chat ID
     const studyGroup = await prisma.studyGroup.findFirst({
-      where: { id: parseInt(chatId) }, // Use chatId to find the corresponding study group
+      where: { chatID: parseInt(chatId) }, // Use chatId to find the corresponding study group
     });
 
     // If a study group is found, return its ID; otherwise, return null
@@ -740,7 +742,7 @@ app.put('/api/study-groups/chat/:chatID', async (req, res) : Promise<any> =>  {
   try {
     // Update the study group in the database using Prisma
     const updatedStudyGroup = await prisma.studyGroup.update({
-      where: { id: parseInt(chatID) }, // Match the study group by its chatID
+      where: { chatID: parseInt(chatID) }, // Match the study group by its chatID
       data: {
         name,
         description,
@@ -916,7 +918,7 @@ app.delete('/api/chats/:chatId', async (req, res):Promise<any> => {
 
     // delete study group too
     await prisma.studyGroup.delete({
-      where: { id: parseInt(chatId) },
+      where: { chatID: parseInt(chatId) },
     });
 
     res.status(200).json({ message: 'Chat deleted successfully' });
