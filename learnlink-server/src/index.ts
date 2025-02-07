@@ -735,8 +735,8 @@ app.put('/api/study-groups/chat/:chatID', async (req, res) : Promise<any> =>  {
   const { name, description, subject } = req.body; // Extract new study group data from the request body
 
   // Validate the input
-  if (!name || !subject) {
-    return res.status(400).json({ error: 'Name, and subject are required.' });
+  if (!name) {
+    return res.status(400).json({ error: 'Name is required.' });
   }
 
   try {
