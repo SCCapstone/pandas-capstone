@@ -1338,40 +1338,6 @@ const sendEmail = async (to: string, subject: string, text: string, html: string
 
 
 /******API endpoint for the forgot password */
-
-app.post ('/api/forgotpassword', async (req, res):Promise<any> => {
-  const {email} = req.body;
-  if (!email) {
-    return res.status(400).json({ error: "Email is required" });
-  }
-
-  try {
-    const resetToken = jwt.sign({ email }, process.env.JWT_SECRET!, { expiresIn: '1h' });
-    const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`;
-
-    // Send the email
-    await sendEmail(
-      email,
-      "Password Reset Request",
-      `Click the link to reset your password: ${resetLink}`,
-      `<p>Click the link to reset your password:</p><a href="${resetLink}">${resetLink}</a>`
-    );
-
-    res.status(200).json({ message: "Email sent successfully" });
-  } catch (error) {
-    console.error("Error sending email:", error);
-    res.status(500).json({ error: "Internal server error" });
-  }
-});
-
-
-// resend.emails.send({
-//   from: 'onboarding@resend.dev',
-//   to: 'jonessara141@gmail.com',
-//   subject: 'Hello World',
-//   html: '<p>Congrats on sending your <strong>first email</strong>!</p>'
-// });
-
 app.post("/api/send-email", async (req, res) => {
   try {
     const { to, subject, html } = req.body; // Get data from frontend
