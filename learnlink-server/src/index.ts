@@ -1374,21 +1374,21 @@ app.post ('/api/forgotpassword', async (req, res):Promise<any> => {
 
 app.post("/api/send-email", async (req, res) => {
   try {
-    // const { to, subject, html } = req.body; // Get data from frontend
+    const { to, subject, html } = req.body; // Get data from frontend
 
-    // const response = await resend.emails.send({
-    //   from: "onboarding@resend.dev",
-    //   to,
-    //   subject,
-    //   html,
-    // });
-
-    const response = resend.emails.send({
-      from: 'onboarding@resend.dev',
-      to: 'jonessara141@gmail.com',
-      subject: 'Hello World',
-      html: '<p>Congrats on sending your <strong>first email</strong>!</p>'
+    const response = await resend.emails.send({
+      from: "onboarding@resend.dev",
+      to,
+      subject,
+      html,
     });
+
+    // const response = resend.emails.send({
+    //   from: 'onboarding@resend.dev',
+    //   to: 'jonessara141@gmail.com',
+    //   subject: 'Hello World',
+    //   html: '<p>Congrats on sending your <strong>first email</strong>!</p>'
+    // });
 
     res.json({ success: true, response });
   } catch (error) {
