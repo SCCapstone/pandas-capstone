@@ -14,6 +14,7 @@ import { profile } from "console";
 import fs from 'fs';
 import https from 'https';
 import dotenv from 'dotenv';
+import { Resend } from 'resend';
 
 
 interface CustomJwtPayload extends JwtPayload {
@@ -30,6 +31,7 @@ const HTTPS_CERT_PATH = process.env.HTTPS_CERT_PATH || './certs/fullchain.pem'; 
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000'; // Local React app URL
 const SERVER_PORT = process.env.SERVER_PORT ? parseInt(process.env.SERVER_PORT, 10) : (NODE_ENV === 'production' ? 2020 : 2002);
 const JWT_SECRET = env.JWT_SECRET || 'your_default_jwt_secret';
+const resend = new Resend(process.env.RESEND);
 
 // Read certificates conditionally based on the environment
 const privateKey = NODE_ENV === 'production'
@@ -1359,6 +1361,38 @@ app.post ('/api/forgotpassword', async (req, res):Promise<any> => {
   } catch (error) {
     console.error("Error sending email:", error);
     res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+
+// resend.emails.send({
+//   from: 'onboarding@resend.dev',
+//   to: 'jonessara141@gmail.com',
+//   subject: 'Hello World',
+//   html: '<p>Congrats on sending your <strong>first email</strong>!</p>'
+// });
+
+app.post("/api/send-email", async (req, res) => {
+  try {
+    // const { to, subject, html } = req.body; // Get data from frontend
+
+    // const response = await resend.emails.send({
+    //   from: "onboarding@resend.dev",
+    //   to,
+    //   subject,
+    //   html,
+    // });
+
+    const response = resend.emails.send({
+      from: 'onboarding@resend.dev',
+      to: 'jonessara141@gmail.com',
+      subject: 'Hello World',
+      html: '<p>Congrats on sending your <strong>first email</strong>!</p>'
+    });
+
+    res.json({ success: true, response });
+  } catch (error) {
+    res.status(500).json({ success: false, error });
   }
 });
 
