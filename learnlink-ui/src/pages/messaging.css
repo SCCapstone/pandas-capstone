@@ -387,14 +387,12 @@
   font-size: 16px;
   margin-top: 4px;
 }
-
+/*location of the hearts in relation to the messages*/
 .MyMessage + .Heart {
   align-self: flex-end;
 }
 
-
 .OtherMessage +.Heart{
-
   align-self: flex-start
 }
 

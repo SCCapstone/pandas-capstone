@@ -79,7 +79,7 @@ const io = new Server(server, {
 
 const corsOptions = {
   origin: FRONTEND_URL, // Your frontend URL
-  methods: ["GET", "POST", "PUT", "DELETE"], // Methods you want to allow
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH"], // Methods you want to allow
   allowedHeaders: ['Content-Type', 'Authorization'], // Headers you want to allow
 };
 
@@ -1000,6 +1000,7 @@ app.post('/api/chats/:chatId/messages', authenticate, async (req, res): Promise<
         content,
         userId, // Associate the message with the sender
         chatId: parseInt(chatId),
+        liked: false,
       },
     });
 
@@ -1010,10 +1011,65 @@ app.post('/api/chats/:chatId/messages', authenticate, async (req, res): Promise<
   }
 });
 
+// adds a like to a message 
+app.patch('/api/messages/:messageId/like', authenticate, async (req, res): Promise<any>  => {
+  const { messageId } = req.params;
+  
+  try {
+    // Fetch the current message
+    const message = await prisma.message.findUnique({
+      where: { id: parseInt(messageId) },
+    });
+
+    if (!message) {
+      return res.status(404).json({ error: 'Message not found' });
+    }
+
+    // Toggle the liked state
+    const updatedMessage = await prisma.message.update({
+      where: { id: parseInt(messageId) },
+      data: { liked: !message.liked },
+    });
+
+    res.json(updatedMessage);
+  } catch (error) {
+    console.error('Error updating message like status:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+//also for adding a like 
+app.patch('/api/messages/:id/like', authenticate, async (req, res):Promise<any>  => {
+  const { id } = req.params;
+
+  try {
+    // Find the message and toggle the 'liked' status
+    const message = await prisma.message.findUnique({
+      where: { id: parseInt(id) },
+    });
+
+    if (!message) {
+      return res.status(404).json({ error: 'Message not found' });
+    }
+
+    const updatedMessage = await prisma.message.update({
+      where: { id: parseInt(id) },
+      data: { liked: !message.liked },
+    });
+
+    res.json(updatedMessage);
+  } catch (error) {
+    console.error('Error updating like status:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
+
+
+
 
 // Create a new chat
-// WORKS
-// Technically should not be called
 app.post('/api/chats', async (req, res) => {
   const { name, userId } = req.body; // Assuming the user is the creator of the chat
 
@@ -1034,7 +1090,6 @@ app.post('/api/chats', async (req, res) => {
 });
 
 
-//WORKS
 app.post('/api/chats/:userId', authenticate, async (req: Request, res: Response): Promise<any> => {
   const { recipientUserId, chatName } = req.body;
   const userId = res.locals.userId;

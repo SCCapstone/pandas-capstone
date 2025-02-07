@@ -154,6 +154,7 @@ model Message {
   chatId       Int
   user         User        @relation(fields: [userId], references: [id]) // One-to-many relation to User
   chat         Chat        @relation(fields: [chatId], references: [id]) // One-to-many relation to Chat
+  liked        Boolean     @default(false)
 }
 
 model Notification {

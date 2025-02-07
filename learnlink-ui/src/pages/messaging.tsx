@@ -23,6 +23,7 @@ interface Message{
   createdAt: string;
   userId: number;
   chatId: number;
+  liked: boolean;
   
 }
 interface User {
@@ -55,7 +56,7 @@ const Messaging: React.FC = () => {
   const [currentUserId, setCurrentUserId] = useState<number | null>(null);
   const [customChatName, setCustomChatName] = useState<string>(''); // Track custom chat name
   const [showGroupNameInput, setShowGroupNameInput] = useState<boolean>(false);
-  const [messages, setMessages] = useState([]);
+  //const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const chatWindowRef = React.useRef<HTMLDivElement | null>(null);
   const [hasStudyGroup, setHasStudyGroup] = useState(false);
@@ -64,6 +65,7 @@ const Messaging: React.FC = () => {
   const [searchParams] = useSearchParams();
   const selectedUserId = searchParams.get('user'); // Get the matched user ID
   const [heartedMessages, setHeartedMessages] = useState<{ [key: number]: boolean }>({});
+  const [messages, setMessages] = useState(selectedChat?.messages || []);
 
   
   useEffect(() => {
@@ -94,6 +96,7 @@ const Messaging: React.FC = () => {
     // Make the API request to fetch chats for the user
   
     const token = localStorage.getItem('token');
+    console.log(token);
     axios.get(`${REACT_APP_API_URL}/api/chats`, {
       headers: { Authorization: `Bearer ${token}` },
     })
@@ -103,7 +106,20 @@ const Messaging: React.FC = () => {
           messages: chat.messages || [], // Ensure messages is always an array
           users: chat.users || [] // Ensure users is always an array
         }));
+
+
         setChats(chatsWithMessages);
+
+
+        // ✅ Ensure we store liked messages correctly
+        const likedMessagesMap = response.data.reduce((acc: Record<number, boolean>, chat: Chat) => {
+          chat.messages?.forEach((msg: Message) => {
+            acc[msg.id] = msg.liked ?? false; // Default to false if missing
+          });
+          return acc;
+        }, {});
+
+        setHeartedMessages(likedMessagesMap); // ✅ Store liked states
       })
       .catch((error) => console.error('Error fetching chats:', error));
     
@@ -187,6 +203,7 @@ const Messaging: React.FC = () => {
           createdAt: new Date().toISOString(),
           userId: currentUserId || 0, // Add a fallback for currentUserId
           chatId: selectedChat.id,
+          liked: false,
         };
   
         
@@ -459,12 +476,38 @@ const Messaging: React.FC = () => {
   };
 
   // Handle double click to like a message
-  const handleDoubleClick = (index: number) => {
-  setHeartedMessages((prev) => ({
-    ...prev,
-    [index]: !prev[index], // Toggle heart for the clicked message
-  }));
-};
+  const handleDoubleClick = async (messageId: number) => {
+
+    const token = localStorage.getItem('token');
+      if (!token) {
+        alert('Please log in again.');
+        return;
+      }
+
+    try {
+      const response = await fetch(`${REACT_APP_API_URL}/api/messages/${messageId}/like`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' , Authorization: `Bearer ${token}`},
+        body: JSON.stringify({ liked: !heartedMessages[messageId] }), // Toggle liked
+      });
+  
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('API Error:', errorData);
+        throw new Error('Failed to update like status');
+      }
+  
+      setHeartedMessages((prev) => ({
+        ...prev,
+        [messageId]: !prev[messageId], // Toggle heart UI
+      }));
+    } catch (error) {
+      console.error('Error updating like status:', error);
+    }
+  };
+  
+
+
 
   
 
@@ -623,7 +666,7 @@ const Messaging: React.FC = () => {
                           className={`MessageBubble ${
                             message.userId === currentUserId ? 'MyMessage' : 'OtherMessage'
                           }`}
-                          onDoubleClick={() => handleDoubleClick(index)}
+                          onDoubleClick={() => handleDoubleClick(message.id)}
                         >
                           {typeof message === 'string'
                             ? message
@@ -632,7 +675,7 @@ const Messaging: React.FC = () => {
                             : JSON.stringify(message)}
                         </div>
                         {/* Show heart if message was double-clicked */}
-                        {heartedMessages[index] && <div className="Heart">❤️</div>}
+                        {heartedMessages[message.id] && <div className="Heart">❤️</div>}
                       </div>
                     ))
                   ) : (
