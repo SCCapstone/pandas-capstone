@@ -92,6 +92,9 @@ const Signup: React.FC = () => {
             } else if (errorData.error === 'EmailAlreadyExists') {
                 setError('Email is already registered');
                 throw new Error('Email is already registered');
+            } else if (errorData.error === 'NotEdu') {
+                setError('Please use a .edu email');
+                throw new Error('Email is already registered');
             } else {
                 throw new Error('Failed to create user');
             }
@@ -187,10 +190,15 @@ const Signup: React.FC = () => {
                             required
                         />
                         <label>&nbsp;
-                        {error === 'Email is already registered' && (
+                        {error === 'Email is already registered'  || error === "Please use a .edu email" && (
                                 <span className="alert">* {error}</span>
                             )}
                         </label>
+                        {/* <label>&nbsp;
+                        {error === 'Please use a .edu email' && (
+                                <span className="alert">* {error}</span>
+                            )}
+                        </label> */}
 
                         <label>Password</label>
                         <input

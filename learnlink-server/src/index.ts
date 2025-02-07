@@ -120,6 +120,13 @@ app.post("/api/users", async (req, res): Promise<any> => {
       return res.status(400).json({ error: "EmailAlreadyExists" });
     }
 
+    const domainParts = email.split("@")[1]?.split(".");
+    const lastExtension = domainParts ? domainParts.pop() : "";
+
+    if (lastExtension !== "edu") {
+      return res.status(400).json({ error: "NotEdu" });
+    }
+
     // Check if username already exists
     const usernameExists = await prisma.user.findUnique({
       where: { username: username }
