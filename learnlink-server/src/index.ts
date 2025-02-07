@@ -328,6 +328,7 @@ app.put('/api/users/update', async (req, res): Promise<any> => {
     const userId = decoded.userId; // Get userId from the token payload
     console.log('userId:', userId);
 
+
     // Update the user's profile information in the database
     const updatedUser = await prisma.user.update({
       where: { id: userId },
@@ -376,11 +377,30 @@ app.post('/api/update-email', authenticate, async (req, res):Promise<any> => {
       return res.status(400).json({ error: 'Old email does not match current email' });
     }
 
+        // Check if username or email already exists
+      // Check if email already exists
+      const emailExists = await prisma.user.findUnique({
+        where: { email: newEmail }
+      });
+  
+      if (emailExists) {
+        return res.status(400).json({ error: "There is already an account attached to this email." });
+      }
+  
+      const domainParts = newEmail.split("@")[1]?.split(".");
+      const lastExtension = domainParts ? domainParts.pop() : "";
+  
+      if (lastExtension !== "edu") {
+        return res.status(400).json({ error: "Please use a valid .edu email." });
+      }
+  
+
     // Update the email
     const updatedUser = await prisma.user.update({
       where: { id: userId },
       data: { email: newEmail },
     });
+
 
     return res.status(200).json({ message: 'Email updated successfully', updatedUser });
   } catch (err) {

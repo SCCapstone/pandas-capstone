@@ -94,7 +94,7 @@ const Signup: React.FC = () => {
                 throw new Error('Email is already registered');
             } else if (errorData.error === 'NotEdu') {
                 setError('Please use a .edu email');
-                throw new Error('Email is already registered');
+                throw new Error('Non .edu email');
             } else {
                 throw new Error('Failed to create user');
             }
