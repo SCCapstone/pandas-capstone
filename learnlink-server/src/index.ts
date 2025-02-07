@@ -884,6 +884,53 @@ app.get('/api/chats', authenticate, async (req, res): Promise<any> => {
   }
 });
 
+app.get('/api/chats/:chatId', authenticate, async (req, res): Promise<any> => {
+  const userId = res.locals.userId; // Use res.locals to get the userId set by the authenticate middleware
+  const { chatId } = req.params;  // Get the chatId from the URL parameters
+
+  if (!userId) {
+    return res.status(401).json({ message: 'User not authenticated' });
+  }
+
+  if (!chatId) {
+    return res.status(400).json({ message: 'Chat ID is required' });
+  }
+
+  try {
+    // Fetch the chat by its ID and include users and messages
+    const chat = await prisma.chat.findUnique({
+      where: {
+        id: parseInt(chatId),  // Find the chat by chatId
+      },
+      include: {
+        users: true,  // Include participants (users) in the chat
+        messages: {   // Include messages for the chat
+          orderBy: {
+            createdAt: 'asc',  // Order messages by their creation date
+          },
+        },
+      },
+    });
+
+    if (!chat) {
+      return res.status(404).json({ message: 'Chat not found' });
+    }
+
+    // Ensure that the user is part of the chat before returning the data
+    const isUserInChat = chat.users.some((user) => user.id === userId);
+    if (!isUserInChat) {
+      return res.status(403).json({ message: 'You are not authorized to view this chat' });
+    }
+
+    // Return the chat information
+    res.status(200).json(chat);
+  } catch (error) {
+    console.error('Error fetching chat:', error);
+    res.status(500).json({ message: 'Internal server error', error});
+  }
+});
+
+
 
 
 
@@ -916,10 +963,16 @@ app.delete('/api/chats/:chatId', async (req, res):Promise<any> => {
       where: { id: parseInt(chatId) },
     });
 
-    // delete study group too
-    await prisma.studyGroup.delete({
+    // Delete study Group too
+    const studyGroup = await prisma.studyGroup.findUnique({
       where: { chatID: parseInt(chatId) },
     });
+
+    if (!studyGroup) {
+      await prisma.studyGroup.delete({
+      where: { chatID: parseInt(chatId) },
+    });
+    }    
 
     res.status(200).json({ message: 'Chat deleted successfully' });
   } catch (error) {
@@ -1034,7 +1087,70 @@ app.post('/api/chats/:userId', authenticate, async (req: Request, res: Response)
   }
 });
 
+app.put('/api/chats/:chatId', authenticate, async (req: Request, res: Response): Promise<any> => {
+  const { chatId } = req.params;
+  const { chatName, studyGroupId } = req.body; // Expect studyGroupId here
+  const userId = res.locals.userId;
 
+  console.log('Authenticated User ID (from middleware):', userId);
+
+  if (!userId) {
+    return res.status(401).json({ error: 'User not authenticated' });
+  }
+
+  try {
+    // Fetch existing chat
+    const existingChat = await prisma.chat.findUnique({
+      where: { id: parseInt(chatId) },
+      include: { users: true },
+    });
+
+    if (!existingChat) {
+      return res.status(404).json({ error: 'Chat not found' });
+    }
+
+    // Ensure the user is part of the chat before allowing updates
+    if (!existingChat.users.some(user => user.id === userId)) {
+      return res.status(403).json({ error: 'You are not a participant of this chat' });
+    }
+
+    let newStudyGroupId = existingChat.studyGroupId;
+
+    if (studyGroupId) {
+      const group = await prisma.studyGroup.findUnique({
+        where: { id: studyGroupId },
+      });
+
+      if (!group) {
+        return res.status(404).json({ error: 'Study group not found' });
+      }
+
+      newStudyGroupId = group.id;
+      console.log('Study group ID from server:', newStudyGroupId);
+    }
+
+    // Update chat
+    const updatedChat = await prisma.chat.update({
+      where: { id: Number(chatId) },
+      data: {
+        name: chatName || existingChat.name,
+        studyGroupId: newStudyGroupId, // Use the corrected ID
+      },
+      include: { users: true },
+    });
+
+    io.emit('chat-updated', {
+      chatName: updatedChat.name,
+      studyGroupId: updatedChat.studyGroupId,
+      users: updatedChat.users.map(user => user.id),
+    });
+
+    res.status(200).json(updatedChat);
+  } catch (error) {
+    console.error('Error updating chat:', error);
+    res.status(500).json({ error: 'Internal server error', message: error });
+  }
+});
 
 /*************** WEBSOCKETS */
 
