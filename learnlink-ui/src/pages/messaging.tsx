@@ -111,7 +111,7 @@ const Messaging: React.FC = () => {
         setChats(chatsWithMessages);
 
 
-        // ✅ Ensure we store liked messages correctly
+        // Ensure we store liked messages correctly
         const likedMessagesMap = response.data.reduce((acc: Record<number, boolean>, chat: Chat) => {
           chat.messages?.forEach((msg: Message) => {
             acc[msg.id] = msg.liked ?? false; // Default to false if missing
@@ -119,7 +119,7 @@ const Messaging: React.FC = () => {
           return acc;
         }, {});
 
-        setHeartedMessages(likedMessagesMap); // ✅ Store liked states
+        setHeartedMessages(likedMessagesMap); // Store liked states
       })
       .catch((error) => console.error('Error fetching chats:', error));
     

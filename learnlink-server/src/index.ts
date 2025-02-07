@@ -826,9 +826,6 @@ app.get('/api/currentUser', authenticate, async (req, res): Promise<any> => {
   }
 });
 
-
-
-// WORKS
 app.get('/api/users', async (req, res) => {
   try {
     // Fetch users from the database using Prisma
@@ -844,8 +841,6 @@ app.get('/api/users', async (req, res) => {
 });
 
 // Get all chats for a user
-// WORKS
-// pulls up the chats with the users authentication code
 // Pulls up the chats with the user's authentication code
 app.get('/api/chats', authenticate, async (req, res): Promise<any> => {
   const userId = res.locals.userId; // Use res.locals to get the userId set by the authenticate middleware
@@ -930,11 +925,6 @@ app.get('/api/chats/:chatId', authenticate, async (req, res): Promise<any> => {
   }
 });
 
-
-
-
-
-//WORKS
 // Delete a chat
 app.delete('/api/chats/:chatId', async (req, res):Promise<any> => {
   const { chatId } = req.params;
@@ -981,8 +971,6 @@ app.delete('/api/chats/:chatId', async (req, res):Promise<any> => {
   }
 });
 
-
-// WORKS
 // Add a message to a chat
 app.post('/api/chats/:chatId/messages', authenticate, async (req, res): Promise<any> => {
   const { chatId } = req.params;
@@ -1011,35 +999,8 @@ app.post('/api/chats/:chatId/messages', authenticate, async (req, res): Promise<
   }
 });
 
-// adds a like to a message 
-app.patch('/api/messages/:messageId/like', authenticate, async (req, res): Promise<any>  => {
-  const { messageId } = req.params;
-  
-  try {
-    // Fetch the current message
-    const message = await prisma.message.findUnique({
-      where: { id: parseInt(messageId) },
-    });
-
-    if (!message) {
-      return res.status(404).json({ error: 'Message not found' });
-    }
-
-    // Toggle the liked state
-    const updatedMessage = await prisma.message.update({
-      where: { id: parseInt(messageId) },
-      data: { liked: !message.liked },
-    });
-
-    res.json(updatedMessage);
-  } catch (error) {
-    console.error('Error updating message like status:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
-
-//also for adding a like 
-app.patch('/api/messages/:id/like', authenticate, async (req, res):Promise<any>  => {
+// for adding a like to a message
+app.patch('/api/messages/:messageid/like', authenticate, async (req, res):Promise<any>  => {
   const { id } = req.params;
 
   try {
