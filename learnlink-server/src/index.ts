@@ -968,10 +968,10 @@ app.delete('/api/chats/:chatId', async (req, res):Promise<any> => {
       where: { chatID: parseInt(chatId) },
     });
 
-    if (!studyGroup) {
+    if (studyGroup) {
       await prisma.studyGroup.delete({
-      where: { chatID: parseInt(chatId) },
-    });
+        where: { chatID: parseInt(chatId) },
+      });
     }    
 
     res.status(200).json({ message: 'Chat deleted successfully' });

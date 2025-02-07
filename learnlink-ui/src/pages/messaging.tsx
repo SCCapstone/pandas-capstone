@@ -405,7 +405,7 @@ const Messaging: React.FC = () => {
 
       let newStudyGroupID = response.data.studyGroup.id
 
-      console.log('Study group created: PROBLEMMM', newStudyGroupID);
+      console.log('new study group ID', newStudyGroupID);
 
       const updateChatPayload = {
         chatName: '',
