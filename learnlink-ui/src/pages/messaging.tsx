@@ -100,6 +100,7 @@ const Messaging: React.FC = () => {
         const chatsWithMessages = response.data.map((chat: Chat) => ({
           ...chat,
           messages: chat.messages || [], // Ensure messages is always an array
+          users: chat.users || [] // Ensure users is always an array
         }));
         setChats(chatsWithMessages);
       })
@@ -114,7 +115,7 @@ const Messaging: React.FC = () => {
         .catch((error) => console.error('Error fetching current user:', error));
     }
     
-  }, []);
+  }, [isPanelVisible]);
 
   
   
@@ -264,10 +265,14 @@ const Messaging: React.FC = () => {
         payload,
         { headers: { Authorization: `Bearer ${token}` } }
       );
+
+      console.log('New chat created:', response.data);
   
       const newChat: Chat = {
         ...response.data,
         name: `${chatName} with ${user.firstName} ${user.lastName}`, // Format the name
+        // ensure that users is SET
+        // users: [user], // Add the selected user to the chat
       };
       setChats((prevChats) => [...prevChats, newChat]);
       setSelectedChat(newChat);
@@ -357,18 +362,37 @@ const Messaging: React.FC = () => {
         return;
       }
 
-      const chat = chats.find((chat) => chat.id === chatId);
-      if (!chat) {
-        alert('Chat not found.');
+      // const updatedChatsResponse= axios.get(`${REACT_APP_API_URL}/api/chats`, {
+      //   headers: { Authorization: `Bearer ${token}` },
+      // });
+      // const updatedChats = (await updatedChatsResponse).data;
+  
+      // const chat = chats.find((chat: any) => chat.id === chatId);
+      // if (!chat) {
+      //   alert('Chat not found.');
+      //   return;
+      // }
+
+      if (!selectedChat) {
+        alert('No chat selected.');
         return;
       }
 
+      console.log("Chat object:", selectedChat);
+
+      const chatResponse = await axios.get(`${REACT_APP_API_URL}/api/chats/${chatId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      console.log("mew Chat object:", chatResponse.data);
+
+
       const studyGroupPayload = {
-        name: chat.name,
+        name: chatResponse.data.name,
         subject: '',
         description: '',
-        users: chat.users.map((user) => user.id),
-        chatID: chat.id,
+        users: chatResponse.data.users.map((user: User) => user.id),
+        chatID: selectedChat.id,
       };
 
       console.log('Creating study group with payload:', studyGroupPayload);
@@ -379,7 +403,27 @@ const Messaging: React.FC = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      console.log('Study group created:', response.data);
+      let newStudyGroupID = response.data.studyGroup.id
+
+      console.log('Study group created: PROBLEMMM', newStudyGroupID);
+
+      const updateChatPayload = {
+        chatName: '',
+        studyGroupId: newStudyGroupID, // Pass only the study group ID
+      };
+  
+      const chatUpdateResponse = await axios.put(
+        `${REACT_APP_API_URL}/api/chats/${chatId}`,
+        updateChatPayload,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+  
+      console.log( 'fetching details for chat:', chatId);
+      console.log('Chat updated with study group ID:', chatUpdateResponse.data);
+
+      if (!error) {
+        setHasStudyGroup(true);
+      }
 
     } catch (error) {
       console.error('Error creating study group:', error);
@@ -388,6 +432,8 @@ const Messaging: React.FC = () => {
       }
     }
   };
+
+
   const checkStudyGroup = async () => {
     console.log('Checking study group for chat:', selectedChat);
     if(!selectedChat) {
@@ -401,6 +447,7 @@ const Messaging: React.FC = () => {
       // Check if studyGroupID is returned (i.e., chat is linked to a study group)
       if (response.ok && data.studyGroupID) {
         setHasStudyGroup(true); // There is a study group linked
+        console.log('setStudyGroupCheck:', hasStudyGroup);
       } else {
         setHasStudyGroup(false); // No study group linked to this chat
       }
@@ -541,7 +588,6 @@ const Messaging: React.FC = () => {
                     className="CreateStudyGroupButton"
                     onClick={() => {
                       handleCreateStudyGroup(selectedChat.id);
-                      setHasStudyGroup(true);
                       setIsPanelVisible(true);
                     }}
                   > Create Study Group </button>}
