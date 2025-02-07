@@ -63,7 +63,8 @@ const Messaging: React.FC = () => {
   const [selectedUser, setSelectedUser] = useState<User | null>(null); // Track selected user
   const [searchParams] = useSearchParams();
   const selectedUserId = searchParams.get('user'); // Get the matched user ID
-  
+  const [heartedMessages, setHeartedMessages] = useState<{ [key: number]: boolean }>({});
+
   
   useEffect(() => {
     if (selectedUserId) {
@@ -457,6 +458,17 @@ const Messaging: React.FC = () => {
     }
   };
 
+  // Handle double click to like a message
+  const handleDoubleClick = (index: number) => {
+  setHeartedMessages((prev) => ({
+    ...prev,
+    [index]: !prev[index], // Toggle heart for the clicked message
+  }));
+};
+
+  
+
+
   const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Enter') {
       handleSendMessage();
@@ -606,17 +618,21 @@ const Messaging: React.FC = () => {
                 {selectedChat && Array.isArray(selectedChat.messages) ? (
                   selectedChat.messages.length > 0 ? (
                     selectedChat.messages.map((message, index) => (
-                      <div
-                        key={index}
-                        className={`MessageBubble ${
-                          message.userId === currentUserId ? 'MyMessage' : 'OtherMessage'
-                        }`}
-                      >
-                         {typeof message === 'string'
-                          ? message
-                          : typeof message.content === 'string'
-                          ? message.content
-                          : JSON.stringify(message)}
+                      <div key={index} className="MessageContainer">
+                        <div
+                          className={`MessageBubble ${
+                            message.userId === currentUserId ? 'MyMessage' : 'OtherMessage'
+                          }`}
+                          onDoubleClick={() => handleDoubleClick(index)}
+                        >
+                          {typeof message === 'string'
+                            ? message
+                            : typeof message.content === 'string'
+                            ? message.content
+                            : JSON.stringify(message)}
+                        </div>
+                        {/* Show heart if message was double-clicked */}
+                        {heartedMessages[index] && <div className="Heart">❤️</div>}
                       </div>
                     ))
                   ) : (
