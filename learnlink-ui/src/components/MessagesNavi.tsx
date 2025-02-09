@@ -3,36 +3,31 @@ import '../pages/messaging.css';
 import React, { useState } from 'react';
 import axios from 'axios';
 
-  interface JoinRequestProps {
+  interface MessagesNaviProps {
     id: number;
     name: String;
-    onClose: () => void;
    }
   
-  const JoinRequests: React.FC<JoinRequestProps> = ({ id, name, onClose }) => {
+  const MessagesNavi: React.FC<MessagesNaviProps> = ({ id, name }) => {
     
     const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
   
   
     // Fetch the study group details when the component is mounted
-    const handleApproval = async () => {
+    const handleGoingToRequests = async () => {
 
 
     }
     
     // Fetch the study group details when the component is mounted
-    const handledDenial = async () => {
+    const handleOpeningChat = async () => {
 
 
-    }
-
-    const handleGoingToMessages = async () => {
-        
     }
     
     return (
-      <div className="requests-panel">
-        <h1>Requests</h1>
+      <div className="messages-panel">
+        <h1>Messages</h1>
         <form onSubmit={(e) => e.preventDefault()}>
           
         </form>
@@ -40,4 +35,4 @@ import axios from 'axios';
     );
   };
   
-  export default JoinRequests;
+  export default MessagesNavi;
