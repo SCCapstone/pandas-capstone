@@ -1372,6 +1372,3 @@ if (require.main === module) {
     console.log(`${NODE_ENV === 'production' ? 'HTTPS' : 'HTTP'} Server running on ${HOST}:${SERVER_PORT}`);
   });
 }
-
-
-
