@@ -3,12 +3,15 @@ import { useParams, useNavigate } from 'react-router-dom';
 import './SwipeProfiles.css';
 import { formatEnum } from '../utils/format';
 import { ReactComponent as GroupLogo } from './GroupLogo.svg'
+import InviteMessagePanel from '../components/InviteMessagePanel';
+import { set } from 'react-hook-form';
 
 
 const SwipeProfiles = ({ userId }: { userId: number }) => {
   const [profiles, setProfiles] = useState<any>({ users: [], studyGroups: [] });
   const [currentProfileIndex, setCurrentProfileIndex] = useState(0);
   const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
+  const [showInvitePanel, setShowInvitePanel] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -34,6 +37,12 @@ const SwipeProfiles = ({ userId }: { userId: number }) => {
 
   const handleMessaging = () => {
     navigate(`/messaging?user=${currentProfile.id}`);
+    
+  };
+
+  const handleInvite = () => {
+    // navigate(`/messaging?user=${currentProfile.id}`);
+    setShowInvitePanel(true);
     
   };
 
@@ -213,7 +222,7 @@ const SwipeProfiles = ({ userId }: { userId: number }) => {
             </button>
 
             <div className="swipe-action-buttons">
-              <button onClick={() => { handleSwipe("Yes", currentProfile.id, !!currentProfile.studyGroupId); handleMessaging(); }}>
+              <button onClick={() => { handleSwipe("Yes", currentProfile.id, !!currentProfile.studyGroupId); handleInvite() }}>
                 Match
               </button>
 
@@ -228,6 +237,12 @@ const SwipeProfiles = ({ userId }: { userId: number }) => {
           <p>No more profiles to swipe on!</p>
         </div>
       )}
+      {showInvitePanel && (
+        <InviteMessagePanel
+          onClose={() => setShowInvitePanel(false)}
+          profile={currentProfile}
+        />
+)}
     </div>
   );
 };
