@@ -240,7 +240,8 @@ const SwipeProfiles = ({ userId }: { userId: number }) => {
       {showInvitePanel && (
         <InviteMessagePanel
           onClose={() => setShowInvitePanel(false)}
-          profile={currentProfile}
+          currentUserId={userId}
+          targetUserId={currentProfile.id}
         />
 )}
     </div>
