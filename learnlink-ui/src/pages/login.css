@@ -94,7 +94,7 @@ input {
   font-weight: 500;
 }
 
-.Logo2 {
+.Logo {
   width: 200px;
   position: absolute;
   padding-top: 10px;
@@ -102,7 +102,7 @@ input {
   padding-bottom: 0;
 }
 
-.Logo2 svg {
+.Logo svg {
   width: 200px; /* Ensures SVG scales with the container */
   height: auto;
 }

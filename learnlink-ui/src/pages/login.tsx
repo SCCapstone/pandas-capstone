@@ -61,7 +61,7 @@ const Login: React.FC = () => {
 
     return (
         <div>
-            <div className="Logo2">
+            <div className="Logo">
                 <Logo />
             </div>
             <div className="login">
