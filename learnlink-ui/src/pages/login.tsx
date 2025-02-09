@@ -61,16 +61,17 @@ const Login: React.FC = () => {
 
     return (
         <div>
-            <div className="Logo">
+            <div className="Logo2">
                 <Logo />
             </div>
             <div className="login">
                 <div className="container">
-                    <h1 className="l1">Login</h1>
-                    <h2 className="t2">Enter your credentials to login.</h2>
+                    <h1 className="login_title">Login</h1>
+                    <h2 className="enter_title">Enter your credentials to login.</h2>
                     <form onSubmit={handleLogin}>
                         <label>Username</label>
                         <input 
+                            id="username"
                             type="text"
                             placeholder="JohnDoe123"
                             value={username}
@@ -79,6 +80,7 @@ const Login: React.FC = () => {
                         />
                         <label>Password</label>
                         <input
+                            id="password"
                             type="password"
                             placeholder="Enter your password"
                             value={password}
@@ -87,11 +89,11 @@ const Login: React.FC = () => {
                         />
                         {error && <p className="error">{error}</p>}
 
-                        <div className="fpp" onClick={() => navigate('/forgotpassword')}>
+                        <div className="forgot" onClick={() => navigate('/forgotpassword')}>
                             Forgot password?
                         </div>
 
-                        <button className="lButton" type="submit" disabled={loading}>
+                        <button type="submit" disabled={loading}>
                             {loading ? "Logging in..." : "Login"}
                         </button>
 
@@ -99,11 +101,9 @@ const Login: React.FC = () => {
                             <label>Or</label>
                         </div>
 
-                        <button 
-                            className="lButton" 
+                        <button
                             type="button" // Prevent form submission
-                            onClick={() => navigate('/signup')}
-                        >
+                            onClick={() => navigate('/signup')} >
                             Sign Up
                         </button> 
                     </form>
