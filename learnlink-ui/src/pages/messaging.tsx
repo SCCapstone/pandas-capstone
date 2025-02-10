@@ -7,6 +7,8 @@ import './LandingPage.css';
 import axios from 'axios';
 import { useSearchParams } from 'react-router-dom';
 import EditStudyGroup from '../components/EditStudyGroup';
+import MessagesNavi from "../components/MessagesNavi";
+
 
 interface Chat {
   id: number;
@@ -67,6 +69,11 @@ const Messaging: React.FC = () => {
   const [heartedMessages, setHeartedMessages] = useState<{ [key: number]: boolean }>({});
   const [messages, setMessages] = useState(selectedChat?.messages || []);
 
+  //for matching stuff
+  const [showMessagesPanel, setShowMessagesPanel] = useState(false);
+  const [showRequestsPanel, setShowRequestsPanel] = useState(false);
+  const [activeTab, setActiveTab] = useState<'messages' | 'requests'>('messages');
+  
   
   useEffect(() => {
     if (selectedUserId) {
@@ -193,6 +200,18 @@ const Messaging: React.FC = () => {
   }, [selectedChat]); // Runs when messages update
   
   
+  const handleMessagesSwitch = () => {
+    // navigate(`/messaging?user=${currentProfile.id}`);
+    setShowMessagesPanel(true);
+    
+  };
+
+  const handleRequestsSwitch = () => {
+    // navigate(`/messaging?user=${currentProfile.id}`);
+    setShowRequestsPanel(true);
+    
+  };
+
   const handleSendMessage = async () => {
     const token = localStorage.getItem('token');
     if (currentMessage.trim() && selectedChat) {
@@ -241,18 +260,7 @@ const Messaging: React.FC = () => {
 
   const createNewChat = async (user: User, chatName: string) => {
     try {
-      // Ensure user and chatName are properly passed to the function
-      if (!user || !chatName.trim()) {
-        alert('Please provide both a user and a chat name!');
-        return;
-      }
-  
-      // Check if chats is defined and has users
-      if (!chats) {
-        alert('No chats available to check.');
-        return;
-      }
-  
+    
       // Check if a chat already exists with this user
       const existingChat = chats.find(chat => 
         chat.users?.some(u => u.id === user.id) // Safe check for undefined `users`
@@ -526,6 +534,9 @@ const Messaging: React.FC = () => {
     <div className="Messaging">
       <Navbar />
       <div className="Chat">
+
+        {/** greyed out because its old but i dont want to delete yet */}
+        {/** 
         <div className="ChatOptions">
           <button
             onClick={() => setShowDropdown(!showDropdown)}
@@ -559,8 +570,8 @@ const Messaging: React.FC = () => {
               </ul>
             </div>
           )}
-
-          {/* Show the group name input */}
+          
+          
           {showGroupNameInput && selectedUser && (
             <div className="ChatNameInput">
               <p>Creating group with: {selectedUser.firstName} {selectedUser.lastName}</p>
@@ -597,7 +608,7 @@ const Messaging: React.FC = () => {
               </div>
             </div>
           )}
-
+          
           <ul className="ChatList">
           <li className="ChatListHeader">
             Groups
@@ -625,6 +636,19 @@ const Messaging: React.FC = () => {
               ))}
           </ul>
         </div>
+        */}       
+        
+        {/* Tabs for Messages and Requests */}
+        <div className="TabsContainer">
+          <button className={`Tab ${activeTab === 'messages' ? 'active' : ''}`} onClick={() => setActiveTab('messages')}>
+            Messages
+          </button>
+          <button className={`Tab ${activeTab === 'requests' ? 'active' : ''}`} onClick={() => setActiveTab('requests')}>
+            Requests
+          </button>
+        </div>
+
+
         <div className="ChatSection">
           {selectedChat ? (
             <>
