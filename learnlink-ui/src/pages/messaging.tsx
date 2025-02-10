@@ -201,15 +201,13 @@ const Messaging: React.FC = () => {
   
   
   const handleMessagesSwitch = () => {
-    // navigate(`/messaging?user=${currentProfile.id}`);
+    setActiveTab('messages');
     setShowMessagesPanel(true);
-    
   };
-
+  
   const handleRequestsSwitch = () => {
-    // navigate(`/messaging?user=${currentProfile.id}`);
-    setShowRequestsPanel(true);
-    
+    setActiveTab('requests');
+    setShowMessagesPanel(false);
   };
 
   const handleSendMessage = async () => {
@@ -639,13 +637,33 @@ const Messaging: React.FC = () => {
         */}       
         
         {/* Tabs for Messages and Requests */}
-        <div className="TabsContainer">
-          <button className={`Tab ${activeTab === 'messages' ? 'active' : ''}`} onClick={() => setActiveTab('messages')}>
-            Messages
-          </button>
-          <button className={`Tab ${activeTab === 'requests' ? 'active' : ''}`} onClick={() => setActiveTab('requests')}>
-            Requests
-          </button>
+        {/* Tabs for Messages and Requests */}
+        <div className="MessagesSidebar">
+          <div className="TabsContainer">
+            <button 
+              className={`Tab ${activeTab === 'messages' ? 'active' : ''}`} 
+              onClick={handleMessagesSwitch}
+            >
+              Messages
+            </button>
+
+            <button 
+              className={`Tab ${activeTab === 'requests' ? 'active' : ''}`}
+              onClick={handleRequestsSwitch}
+            >
+              Requests
+            </button>
+          </div>
+
+          {/* Conditionally show the messages panel */}
+          {showMessagesPanel && (
+            <MessagesNavi 
+              chats={chats} 
+              selectedChat={selectedChat} 
+              setSelectedChat={setSelectedChat} 
+              handleDeleteChat={handleDeleteChat} 
+            />
+          )}
         </div>
 
 
