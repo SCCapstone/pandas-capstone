@@ -237,13 +237,13 @@ const SwipeProfiles = ({ userId }: { userId: number }) => {
           <p>No more profiles to swipe on!</p>
         </div>
       )}
-      {showInvitePanel && (
+      {/* {showInvitePanel && (
         <InviteMessagePanel
           onClose={() => setShowInvitePanel(false)}
           currentUserId={userId}
           targetUserId={currentProfile.id}
         />
-      )}
+      )} */}
     </div>
   );
 };
