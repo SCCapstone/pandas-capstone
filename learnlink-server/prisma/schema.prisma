@@ -117,6 +117,8 @@ model Swipe {
   targetUser   User?    @relation("SwipesReceived", fields: [targetUserId], references: [id], onDelete: Cascade)
   targetGroup  StudyGroup? @relation("StudyGroupSwipes", fields: [targetGroupId], references: [id])
   createdAt    DateTime @default(now())
+
+  message      String?  // Optional field to store a message
 }
 
 

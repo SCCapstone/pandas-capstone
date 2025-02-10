@@ -2,70 +2,45 @@ import './components.css';
 import './InviteMessagePanel.css';
 import '../pages/messaging.css';
 import React, { useState } from 'react';
-import axios from 'axios';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextareaAutosize } from "@mui/material";
 
 interface InviteMessagePanelProps {
-  currentUserId: number;
-  targetUserId: number;
+  open: boolean;
   onClose: () => void;
+  onConfirm: (message: string) => void;
 }
 
-const InviteMessagePanel: React.FC<InviteMessagePanelProps> = ({ currentUserId, targetUserId, onClose }) => {
-  const [message, setMessage] = useState('');
-  const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
+const InviteMessagePanel: React.FC<InviteMessagePanelProps> = ({ open, onClose, onConfirm }) => {
+  const [message, setMessage] = useState("");
 
-  const handleSendInvite = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        alert('You need to be logged in to send an invite.');
-        return;
-      }
-
-      if (!message.trim()) {
-        alert('Please enter a message before sending.');
-        return;
-      }
-
-      const inviteData = {
-        senderId: currentUserId,
-        receiverId: targetUserId,
-        message,
-      };
-
-      const response = await axios.post(
-        `${REACT_APP_API_URL}/api/study-groups/invite`,
-        inviteData,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-
-      console.log('Invite sent:', response.data);
-      alert('Invite sent successfully!');
-      onClose();
-    } catch (error) {
-      console.error('Error sending invite:', error);
-      alert('Failed to send invite.');
-    }
+  const handleConfirm = () => {
+    onConfirm(message);
+    setMessage(""); // Reset message after sending
   };
 
   return (
-    <div className="yloy">
-    <div className="invite-message-panel">
-      <h1>Invite to Study Group</h1>
-      <form onSubmit={(e) => e.preventDefault()}>
-        <div>
-          <label>Message:</label>
-          <textarea
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            placeholder="Write a message to invite the user..."
-          />
-        </div>
-        <button type="button" onClick={handleSendInvite}>Send Invite</button>
-        <button type="button" onClick={onClose}>Cancel</button>
-      </form>
-    </div>
-    </div>
+    <Dialog
+      open={open}
+      onClose={onClose}
+      fullWidth
+      maxWidth="md" // Adjust this to "lg" if you need it even bigger
+      sx={{ "& .MuiDialog-paper": { width: "400px", height: "auto" } }}
+    >
+      <DialogTitle>Send a message</DialogTitle>
+      <DialogContent>
+        <TextareaAutosize
+          minRows={3}
+          placeholder="Write a message..."
+          value={message}
+          onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setMessage(e.target.value)}
+          style={{ width: "85%", padding: "20px", fontSize: "16px", fontFamily:'Inter' }}
+        />
+      </DialogContent>
+      <DialogActions sx={{ justifyContent: "space-between", marginLeft: "15px", marginRight: "15px", marginBottom: "10px" }}>
+        <Button onClick={onClose} sx={{ backgroundColor: "#00668C", color: 'white',fontFamily:'Inter', width:"100px"}}>Cancel</Button>
+        <Button onClick={handleConfirm} sx={{ backgroundColor: "#00668C", color: 'white',fontFamily:'Inter', width:"100px" }}>Send</Button>
+      </DialogActions>
+    </Dialog>
   );
 };
 

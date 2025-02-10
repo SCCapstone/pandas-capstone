@@ -52,7 +52,7 @@ const SwipeProfiles = ({ userId }: { userId: number }) => {
     }
   };
 
-  const handleSwipe = async (direction: 'Yes' | 'No', targetId: number, isStudyGroup: boolean) => {
+  const handleSwipe = async (direction: 'Yes' | 'No', targetId: number, isStudyGroup: boolean, message:string | undefined) => {
     try {
       const currentProfile = profiles[currentProfileIndex];
 
@@ -66,8 +66,11 @@ const SwipeProfiles = ({ userId }: { userId: number }) => {
           targetId: currentProfile.id,
           direction,
           isStudyGroup: !!currentProfile.chatID, // Check if it's a study group
+          message: message
         }),
       });
+
+      setShowInvitePanel(false);
 
       setCurrentProfileIndex(currentProfileIndex + 1);  // Move to the next profile
     } catch (error) {
@@ -83,7 +86,9 @@ const SwipeProfiles = ({ userId }: { userId: number }) => {
   const currentProfile = profiles[currentProfileIndex];
   console.log(currentProfile)
 
-
+  const handleSendMessage = async (message: string) => {
+    handleSwipe("Yes", currentProfile.id, !!currentProfile.studyGroupId, message);
+  };
   return (
     <div className="whole-swipe-component">
       {currentProfile ? (
@@ -222,11 +227,12 @@ const SwipeProfiles = ({ userId }: { userId: number }) => {
             </button>
 
             <div className="swipe-action-buttons">
-              <button onClick={() => { handleSwipe("Yes", currentProfile.id, !!currentProfile.studyGroupId); handleInvite() }}>
+              {/* <button onClick={() => { handleSwipe("Yes", currentProfile.id, !!currentProfile.studyGroupId); handleInvite() }}> */}
+              <button onClick={() => handleInvite()}>
                 Match
               </button>
 
-              <button onClick={() => handleSwipe("No", currentProfile.id, !!currentProfile.studyGroupId)}>
+              <button onClick={() => handleSwipe("No", currentProfile.id, !!currentProfile.studyGroupId, undefined)}>
                 Skip
               </button>
             </div>
@@ -237,13 +243,11 @@ const SwipeProfiles = ({ userId }: { userId: number }) => {
           <p>No more profiles to swipe on!</p>
         </div>
       )}
-      {/* {showInvitePanel && (
-        <InviteMessagePanel
-          onClose={() => setShowInvitePanel(false)}
-          currentUserId={userId}
-          targetUserId={currentProfile.id}
-        />
-      )} */}
+      <InviteMessagePanel 
+        open={showInvitePanel} 
+        onClose={() => setShowInvitePanel(false)} 
+        onConfirm={handleSendMessage} 
+      />
     </div>
   );
 };
