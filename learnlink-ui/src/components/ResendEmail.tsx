@@ -19,15 +19,13 @@ const ResendEmail = ({ email }: ResendEmailProps) => {
         setMessage("");
 
         try {
-            const response = await fetch(`${REACT_APP_API_URL}/api/send-email`, {
+            const response = await fetch(`${REACT_APP_API_URL}/api/forgot-password/email`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    to: email,
-                    subject: "Resend Test Email",
-                    html: "<p>This is a test email from Resend.</p>",
+                    email,
                 }),
             });
 

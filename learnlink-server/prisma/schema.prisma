@@ -86,6 +86,10 @@ model User {
   chats               Chat[]         @relation("ChatUsers")
   messages            Message[]
   notifications       Notification[]
+
+  // Password reset fields
+  resetToken          String?        @unique // Nullable, unique reset token
+  resetTokenExpiry    DateTime?      // Expiration timestamp for the reset token
 }
 
 model StudyGroup {

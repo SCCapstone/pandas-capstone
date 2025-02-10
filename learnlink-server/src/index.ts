@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import bcrypt from 'bcrypt';
+import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
 import { PrismaClient, Grade, Gender, StudyTags } from "@prisma/client";
 import { env } from "process";
@@ -1307,34 +1308,34 @@ io.on("connection", (socket) => {
 
 
 
-/****** Code for forget password */
+// /****** Code for forget password */
 
-const sendEmail = async (to: string, subject: string, text: string, html: string): Promise<void> => {
-  const transport = nodemailer.createTransport(
-    {
-      service: "icloud",
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_Password,
-      },
-    }
-  );
-  const mailOptions = {
-    from: `"LearnLink" <${process.env.EMAIL_USER}>`,
-    to,
-    subject,
-    text,
-    html
-  };
+// const sendEmail = async (to: string, subject: string, text: string, html: string): Promise<void> => {
+//   const transport = nodemailer.createTransport(
+//     {
+//       service: "icloud",
+//       auth: {
+//         user: process.env.EMAIL_USER,
+//         pass: process.env.EMAIL_Password,
+//       },
+//     }
+//   );
+//   const mailOptions = {
+//     from: `"LearnLink" <${process.env.EMAIL_USER}>`,
+//     to,
+//     subject,
+//     text,
+//     html
+//   };
 
-  try {
-    await transport.sendMail(mailOptions);
-  } catch (error) {
-    console.error("Error in sending the email" , error);
-    throw new Error("Failed to send email");
-  }
+//   try {
+//     await transport.sendMail(mailOptions);
+//   } catch (error) {
+//     console.error("Error in sending the email" , error);
+//     throw new Error("Failed to send email");
+//   }
   
-};
+// };
 
 
 
@@ -1361,6 +1362,72 @@ app.post("/api/send-email", async (req, res) => {
   } catch (error) {
     res.status(500).json({ success: false, error });
   }
+});
+
+app.post("/api/forgot-password/email", async (req, res):Promise<any> => {
+  const { email } = req.body;
+
+  const user = await prisma.user.findUnique({ where: { email } });
+  if (!user) return res.status(400).json({ error: "User not found" });
+
+  // Generate a secure reset token
+  const resetToken = crypto.randomBytes(32).toString("hex");
+  const hashedResetToken = await bcrypt.hash(resetToken, 10);
+
+  const tokenExpiry = new Date(Date.now() + 60 * 60 * 1000); // 1-hour expiration
+
+  // Save token in database
+  await prisma.user.update({
+    where: { email },
+    data: { resetToken: hashedResetToken, resetTokenExpiry: tokenExpiry },
+  });
+
+  // Construct password reset link
+  const resetLink = `${FRONTEND_URL}/resetpassword/${resetToken}`;
+
+  // Send email via Resend
+  try {
+    const resendResponse =await resend.emails.send({
+      from: "onboarding@resend.dev",
+      to: email,
+      subject: "Password Reset Request",
+      html: `<p>Click <a href="${resetLink}">here</a> to reset your password. This link expires in 1 hour.</p>`,
+    });
+
+    res.json({ success: true, resendResponse });
+  } catch (error) {
+    console.error("Error sending email:", error);
+    res.status(500).json({ success: false, error });
+  }
+});
+
+app.post("/api/reset-password/email", async (req, res): Promise<any> => {
+  const { token, password } = req.body;
+
+  // Find user based on resetTokenExpiry (token itself is hashed, so we can't search by it directly)
+  const user = await prisma.user.findFirst({
+    where: { resetTokenExpiry: { gt: new Date() } }, // Ensuring token is not expired
+  });
+
+  if (!user || !user.resetToken) {
+    return res.status(400).json({ error: "Invalid or expired token" });
+  }
+
+  // Compare provided token with the hashed token in the database
+  const isValid = await bcrypt.compare(token, user.resetToken);
+  if (!isValid) {
+    return res.status(400).json({ error: "Invalid or expired token" });
+  }
+  // Hash the new password
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  // Update user's password and remove token
+  await prisma.user.update({
+    where: { id: user.id },
+    data: { password: hashedPassword, resetToken: null, resetTokenExpiry: null },
+  });
+
+  res.json({ message: "Password reset successful" });
 });
 
 export { app }; // Export the app for testing

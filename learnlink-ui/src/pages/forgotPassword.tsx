@@ -38,7 +38,7 @@ const ForgotPassword: React.FC = () => {
         setError(null);
 
         try {
-            const response = await fetch (`${REACT_APP_API_URL}/api/forgotpassword`, {
+            const response = await fetch (`${REACT_APP_API_URL}/api/forgot-password/email`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
