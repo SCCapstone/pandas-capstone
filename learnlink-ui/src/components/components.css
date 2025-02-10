@@ -1,13 +1,12 @@
 .Logo {
-  width: 200px;
-  position: absolute;
-  padding-top: 10px;
-  padding-left: 10px;
+  width: 100%; /* Ensures the logo scales based on the container */
+  position: relative;
+  margin: auto; /* Centers the logo and adds space around it */
   padding-bottom: 0;
 }
 
 .Logo svg {
-  width: 200px; /* Ensures SVG scales with the container */
+  width: 100%; /* Ensures SVG scales with the container */
   height: auto;
 }
 
