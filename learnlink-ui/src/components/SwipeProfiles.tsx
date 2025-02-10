@@ -243,7 +243,7 @@ const SwipeProfiles = ({ userId }: { userId: number }) => {
           currentUserId={userId}
           targetUserId={currentProfile.id}
         />
-)}
+      )}
     </div>
   );
 };

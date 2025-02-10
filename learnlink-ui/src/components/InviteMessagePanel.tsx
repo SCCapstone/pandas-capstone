@@ -1,4 +1,5 @@
 import './components.css';
+import './InviteMessagePanel.css';
 import '../pages/messaging.css';
 import React, { useState } from 'react';
 import axios from 'axios';
@@ -48,6 +49,7 @@ const InviteMessagePanel: React.FC<InviteMessagePanelProps> = ({ currentUserId, 
   };
 
   return (
+    <div className="yloy">
     <div className="invite-message-panel">
       <h1>Invite to Study Group</h1>
       <form onSubmit={(e) => e.preventDefault()}>
@@ -62,6 +64,7 @@ const InviteMessagePanel: React.FC<InviteMessagePanelProps> = ({ currentUserId, 
         <button type="button" onClick={handleSendInvite}>Send Invite</button>
         <button type="button" onClick={onClose}>Cancel</button>
       </form>
+    </div>
     </div>
   );
 };
