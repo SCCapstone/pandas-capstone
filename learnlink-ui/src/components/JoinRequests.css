@@ -68,33 +68,25 @@
     margin-top: 12px;
   }
   
-  /* Buttons */
-  button {
-    border: none;
-    padding: 10px 16px;
-    font-size: 1rem;
-    cursor: pointer;
-    border-radius: 8px;
-    transition: 0.2s ease-in-out;
-  }
+
   
   /* Approve button */
-  button.approve {
+  .button.approve {
     background: #4CAF50;
     color: white;
   }
   
-  button.approve:hover {
+  .button.approve:hover {
     background: #45a049;
   }
   
   /* Reject button */
-  button.reject {
+  .button.reject {
     background: #d9534f;
     color: white;
   }
   
-  button.reject:hover {
+ .button.reject:hover {
     background: #c9302c;
   }
   
