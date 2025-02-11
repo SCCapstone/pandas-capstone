@@ -3,6 +3,7 @@ import './forgotPassword.css';
 import CopyrightFooter from '../components/CopyrightFooter';
 import {useNavigate} from 'react-router-dom';
 import React, {useState} from 'react';
+import ResendEmail from '../components/ResendEmail';
 
 const ForgotPassword: React.FC = () => {
     const [email, setEmail] = useState<string>('');
@@ -37,7 +38,7 @@ const ForgotPassword: React.FC = () => {
         setError(null);
 
         try {
-            const response = await fetch (`${REACT_APP_API_URL}/api/forgotpassword`, {
+            const response = await fetch (`${REACT_APP_API_URL}/api/forgot-password/email`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -78,7 +79,9 @@ const ForgotPassword: React.FC = () => {
                             ></input>
                     {error && <p className="error">{error}</p>}
                     {success && <p className="success">{success}</p>}
-                    <button className="send" disabled={loading} type="submit">{loading ? 'Sending...' : 'Send Reset Link'}</button>
+                    <ResendEmail email={email} />
+
+                    {/* <button className="send" disabled={loading} type="submit">{loading ? 'Sending...' : 'Send Reset Link'}</button> */}
                 </form>
             </div>
             <div>

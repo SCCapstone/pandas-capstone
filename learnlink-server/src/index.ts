@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import bcrypt from 'bcrypt';
+import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
 import { PrismaClient, Grade, Gender, StudyTags } from "@prisma/client";
 import { env } from "process";
@@ -14,6 +15,7 @@ import { profile } from "console";
 import fs from 'fs';
 import https from 'https';
 import dotenv from 'dotenv';
+import { Resend } from 'resend';
 
 
 interface CustomJwtPayload extends JwtPayload {
@@ -28,8 +30,9 @@ const NODE_ENV = process.env.NODE_ENV || 'development'; // default to 'developme
 const HTTPS_KEY_PATH = process.env.HTTPS_KEY_PATH || './certs/privkey.pem'; // Local default
 const HTTPS_CERT_PATH = process.env.HTTPS_CERT_PATH || './certs/fullchain.pem'; // Local default
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000'; // Local React app URL
-const SERVER_PORT = process.env.SERVER_PORT ? parseInt(process.env.SERVER_PORT, 10) : (NODE_ENV === 'production' ? 2020 : 2002);
+const SERVER_PORT = process.env.SERVER_PORT ? parseInt(process.env.SERVER_PORT, 10) : (NODE_ENV === 'production' ? 2020 : 2020);
 const JWT_SECRET = env.JWT_SECRET || 'your_default_jwt_secret';
+const resend = new Resend(process.env.RESEND);
 
 // Read certificates conditionally based on the environment
 const privateKey = NODE_ENV === 'production'
@@ -71,7 +74,7 @@ if (NODE_ENV === 'production') {
 
 const io = new Server(server, {
   cors: {
-    origin: FRONTEND_URL, // Dynamically set the frontend URL
+    origin: '*', // Dynamically set the frontend URL
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   },
@@ -79,7 +82,7 @@ const io = new Server(server, {
 
 const corsOptions = {
   origin: FRONTEND_URL, // Your frontend URL
-  methods: ["GET", "POST", "PUT", "DELETE"], // Methods you want to allow
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH"], // Methods you want to allow
   allowedHeaders: ['Content-Type', 'Authorization'], // Headers you want to allow
 };
 
@@ -118,6 +121,13 @@ app.post("/api/users", async (req, res): Promise<any> => {
 
     if (emailExists) {
       return res.status(400).json({ error: "EmailAlreadyExists" });
+    }
+
+    const domainParts = email.split("@")[1]?.split(".");
+    const lastExtension = domainParts ? domainParts.pop() : "";
+
+    if (lastExtension !== "edu") {
+      return res.status(400).json({ error: "NotEdu" });
     }
 
     // Check if username already exists
@@ -321,6 +331,7 @@ app.put('/api/users/update', async (req, res): Promise<any> => {
     const userId = decoded.userId; // Get userId from the token payload
     console.log('userId:', userId);
 
+
     // Update the user's profile information in the database
     const updatedUser = await prisma.user.update({
       where: { id: userId },
@@ -369,11 +380,30 @@ app.post('/api/update-email', authenticate, async (req, res):Promise<any> => {
       return res.status(400).json({ error: 'Old email does not match current email' });
     }
 
+        // Check if username or email already exists
+      // Check if email already exists
+      const emailExists = await prisma.user.findUnique({
+        where: { email: newEmail }
+      });
+  
+      if (emailExists) {
+        return res.status(400).json({ error: "There is already an account attached to this email." });
+      }
+  
+      const domainParts = newEmail.split("@")[1]?.split(".");
+      const lastExtension = domainParts ? domainParts.pop() : "";
+  
+      if (lastExtension !== "edu") {
+        return res.status(400).json({ error: "Please use a valid .edu email." });
+      }
+  
+
     // Update the email
     const updatedUser = await prisma.user.update({
       where: { id: userId },
       data: { email: newEmail },
     });
+
 
     return res.status(200).json({ message: 'Email updated successfully', updatedUser });
   } catch (err) {
@@ -424,7 +454,7 @@ app.post('/api/update-password', authenticate, async (req, res):Promise<any> => 
 
 // Endpoint to handle swipe action and create a match if applicable
 app.post('/api/swipe', async (req, res) => {
-  const { userId, targetId, direction, isStudyGroup } = req.body;
+  const { userId, targetId, direction, isStudyGroup, message } = req.body;
 
   try {
     // Store the swipe in the database
@@ -434,6 +464,7 @@ app.post('/api/swipe', async (req, res) => {
         direction,
         targetUserId: isStudyGroup ? null : targetId,  // If study group, nullify targetUserId
         targetGroupId: isStudyGroup ? targetId : null,  // If user, nullify targetGroupId
+        message,
       },
     });
 
@@ -735,8 +766,8 @@ app.put('/api/study-groups/chat/:chatID', async (req, res) : Promise<any> =>  {
   const { name, description, subject } = req.body; // Extract new study group data from the request body
 
   // Validate the input
-  if (!name || !subject) {
-    return res.status(400).json({ error: 'Name, and subject are required.' });
+  if (!name) {
+    return res.status(400).json({ error: 'Name is required.' });
   }
 
   try {
@@ -845,7 +876,6 @@ app.get('/api/users', async (req, res) => {
 
 // Get all chats for a user
 // WORKS
-// pulls up the chats with the users authentication code
 // Pulls up the chats with the user's authentication code
 app.get('/api/chats', authenticate, async (req, res): Promise<any> => {
   const userId = res.locals.userId; // Use res.locals to get the userId set by the authenticate middleware
@@ -968,10 +998,10 @@ app.delete('/api/chats/:chatId', async (req, res):Promise<any> => {
       where: { chatID: parseInt(chatId) },
     });
 
-    if (!studyGroup) {
+    if (studyGroup) {
       await prisma.studyGroup.delete({
-      where: { chatID: parseInt(chatId) },
-    });
+        where: { chatID: parseInt(chatId) },
+      });
     }    
 
     res.status(200).json({ message: 'Chat deleted successfully' });
@@ -1000,6 +1030,7 @@ app.post('/api/chats/:chatId/messages', authenticate, async (req, res): Promise<
         content,
         userId, // Associate the message with the sender
         chatId: parseInt(chatId),
+        liked: false,
       },
     });
 
@@ -1010,10 +1041,65 @@ app.post('/api/chats/:chatId/messages', authenticate, async (req, res): Promise<
   }
 });
 
+// adds a like to a message 
+app.patch('/api/messages/:messageId/like', authenticate, async (req, res): Promise<any>  => {
+  const { messageId } = req.params;
+  
+  try {
+    // Fetch the current message
+    const message = await prisma.message.findUnique({
+      where: { id: parseInt(messageId) },
+    });
+
+    if (!message) {
+      return res.status(404).json({ error: 'Message not found' });
+    }
+
+    // Toggle the liked state
+    const updatedMessage = await prisma.message.update({
+      where: { id: parseInt(messageId) },
+      data: { liked: !message.liked },
+    });
+
+    res.json(updatedMessage);
+  } catch (error) {
+    console.error('Error updating message like status:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+/*
+//also for adding a like 
+app.patch('/api/messages/:id/like', authenticate, async (req, res):Promise<any>  => {
+  const { id } = req.params;
+
+  try {
+    // Find the message and toggle the 'liked' status
+    const message = await prisma.message.findUnique({
+      where: { id: parseInt(id) },
+    });
+
+    if (!message) {
+      return res.status(404).json({ error: 'Message not found' });
+    }
+
+    const updatedMessage = await prisma.message.update({
+      where: { id: parseInt(id) },
+      data: { liked: !message.liked },
+    });
+
+    res.json(updatedMessage);
+  } catch (error) {
+    console.error('Error updating like status:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+*/
+
+
+
+
 
 // Create a new chat
-// WORKS
-// Technically should not be called
 app.post('/api/chats', async (req, res) => {
   const { name, userId } = req.body; // Assuming the user is the creator of the chat
 
@@ -1034,7 +1120,6 @@ app.post('/api/chats', async (req, res) => {
 });
 
 
-//WORKS
 app.post('/api/chats/:userId', authenticate, async (req: Request, res: Response): Promise<any> => {
   const { recipientUserId, chatName } = req.body;
   const userId = res.locals.userId;
@@ -1223,62 +1308,185 @@ io.on("connection", (socket) => {
 
 
 
-/****** Code for forget password */
+// /****** Code for forget password */
 
-const sendEmail = async (to: string, subject: string, text: string, html: string): Promise<void> => {
-  const transport = nodemailer.createTransport(
-    {
-      service: "icloud",
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_Password,
-      },
-    }
-  );
-  const mailOptions = {
-    from: `"LearnLink" <${process.env.EMAIL_USER}>`,
-    to,
-    subject,
-    text,
-    html
-  };
+// const sendEmail = async (to: string, subject: string, text: string, html: string): Promise<void> => {
+//   const transport = nodemailer.createTransport(
+//     {
+//       service: "icloud",
+//       auth: {
+//         user: process.env.EMAIL_USER,
+//         pass: process.env.EMAIL_Password,
+//       },
+//     }
+//   );
+//   const mailOptions = {
+//     from: `"LearnLink" <${process.env.EMAIL_USER}>`,
+//     to,
+//     subject,
+//     text,
+//     html
+//   };
 
-  try {
-    await transport.sendMail(mailOptions);
-  } catch (error) {
-    console.error("Error in sending the email" , error);
-    throw new Error("Failed to send email");
-  }
+//   try {
+//     await transport.sendMail(mailOptions);
+//   } catch (error) {
+//     console.error("Error in sending the email" , error);
+//     throw new Error("Failed to send email");
+//   }
   
-};
+// };
 
+app.post("/api/sign-up-email", async (req, res) => {
+  try {
+    const { to } = req.body; // Get data from frontend
+    console.log('Sending email to:', to);
 
+    const response = await resend.emails.send({
+      from: "onboarding@resend.dev",
+      to,
+      subject: "Welcome to LearnLink",
+      html: `
+      <html>
+      <head>
+        <style>
+          @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
+          
+          body {
+            font-family: 'Inter', Arial, sans-serif;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+          }
+          .email-container {
+            text-align: center;
+            padding: 20px;
+          }
+          h1 {
+            color: #00668c;
+          }
+          p {
+            font-size: 16px;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="email-container">
+          <img src="../../learnlink-ui/src/components/LearnLink.svg" alt="LearnLink Logo" width="100" />
+          <h1>Welcome to LearnLink!</h1>
+          <p>Thank you for signing up with LearnLink. We're excited to have you on board!</p>
+          <p>If you have any questions, feel free to reach out to our support team.</p>
+          <p>Best regards,<br />The LearnLink Team</p>
+        </div>
+      </body>
+    </html>
+    `
+    ,
+    });
+
+    // const response = resend.emails.send({
+    //   from: 'onboarding@resend.dev',
+    //   to: 'jonessara141@gmail.com',
+    //   subject: 'Hello World',
+    //   html: '<p>Congrats on sending your <strong>first email</strong>!</p>'
+    // });
+
+    res.json({ to, success: true, response, message: 'Email sent successfully' });
+  } catch (error) {
+    res.status(500).json({ success: false, error });
+  }
+});
 
 /******API endpoint for the forgot password */
-
-app.post ('/api/forgotpassword', async (req, res):Promise<any> => {
-  const {email} = req.body;
-  if (!email) {
-    return res.status(400).json({ error: "Email is required" });
-  }
-
+app.post("/api/send-email", async (req, res) => {
   try {
-    const resetToken = jwt.sign({ email }, process.env.JWT_SECRET!, { expiresIn: '1h' });
-    const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`;
+    const { to, subject, html } = req.body; // Get data from frontend
 
-    // Send the email
-    await sendEmail(
-      email,
-      "Password Reset Request",
-      `Click the link to reset your password: ${resetLink}`,
-      `<p>Click the link to reset your password:</p><a href="${resetLink}">${resetLink}</a>`
-    );
+    const response = await resend.emails.send({
+      from: "onboarding@resend.dev",
+      to,
+      subject,
+      html,
+    });
 
-    res.status(200).json({ message: "Email sent successfully" });
+    // const response = resend.emails.send({
+    //   from: 'onboarding@resend.dev',
+    //   to: 'jonessara141@gmail.com',
+    //   subject: 'Hello World',
+    //   html: '<p>Congrats on sending your <strong>first email</strong>!</p>'
+    // });
+
+    res.json({ success: true, response });
+  } catch (error) {
+    res.status(500).json({ success: false, error });
+  }
+});
+
+app.post("/api/forgot-password/email", async (req, res):Promise<any> => {
+  const { email } = req.body;
+
+  const user = await prisma.user.findUnique({ where: { email } });
+  if (!user) return res.status(400).json({ error: "User not found" });
+
+  // Generate a secure reset token
+  const resetToken = crypto.randomBytes(32).toString("hex");
+  const hashedResetToken = await bcrypt.hash(resetToken, 10);
+
+  const tokenExpiry = new Date(Date.now() + 60 * 60 * 1000); // 1-hour expiration
+
+  // Save token in database
+  await prisma.user.update({
+    where: { email },
+    data: { resetToken: hashedResetToken, resetTokenExpiry: tokenExpiry },
+  });
+
+  // Construct password reset link
+  const resetLink = `${FRONTEND_URL}/resetpassword/${resetToken}`;
+
+  // Send email via Resend
+  try {
+    const resendResponse =await resend.emails.send({
+      from: "onboarding@resend.dev",
+      to: email,
+      subject: "Password Reset Request",
+      html: `<p>Click <a href="${resetLink}">here</a> to reset your password. This link expires in 1 hour.</p>`,
+    });
+
+    res.json({ success: true, resendResponse });
   } catch (error) {
     console.error("Error sending email:", error);
-    res.status(500).json({ error: "Internal server error" });
+    res.status(500).json({ success: false, error });
   }
+});
+
+app.post("/api/reset-password/email", async (req, res): Promise<any> => {
+  const { token, password } = req.body;
+
+  // Find user based on resetTokenExpiry (token itself is hashed, so we can't search by it directly)
+  const user = await prisma.user.findFirst({
+    where: { resetTokenExpiry: { gt: new Date() } }, // Ensuring token is not expired
+  });
+
+  if (!user || !user.resetToken) {
+    return res.status(400).json({ error: "Invalid or expired token" });
+  }
+
+  // Compare provided token with the hashed token in the database
+  const isValid = await bcrypt.compare(token, user.resetToken);
+  if (!isValid) {
+    return res.status(400).json({ error: "Invalid or expired token" });
+  }
+  // Hash the new password
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  // Update user's password and remove token
+  await prisma.user.update({
+    where: { id: user.id },
+    data: { password: hashedPassword, resetToken: null, resetTokenExpiry: null },
+  });
+
+  res.json({ message: "Password reset successful" });
 });
 
 export { app }; // Export the app for testing
@@ -1291,6 +1499,3 @@ if (require.main === module) {
     console.log(`${NODE_ENV === 'production' ? 'HTTPS' : 'HTTP'} Server running on ${HOST}:${SERVER_PORT}`);
   });
 }
-
-
-

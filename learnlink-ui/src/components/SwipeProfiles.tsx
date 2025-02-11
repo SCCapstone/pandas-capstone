@@ -3,12 +3,15 @@ import { useParams, useNavigate } from 'react-router-dom';
 import './SwipeProfiles.css';
 import { formatEnum } from '../utils/format';
 import { ReactComponent as GroupLogo } from './GroupLogo.svg'
+import InviteMessagePanel from '../components/InviteMessagePanel';
+import { set } from 'react-hook-form';
 
 
 const SwipeProfiles = ({ userId }: { userId: number }) => {
   const [profiles, setProfiles] = useState<any>({ users: [], studyGroups: [] });
   const [currentProfileIndex, setCurrentProfileIndex] = useState(0);
   const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
+  const [showInvitePanel, setShowInvitePanel] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -37,13 +40,19 @@ const SwipeProfiles = ({ userId }: { userId: number }) => {
     
   };
 
+  const handleInvite = () => {
+    // navigate(`/messaging?user=${currentProfile.id}`);
+    setShowInvitePanel(true);
+    
+  };
+
   const handleBack = () => {
     if (currentProfileIndex > 0) {
       setCurrentProfileIndex(currentProfileIndex - 1); // Move to the previous profile
     }
   };
 
-  const handleSwipe = async (direction: 'Yes' | 'No', targetId: number, isStudyGroup: boolean) => {
+  const handleSwipe = async (direction: 'Yes' | 'No', targetId: number, isStudyGroup: boolean, message:string | undefined) => {
     try {
       const currentProfile = profiles[currentProfileIndex];
 
@@ -57,8 +66,11 @@ const SwipeProfiles = ({ userId }: { userId: number }) => {
           targetId: currentProfile.id,
           direction,
           isStudyGroup: !!currentProfile.chatID, // Check if it's a study group
+          message: message
         }),
       });
+
+      setShowInvitePanel(false);
 
       setCurrentProfileIndex(currentProfileIndex + 1);  // Move to the next profile
     } catch (error) {
@@ -74,7 +86,9 @@ const SwipeProfiles = ({ userId }: { userId: number }) => {
   const currentProfile = profiles[currentProfileIndex];
   console.log(currentProfile)
 
-
+  const handleSendMessage = async (message: string) => {
+    handleSwipe("Yes", currentProfile.id, !!currentProfile.studyGroupId, message);
+  };
   return (
     <div className="whole-swipe-component">
       {currentProfile ? (
@@ -213,11 +227,12 @@ const SwipeProfiles = ({ userId }: { userId: number }) => {
             </button>
 
             <div className="swipe-action-buttons">
-              <button onClick={() => { handleSwipe("Yes", currentProfile.id, !!currentProfile.studyGroupId); handleMessaging(); }}>
+              {/* <button onClick={() => { handleSwipe("Yes", currentProfile.id, !!currentProfile.studyGroupId); handleInvite() }}> */}
+              <button onClick={() => handleInvite()}>
                 Match
               </button>
 
-              <button onClick={() => handleSwipe("No", currentProfile.id, !!currentProfile.studyGroupId)}>
+              <button onClick={() => handleSwipe("No", currentProfile.id, !!currentProfile.studyGroupId, undefined)}>
                 Skip
               </button>
             </div>
@@ -228,6 +243,11 @@ const SwipeProfiles = ({ userId }: { userId: number }) => {
           <p>No more profiles to swipe on!</p>
         </div>
       )}
+      <InviteMessagePanel 
+        open={showInvitePanel} 
+        onClose={() => setShowInvitePanel(false)} 
+        onConfirm={handleSendMessage} 
+      />
     </div>
   );
 };

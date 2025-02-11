@@ -108,7 +108,7 @@ p {
   font-size: 25px;
   font-weight: 700;
   width: 18%;
-  height: 200px;
+  height: 20%;
   text-align: center;
   border-radius: 15px;
   padding: 20px;
@@ -148,7 +148,6 @@ p {
 
   .menuButtons {
     width: 45%; /* Ensure buttons fit side-by-side on small screens */
-    max-width: 160px;
     padding: 15px;
   }
 }

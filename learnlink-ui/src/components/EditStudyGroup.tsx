@@ -60,11 +60,18 @@ const EditStudyGroup = ({ chatID, onClose }: { chatID: number; onClose: () => vo
 
       const updatedStudyGroup = { name, description, subject, chatID };
 
+      if (name==='' || name === null) {
+        alert('Please enter a study group name.');
+        return;
+      }
+
       const response = await axios.put(
         `${REACT_APP_API_URL}/api/study-groups/chat/${chatID}`,
         updatedStudyGroup,
         { headers: { Authorization: `Bearer ${token}` } }
       );
+
+    
 
       console.log('Study group updated:', response.data);
       // alert('Study group updated successfully!');

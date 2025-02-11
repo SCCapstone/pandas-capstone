@@ -1,19 +1,11 @@
-# Step 1: Use an official Node.js image from Docker Hub
-FROM node:18-alpine
+# Step 1: Use the official Node.js image (Debian-based)
+FROM node:18 AS build
 
 # Step 2: Set working directory inside the container
 WORKDIR /app
 
 # Step 3: Copy package.json and package-lock.json
 COPY package*.json ./
-# COPY .env ./
-
-
-# replaced COPY .env ./ with this
-COPY .env.production ./
-
-
-
 
 # Step 4: Install dependencies
 RUN npm install
@@ -21,7 +13,7 @@ RUN npm install
 # Step 5: Copy the rest of the app code into the container
 COPY . .
 
-# Step 6: Build Prisma Client
+# Step 6: Install Prisma Client (and generate Prisma client)
 RUN npx prisma generate
 
 # Step 7: Expose the port your app will run on (default port 2020)

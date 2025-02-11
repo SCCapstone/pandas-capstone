@@ -86,6 +86,10 @@ model User {
   chats               Chat[]         @relation("ChatUsers")
   messages            Message[]
   notifications       Notification[]
+
+  // Password reset fields
+  resetToken          String?        @unique // Nullable, unique reset token
+  resetTokenExpiry    DateTime?      // Expiration timestamp for the reset token
 }
 
 model StudyGroup {
@@ -117,6 +121,8 @@ model Swipe {
   targetUser   User?    @relation("SwipesReceived", fields: [targetUserId], references: [id], onDelete: Cascade)
   targetGroup  StudyGroup? @relation("StudyGroupSwipes", fields: [targetGroupId], references: [id])
   createdAt    DateTime @default(now())
+
+  message      String?  // Optional field to store a message
 }
 
 
@@ -154,6 +160,7 @@ model Message {
   chatId       Int
   user         User        @relation(fields: [userId], references: [id]) // One-to-many relation to User
   chat         Chat        @relation(fields: [chatId], references: [id]) // One-to-many relation to Chat
+  liked        Boolean     @default(false)
 }
 
 model Notification {

@@ -106,6 +106,7 @@
   }
 
   .swipe-action-buttons button, .swipe-buttons-container button {
+    width:auto;
     align-self:flex-end;
     padding-left: 40px;
     padding-right: 40px;

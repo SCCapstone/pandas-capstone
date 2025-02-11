@@ -7,6 +7,8 @@ import './LandingPage.css';
 import axios from 'axios';
 import { useSearchParams } from 'react-router-dom';
 import EditStudyGroup from '../components/EditStudyGroup';
+import MessagesNavi from "../components/MessagesNavi";
+
 
 interface Chat {
   id: number;
@@ -23,6 +25,7 @@ interface Message{
   createdAt: string;
   userId: number;
   chatId: number;
+  liked: boolean;
   
 }
 interface User {
@@ -55,7 +58,7 @@ const Messaging: React.FC = () => {
   const [currentUserId, setCurrentUserId] = useState<number | null>(null);
   const [customChatName, setCustomChatName] = useState<string>(''); // Track custom chat name
   const [showGroupNameInput, setShowGroupNameInput] = useState<boolean>(false);
-  const [messages, setMessages] = useState([]);
+  //const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const chatWindowRef = React.useRef<HTMLDivElement | null>(null);
   const [hasStudyGroup, setHasStudyGroup] = useState(false);
@@ -63,6 +66,13 @@ const Messaging: React.FC = () => {
   const [selectedUser, setSelectedUser] = useState<User | null>(null); // Track selected user
   const [searchParams] = useSearchParams();
   const selectedUserId = searchParams.get('user'); // Get the matched user ID
+  const [heartedMessages, setHeartedMessages] = useState<{ [key: number]: boolean }>({});
+  const [messages, setMessages] = useState(selectedChat?.messages || []);
+
+  //for matching stuff
+  const [showMessagesPanel, setShowMessagesPanel] = useState(false);
+  const [showRequestsPanel, setShowRequestsPanel] = useState(false);
+  const [activeTab, setActiveTab] = useState<'messages' | 'requests'>('messages');
   
   
   useEffect(() => {
@@ -93,6 +103,7 @@ const Messaging: React.FC = () => {
     // Make the API request to fetch chats for the user
   
     const token = localStorage.getItem('token');
+    console.log(token);
     axios.get(`${REACT_APP_API_URL}/api/chats`, {
       headers: { Authorization: `Bearer ${token}` },
     })
@@ -102,7 +113,20 @@ const Messaging: React.FC = () => {
           messages: chat.messages || [], // Ensure messages is always an array
           users: chat.users || [] // Ensure users is always an array
         }));
+
+
         setChats(chatsWithMessages);
+
+
+        // Ensure we store liked messages correctly
+        const likedMessagesMap = response.data.reduce((acc: Record<number, boolean>, chat: Chat) => {
+          chat.messages?.forEach((msg: Message) => {
+            acc[msg.id] = msg.liked ?? false; // Default to false if missing
+          });
+          return acc;
+        }, {});
+
+        setHeartedMessages(likedMessagesMap); // Store liked states
       })
       .catch((error) => console.error('Error fetching chats:', error));
     
@@ -176,6 +200,16 @@ const Messaging: React.FC = () => {
   }, [selectedChat]); // Runs when messages update
   
   
+  const handleMessagesSwitch = () => {
+    setActiveTab('messages');
+    setShowMessagesPanel(true);
+  };
+  
+  const handleRequestsSwitch = () => {
+    setActiveTab('requests');
+    setShowMessagesPanel(false);
+  };
+
   const handleSendMessage = async () => {
     const token = localStorage.getItem('token');
     if (currentMessage.trim() && selectedChat) {
@@ -186,6 +220,7 @@ const Messaging: React.FC = () => {
           createdAt: new Date().toISOString(),
           userId: currentUserId || 0, // Add a fallback for currentUserId
           chatId: selectedChat.id,
+          liked: false,
         };
   
         
@@ -223,18 +258,7 @@ const Messaging: React.FC = () => {
 
   const createNewChat = async (user: User, chatName: string) => {
     try {
-      // Ensure user and chatName are properly passed to the function
-      if (!user || !chatName.trim()) {
-        alert('Please provide both a user and a chat name!');
-        return;
-      }
-  
-      // Check if chats is defined and has users
-      if (!chats) {
-        alert('No chats available to check.');
-        return;
-      }
-  
+    
       // Check if a chat already exists with this user
       const existingChat = chats.find(chat => 
         chat.users?.some(u => u.id === user.id) // Safe check for undefined `users`
@@ -405,7 +429,7 @@ const Messaging: React.FC = () => {
 
       let newStudyGroupID = response.data.studyGroup.id
 
-      console.log('Study group created: PROBLEMMM', newStudyGroupID);
+      console.log('new study group ID', newStudyGroupID);
 
       const updateChatPayload = {
         chatName: '',
@@ -457,6 +481,43 @@ const Messaging: React.FC = () => {
     }
   };
 
+  // Handle double click to like a message
+  const handleDoubleClick = async (messageId: number) => {
+
+    const token = localStorage.getItem('token');
+      if (!token) {
+        alert('Please log in again.');
+        return;
+      }
+
+    try {
+      const response = await fetch(`${REACT_APP_API_URL}/api/messages/${messageId}/like`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' , Authorization: `Bearer ${token}`},
+        body: JSON.stringify({ liked: !heartedMessages[messageId] }), // Toggle liked
+      });
+  
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('API Error:', errorData);
+        throw new Error('Failed to update like status');
+      }
+  
+      setHeartedMessages((prev) => ({
+        ...prev,
+        [messageId]: !prev[messageId], // Toggle heart UI
+      }));
+    } catch (error) {
+      console.error('Error updating like status:', error);
+    }
+  };
+  
+
+
+
+  
+
+
   const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Enter') {
       handleSendMessage();
@@ -471,6 +532,9 @@ const Messaging: React.FC = () => {
     <div className="Messaging">
       <Navbar />
       <div className="Chat">
+
+        {/** greyed out because its old but i dont want to delete yet */}
+        
         <div className="ChatOptions">
           <button
             onClick={() => setShowDropdown(!showDropdown)}
@@ -504,8 +568,8 @@ const Messaging: React.FC = () => {
               </ul>
             </div>
           )}
-
-          {/* Show the group name input */}
+          
+          
           {showGroupNameInput && selectedUser && (
             <div className="ChatNameInput">
               <p>Creating group with: {selectedUser.firstName} {selectedUser.lastName}</p>
@@ -542,7 +606,7 @@ const Messaging: React.FC = () => {
               </div>
             </div>
           )}
-
+          
           <ul className="ChatList">
           <li className="ChatListHeader">
             Groups
@@ -570,6 +634,41 @@ const Messaging: React.FC = () => {
               ))}
           </ul>
         </div>
+
+        
+              
+        
+        {/* Tabs for Messages and Requests */}
+        {/* Tabs for Messages and Requests */}
+        <div className="MessagesSidebar">
+          <div className="TabsContainer">
+            <button 
+              className={`Tab ${activeTab === 'messages' ? 'active' : ''}`} 
+              onClick={handleMessagesSwitch}
+            >
+              Messages
+            </button>
+
+            <button 
+              className={`Tab ${activeTab === 'requests' ? 'active' : ''}`}
+              onClick={handleRequestsSwitch}
+            >
+              Requests
+            </button>
+          </div>
+
+          {/* Conditionally show the messages panel */}
+          {showMessagesPanel && (
+            <MessagesNavi 
+              chats={chats} 
+              selectedChat={selectedChat} 
+              setSelectedChat={setSelectedChat} 
+              handleDeleteChat={handleDeleteChat} 
+            />
+          )}
+        </div>
+
+
         <div className="ChatSection">
           {selectedChat ? (
             <>
@@ -606,17 +705,21 @@ const Messaging: React.FC = () => {
                 {selectedChat && Array.isArray(selectedChat.messages) ? (
                   selectedChat.messages.length > 0 ? (
                     selectedChat.messages.map((message, index) => (
-                      <div
-                        key={index}
-                        className={`MessageBubble ${
-                          message.userId === currentUserId ? 'MyMessage' : 'OtherMessage'
-                        }`}
-                      >
-                         {typeof message === 'string'
-                          ? message
-                          : typeof message.content === 'string'
-                          ? message.content
-                          : JSON.stringify(message)}
+                      <div key={index} className="MessageContainer">
+                        <div
+                          className={`MessageBubble ${
+                            message.userId === currentUserId ? 'MyMessage' : 'OtherMessage'
+                          }`}
+                          onDoubleClick={() => handleDoubleClick(message.id)}
+                        >
+                          {typeof message === 'string'
+                            ? message
+                            : typeof message.content === 'string'
+                            ? message.content
+                            : JSON.stringify(message)}
+                        </div>
+                        {/* Show heart if message was double-clicked */}
+                        {heartedMessages[message.id] && <div className="Heart">❤️</div>}
                       </div>
                     ))
                   ) : (

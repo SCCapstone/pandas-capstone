@@ -19,6 +19,7 @@ import AccountDetails from './pages/accountDetails';
 import PublicProfile from './pages/publicProfile';
 import {PrivateRoutes} from './utils/privateRoutes';
 import {MatchRoute} from './utils/matchRoute';
+import ResetPasswordFromEmail from './pages/resetPasswordFromEmail';
 
 function App() {
   return (
@@ -31,6 +32,8 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/forgotpassword" element={<ForgotPassword />} />
+          <Route path="/resetpassword/:token" element={<ResetPasswordFromEmail />} />
+
           
           {/* Private Routes */}
           <Route element={<PrivateRoutes/>}>

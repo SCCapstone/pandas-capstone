@@ -356,6 +356,51 @@
   margin-left: 5px;
 }
 
+.TabsContainer {
+  display: flex;
+  justify-content: center;
+  background-color: #f0f4f8;
+  padding: 10px;
+  border-bottom: 2px solid #ccc;
+}
+
+.Tab {
+  padding: 10px 20px;
+  cursor: pointer;
+  font-size: 20px;
+  font-weight: bold;
+  color: #333;
+  background-color: transparent;
+  border: none;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.Tab.active {
+  border-bottom: 3px solid #007bff; /* Highlight the active tab */
+  color: #007bff;
+}
+
+.Tab:hover {
+  color: #0056b3;
+}
+
+
+
+.messages-panel {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  overflow: hidden; /* Prevents overflow issues */
+}
+
+.ChatList {
+  flex-grow: 1;
+  overflow-y: auto; /* Enables scrolling when needed */
+  max-height: 100%;
+  padding-right: 10px;
+}
+
 
 /* Individual message */
 .message {
@@ -367,6 +412,13 @@
   line-height: 1.4;
 }
 
+.MessageContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-bottom: 8px;
+}
+
 .MyMessage {
   background-color: #daf8cb; /* light green */
   align-self: flex-end;
@@ -376,6 +428,18 @@
   align-self: flex-start;
 }
 
+.Heart {
+  font-size: 16px;
+  margin-top: 4px;
+}
+/*location of the hearts in relation to the messages*/
+.MyMessage + .Heart {
+  align-self: flex-end;
+}
+
+.OtherMessage +.Heart{
+  align-self: flex-start
+}
 
 /* Responsive Adjustments */
 @media (max-width: 768px) {
