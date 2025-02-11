@@ -1,4 +1,4 @@
-/* Container panel styling */
+
 .requests-panel {
     max-width: 600px;
     margin: 20px auto;
@@ -15,7 +15,6 @@
     margin-bottom: 15px;
   }
   
-  /* No requests message */
   .no-requests {
     text-align: center;
     font-size: 1rem;
@@ -23,7 +22,6 @@
     padding: 10px;
   }
   
-  /* Error message styling */
   .error-message {
     color: #d9534f;
     background: #fcecec;
@@ -33,7 +31,7 @@
     margin-bottom: 10px;
   }
   
-  /* List styles */
+
   .requests-list {
     list-style: none;
     padding: 0;
@@ -50,7 +48,6 @@
     flex-direction: column;
   }
   
-  /* Request details */
   .request-details p {
     margin: 5px 0;
     font-size: 1rem;
@@ -61,32 +58,39 @@
     color: #222;
   }
   
-  /* Buttons container */
   .request-actions {
     display: flex;
     justify-content: space-evenly;
     margin-top: 12px;
   }
   
-
-  
-  /* Approve button */
-  .button.approve {
+  .approve {
     background: #4CAF50;
     color: white;
+    border: none;
+    padding: 10px 16px;
+    font-size: 1rem;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: 0.2s ease-in-out;
   }
   
-  .button.approve:hover {
+  .approve:hover {
     background: #45a049;
   }
-  
-  /* Reject button */
-  .button.reject {
+
+  .reject {
     background: #d9534f;
     color: white;
+    border: none;
+    padding: 10px 16px;
+    font-size: 1rem;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: 0.2s ease-in-out;
   }
   
- .button.reject:hover {
+ .reject:hover {
     background: #c9302c;
   }
   
