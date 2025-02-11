@@ -1,5 +1,6 @@
 import './JoinRequests.css';
 import '../pages/messaging.css';
+import './components.css';
 import React, { useState } from 'react';
 import axios from 'axios';
 
@@ -14,21 +15,24 @@ import axios from 'axios';
     const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
   
   
-    // Fetch the study group details when the component is mounted
-    const handleApproval = async () => {
+    const handleRetreivingRequests = async () => {
+        // will have a get function pulling from the swipe table 
 
+    }
+
+
+    const handleApproval = async () => {
+      //approves someones message request
 
     }
     
-    // Fetch the study group details when the component is mounted
+    
     const handledDenial = async () => {
-
+      //rejects someones message request
 
     }
 
-    const handleGoingToMessages = async () => {
-        
-    }
+    
     
     return (
       <div className="requests-panel">

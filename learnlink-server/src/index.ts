@@ -486,6 +486,16 @@ app.post('/api/swipe', async (req, res) => {
   }
 });
 
+
+//endpoint for retrieving requests from the swipe table for matching logic
+app.get('/api/swipe/:currentUser', async (req, res) => {
+  // make an API that finds all swipes where [currentUser] = [targetUserID] 
+
+  const { currentUser } = req.params;
+  console.log('Fetching requests for user:', currentUser);
+
+});
+
 // Helper function to create user-to-user matches
 const createMatchForUsers = async (userId: number, targetUserId: number) => {
   const targetUserSwipe = await prisma.swipe.findFirst({
