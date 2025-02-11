@@ -4,7 +4,8 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './components.css';
 import Logo from '../components/Logo';
-import { FaSearch, FaBell, FaCog, FaUserCircle } from 'react-icons/fa';
+import { FaSearch, FaBell, FaCog, FaUserCircle, FaBars, FaTimes } from 'react-icons/fa';
+
 
 interface User {
   id: number;
@@ -77,15 +78,22 @@ const Navbar: React.FC = () => {
     const handleAccountDetails = () => { 
         navigate('/accountDetails');
     }
+    const [isNavOpen, setIsNavOpen] = useState(false);
   return (
     <header className="navbar">
-      <div className="nav-logo"><Logo/></div>
-      <nav className="nav-links">
+      <div className="nav-logo"><Logo /></div>
+      <FaBars className="hamburger" onClick={() => setIsNavOpen(true)} />
+
+
+      {/* Full-Screen Menu */}
+      <div className={`fullscreen-menu ${isNavOpen ? "show" : ""}`}>
+        <FaTimes className="close-icon" onClick={() => setIsNavOpen(false)} />
         <a href="/swiping">Match</a>
         <a href="/profile">Profile</a>
-        <a href="/messaging" onClick={handleMessaging} >Messaging</a>
+        <a href="/messaging" onClick={handleMessaging}>Messaging</a>
         <a href="/resources/studyTips">Resources</a>
-      </nav>
+      </div>
+
       <div className="search-bar">
         <input
           type="text"
@@ -93,8 +101,6 @@ const Navbar: React.FC = () => {
           onChange={handleSearch}
           placeholder="Search for users"
         />
-        {/* {searchResults.length}
-        {isDropdownVisible.toString()} */}
         {isDropdownVisible && searchResults.length > 0 && (
           <ul className="dropdown">
             {searchResults.map((user) => (
@@ -104,17 +110,21 @@ const Navbar: React.FC = () => {
             ))}
           </ul>
         )}
-        {/* <p>{searchResults.length} results found</p> */}
-          <FaSearch className="search-icon" />
-        </div>
+        <FaSearch className="search-icon" />
+      </div>
+
+      {/* Normal Navigation Links - Hidden on Mobile */}
+      <nav className="nav-links">
+        <a href="/swiping">Match</a>
+        <a href="/profile">Profile</a>
+        <a href="/messaging" onClick={handleMessaging}>Messaging</a>
+        <a href="/resources/studyTips">Resources</a>
+      </nav>
+
       <div className="nav-icons">
-        {/*give user a notification*/}
         <FaBell className="icon" />
-        {/*create an onclick function to go to settings page*/}
         <FaCog className="icon" onClick={handleSettings} />
-        <FaUserCircle className="icon profile-icon" onClick={handleAccountDetails}/>
-        {/* create a drag down menu for the profile and resources*/}
-      
+        <FaUserCircle className="icon profile-icon" onClick={handleAccountDetails} />
       </div>
     </header>
   );
