@@ -22,11 +22,17 @@ interface User{
   lastName: string;
 }
 
+interface Group{
+  id: number;
+  name: string;
+}
+
 const JoinRequests: React.FC<JoinRequestProps> = ({ currentUserId }) => {
   const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
   const [requests, setRequests] = useState<SwipeRequest[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [user, setReqUser] = useState<User[]>([]);
+  const [group, setGroup]  = useState<Group[]>([]);
   //console.log("JoinRequests component is rendering!");
 
   useEffect(() => {
@@ -43,7 +49,6 @@ const JoinRequests: React.FC<JoinRequestProps> = ({ currentUserId }) => {
       const requestResponse = await axios.get(`${REACT_APP_API_URL}/api/swipe/${currentUserId}`);
       setRequests(requestResponse.data);
   
-      
       // Fetch user details for each request
       const userRequests = await Promise.all(
         requestResponse.data.map(async (req: SwipeRequest) => {
@@ -52,7 +57,18 @@ const JoinRequests: React.FC<JoinRequestProps> = ({ currentUserId }) => {
         })
       );
   
+      // Fetch study group details only if targetGroupId exists
+      const studyGroupInfo = await Promise.all(
+        requestResponse.data
+          .filter((req: SwipeRequest) => req.targetGroupId !== null) // Filter out null targetGroupId
+          .map(async (req: SwipeRequest) => {
+            const groupResponse = await axios.get(`${REACT_APP_API_URL}/api/study-groups/${req.targetGroupId}`);
+            return groupResponse.data;
+          })
+      );
+  
       setReqUser(userRequests);
+      setGroup(studyGroupInfo);
     } catch (err) {
       console.error('Error fetching requests:', err);
       setError('Failed to load requests.');
@@ -88,12 +104,10 @@ const JoinRequests: React.FC<JoinRequestProps> = ({ currentUserId }) => {
 
   return (
     <div className="requests-panel">
-      <h2>Join Requests</h2>
-  
       {error && <p className="error-message">{error}</p>}
       
       {requests.length === 0 ? (
-        <p className="no-requests">No join requests available.</p>
+        <p className="no-requests">No join requests.</p>
       ) : (
         <ul className="requests-list">
           {requests.map((request, index) => (
@@ -101,7 +115,7 @@ const JoinRequests: React.FC<JoinRequestProps> = ({ currentUserId }) => {
               <div className="request-details">
                 <p><strong>Requester Name:</strong> {user[index]?.firstName} {user[index]?.lastName}</p>
                 {request.targetGroupId && (
-                  <p><strong>Target Group ID:</strong> {request.targetGroupId}</p>
+                  <p><strong>Target Group:</strong> {group.find(g => g.id === request.targetGroupId)?.name || 'Unknown Group'}</p>
                 )}
                 <p><strong>Message:</strong> {request.message}</p>
               </div>
@@ -111,7 +125,6 @@ const JoinRequests: React.FC<JoinRequestProps> = ({ currentUserId }) => {
               </div>
             </li>
           ))}
-
         </ul>
       )}
     </div>

@@ -488,23 +488,32 @@ app.post('/api/swipe', async (req, res) => {
 
 
 //endpoint for retrieving requests from the swipe table for matching logic
-app.get('/api/swipe/:currentUser', async (req, res) : Promise<any> => {
+app.get('/api/swipe/:currentUser', async (req, res): Promise<any> => {
   let { currentUser } = req.params;
   console.log('Fetching requests for user:', currentUser);
 
-  // Convert currentUser to a number
   const userId = parseInt(currentUser, 10);
-
-  // Check if conversion was successful
+  
   if (isNaN(userId)) {
     return res.status(400).json({ error: 'Invalid user ID' });
   }
 
   try {
-    // Find all swipes where the current user is the target
+    // Fetch all study group IDs where the current user is a member
+    const userGroups = await prisma.studyGroup.findMany({
+      where: { users: { some: { id: userId } } },  // Check if user is in any study group
+      select: { id: true },
+    });
+
+    const userGroupIds = userGroups.map(g => g.id); // Extract group IDs
+
+    // Find swipes where the user is directly targeted OR their group is targeted
     const swipes = await prisma.swipe.findMany({
       where: {
-        targetUserId: userId, // Use the converted number
+        OR: [
+          { targetUserId: userId },  // Direct match
+          { targetGroupId: { in: userGroupIds } } // User's study group is a target
+        ],
       },
     });
 
@@ -514,6 +523,7 @@ app.get('/api/swipe/:currentUser', async (req, res) : Promise<any> => {
     res.status(500).json({ error: 'Something went wrong' });
   }
 });
+
 
 
 
@@ -817,6 +827,40 @@ app.put('/api/study-groups/chat/:chatID', async (req, res) : Promise<any> =>  {
   } catch (error) {
     console.error('Error updating study group:', error);
     res.status(500).json({ error: 'Failed to update the study group' });
+  }
+});
+
+
+//for the request panel 
+
+// Endpoint to get a study group by ID
+app.get('/api/study-groups/:groupId', async (req, res): Promise<any> => {
+  const { groupId } = req.params;
+  const studyGroupId = parseInt(groupId, 10);
+
+  if (isNaN(studyGroupId)) {
+    return res.status(400).json({ error: 'Invalid Study Group ID' });
+  }
+
+  try {
+    const studyGroup = await prisma.studyGroup.findUnique({
+      where: { id: studyGroupId },
+      include: {
+        creator: true, // Fetch creator details
+        users: true,   // Fetch all users in the study group
+        matches: true, // Fetch associated matches
+        chat: true,    // Fetch linked chat if exists
+      },
+    });
+
+    if (!studyGroup) {
+      return res.status(404).json({ error: 'Study Group not found' });
+    }
+
+    res.status(200).json(studyGroup);
+  } catch (error) {
+    console.error('Error fetching study group:', error);
+    res.status(500).json({ error: 'Something went wrong' });
   }
 });
 
