@@ -107,7 +107,7 @@
   color: #00668C;
 }
 
-/* Full-Screen Overlay Menu */
+/* Full-Screen Overlay Menu - for navigation when for mobile*/
 .fullscreen-menu {
   position: fixed;
   top: 0;
@@ -142,7 +142,6 @@
 .fullscreen-menu a:hover {
   text-decoration: underline;
 }
-
 
 .close-icon {
   position: absolute;

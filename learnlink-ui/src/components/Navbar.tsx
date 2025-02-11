@@ -82,15 +82,13 @@ const Navbar: React.FC = () => {
       <div className="nav-logo"><Logo /></div>
       <FaBars className="hamburger" onClick={() => setIsNavOpen(true)} />
 
-
-      {/* Full-Screen Menu */}
-      <div className={`fullscreen-menu ${isNavOpen ? "show" : ""}`}>
-        <FaTimes className="close-icon" onClick={() => setIsNavOpen(false)} />
+      {/* Normal Navigation Links*/}
+      <nav className="nav-links">
         <a href="/swiping">Match</a>
         <a href="/profile">Profile</a>
         <a href="/messaging" onClick={handleMessaging}>Messaging</a>
         <a href="/resources/studyTips">Resources</a>
-      </div>
+      </nav>
 
       <div className="search-bar">
         <input
@@ -111,13 +109,14 @@ const Navbar: React.FC = () => {
         <FaSearch className="search-icon" />
       </div>
 
-      {/* Normal Navigation Links - Hidden on Mobile */}
-      <nav className="nav-links">
+      {/* Full-Screen Menu */}
+      <div className={`fullscreen-menu ${isNavOpen ? "show" : ""}`}>
+        <FaTimes className="close-icon" onClick={() => setIsNavOpen(false)} />
         <a href="/swiping">Match</a>
         <a href="/profile">Profile</a>
         <a href="/messaging" onClick={handleMessaging}>Messaging</a>
         <a href="/resources/studyTips">Resources</a>
-      </nav>
+      </div>
 
       <div className="nav-icons">
         <FaBell className="icon" />
