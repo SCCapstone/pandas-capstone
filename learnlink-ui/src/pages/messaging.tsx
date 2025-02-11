@@ -8,6 +8,7 @@ import axios from 'axios';
 import { useSearchParams } from 'react-router-dom';
 import EditStudyGroup from '../components/EditStudyGroup';
 import MessagesNavi from "../components/MessagesNavi";
+import JoinRequests from '../components/JoinRequests';
 
 
 interface Chat {
@@ -94,6 +95,8 @@ const Messaging: React.FC = () => {
   }, [selectedChat]);  
 
   useEffect(() => {
+
+    handleMessagesSwitch();
     // Fetch users and chats from the API when the component mounts
     axios.get(`${REACT_APP_API_URL}/api/users`)
       .then((response) => setUsers(response.data))
@@ -635,8 +638,8 @@ const Messaging: React.FC = () => {
           </ul>
         </div>
 
-        
-              
+
+
         
         {/* Tabs for Messages and Requests */}
         {/* Tabs for Messages and Requests */}
@@ -666,6 +669,7 @@ const Messaging: React.FC = () => {
               handleDeleteChat={handleDeleteChat} 
             />
           )}
+          {showRequestsPanel}
         </div>
 
 

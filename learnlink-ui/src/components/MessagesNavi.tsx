@@ -1,5 +1,6 @@
 import './JoinRequests.css';
 import '../pages/messaging.css';
+import './components.css';
 import React, { useState } from 'react';
 import axios from 'axios';
 
