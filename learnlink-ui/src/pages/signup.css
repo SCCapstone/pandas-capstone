@@ -15,7 +15,14 @@ body{
   background-color: #D4EAF7;
 }
 
+.signupPage {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
 .container {
+  flex:1;
   width: 700px;
   height: 500px;
   padding: 20px;
@@ -23,11 +30,12 @@ body{
   flex-direction: column;
   align-items: flex-start;
   text-align: left;
+  overflow-y: scroll;
 }
 
 .l1 {
-  width: 513px;
-  height: 108px;
+  width: 700px;
+  height: auto;
   font-family: 'Inter';
   font-weight: 500;
   font-size: 64px;
@@ -38,7 +46,7 @@ body{
 }
 
 .t2 {
-  width: 513px;
+  width: 700px;
   font-family: 'Inter';
   font-weight:400;
   font-size: 18px;

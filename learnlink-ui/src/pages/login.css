@@ -9,6 +9,11 @@
   justify-content: center;
   align-items: center;
 }
+.loginPage {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
 
 .container {
   width: 80%;
@@ -16,19 +21,20 @@
   display: flex;
   flex-direction: column;
   align-items: center; /* This will center the form contents */
-  text-align: center; /* Centers the text inside the container */
-  margin-bottom: 50px;
+  text-align: left; /* Centers the text inside the container */
+  /* margin-bottom: 50px; */
 }
 
 .login_title {
   width: 100%;
   height: auto; /* Adjust the height */
   font-family: 'Inter';
-  font-weight: 400;
+  font-weight: 500;
   font-size: 64px;
   line-height: 1.2;
-  text-align: left; /* Centers the title */
-  margin-bottom: 15px; /* Add some space below the title */
+  text-align: left;
+  margin-bottom: 5px;
+  color: #3B3C3D;
 }
 
 .enter_title {

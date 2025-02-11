@@ -148,7 +148,7 @@ const Signup: React.FC = () => {
     };
 
     return (
-        <div>
+        <div className="signupPage">
             <div className="Logo2">
                 <Logo />
             </div>
@@ -256,9 +256,7 @@ const Signup: React.FC = () => {
                     </div>
                 </div>
             </div>
-            <div>
-                <Copyright />
-            </div>
+            <Copyright />
         </div>
     );
 };

@@ -115,6 +115,7 @@
   padding: 10px;
   background-color: #f9f9f9;
   border-radius: 8px;
+  overflow-y: scroll;
 }
 
 .NoChatSelected {

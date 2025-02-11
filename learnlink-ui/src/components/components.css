@@ -12,17 +12,33 @@
 }
 
 /* Footer */
-.Copyright {
-  font-size: 14px;
+ .Copyright footer {
+  /*font-size: 14px;
   color: #00668C;
   text-align: center;
   width: 100%;
-  position: fixed;
+  position:absolute;
   line-height: 50px;
   bottom: 0;
   background-color: #D4EAF7;
   height: 50px;
   z-index: 1000;
+  display: block;
+  margin-top: auto;
+  display: inline-block; */
+  
+    font-size: 14px;
+    color: #00668C;
+    text-align: center;
+    width: 100%;
+    line-height: 50px;
+    background-color: #D4EAF7;
+    height: 50px;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: auto; 
 }
 
 
