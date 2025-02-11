@@ -67,8 +67,6 @@ const Navbar: React.FC = () => {
     setSearchResults([]);
     setIsDropdownVisible(false);
   };
-
-
     const handleSettings = () => {
         navigate('/settings');
     };
