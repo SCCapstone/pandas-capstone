@@ -11,7 +11,6 @@
   flex: 1; /* Take up all remaining space between header and footer */
   flex-direction: row;
   overflow-y: hidden;
-  margin-bottom: 50px; /* Space for the fixed footer */
 
 }
   
