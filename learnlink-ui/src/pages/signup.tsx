@@ -120,9 +120,26 @@ const Signup: React.FC = () => {
             // Store the JWT in localStorage
             localStorage.setItem('token', token);
 
+            const emailResponse = await fetch(`${REACT_APP_API_URL}/api/sign-up-email`, {
+
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    to: formData.email,
+                }),
+            });
+
+            console.log(emailResponse);
+
+            if (!emailResponse.ok) {
+                const errorData = await emailResponse.json();
+                throw new Error(errorData.error || 'Failed to send email');
+            }
             
             // Navigate to landing page after successful signup
-            navigate('/LandingPage');
+            //navigate('/LandingPage');
         } catch (error) {
             //setError('Failed to sign up. Please try again later.');
         } finally {

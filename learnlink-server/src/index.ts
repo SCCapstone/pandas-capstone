@@ -30,7 +30,7 @@ const NODE_ENV = process.env.NODE_ENV || 'development'; // default to 'developme
 const HTTPS_KEY_PATH = process.env.HTTPS_KEY_PATH || './certs/privkey.pem'; // Local default
 const HTTPS_CERT_PATH = process.env.HTTPS_CERT_PATH || './certs/fullchain.pem'; // Local default
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000'; // Local React app URL
-const SERVER_PORT = process.env.SERVER_PORT ? parseInt(process.env.SERVER_PORT, 10) : (NODE_ENV === 'production' ? 2020 : 2002);
+const SERVER_PORT = process.env.SERVER_PORT ? parseInt(process.env.SERVER_PORT, 10) : (NODE_ENV === 'production' ? 2020 : 2020);
 const JWT_SECRET = env.JWT_SECRET || 'your_default_jwt_secret';
 const resend = new Resend(process.env.RESEND);
 
@@ -74,7 +74,7 @@ if (NODE_ENV === 'production') {
 
 const io = new Server(server, {
   cors: {
-    origin: FRONTEND_URL, // Dynamically set the frontend URL
+    origin: '*', // Dynamically set the frontend URL
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   },
@@ -1337,7 +1337,66 @@ io.on("connection", (socket) => {
   
 // };
 
+app.post("/api/sign-up-email", async (req, res) => {
+  try {
+    const { to } = req.body; // Get data from frontend
+    console.log('Sending email to:', to);
 
+    const response = await resend.emails.send({
+      from: "onboarding@resend.dev",
+      to,
+      subject: "Welcome to LearnLink",
+      html: `
+      <html>
+      <head>
+        <style>
+          @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
+          
+          body {
+            font-family: 'Inter', Arial, sans-serif;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+          }
+          .email-container {
+            text-align: center;
+            padding: 20px;
+          }
+          h1 {
+            color: #00668c;
+          }
+          p {
+            font-size: 16px;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="email-container">
+          <img src="../../learnlink-ui/src/components/LearnLink.svg" alt="LearnLink Logo" width="100" />
+          <h1>Welcome to LearnLink!</h1>
+          <p>Thank you for signing up with LearnLink. We're excited to have you on board!</p>
+          <p>If you have any questions, feel free to reach out to our support team.</p>
+          <p>Best regards,<br />The LearnLink Team</p>
+        </div>
+      </body>
+    </html>
+    `
+    ,
+    });
+
+    // const response = resend.emails.send({
+    //   from: 'onboarding@resend.dev',
+    //   to: 'jonessara141@gmail.com',
+    //   subject: 'Hello World',
+    //   html: '<p>Congrats on sending your <strong>first email</strong>!</p>'
+    // });
+
+    res.json({ to, success: true, response, message: 'Email sent successfully' });
+  } catch (error) {
+    res.status(500).json({ success: false, error });
+  }
+});
 
 /******API endpoint for the forgot password */
 app.post("/api/send-email", async (req, res) => {
