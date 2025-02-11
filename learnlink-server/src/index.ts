@@ -488,13 +488,34 @@ app.post('/api/swipe', async (req, res) => {
 
 
 //endpoint for retrieving requests from the swipe table for matching logic
-app.get('/api/swipe/:currentUser', async (req, res) => {
-  // make an API that finds all swipes where [currentUser] = [targetUserID] 
-
-  const { currentUser } = req.params;
+app.get('/api/swipe/:currentUser', async (req, res) : Promise<any> => {
+  let { currentUser } = req.params;
   console.log('Fetching requests for user:', currentUser);
 
+  // Convert currentUser to a number
+  const userId = parseInt(currentUser, 10);
+
+  // Check if conversion was successful
+  if (isNaN(userId)) {
+    return res.status(400).json({ error: 'Invalid user ID' });
+  }
+
+  try {
+    // Find all swipes where the current user is the target
+    const swipes = await prisma.swipe.findMany({
+      where: {
+        targetUserId: userId, // Use the converted number
+      },
+    });
+
+    res.status(200).json(swipes);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Something went wrong' });
+  }
 });
+
+
 
 // Helper function to create user-to-user matches
 const createMatchForUsers = async (userId: number, targetUserId: number) => {
@@ -883,6 +904,35 @@ app.get('/api/users', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+//used for getting request list in messaging page
+app.get('/api/users/:id', async (req, res) : Promise<any> => {
+  try {
+    const userId = parseInt(req.params.id);
+
+    // Fetch a single user from the database using Prisma
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+      },
+    });
+
+    // If user not found, return a 404 error
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Respond with the user in JSON format
+    res.status(200).json(user);
+  } catch (error) {
+    // Log the error and send a response with a 500 status code in case of error
+    console.error('Error fetching user:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 
 // Get all chats for a user
 // WORKS

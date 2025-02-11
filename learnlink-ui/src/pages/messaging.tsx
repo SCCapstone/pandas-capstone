@@ -102,7 +102,7 @@ const Messaging: React.FC = () => {
       .then((response) => setUsers(response.data))
       .catch((error) => console.error('Error fetching users:', error));
 
-
+    //console.log("current user id:", currentUserId);
     // Make the API request to fetch chats for the user
   
     const token = localStorage.getItem('token');
@@ -205,12 +205,14 @@ const Messaging: React.FC = () => {
   
   const handleMessagesSwitch = () => {
     setActiveTab('messages');
+    setShowRequestsPanel(false);
     setShowMessagesPanel(true);
   };
   
   const handleRequestsSwitch = () => {
     setActiveTab('requests');
     setShowMessagesPanel(false);
+    setShowRequestsPanel(true);
   };
 
   const handleSendMessage = async () => {
@@ -669,7 +671,13 @@ const Messaging: React.FC = () => {
               handleDeleteChat={handleDeleteChat} 
             />
           )}
-          {showRequestsPanel}
+          {showRequestsPanel && (
+            <JoinRequests 
+              currentUserId= {currentUserId}
+              
+            />
+          )}
+      
         </div>
 
 
