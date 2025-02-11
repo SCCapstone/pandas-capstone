@@ -66,9 +66,10 @@ const Login: React.FC = () => {
             </div>
             <div className="login">
                 <div className="container">
+
+                    <form onSubmit={handleLogin}>
                     <h1 className="login_title">Login</h1>
                     <h2 className="enter_title">Enter your credentials to login.</h2>
-                    <form onSubmit={handleLogin}>
                         <label>Username</label>
                         <input 
                             id="username"

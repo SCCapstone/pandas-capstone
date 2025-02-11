@@ -15,20 +15,20 @@
   padding: 20px;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  text-align: left;
+  align-items: center; /* This will center the form contents */
+  text-align: center; /* Centers the text inside the container */
   margin-bottom: 50px;
 }
 
 .login_title {
   width: 100%;
-  height: 108px;
+  height: auto; /* Adjust the height */
   font-family: 'Inter';
   font-weight: 400;
   font-size: 64px;
   line-height: 1.2;
-  text-align: left;
-  margin-bottom: 2px;
+  text-align: left; /* Centers the title */
+  margin-bottom: 15px; /* Add some space below the title */
 }
 
 .enter_title {
@@ -36,10 +36,9 @@
   font-family: 'Inter';
   font-weight: normal;
   font-size: 18px;
-  text-align: left;
+  text-align: left; /* Centers the enter title */
   line-height: 1.2;
-  margin-bottom: 2px;
-  margin-bottom: 15px;
+  margin-bottom: 15px; /* Add space between this and the form */
 }
 
 label {
@@ -52,7 +51,7 @@ label {
   text-align: left;
   margin-bottom: 10px;
   line-height: 10px;
-  display:block;
+  display: block;
   font-weight: normal;
   color: #3B3C3D;
 }

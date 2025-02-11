@@ -52,12 +52,14 @@ const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:200
     <div>
       <Navbar />
 
-      <div className='detailHeader'>Account</div>
-      <div className="user-details">
-        <p><strong>First Name:</strong> {formData.first_name}</p>
-        <p><strong>Last Name:</strong> {formData.last_name}</p>
-        <p><strong>Username:</strong> {formData.username}</p>
-        <p><strong>Email:</strong> {formData.email || 'No email available'}</p>
+      <div className="container">
+        <div className='heading'>Account Details</div>
+          <div className="details">
+            <p><strong>First Name:</strong> {formData.first_name}</p>
+            <p><strong>Last Name:</strong> {formData.last_name}</p>
+            <p><strong>Username:</strong> {formData.username}</p>
+            <p><strong>Email:</strong> {formData.email || 'No email available'}</p>
+          </div>
       </div>
 
       <CopyrightFooter />
