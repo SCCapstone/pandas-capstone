@@ -454,7 +454,7 @@ app.post('/api/update-password', authenticate, async (req, res):Promise<any> => 
 
 // Endpoint to handle swipe action and create a match if applicable
 app.post('/api/swipe', async (req, res) => {
-  const { userId, targetId, direction, isStudyGroup, message } = req.body;
+  const { userId, targetId, direction, isStudyGroup, message, targetGroup, user } = req.body;
 
   try {
     // Store the swipe in the database
@@ -464,7 +464,7 @@ app.post('/api/swipe', async (req, res) => {
         direction,
         targetUserId: isStudyGroup ? null : targetId,  // If study group, nullify targetUserId
         targetGroupId: isStudyGroup ? targetId : null,  // If user, nullify targetGroupId
-        message,
+        message
       },
     });
 
@@ -502,7 +502,7 @@ app.get('/api/swipe/:currentUser', async (req, res): Promise<any> => {
     // Fetch all study group IDs where the current user is a member
     const userGroups = await prisma.studyGroup.findMany({
       where: { users: { some: { id: userId } } },  // Check if user is in any study group
-      select: { id: true },
+      select: { id: true},
     });
 
     const userGroupIds = userGroups.map(g => g.id); // Extract group IDs
