@@ -47,7 +47,7 @@ const Navbar: React.FC = () => {
   const [courseInputValue, setCourseInputValue] = useState(""); // State to track the input value
 
   const { grade, gender, studyHabitTags } = useEnums();
-  const colleges = useColleges();
+  const {isLoading, colleges} = useColleges();
 
   
   const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
@@ -193,7 +193,7 @@ const Navbar: React.FC = () => {
                 isMulti
                 name="college-filter"
                 components={animatedComponents}
-                options={colleges} // Can be prefilled with options if needed
+                options={isLoading ? [] : colleges} // Only show colleges when they are loaded
                 value={selectedColleges}
                 onChange={handleCollegeChange}
                 isClearable
@@ -202,15 +202,14 @@ const Navbar: React.FC = () => {
                 className="basic-multi-select"
                 classNamePrefix="select"
                 noOptionsMessage={() => "Type to add a new college"}
-                inputValue={collegeInputValue} // Set input value
-                onInputChange={(newInputValue) => setCollegeInputValue(newInputValue)} // Update input value on change
+                inputValue={collegeInputValue}
+                onInputChange={(newInputValue) => setCollegeInputValue(newInputValue)}
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && collegeInputValue) {
-                    setSelectedColleges([
-                      ...selectedColleges,
-                      { label: collegeInputValue, value: collegeInputValue }
-                    ]);
-                    setCollegeInputValue(""); // Clear input
+                    const newCollege = { label: collegeInputValue, value: collegeInputValue };
+                    setSelectedColleges([...selectedColleges, newCollege]);
+                    // setColleges([...colleges, newCollege]);
+                    setCollegeInputValue('');
                   }
                 }}
               />

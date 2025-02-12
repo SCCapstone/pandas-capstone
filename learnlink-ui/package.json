@@ -28,6 +28,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
+    "prebuild": "cross-env REACT_APP_API_KEY_DEPT_EDU=U4jNA1aeL3dEL0VuHCh66mgaIZQWthWxuusCZsbU node ./src/utils/fetchColleges.js",
     "build": "cross-env REACT_APP_ENV=prod react-scripts build",
     "test": "react-scripts test --watchAll --coverage",
     "eject": "react-scripts eject"

@@ -55,57 +55,29 @@ export const useEnums = () => {
 };
 
 export const useColleges = () => {
-  const [colleges, setColleges] = useState<{ label: string, value: string }[]>([]);
-
+  const [colleges, setColleges] = useState<{ label: string; value: string }[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   useEffect(() => {
-
+    // Fetch the preloaded colleges data from the public directory
     const fetchColleges = async () => {
-      let allColleges: { label: string; value: string }[] = [];
-      let page = 0;
-      const perPage = 100; // Number of results per page
-  
-      while (true) {
-        try {
-          const response = await fetch(
-            `https://api.data.gov/ed/collegescorecard/v1/schools?api_key=${REACT_APP_API_KEY_DEPT_EDU}&fields=id,school.name&per_page=${perPage}&page=${page}`
-          );
-          const data = await response.json();
-          console.log("API Response:", data); // Log to inspect the data structure
-  
-          if (data && data.results && data.results.length > 0) {
-            // Collect colleges from the current page
-            const collegesList = data.results
-              .filter((college: { "school.name": string; id: number }) => college["school.name"]) // Ensure school.name exists
-              .map((college: { "school.name": string; id: number }) => ({
-                label: college["school.name"], // Access school.name directly as key
-                value: college.id, // Use college ID as value
-              }));
-  
-            allColleges = [...allColleges, ...collegesList];
-  
-            // If fewer than `perPage` results, we've reached the last page
-            if (data.results.length < perPage) {
-              break;
-            }
-  
-            // Otherwise, go to the next page
-            page++;
-          } else {
-            console.error("No colleges found in the response:", data);
-            break;
-          }
-        } catch (error) {
-          console.error("Error fetching colleges:", error);
-          break;
+      try {
+        const response = await fetch('/colleges.json');
+        const data = await response.json();
+
+        if (data) {
+          setColleges(data);
+          setIsLoading(false);
+        } else {
+          console.error("No colleges data available.");
+          setIsLoading(false);
         }
+      } catch (error) {
+        console.error("Error fetching colleges:", error);
+        setIsLoading(false);
       }
-  
-      // Set all colleges after paginating through all the pages
-      setColleges(allColleges);
     };
-  
+
     fetchColleges();
   }, []);
-
-  return colleges;
-}
+  return { colleges, isLoading };
+};
