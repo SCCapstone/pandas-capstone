@@ -34,8 +34,6 @@ const JoinRequests: React.FC<JoinRequestProps> = ({ currentUserId }) => {
   const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
   const [requests, setRequests] = useState<SwipeRequest[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [user, setReqUser] = useState<User[]>();
-  const [group, setGroup]  = useState<Group[]>();
   //console.log("JoinRequests component is rendering!");
 
   useEffect(() => {
@@ -50,42 +48,34 @@ const JoinRequests: React.FC<JoinRequestProps> = ({ currentUserId }) => {
   const handleRetrievingRequests = async () => {
     try {
       const requestResponse = await axios.get(`${REACT_APP_API_URL}/api/swipe/${currentUserId}`);
-      console.log(requestResponse);
-
+      const requestData = requestResponse.data;
   
       // Fetch user details for each request
       const userRequests = await Promise.all(
-        requestResponse.data.map(async (req: SwipeRequest) => {
+        requestData.map(async (req: SwipeRequest) => {
           const userResponse = await axios.get(`${REACT_APP_API_URL}/api/users/${req.userId}`);
-          return userResponse.data;
+          return { ...req, user: userResponse.data }; // Attach user data to request
         })
       );
   
-      // Fetch study group details only if targetGroupId exists
-      const studyGroupInfo = await Promise.all(
-        requestResponse.data
-          .filter((req: SwipeRequest) => req.targetGroupId !== null) // Filter out null targetGroupId
-          .map(async (req: SwipeRequest) => {
+      // Fetch study group details only for requests with targetGroupId
+      const updatedRequests = await Promise.all(
+        userRequests.map(async (req: SwipeRequest) => {
+          if (req.targetGroupId) {
             const groupResponse = await axios.get(`${REACT_APP_API_URL}/api/study-groups/${req.targetGroupId}`);
-            return groupResponse.data;
-          })
+            return { ...req, targetGroup: groupResponse.data }; // Attach group data to request
+          }
+          return req; // If no group, return request unchanged
+        })
       );
-      setRequests(requestResponse.data);
-      setReqUser(userRequests);
-      setGroup(studyGroupInfo);
-
-      console.log(requests);
-      console.log(user);
-      console.log(group);
-
-      
+  
+      setRequests(updatedRequests);
     } catch (err) {
       console.error('Error fetching requests:', err);
       setError('Failed to load requests.');
     }
   };
   
-
   // Approve request (creates a match)
   const handleApproval = async (requestId: number) => {
     /*
@@ -139,13 +129,13 @@ const JoinRequests: React.FC<JoinRequestProps> = ({ currentUserId }) => {
               
               <div className="request-details">
                 {/*Shows the name of the requestor*/}
-                <p><strong>Requester Name:</strong>{} </p>
+                <p><strong>Requester Name: </strong>{request.user.firstName +' ' +request.user.lastName} </p>
                 {/*Shows the group - if any - that they want to join*/}
                 {request.targetGroupId && (
-                  <p><strong>Target Group:</strong> {}</p>
+                  <p><strong>Target Group: </strong> {request.targetGroup.name}</p>
                 )}
                 {/*Shows the message from the requestor*/}
-                <p><strong>Message:</strong> {request.message}</p>
+                <p><strong>Message: </strong> {request.message}</p>
               </div>
 
               <div className="request-actions">
