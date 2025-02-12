@@ -72,8 +72,10 @@ const Settings: React.FC = () => {
     navigate('/changePassword');
 };
   return (
-    <div>
+    <div className='settingsPage'>
+      <div>
       <Navbar />
+      </div>
 
       <div className="settings">
         <div className='heading'>Manage Account</div>

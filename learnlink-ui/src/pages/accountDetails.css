@@ -1,5 +1,6 @@
 /* Center the entire page content */
-.container {
+.acccount-details-container {
+  flex:1;
   display: flex;
   flex-direction: column;
   align-items: center;  /* Horizontally centers content */
@@ -13,6 +14,13 @@
   color: #00668C;
   font-size: 36px;
   font-weight: 600;
+}
+
+.account-details {
+  overflow-y: scroll;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
 }
 
 /* Center the details box */

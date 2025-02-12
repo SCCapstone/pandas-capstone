@@ -8,6 +8,17 @@
   font-weight: 600;
 }
 
+.settingsPage  {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.settings{
+  flex:1;
+  overflow-y: scroll;
+}
+
 /* All buttons Container */
 .buttons {
   display: flex;

@@ -49,10 +49,10 @@ const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:200
   }, []);
 
   return (
-    <div>
+    <div className="account-details">
       <Navbar />
 
-      <div className="container">
+      <div className="account-details-container">
         <div className='heading'>Account Details</div>
           <div className="details">
             <p><strong>First Name:</strong> {formData.first_name}</p>
@@ -62,7 +62,10 @@ const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:200
           </div>
       </div>
 
-      <CopyrightFooter />
+      <div>
+        <CopyrightFooter />
+
+      </div>
     </div>
   );
 };
