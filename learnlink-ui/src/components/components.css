@@ -95,17 +95,27 @@
 
 .search-bar input {
   padding: 0.5rem;
+  padding-left: 35px;
+  padding-right: 0.5rem;
   border-radius: 5px;
   border: 1px solid #ddd;
-  width: 100%;
+  width: 95%;
 }
 
 .search-icon {
   position: absolute;
   right: 10px;
-  top: 50%;
+  top: 40%;
   transform: translateY(-50%);
   color: #00668C;
+}
+
+.hamburger-icon {
+  position: absolute;
+  left: 10px;
+  top: 40%;
+  transform: translateY(-50%);
+  color: #D9D9D9;
 }
 
 .icon {
@@ -276,4 +286,75 @@
   font-size: 14px;
   font-weight: 500;
   padding: 5px;
+}
+
+.filters {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  position: absolute;
+  top: 75%;
+  left: 0;
+  right: 0;
+  padding: 10px;
+  max-height: 300px;
+  background-color: #fff;
+  border-radius: 2px;
+  overflow-y: scroll;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+
+.filters input {
+  color: black;
+  cursor: pointer;
+  font-size: small;
+  margin: 5px;
+  width : 90%;
+}
+
+.age-slider-container {
+  text-align: center;
+  width: 100%;
+}
+
+.slider-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  margin-top: 10px;
+  gap: 5px;
+}
+
+.slider-label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #333;
+}
+
+.age-slider {
+  flex:1;
+  width: auto;
+  height: 8px;
+  border-radius: 4px;
+  margin: 20px 0;
+  background: #00668C;
+
+}
+
+.thumb {
+  top: -60%;
+  width: 20px;
+  height: 20px;
+  background: #00668C;
+  border-radius: 50%;
+  cursor: grab;
+}
+
+.track {
+  background: #00668C;
+  height: 8px;
+  border-radius: 4px;
 }
