@@ -343,7 +343,7 @@ app.put('/api/users/update', async (req, res): Promise<any> => {
         college: college || undefined,
         major: major || undefined,
         grade: grade || undefined,
-        relevant_courses: relevant_courses || undefined,
+        relevant_courses: Array.isArray(relevant_courses) ? relevant_courses : (relevant_courses ? [relevant_courses] : undefined),
         study_method: study_method || undefined,
         gender: gender || undefined,
         bio: bio || undefined,
@@ -898,7 +898,14 @@ app.get('/api/users/search', authenticate, async (req, res): Promise<any> => {
 
     // Add course filter if provided
     if (typeof course === 'string' && course.length > 0) {
-      filters.push({ course: { in: course.split(',') } });
+      const courseArray = course.split(',').map((item) => item.trim())
+      console.log('courseArray:', courseArray);
+      filters.push({
+        relevant_courses: {
+          hasSome: courseArray // Split and trim course names
+        }
+      });
+      console.log('course:', course); // Log for debugging
     }
 
     // Add age range filter if provided

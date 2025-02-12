@@ -130,10 +130,13 @@ const Profile: React.FC = () => {
     const dataToSend = {
       ...formData,
       age: formData.age ? parseInt(formData.age) : undefined,
-      relevant_courses: formData.relevant_courses ?
-        (Array.isArray(formData.relevant_courses) ? formData.relevant_courses : [formData.relevant_courses]) : [],
+      relevant_courses: formData.relevant_courses
+        ? Array.isArray(formData.relevant_courses)
+          ? formData.relevant_courses // If it's already an array, use it
+          : [formData.relevant_courses] // If it's a single string, make it an array
+        : [], // If no courses are provided, use an empty array
       studyHabitTags: formData.studyHabitTags ? formData.studyHabitTags : [],
-      
+
 
     };
 
@@ -228,7 +231,20 @@ const Profile: React.FC = () => {
                   </select>
                 </label>
                 <label>
-                  Relevant Course: <input type="text" name="relevant_courses" value={formData.relevant_courses} onChange={handleChange} />
+                  {/* Relevant Course: <input type="text" name="relevant_courses" value={formData.relevant_courses} onChange={handleChange} /> */}
+                  Relevant Course:
+                  <input
+                    type="text"
+                    name="relevant_courses"
+                    value={formData.relevant_courses.join(', ')} // Convert array to string for display
+                    onChange={(e) => {
+                      const coursesArray = e.target.value.split(',').map((course) => course.trim());
+                      setFormData((prevData) => ({
+                        ...prevData,
+                        relevant_courses: coursesArray, // Store as an array
+                      }));
+                    }}
+                  />
                 </label>
                 <label>
                   Fav Study Method: <input type="text" name="study_method" value={formData.study_method} onChange={handleChange} />
