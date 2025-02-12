@@ -358,3 +358,14 @@
   height: 8px;
   border-radius: 4px;
 }
+
+.college-filter {
+  z-index: 1000;
+}
+.coursework-filter{
+  z-index:999;
+}
+
+.gender-filter {
+  z-index: 998;
+}

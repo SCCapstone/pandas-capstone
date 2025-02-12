@@ -866,22 +866,57 @@ app.get('/api/study-groups/:groupId', async (req, res): Promise<any> => {
 
 
 
-// SEARCH FEATURE
 app.get('/api/users/search', authenticate, async (req, res): Promise<any> => {
-  const { query } = req.query;
+  const { query, gender, college, ageRange, course } = req.query;
 
   if (!query) {
     return res.status(400).json({ error: 'Query parameter is required' });
   }
 
   try {
+    const filters: any = []; // Create an array to store valid filters
+
+    // Add search filters for username, firstName, and lastName
+    filters.push({
+      OR: [
+        { username: { contains: query as string, mode: 'insensitive' } },
+        { firstName: { contains: query as string, mode: 'insensitive' } },
+        { lastName: { contains: query as string, mode: 'insensitive' } },
+      ],
+    });
+
+    // Add gender filter if provided
+    if (typeof gender === 'string' && gender.length > 0) {
+      filters.push({ gender: { in: gender.split(',') } });
+    }
+
+    // Add college filter if provided
+    if (typeof college === 'string' && college.length > 0) {
+      filters.push({ college: { in: college.split(',') } });
+      console.log('College:', college);
+    }
+
+    // Add course filter if provided
+    if (typeof course === 'string' && course.length > 0) {
+      filters.push({ course: { in: course.split(',') } });
+    }
+
+    // Add age range filter if provided
+    if (ageRange && ageRange.length === 2) {
+      const [minAge, maxAge] = (ageRange as string).split(',').map(Number);
+      filters.push({
+        age: { gte: minAge, lte: maxAge },
+      });
+    }
+
+    // If no valid filters, return a 400 error
+    if (filters.length === 0) {
+      return res.status(400).json({ error: 'At least one filter must be provided' });
+    }
+
     const users = await prisma.user.findMany({
       where: {
-        OR: [
-          { username: { contains: query as string, mode: 'insensitive' } },
-          { firstName: { contains: query as string, mode: 'insensitive' } },
-          { lastName: { contains: query as string, mode: 'insensitive' } },
-        ],
+        AND: filters,
       },
       select: {
         id: true,
@@ -897,9 +932,6 @@ app.get('/api/users/search', authenticate, async (req, res): Promise<any> => {
     return res.status(500).json({ error: 'Internal server error' });
   }
 });
-
-
-
 
 
 /*************** MESSAGING END POINTS API */

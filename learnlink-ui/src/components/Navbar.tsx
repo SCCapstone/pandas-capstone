@@ -40,7 +40,7 @@ const Navbar: React.FC = () => {
   const [filterCriteria, setFilterCriteria] = useState<FilterCriteria>({});
   const [isFilterVisible, setIsFilterVisible] = useState(false);
   const [selectedGenders, setSelectedGenders] = useState<{ value: string; label: string }[]>([]);
-  const [ageRange, setAgeRange] = useState<[number, number]>([18, 30]); // Default range
+  const [ageRange, setAgeRange] = useState<[number, number]>([0, 100]); // Default range
   const [selectedColleges, setSelectedColleges] = useState<{ label: string; value: string }[]>([]);
   const [selectedCourses, setSelectedCourses] = useState<{ label: string; value: string }[]>([]);
   const [collegeInputValue, setCollegeInputValue] = useState(""); // State to track the input value
@@ -53,57 +53,46 @@ const Navbar: React.FC = () => {
   const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
   // Function to handle search and display results
   const handleSearch = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log("Searching for:", e.target.value);
     const query = e.target.value;
     setSearchQuery(query);
-
+  
     if (query.trim() === '') {
       setSearchResults([]);
       setIsDropdownVisible(false);
       return;
     }
+  
+    const token = localStorage.getItem('token');
+    const genderFilter = selectedGenders.map(gender => gender.label);
+    const collegeFilter = selectedColleges.map(college => college.label); // Adjusted to `value` for consistency
+    const courseFilter = selectedCourses.map(course => course.label); // Adjusted to `value` for consistency
+    const ageRangeFilter = ageRange;
+  
+    // Use URLSearchParams to construct the query string
+    const queryParams = new URLSearchParams({
+      query,
+      gender: genderFilter.join(','),
+      college: collegeFilter.join(','),
+      ageRange: ageRangeFilter.join(','),
+      course: courseFilter.join(','),
+    });
 
+    console.log("Query Params:", queryParams.toString());
+  
     try {
-      const token = localStorage.getItem('token');
       if (token) {
-        const response = await fetch(`${REACT_APP_API_URL}/api/users/search?query=${query}`, {
+        const response = await fetch(`${REACT_APP_API_URL}/api/users/search?${queryParams.toString()}`, {
           headers: {
             'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
           },
         });
-      
-      const data = await response.json();
-
+  
+        const data = await response.json();
+  
         if (response.ok) {
-          let filteredUsers = data.users as User[];
-
-          // Apply filtering based on criteria
-          filteredUsers = filteredUsers.filter((user) => {
-            if (filterCriteria.age) {
-              const { min, max } = filterCriteria.age;
-              if ((min !== undefined && user.age < min) || (max !== undefined && user.age > max)) {
-                return false;
-              }
-            }
-
-            if (filterCriteria.gender && user.gender !== filterCriteria.gender) {
-              return false;
-            }
-
-            if (filterCriteria.college && user.college.toLowerCase() !== filterCriteria.college.toLowerCase()) {
-              return false;
-            }
-
-            if (filterCriteria.coursework && filterCriteria.coursework.length > 0) {
-              if (!filterCriteria.coursework.some((course) => user.coursework.includes(course))) {
-                return false;
-              }
-            }
-
-            return true;
-          });
-
-          setSearchResults(filteredUsers);
+          setSearchResults(data.users);
           setIsDropdownVisible(true);
         } else {
           setSearchResults([]);
@@ -111,14 +100,22 @@ const Navbar: React.FC = () => {
         }
       }
     } catch (error) {
-      console.error("Error fetching search results:", error);
+      console.error('Error fetching search results:', error);
       setSearchResults([]);
       setIsDropdownVisible(false);
     }
   };
 
-  const handleFilterChange = (key: keyof FilterCriteria, value: any) => {
-    setFilterCriteria((prev) => ({ ...prev, [key]: value }));
+
+  const handleApplyFilters = () => {
+    console.log("Filters applied:", {
+      selectedColleges,
+      selectedCourses,
+      ageRange,
+      selectedGenders,
+    });
+  
+    // You can call an API or perform any action based on the selected filters here
   };
 
   // Handler to update selected options
@@ -148,6 +145,15 @@ const Navbar: React.FC = () => {
     navigate('/accountDetails');
   }
   const [isNavOpen, setIsNavOpen] = useState(false);
+
+  const handleClearFilters = () => {
+    setSelectedColleges([]);
+    setSelectedCourses([]);
+    setAgeRange([0,100]);
+    setSelectedGenders([]);
+    setFilterCriteria({});
+  };
+
   return (
     <header className="navbar">
       <div className="nav-logo"><Logo /></div>
@@ -290,7 +296,12 @@ const Navbar: React.FC = () => {
             {/* <input type="text" placeholder="College" onChange={(e) => handleFilterChange("college", e.target.value)} />
 
             <input type="text" placeholder="Coursework (comma-separated)" onChange={(e) => handleFilterChange("coursework", e.target.value.split(","))} /> */}
+            <div className="filter-buttons">
+              <button onClick={handleApplyFilters} className="filter-btn">Apply Filters</button>
+              <button onClick={handleClearFilters} className="cancel-btn">Clear</button>
+            </div>
           </div>
+          
         )}
         <FaSearch className="search-icon" />
       </div>
