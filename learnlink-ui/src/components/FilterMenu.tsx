@@ -1,7 +1,7 @@
 import './EditStudyGroup.css';
 import '../pages/messaging.css';
 import React, { use, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import './components.css';
 import Logo from '../components/Logo';
 import { FaSearch, FaBell, FaCog, FaUserCircle, FaTimes, FaSlidersH } from 'react-icons/fa';
@@ -12,13 +12,71 @@ import { set } from 'react-hook-form';
 import ReactSlider from 'react-slider'
 
 const animatedComponents = makeAnimated();
-
+interface FilterCriteria {
+    selectedColleges: { label: string; value: string }[];
+    selectedCourses: { label: string; value: string }[];
+    selectedGenders: { value: string; label: string }[];
+    ageRange: [number, number];
+}
 
 const FilterMenu = () => {
+// const navigate = useNavigate();
+// //   const [searchQuery, setSearchQuery] = useState('');
+// //   const [searchResults, setSearchResults] = useState<User[]>([]);
+// //   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
+//   // Filter Consts
+//   const [selectedGenders, setSelectedGenders] = useState<{ value: string; label: string }[]>([]);
+//   const [ageRange, setAgeRange] = useState<[number, number]>([0, 100]); // Default range
+//   const [selectedColleges, setSelectedColleges] = useState<{ label: string; value: string }[]>([]);
+//   const [selectedCourses, setSelectedCourses] = useState<{ label: string; value: string }[]>([]);
+//   const [collegeInputValue, setCollegeInputValue] = useState(""); // State to track the input value
+//   const [courseInputValue, setCourseInputValue] = useState(""); // State to track the input value
+//   const [filterCriteria, setFilterCriteria] = useState({ selectedColleges, selectedCourses, selectedGenders, ageRange });   // State to track the filter criteria
+//   const [searchParams, setSearchParams] = useSearchParams();
+
+
+//   const { grade, gender, studyHabitTags } = useEnums();
+//   const {isLoading, colleges} = useColleges();
+
+  
+//   const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
+
+
+//   // Handler to update selected options
+//   const handleCollegeChange = (selected: any) => {
+//     setSelectedColleges(selected);
+//   };
+
+//   const handleCourseChange = (selected: any) => {
+//     setSelectedCourses(selected);
+//   };
+
+//   const handleClearFilters = () => {
+//     setSelectedColleges([]);
+//     setSelectedCourses([]);
+//     setAgeRange([0,100]);
+//     setSelectedGenders([]);
+//     setFilterCriteria({ selectedColleges: [], selectedCourses: [], selectedGenders: [], ageRange: [0, 100] });
+//   };
+
+
+//     const handleSetFilterCriteria = () => {
+//         setFilterCriteria({ selectedColleges, selectedCourses, selectedGenders, ageRange });
+//       };
+
+
+// const handleApplyFilters = () => {
+    
+
+//     Object.entries(filterCriteria).forEach(([key, value]) => {
+//         searchParams.set(key, JSON.stringify(value));
+//     });
+//     setSearchParams(searchParams);
+// };
+
 const navigate = useNavigate();
-//   const [searchQuery, setSearchQuery] = useState('');
-//   const [searchResults, setSearchResults] = useState<User[]>([]);
-//   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
+
   // Filter Consts
   const [selectedGenders, setSelectedGenders] = useState<{ value: string; label: string }[]>([]);
   const [ageRange, setAgeRange] = useState<[number, number]>([0, 100]); // Default range
@@ -26,24 +84,25 @@ const navigate = useNavigate();
   const [selectedCourses, setSelectedCourses] = useState<{ label: string; value: string }[]>([]);
   const [collegeInputValue, setCollegeInputValue] = useState(""); // State to track the input value
   const [courseInputValue, setCourseInputValue] = useState(""); // State to track the input value
-  const [filterCriteria, setFilterCriteria] = useState({ selectedColleges, selectedCourses, selectedGenders, ageRange });   // State to track the filter criteria
-
+  const [filterCriteria, setFilterCriteria] = useState({ selectedColleges, selectedCourses, selectedGenders, ageRange });
 
   const { grade, gender, studyHabitTags } = useEnums();
-  const {isLoading, colleges} = useColleges();
+  const { isLoading, colleges } = useColleges();
 
-  
   const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
-  const handleApplyFilters = () => {
-    console.log("Filters applied:", {
-      selectedColleges,
-      selectedCourses,
-      ageRange,
-      selectedGenders,
-    });
-  
-    // You can call an API or perform any action based on the selected filters here
-  };
+
+  // Initialize filter criteria from URL
+  useEffect(() => {
+    const queryGender = searchParams.get('gender')?.split(',') || [];
+    const queryColleges = searchParams.get('college')?.split(',') || [];
+    const queryCourses = searchParams.get('course')?.split(',') || [];
+    const queryAgeRange = searchParams.get('ageRange')?.split(',').map(Number) || [0, 100];
+
+    setSelectedGenders(queryGender.map(gender => ({ value: gender, label: formatEnum(gender) })));
+    setSelectedColleges(queryColleges.map(college => ({ label: college, value: college })));
+    setSelectedCourses(queryCourses.map(course => ({ label: course, value: course })));
+    setAgeRange(queryAgeRange as [number, number]);
+  }, [searchParams]);
 
   // Handler to update selected options
   const handleCollegeChange = (selected: any) => {
@@ -57,16 +116,24 @@ const navigate = useNavigate();
   const handleClearFilters = () => {
     setSelectedColleges([]);
     setSelectedCourses([]);
-    setAgeRange([0,100]);
+    setAgeRange([0, 100]);
     setSelectedGenders([]);
     setFilterCriteria({ selectedColleges: [], selectedCourses: [], selectedGenders: [], ageRange: [0, 100] });
   };
 
+  const handleSetFilterCriteria = () => {
+    setFilterCriteria({ selectedColleges, selectedCourses, selectedGenders, ageRange });
+  };
 
-    const handleSetFilterCriteria = () => {
-        setFilterCriteria({ selectedColleges, selectedCourses, selectedGenders, ageRange });
-      };
-
+  const handleApplyFilters = () => {
+    // Sync state with URL
+    setSearchParams({
+      gender: selectedGenders.map(item => item.label).join(','),
+      college: selectedColleges.map(item => item.label).join(','),
+      course: selectedCourses.map(item => item.label).join(','),
+      ageRange: ageRange.join(','),
+    });
+  };
 
   
 
@@ -174,7 +241,7 @@ const navigate = useNavigate();
               />
             </div>
             <div className="filter-buttons">
-              <button onClick={handleSetFilterCriteria} className="filter-btn">Apply Filters</button>
+              <button onClick={handleApplyFilters} className="filter-btn">Apply Filters</button>
               <button onClick={handleClearFilters} className="cancel-btn">Clear</button>
             </div>
           </div>

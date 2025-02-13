@@ -1,7 +1,7 @@
 // Navbar.tsx
 import React from 'react';
 import { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import './components.css';
 import Logo from '../components/Logo';
 import { FaSearch, FaBell, FaCog, FaUserCircle, FaTimes, FaSlidersH, FaBars } from 'react-icons/fa';
@@ -10,6 +10,7 @@ import { useEnums, formatEnum, useColleges } from '../utils/format';
 import  makeAnimated from 'react-select/animated';
 import { set } from 'react-hook-form';
 import ReactSlider from 'react-slider'
+import { useEffect } from 'react';
 
 
 const animatedComponents = makeAnimated();
@@ -50,6 +51,8 @@ const Navbar: React.FC = () => {
   const [selectedCourses, setSelectedCourses] = useState<{ label: string; value: string }[]>([]);
   const [collegeInputValue, setCollegeInputValue] = useState(""); // State to track the input value
   const [courseInputValue, setCourseInputValue] = useState(""); // State to track the input value
+  const [searchParams, setSearchParams] = useSearchParams();
+
 
 
   const { grade, gender, studyHabitTags } = useEnums();
@@ -63,11 +66,37 @@ const Navbar: React.FC = () => {
   //   return location;
   // }
 
+  // useEffect(() => {
+  //   const query = searchParams.get('query') || '';
+  //   setSearchQuery(query);
+  //   handleSearch(query); // Trigger search whenever query param changes
+  // }, [searchParams]);
+
+  useEffect(() => {
+    // Sync the search query and filter criteria from URL params whenever the URL changes
+    const query = searchParams.get('query') || '';
+    const genderParam = searchParams.get('gender') || '';
+    const collegeParam = searchParams.get('college') || '';
+    const courseParam = searchParams.get('course') || '';
+    const ageRangeParam = (searchParams.get('ageRange')?.split(',').map(Number) as [number, number]) || [0, 100];
+
+    setSearchQuery(query);
+    setSelectedGenders(genderParam ? genderParam.split(',').map(label => ({ value: label, label })) : []);
+    setSelectedColleges(collegeParam ? collegeParam.split(',').map(label => ({ value: label, label })) : []);
+    setSelectedCourses(courseParam ? courseParam.split(',').map(label => ({ value: label, label })) : []);
+    setAgeRange(ageRangeParam);
+
+    // handleSearch(query); // Trigger search whenever the URL query parameters change
+  }, [searchParams]);
+
   // Function to handle search and display results
   const handleSearch = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log("Searching for:", e.target.value);
     const query = e.target.value;
     setSearchQuery(query);
+
+    console.log("Searching for:", query);
+    // const query = e.target.value;
+    // setSearchQuery(query);
   
     if (query.trim() === '') {
       setSearchResults([]);
@@ -76,18 +105,26 @@ const Navbar: React.FC = () => {
     }
   
     const token = localStorage.getItem('token');
-    const genderFilter = selectedGenders.map(gender => gender.label);
-    const collegeFilter = selectedColleges.map(college => college.label); // Adjusted to `value` for consistency
-    const courseFilter = selectedCourses.map(course => course.label); // Adjusted to `value` for consistency
-    const ageRangeFilter = ageRange;
+    // const genderFilter = selectedGenders.map(gender => gender.label);
+    // const collegeFilter = selectedColleges.map(college => college.label); // Adjusted to `value` for consistency
+    // const courseFilter = selectedCourses.map(course => course.label); // Adjusted to `value` for consistency
+    // const ageRangeFilter = ageRange;
   
-    // Use URLSearchParams to construct the query string
+    // // Use URLSearchParams to construct the query string
+    // const queryParams = new URLSearchParams({
+    //   query,
+    //   gender: genderFilter.join(','),
+    //   college: collegeFilter.join(','),
+    //   ageRange: ageRangeFilter.join(','),
+    //   course: courseFilter.join(','),
+    // });
+
     const queryParams = new URLSearchParams({
-      query,
-      gender: genderFilter.join(','),
-      college: collegeFilter.join(','),
-      ageRange: ageRangeFilter.join(','),
-      course: courseFilter.join(','),
+      query: query,
+      gender: selectedGenders.map(gender => gender.label).join(','),
+      college: selectedColleges.map(college => college.label).join(','),
+      course: selectedCourses.map(course => course.label).join(','),
+      ageRange: ageRange.join(','),
     });
 
     console.log("Query Params:", queryParams.toString());
@@ -125,6 +162,17 @@ const Navbar: React.FC = () => {
       setSearchResults([]);
       setIsDropdownVisible(false);
     }
+  };
+
+  const updateFiltersInURL = () => {
+    const queryParams = new URLSearchParams();
+    queryParams.set('query', searchQuery);
+    queryParams.set('gender', selectedGenders.map(gender => gender.label).join(','));
+    queryParams.set('college', selectedColleges.map(college => college.label).join(','));
+    queryParams.set('course', selectedCourses.map(course => course.label).join(','));
+    queryParams.set('ageRange', ageRange.join(','));
+
+    setSearchParams(queryParams);
   };
 
 
@@ -205,125 +253,6 @@ const Navbar: React.FC = () => {
             ))}
           </ul>
         )}
-
-        {isFilterVisible && (
-          <div className="filters">
-            {/* <select onChange={(e) => handleGetEnums()}>
-              <option value="">All Genders</option>
-              <option value="male">Male</option>
-              <option value="female">Female</option>
-              <option value="other">Other</option>
-            </select> */}
-            <div className="college-filter">
-              <label>College:</label>
-              <Select
-                isMulti
-                name="college-filter"
-                components={animatedComponents}
-                options={isLoading ? [] : colleges} // Only show colleges when they are loaded
-                value={selectedColleges}
-                onChange={handleCollegeChange}
-                isClearable
-                isSearchable
-                placeholder="Type or select colleges..."
-                className="basic-multi-select"
-                classNamePrefix="select"
-                noOptionsMessage={() => "Type to add a new college"}
-                inputValue={collegeInputValue}
-                onInputChange={(newInputValue) => setCollegeInputValue(newInputValue)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && collegeInputValue) {
-                    const newCollege = { label: collegeInputValue, value: collegeInputValue };
-                    setSelectedColleges([...selectedColleges, newCollege]);
-                    // setColleges([...colleges, newCollege]);
-                    setCollegeInputValue('');
-                  }
-                }}
-              />
-            </div>
-            <div className="coursework-filter">
-              <label>Course:</label>
-              <Select
-                isMulti
-                name="course-filter"
-                components={animatedComponents}
-                options={[]} // Can be prefilled with options if needed
-                value={selectedCourses}
-                onChange={handleCourseChange}
-                isClearable
-                isSearchable
-                placeholder="Type or select courses..."
-                className="basic-multi-select"
-                classNamePrefix="select"
-                noOptionsMessage={() => "Type to add a new course"}
-                inputValue={courseInputValue} // Set input value
-                onInputChange={(newInputValue) => setCourseInputValue(newInputValue)} // Update input value on change
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && courseInputValue) {
-                    setSelectedCourses([
-                      ...selectedCourses,
-                      { label: courseInputValue, value: courseInputValue }
-                    ]);
-                    setCourseInputValue(""); // Clear input
-                  }
-                }}
-              />
-            </div>
-            <div className="age-slider-container">
-              <label>Age Range: {ageRange[0]} - {ageRange[1]}</label>
-
-              <div className="slider-wrapper">
-                {/* Min Label */}
-                <span className="slider-label min-label">18</span>
-
-                {/* Slider */}
-                <ReactSlider
-                  className="age-slider"
-                  thumbClassName="thumb"
-                  trackClassName="track"
-                  min={18}
-                  max={100}
-                  value={ageRange}
-                  onChange={(newValue) => setAgeRange(newValue as [number, number])}
-                  pearling
-                  minDistance={1}
-                />
-
-                {/* Max Label */}
-                <span className="slider-label max-label">100</span>
-              </div>
-            </div>
-            <div className="gender-filter">
-              <label>Gender:</label>
-              <Select
-                isMulti
-                name="gender-filter"
-                options={gender.map((tag) => ({
-                  value: tag,
-                  label: formatEnum(tag), // Assuming formatEnum formats the tag as a readable label
-                }))}
-                value={selectedGenders} // Controlled state
-                onChange={(selectedOptions) => setSelectedGenders(selectedOptions as { value: string; label: string }[] || [])} // Updates state
-                closeMenuOnSelect={false}
-                components={animatedComponents}
-                className="basic-multi-select"
-                classNamePrefix="select"
-              />
-            </div>
-
-            {/* <input type="number" placeholder="Min Age" onChange={(e) => handleFilterChange("age", { ...filterCriteria.age, min: Number(e.target.value) })} />
-            <input type="number" placeholder="Max Age" onChange={(e) => handleFilterChange("age", { ...filterCriteria.age, max: Number(e.target.value) })} /> */}
-
-            {/* <input type="text" placeholder="College" onChange={(e) => handleFilterChange("college", e.target.value)} />
-
-            <input type="text" placeholder="Coursework (comma-separated)" onChange={(e) => handleFilterChange("coursework", e.target.value.split(","))} /> */}
-            <div className="filter-buttons">
-              <button onClick={handleApplyFilters} className="filter-btn">Apply Filters</button>
-              <button onClick={handleClearFilters} className="cancel-btn">Clear</button>
-            </div>
-          </div>
-          
-        )}
         <FaSearch className="search-icon" />
       </div>
 
@@ -348,4 +277,3 @@ const Navbar: React.FC = () => {
 };
 
 export default Navbar;
-
