@@ -524,8 +524,37 @@ app.get('/api/swipe/:currentUser', async (req, res): Promise<any> => {
   }
 });
 
+//for deleting a request in the reject button in requests panel
+app.delete('/api/swipe/:requestId', async(req, res): Promise<any> =>{
+  let {requestId} = req.params;
+  console.log('Deleting request with ID:', requestId);
 
+  try{
 
+    if (!requestId || isNaN(parseInt(requestId))) {
+      return res.status(400).json({ error: "Invalid swipe ID." });
+    }
+
+    const swipe = await prisma.swipe.findUnique({
+      where: { id: parseInt(requestId) }
+    });
+
+    if (!swipe) {
+      return res.status(404).json({ error: 'request not found' });
+    }
+
+    await prisma.swipe.delete({
+      where: { id: parseInt(requestId) },
+    });
+  
+
+    res.status(200).json({ message: 'request deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting request:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+
+});
 
 // Helper function to create user-to-user matches
 const createMatchForUsers = async (userId: number, targetUserId: number) => {

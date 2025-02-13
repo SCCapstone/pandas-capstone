@@ -91,15 +91,13 @@ const JoinRequests: React.FC<JoinRequestProps> = ({ currentUserId }) => {
 
   // Reject request (delete or ignore)
   const handleDenial = async (requestId: number) => {
-    
-    /*
     try {
       await axios.delete(`${REACT_APP_API_URL}/api/swipe/${requestId}`);
       setRequests(requests.filter((request) => request.id !== requestId));
     } catch (err) {
       console.error('Error rejecting request:', err);
       setError('Failed to reject request.');
-    }*/
+    }
   };
 
   return (
