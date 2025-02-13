@@ -3,9 +3,12 @@ import '../pages/messaging.css';
 import './components.css';
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { useResolvedPath } from 'react-router-dom';
+import userEvent from '@testing-library/user-event';
 
 interface JoinRequestProps {
   currentUserId: number | null;
+  addNewChat: (newChat: any) => void;
 }
 
 interface SwipeRequest {
@@ -30,7 +33,7 @@ interface Group{
   name: string;
 }
 
-const JoinRequests: React.FC<JoinRequestProps> = ({ currentUserId }) => {
+const JoinRequests: React.FC<JoinRequestProps> = ({ currentUserId, addNewChat }) => {
   const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
   const [requests, setRequests] = useState<SwipeRequest[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -78,18 +81,49 @@ const JoinRequests: React.FC<JoinRequestProps> = ({ currentUserId }) => {
   
   // Approve request 
   // adds someone to a study group or creates a chat between two users, where they can then create a study group if they want
-  const handleApproval = async (requestId: number) => {
-    
+  const handleApproval = async (
+    requestId: number,
+    studyGroupId?: number | null,
+    targetUserId?: number | null,
+    requestUserId?: number
+  ) => {
     try {
-      await axios.post(`${REACT_APP_API_URL}/TODO`, { requestId });
-      setRequests(requests.filter((request) => request.id !== requestId));
-      //delete it from requests after posting user to that study group..
+      let endpoint = "";
+      let payload: any = { };
+  
+      if (studyGroupId) {
+        // If the request has a study group, add the user to the group
+        endpoint = "/add-to-study-group";
+        payload.studyGroupId = studyGroupId;
+        payload.userId = requestUserId; // Ensure request user is added
+      } else if (targetUserId) {
+        // Otherwise, create a chat between the request user and the target user
+        endpoint = "/api/chats";
+        payload.userId1 = requestUserId;
+        payload.userId2 = targetUserId;
+      } else {
+        throw new Error("Invalid request: No study group or target user.");
+      }
+      const response = await axios.post(`${REACT_APP_API_URL}${endpoint}`, payload);
+  
+      if (response.status === 200 || response.status === 201) {
+        // If chat was created, update the chats in the parent component
+        if (targetUserId) {
+          addNewChat(response.data); // Pass the new chat to parent via callback
+        }
+        // Optionally remove the request after approval
+        handleDeleteRequest(requestId);
+      } else {
+        setError("Failed to approve request. Please try again.");
+      }
     } catch (err) {
-      console.error('Error approving request:', err);
-      setError('Failed to approve request.');
+      console.error("Error approving request:", err);
+      setError("Failed to approve request. Please check your network and try again.");
     }
-      
   };
+  
+  
+  
 
   // Reject request (delete)
   const handleDenial = async (requestId: number) => {
@@ -142,11 +176,26 @@ const JoinRequests: React.FC<JoinRequestProps> = ({ currentUserId }) => {
                 {/*Shows the message from the requestor*/}
                 <p><strong>Message: </strong> {request.message}</p>
               </div>
-
               <div className="request-actions">
-                <button className="approve" onClick={() => handleApproval(request.id)}>✔️ Approve</button>
-                <button className="reject" onClick={() => handleDenial(request.id)}>❌ Reject</button>
+                <button
+                  className="approve"
+                  onClick={() =>
+                    handleApproval(
+                      request.id,
+                      request.targetGroupId ?? undefined, // Passing the targetGroupId (or undefined)
+                      request.targetUserId ?? undefined, // Passing the targetUserId (or undefined)
+                      request.userId // Passing the requestUserId
+                    )
+                  }
+                >
+                  ✔️ Approve
+                </button>
+                <button className="reject" onClick={() => handleDenial(request.id)}>
+                  ❌ Reject
+                </button>
               </div>
+
+
             </li>
           ))}
         </ul>

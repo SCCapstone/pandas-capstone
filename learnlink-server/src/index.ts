@@ -1275,24 +1275,46 @@ app.patch('/api/messages/:id/like', authenticate, async (req, res):Promise<any> 
 
 
 // Create a new chat
-app.post('/api/chats', async (req, res) => {
-  const { name, userId } = req.body; // Assuming the user is the creator of the chat
+app.post('/api/chats', async (req, res) : Promise<any> => {
+  const { userId1, userId2 } = req.body; // Expecting both user IDs
+
+  if (!userId1 || !userId2) {
+    return res.status(400).json({ error: "Both user IDs are required." });
+  }
 
   try {
-    const newChat = await prisma.chat.create({
-      data: {
-        name,
+    // Check if a chat between these users already exists
+    const existingChat = await prisma.chat.findFirst({
+      where: {
         users: {
-          connect: { id: userId }, // Assuming a user creates the chat
+          every: {
+            id: { in: [userId1, userId2] },
+          },
         },
       },
     });
+
+    if (existingChat) {
+      return res.status(200).json(existingChat); // Return existing chat if found
+    }
+
+    // Create a new chat linking both users
+    const newChat = await prisma.chat.create({
+      data: {
+        name: `Chat between ${userId1} and ${userId2}`, // Optional chat name
+        users: {
+          connect: [{ id: userId1 }, { id: userId2 }], // Connect both users
+        },
+      },
+    });
+
     res.status(201).json(newChat);
   } catch (error) {
     console.error("Error creating chat:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 });
+
 
 
 app.post('/api/chats/:userId', authenticate, async (req: Request, res: Response): Promise<any> => {

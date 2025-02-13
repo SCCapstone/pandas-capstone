@@ -520,7 +520,9 @@ const Messaging: React.FC = () => {
 
 
 
-  
+  const addNewChat = (newChat: any) => {
+    setChats((prevChats) => [...prevChats, newChat]);
+  };
 
 
   const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -673,9 +675,9 @@ const Messaging: React.FC = () => {
           )}
           {showRequestsPanel && (
             <JoinRequests 
-              currentUserId= {currentUserId}
-              
-            />
+            currentUserId={currentUserId} 
+            addNewChat={addNewChat} // Passing addNewChat as a prop
+          />
           )}
       
         </div>
