@@ -76,7 +76,8 @@ const JoinRequests: React.FC<JoinRequestProps> = ({ currentUserId }) => {
     }
   };
   
-  // Approve request (creates a match)
+  // Approve request 
+  // adds someone to a study group or creates a chat between two users, where they can then create a study group if they want
   const handleApproval = async (requestId: number) => {
     /*
     try {
@@ -89,7 +90,7 @@ const JoinRequests: React.FC<JoinRequestProps> = ({ currentUserId }) => {
       */
   };
 
-  // Reject request (delete or ignore)
+  // Reject request (delete)
   const handleDenial = async (requestId: number) => {
     try {
       await axios.delete(`${REACT_APP_API_URL}/api/swipe/${requestId}`);
