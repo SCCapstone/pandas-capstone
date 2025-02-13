@@ -14,7 +14,7 @@ import ReactSlider from 'react-slider'
 const animatedComponents = makeAnimated();
 
 
-const FilterMenu = ({ chatID, onClose }: { chatID: number; onClose: () => void }) => {
+const FilterMenu = () => {
 const navigate = useNavigate();
 //   const [searchQuery, setSearchQuery] = useState('');
 //   const [searchResults, setSearchResults] = useState<User[]>([]);
@@ -34,62 +34,6 @@ const navigate = useNavigate();
 
   
   const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
-//   // Function to handle search and display results
-//   const handleSearch = async (e: React.ChangeEvent<HTMLInputElement>) => {
-//     console.log("Searching for:", e.target.value);
-//     const query = e.target.value;
-//     setSearchQuery(query);
-  
-//     if (query.trim() === '') {
-//       setSearchResults([]);
-//       setIsDropdownVisible(false);
-//       return;
-//     }
-  
-//     const token = localStorage.getItem('token');
-//     const genderFilter = selectedGenders.map(gender => gender.label);
-//     const collegeFilter = selectedColleges.map(college => college.label); // Adjusted to `value` for consistency
-//     const courseFilter = selectedCourses.map(course => course.label); // Adjusted to `value` for consistency
-//     const ageRangeFilter = ageRange;
-  
-//     // Use URLSearchParams to construct the query string
-//     const queryParams = new URLSearchParams({
-//       query,
-//       gender: genderFilter.join(','),
-//       college: collegeFilter.join(','),
-//       ageRange: ageRangeFilter.join(','),
-//       course: courseFilter.join(','),
-//     });
-
-//     console.log("Query Params:", queryParams.toString());
-  
-//     try {
-//       if (token) {
-//         const response = await fetch(`${REACT_APP_API_URL}/api/users/search?${queryParams.toString()}`, {
-//           headers: {
-//             'Content-Type': 'application/json',
-//             Authorization: `Bearer ${token}`,
-//           },
-//         });
-  
-//         const data = await response.json();
-  
-//         if (response.ok) {
-//           setSearchResults(data.users);
-//           setIsDropdownVisible(true);
-//         } else {
-//           setSearchResults([]);
-//           setIsDropdownVisible(false);
-//         }
-//       }
-//     } catch (error) {
-//       console.error('Error fetching search results:', error);
-//       setSearchResults([]);
-//       setIsDropdownVisible(false);
-//     }
-//   };
-
-
   const handleApplyFilters = () => {
     console.log("Filters applied:", {
       selectedColleges,
@@ -131,13 +75,8 @@ const navigate = useNavigate();
 
 
   return (
+    <div className="filter-menu">
     <div className="filters">
-            {/* <select onChange={(e) => handleGetEnums()}>
-              <option value="">All Genders</option>
-              <option value="male">Male</option>
-              <option value="female">Female</option>
-              <option value="other">Other</option>
-            </select> */}
             <div className="college-filter">
               <label>College:</label>
               <Select
@@ -234,17 +173,11 @@ const navigate = useNavigate();
                 classNamePrefix="select"
               />
             </div>
-
-            {/* <input type="number" placeholder="Min Age" onChange={(e) => handleFilterChange("age", { ...filterCriteria.age, min: Number(e.target.value) })} />
-            <input type="number" placeholder="Max Age" onChange={(e) => handleFilterChange("age", { ...filterCriteria.age, max: Number(e.target.value) })} /> */}
-
-            {/* <input type="text" placeholder="College" onChange={(e) => handleFilterChange("college", e.target.value)} />
-
-            <input type="text" placeholder="Coursework (comma-separated)" onChange={(e) => handleFilterChange("coursework", e.target.value.split(","))} /> */}
             <div className="filter-buttons">
               <button onClick={handleSetFilterCriteria} className="filter-btn">Apply Filters</button>
               <button onClick={handleClearFilters} className="cancel-btn">Clear</button>
             </div>
+          </div>
           </div>
           
         

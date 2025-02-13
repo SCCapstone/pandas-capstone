@@ -1,6 +1,7 @@
 import React from 'react';
 import Navbar from '../components/Navbar';
 import ResourcesNavBar from '../components/ResourcesNavBar';
+import FilterMenu from '../components/FilterMenu';
 import './advancedSearch.css';
 import CopyrightFooter from '../components/CopyrightFooter';
 import { useEffect, useState } from "react";
@@ -70,7 +71,6 @@ const AdvancedSearch: React.FC = () => {
 
 
             <div className='advanced-search-content'>
-                <ResourcesNavBar />
                 <main className="main-content">
                     <h1>External advanced-search</h1>
                     <h2>External Scheduling Tool</h2>
@@ -78,10 +78,12 @@ const AdvancedSearch: React.FC = () => {
                         <li key={user.id}>{user.username}</li>
                     ))}
                 </main>
+                <FilterMenu />
+
             </div>
-            <footer>
+            <div>
                 <CopyrightFooter />
-            </footer>
+            </div>
         </div>
     );
 };

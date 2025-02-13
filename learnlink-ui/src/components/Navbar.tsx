@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import './components.css';
 import Logo from '../components/Logo';
-import { FaSearch, FaBell, FaCog, FaUserCircle, FaTimes, FaSlidersH } from 'react-icons/fa';
+import { FaSearch, FaBell, FaCog, FaUserCircle, FaTimes, FaSlidersH, FaBars } from 'react-icons/fa';
 import Select from 'react-select';
 import { useEnums, formatEnum, useColleges } from '../utils/format';
 import  makeAnimated from 'react-select/animated';
@@ -50,6 +50,7 @@ const Navbar: React.FC = () => {
   const [selectedCourses, setSelectedCourses] = useState<{ label: string; value: string }[]>([]);
   const [collegeInputValue, setCollegeInputValue] = useState(""); // State to track the input value
   const [courseInputValue, setCourseInputValue] = useState(""); // State to track the input value
+
 
   const { grade, gender, studyHabitTags } = useEnums();
   const {isLoading, colleges} = useColleges();
@@ -177,7 +178,7 @@ const Navbar: React.FC = () => {
   return (
     <header className="navbar">
       <div className="nav-logo"><Logo /></div>
-      {/* <FaBars className="hamburger" onClick={() => setIsNavOpen(true)} /> */}
+      <FaBars className="hamburger" onClick={() => setIsNavOpen(true)} />
 
       {/* Normal Navigation Links*/}
       <nav className="nav-links">
