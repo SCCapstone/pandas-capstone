@@ -79,19 +79,25 @@ const JoinRequests: React.FC<JoinRequestProps> = ({ currentUserId }) => {
   // Approve request 
   // adds someone to a study group or creates a chat between two users, where they can then create a study group if they want
   const handleApproval = async (requestId: number) => {
-    /*
+    
     try {
-      await axios.post(`${REACT_APP_API_URL}/api/match`, { requestId });
+      await axios.post(`${REACT_APP_API_URL}/TODO`, { requestId });
       setRequests(requests.filter((request) => request.id !== requestId));
+      //delete it from requests after posting user to that study group..
     } catch (err) {
       console.error('Error approving request:', err);
       setError('Failed to approve request.');
     }
-      */
+      
   };
 
   // Reject request (delete)
   const handleDenial = async (requestId: number) => {
+    handleDeleteRequest(requestId);
+  };
+
+  //deletes a request from the panel (same as rejection but keeping them separate for logic purposes)
+  const handleDeleteRequest = async(requestId: number )=> {
     try {
       await axios.delete(`${REACT_APP_API_URL}/api/swipe/${requestId}`);
       setRequests(requests.filter((request) => request.id !== requestId));
