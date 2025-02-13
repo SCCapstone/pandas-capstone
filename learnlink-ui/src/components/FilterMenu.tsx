@@ -1,7 +1,7 @@
-// Navbar.tsx
-import React from 'react';
-import { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import './EditStudyGroup.css';
+import '../pages/messaging.css';
+import React, { use, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './components.css';
 import Logo from '../components/Logo';
 import { FaSearch, FaBell, FaCog, FaUserCircle, FaTimes, FaSlidersH } from 'react-icons/fa';
@@ -11,120 +11,83 @@ import  makeAnimated from 'react-select/animated';
 import { set } from 'react-hook-form';
 import ReactSlider from 'react-slider'
 
-
 const animatedComponents = makeAnimated();
-// const location = useLocation(); // ✅ Correct way to use location in React
 
 
-interface User {
-  id: number;
-  username: string;
-  firstName: string;
-  lastName: string;
-  age: number; // Add the age property
-  gender: string;
-  college: string;
-  coursework: string[];
-}
-interface FilterCriteria {
-  age?: { min?: number; max?: number };
-  gender?: "Male" | "Female" | "Nonbinary" | "Other" | "Prefer not to say";
-  college?: string;
-  coursework?: string[];
-}
-
-const Navbar: React.FC = () => {
-  const navigate = useNavigate();
-  const location = useLocation().pathname;
-
-
-  const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState<User[]>([]);
-  const [isDropdownVisible, setIsDropdownVisible] = useState(false);
+const FilterMenu = ({ chatID, onClose }: { chatID: number; onClose: () => void }) => {
+const navigate = useNavigate();
+//   const [searchQuery, setSearchQuery] = useState('');
+//   const [searchResults, setSearchResults] = useState<User[]>([]);
+//   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
   // Filter Consts
-  const [filterCriteria, setFilterCriteria] = useState<FilterCriteria>({});
-  const [isFilterVisible, setIsFilterVisible] = useState(false);
   const [selectedGenders, setSelectedGenders] = useState<{ value: string; label: string }[]>([]);
   const [ageRange, setAgeRange] = useState<[number, number]>([0, 100]); // Default range
   const [selectedColleges, setSelectedColleges] = useState<{ label: string; value: string }[]>([]);
   const [selectedCourses, setSelectedCourses] = useState<{ label: string; value: string }[]>([]);
   const [collegeInputValue, setCollegeInputValue] = useState(""); // State to track the input value
   const [courseInputValue, setCourseInputValue] = useState(""); // State to track the input value
+  const [filterCriteria, setFilterCriteria] = useState({ selectedColleges, selectedCourses, selectedGenders, ageRange });   // State to track the filter criteria
+
 
   const { grade, gender, studyHabitTags } = useEnums();
   const {isLoading, colleges} = useColleges();
 
   
   const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
-
-  // const getLocation = () => {
-  //   const location = useLocation().pathname;
-  //   return location;
-  // }
-
-  // Function to handle search and display results
-  const handleSearch = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log("Searching for:", e.target.value);
-    const query = e.target.value;
-    setSearchQuery(query);
+//   // Function to handle search and display results
+//   const handleSearch = async (e: React.ChangeEvent<HTMLInputElement>) => {
+//     console.log("Searching for:", e.target.value);
+//     const query = e.target.value;
+//     setSearchQuery(query);
   
-    if (query.trim() === '') {
-      setSearchResults([]);
-      setIsDropdownVisible(false);
-      return;
-    }
+//     if (query.trim() === '') {
+//       setSearchResults([]);
+//       setIsDropdownVisible(false);
+//       return;
+//     }
   
-    const token = localStorage.getItem('token');
-    const genderFilter = selectedGenders.map(gender => gender.label);
-    const collegeFilter = selectedColleges.map(college => college.label); // Adjusted to `value` for consistency
-    const courseFilter = selectedCourses.map(course => course.label); // Adjusted to `value` for consistency
-    const ageRangeFilter = ageRange;
+//     const token = localStorage.getItem('token');
+//     const genderFilter = selectedGenders.map(gender => gender.label);
+//     const collegeFilter = selectedColleges.map(college => college.label); // Adjusted to `value` for consistency
+//     const courseFilter = selectedCourses.map(course => course.label); // Adjusted to `value` for consistency
+//     const ageRangeFilter = ageRange;
   
-    // Use URLSearchParams to construct the query string
-    const queryParams = new URLSearchParams({
-      query,
-      gender: genderFilter.join(','),
-      college: collegeFilter.join(','),
-      ageRange: ageRangeFilter.join(','),
-      course: courseFilter.join(','),
-    });
+//     // Use URLSearchParams to construct the query string
+//     const queryParams = new URLSearchParams({
+//       query,
+//       gender: genderFilter.join(','),
+//       college: collegeFilter.join(','),
+//       ageRange: ageRangeFilter.join(','),
+//       course: courseFilter.join(','),
+//     });
 
-    console.log("Query Params:", queryParams.toString());
+//     console.log("Query Params:", queryParams.toString());
   
-    try {
-      if (token) {
-        const response = await fetch(`${REACT_APP_API_URL}/api/users/search?${queryParams.toString()}`, {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-        });
+//     try {
+//       if (token) {
+//         const response = await fetch(`${REACT_APP_API_URL}/api/users/search?${queryParams.toString()}`, {
+//           headers: {
+//             'Content-Type': 'application/json',
+//             Authorization: `Bearer ${token}`,
+//           },
+//         });
   
-        const data = await response.json();
-        
-        if (response.ok) {
-          setSearchResults(data.users);
-
-          if (location === "/advancedsearch") {
-            // If on Advanced Search page, fetch and update results without dropdown
-            setIsDropdownVisible(false);
-            navigate(`/advancedsearch?${queryParams.toString()}`, { replace: true });
-
-          } else {
-            // Otherwise, show dropdown results
-            setIsDropdownVisible(true);
-          }
-        } else {
-          setSearchResults([]);
-          setIsDropdownVisible(false);
-        }
-      }
-    } catch (error) {
-      console.error('Error fetching search results:', error);
-      setSearchResults([]);
-      setIsDropdownVisible(false);
-    }
-  };
+//         const data = await response.json();
+  
+//         if (response.ok) {
+//           setSearchResults(data.users);
+//           setIsDropdownVisible(true);
+//         } else {
+//           setSearchResults([]);
+//           setIsDropdownVisible(false);
+//         }
+//       }
+//     } catch (error) {
+//       console.error('Error fetching search results:', error);
+//       setSearchResults([]);
+//       setIsDropdownVisible(false);
+//     }
+//   };
 
 
   const handleApplyFilters = () => {
@@ -147,66 +110,28 @@ const Navbar: React.FC = () => {
     setSelectedCourses(selected);
   };
 
-
-  // Function to handle when a user selects a search result
-  const handleSelectUser = (userId: number) => {
-    navigate(`/user-profile/${userId}`); // Navigate to the user's profile page
-    setSearchQuery('');
-    setSearchResults([]);
-    setIsDropdownVisible(false);
-  };
-  const handleSettings = () => {
-    navigate('/settings');
-  };
-  const handleMessaging = () => {
-    navigate('/messaging');
-  };
-  const handleAccountDetails = () => {
-    navigate('/accountDetails');
-  }
-  const [isNavOpen, setIsNavOpen] = useState(false);
-
   const handleClearFilters = () => {
     setSelectedColleges([]);
     setSelectedCourses([]);
     setAgeRange([0,100]);
     setSelectedGenders([]);
-    setFilterCriteria({});
+    setFilterCriteria({ selectedColleges: [], selectedCourses: [], selectedGenders: [], ageRange: [0, 100] });
   };
 
+
+    const handleSetFilterCriteria = () => {
+        setFilterCriteria({ selectedColleges, selectedCourses, selectedGenders, ageRange });
+      };
+
+
+  
+
+
+
+
+
   return (
-    <header className="navbar">
-      <div className="nav-logo"><Logo /></div>
-      {/* <FaBars className="hamburger" onClick={() => setIsNavOpen(true)} /> */}
-
-      {/* Normal Navigation Links*/}
-      <nav className="nav-links">
-        <a href="/swiping">Match</a>
-        <a href="/profile">Profile</a>
-        <a href="/messaging" onClick={handleMessaging}>Messaging</a>
-        <a href="/resources/studyTips">Resources</a>
-      </nav>
-
-      <div className="search-bar">
-        <FaSlidersH className='hamburger-icon' onClick={() => setIsFilterVisible(!isFilterVisible)} />
-        <input
-          type="text"
-          value={searchQuery}
-          onChange={handleSearch}
-          placeholder="Search for users"
-        />
-        {isDropdownVisible && searchResults.length > 0 && (
-          <ul className="dropdown">
-            {searchResults.map((user) => (
-              <p key={user.id} onClick={() => handleSelectUser(user.id)}>
-                {user.firstName} {user.lastName} (@{user.username})
-              </p>
-            ))}
-          </ul>
-        )}
-
-        {isFilterVisible && (
-          <div className="filters">
+    <div className="filters">
             {/* <select onChange={(e) => handleGetEnums()}>
               <option value="">All Genders</option>
               <option value="male">Male</option>
@@ -317,34 +242,13 @@ const Navbar: React.FC = () => {
 
             <input type="text" placeholder="Coursework (comma-separated)" onChange={(e) => handleFilterChange("coursework", e.target.value.split(","))} /> */}
             <div className="filter-buttons">
-              <button onClick={handleApplyFilters} className="filter-btn">Apply Filters</button>
+              <button onClick={handleSetFilterCriteria} className="filter-btn">Apply Filters</button>
               <button onClick={handleClearFilters} className="cancel-btn">Clear</button>
             </div>
           </div>
           
-        )}
-        <FaSearch className="search-icon" />
-      </div>
-
-
-
-      {/* Full-Screen Menu */}
-      <div className={`fullscreen-menu ${isNavOpen ? "show" : ""}`}>
-        <FaTimes className="close-icon" onClick={() => setIsNavOpen(false)} />
-        <a href="/swiping">Match</a>
-        <a href="/profile">Profile</a>
-        <a href="/messaging" onClick={handleMessaging}>Messaging</a>
-        <a href="/resources/studyTips">Resources</a>
-      </div>
-
-      <div className="nav-icons">
-        <FaBell className="icon" />
-        <FaCog className="icon" onClick={handleSettings} />
-        <FaUserCircle className="icon profile-icon" onClick={handleAccountDetails} />
-      </div>
-    </header>
+        
   );
 };
 
-export default Navbar;
-
+export default FilterMenu;
