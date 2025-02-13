@@ -81,6 +81,8 @@ const JoinRequests: React.FC<JoinRequestProps> = ({ currentUserId, addNewChat })
   
   // Approve request 
   // adds someone to a study group or creates a chat between two users, where they can then create a study group if they want
+
+  
   const handleApproval = async (
     requestId: number,
     studyGroupId?: number | null,
@@ -91,11 +93,12 @@ const JoinRequests: React.FC<JoinRequestProps> = ({ currentUserId, addNewChat })
       let endpoint = "";
       let payload: any = { };
   
+      console.log(studyGroupId);
       if (studyGroupId) {
         // If the request has a study group, add the user to the group
-        endpoint = "/add-to-study-group";
+        endpoint = "/api/add-to-study-group";
         payload.studyGroupId = studyGroupId;
-        payload.userId = requestUserId; // Ensure request user is added
+        payload.requestUserId = requestUserId; // Ensure request user is added
       } else if (targetUserId) {
         // Otherwise, create a chat between the request user and the target user
         endpoint = "/api/chats";
@@ -122,6 +125,7 @@ const JoinRequests: React.FC<JoinRequestProps> = ({ currentUserId, addNewChat })
     }
   };
   
+
   
   
 
