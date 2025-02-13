@@ -107,11 +107,34 @@ const navigate = useNavigate();
 
     const queryAgeRange = searchParams.get('ageRange')?.split(',').map(Number) || [0, 100];
 
-    setSelectedGenders(parsedGender.map(gender => ({ value: gender, label: formatEnum(gender) })));
-    setSelectedColleges(parsedColleges.map(college => ({ label: college, value: college })));
-    setSelectedCourses(parsedCourses? parsedCourses.map(course => ({ label: course, value: course })):[]);
-    console.log(selectedCourses);
-    setAgeRange(queryAgeRange as [number, number]);
+    // Only update state if values have changed
+  setSelectedGenders(prev => 
+    JSON.stringify(prev) !== JSON.stringify(parsedGender.map(g => ({ value: g, label: formatEnum(g) })))
+      ? parsedGender.map(g => ({ value: g, label: formatEnum(g) }))
+      : prev
+  );
+
+  setSelectedColleges(prev => 
+    JSON.stringify(prev) !== JSON.stringify(parsedColleges.map(c => ({ label: c, value: c })))
+      ? parsedColleges.map(c => ({ label: c, value: c }))
+      : prev
+  );
+
+  setSelectedCourses(prev => 
+    JSON.stringify(prev) !== JSON.stringify(parsedCourses.map(c => ({ label: c, value: c })))
+      ? parsedCourses.map(c => ({ label: c, value: c }))
+      : prev
+  );
+
+  setAgeRange(prev => 
+    JSON.stringify(prev) !== JSON.stringify(queryAgeRange) ? queryAgeRange as [number, number] : prev
+  );
+
+    // setSelectedGenders(parsedGender.map(gender => ({ value: gender, label: formatEnum(gender) })));
+    // setSelectedColleges(parsedColleges.map(college => ({ label: college, value: college })));
+    // setSelectedCourses(parsedCourses? parsedCourses.map(course => ({ label: course, value: course })):[]);
+    // console.log(selectedCourses);
+    // setAgeRange(queryAgeRange as [number, number]);
   }, [searchParams]);
 
   // Handler to update selected options
@@ -128,7 +151,9 @@ const navigate = useNavigate();
     setSelectedCourses([]);
     setAgeRange([0, 100]);
     setSelectedGenders([]);
-    setFilterCriteria({ selectedColleges: [], selectedCourses: [], selectedGenders: [], ageRange: [0, 100] });
+    setSearchParams({query});
+
+    // setFilterCriteria({ selectedColleges: [], selectedCourses: [], selectedGenders: [], ageRange: [0, 100] });
   };
 
   const handleSetFilterCriteria = () => {

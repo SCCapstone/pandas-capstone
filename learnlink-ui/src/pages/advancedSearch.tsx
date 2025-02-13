@@ -9,12 +9,6 @@ import { useLocation } from "react-router-dom";
 
 const AdvancedSearch: React.FC = () => {
     const location = useLocation();
-    const queryParams = new URLSearchParams(location.search);
-    const searchQuery = queryParams.get("query") || "";
-    const gender = queryParams.get("gender") || "";
-    const college = queryParams.get("college") || "";
-    const ageRange = queryParams.get("ageRange") || "";
-    const course = queryParams.get("course") || "";
 
 
     interface User {
@@ -33,12 +27,20 @@ const AdvancedSearch: React.FC = () => {
 
 
     useEffect(() => {
-        if (!searchQuery) return;
         console.log("Fetching search results for:", location.search);
 
         const fetchResults = async () => {
             try {
                 const token = localStorage.getItem('token'); // Retrieve token from storage
+                const queryParams = new URLSearchParams(location.search);
+                // const gender = queryParams.get("gender") || "";
+                // const college = queryParams.get("college") || "";
+                // const ageRange = queryParams.get("ageRange") || "";
+                // const course = queryParams.get("course") || "";
+                const searchQuery = queryParams.get("query") || "";
+                if (!searchQuery) return;
+
+
 
                 if (!token) {
                     console.error("🚨 No token found! User might not be logged in.");

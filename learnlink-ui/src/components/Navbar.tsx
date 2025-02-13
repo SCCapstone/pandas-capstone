@@ -79,14 +79,19 @@ const Navbar: React.FC = () => {
     const collegeParam = searchParams.get('college') || '';
     const courseParam = searchParams.get('course') || '';
     const ageRangeParam = (searchParams.get('ageRange')?.split(',').map(Number) as [number, number]) || [0, 100];
+  
+    // Convert params into expected format
+    const parsedGenders = genderParam ? genderParam.split(',').map(g => ({ value: g, label: formatEnum(g) })) : [];
+    const parsedColleges = collegeParam ? collegeParam.split(',').map(c => ({ label: c, value: c })) : [];
+    const parsedCourses = courseParam ? courseParam.split(',').map(c => ({ label: c, value: c })) : [];
+  
+    // Only update state if the values have changed (prevents infinite loops)
+    setSelectedGenders(prev => JSON.stringify(prev) !== JSON.stringify(parsedGenders) ? parsedGenders : prev);
+    setSelectedColleges(prev => JSON.stringify(prev) !== JSON.stringify(parsedColleges) ? parsedColleges : prev);
+    setSelectedCourses(prev => JSON.stringify(prev) !== JSON.stringify(parsedCourses) ? parsedCourses : prev);
+    setAgeRange(prev => JSON.stringify(prev) !== JSON.stringify(ageRangeParam) ? ageRangeParam : prev);
 
-    // setSearchQuery(query);
-    setSelectedGenders(genderParam ? genderParam.split(',').map(label => ({ value: label, label })) : []);
-    setSelectedColleges(collegeParam ? collegeParam.split(',').map(label => ({ value: label, label })) : []);
-    setSelectedCourses(courseParam ? courseParam.split(',').map(label => ({ value: label, label })) : []);
-    setAgeRange(ageRangeParam);
-
-    handleSearchFromAdvanced(query); // Trigger search whenever the URL query parameters change
+    //handleSearchFromAdvanced(query); // Trigger search whenever the URL query parameters change
   }, [searchParams]);
 
   // Function to handle search and display results
