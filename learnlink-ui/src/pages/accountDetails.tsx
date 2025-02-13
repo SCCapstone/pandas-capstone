@@ -49,23 +49,22 @@ useEffect(() => {
 }, []);
 
 return (
-    <div>
+  <div>
     <Navbar />
+
     <div className="account-details">
-    <div className="account-details-container">
-      <div className='heading'>Account Details</div>
-        <div className="details">
-          <p><strong>First Name:</strong> {formData.first_name}</p>
-          <p><strong>Last Name:</strong> {formData.last_name}</p>
-          <p><strong>Username:</strong> {formData.username}</p>
-          <p><strong>Email:</strong> {formData.email || 'No email available'}</p>
-        </div>
+      <div className="account-details-container">
+        <div className='heading'>Account Details</div>
+          <div className="details">
+            <p><strong>First Name:</strong> {formData.first_name}</p>
+            <p><strong>Last Name:</strong> {formData.last_name}</p>
+            <p><strong>Username:</strong> {formData.username}</p>
+            <p><strong>Email:</strong> {formData.email || 'No email available'}</p>
+          </div>
+      </div>
     </div>
 
-    </div>
-    <div>
       <CopyrightFooter />
-    </div>
   </div>
 );
 };
