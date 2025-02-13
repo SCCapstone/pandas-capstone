@@ -60,8 +60,8 @@ const ChangePassword: React.FC = () => {
       </header>
       <main className="content">
         <div className="change-password">
+        <h1 className="p1">Change Password</h1>
           <div className="change-password-container">
-            <h1 className="p1">Change Password</h1>
             <form onSubmit={handleSubmit}>
               <label>Old Password</label>
               <input 
