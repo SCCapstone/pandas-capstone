@@ -5,10 +5,11 @@ import FilterMenu from '../components/FilterMenu';
 import './advancedSearch.css';
 import CopyrightFooter from '../components/CopyrightFooter';
 import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const AdvancedSearch: React.FC = () => {
     const location = useLocation();
+    const navigate = useNavigate();
 
 
     interface User {
@@ -64,6 +65,12 @@ const AdvancedSearch: React.FC = () => {
         fetchResults();
     }, [location.search]); // 🔹 Re-fetch when URL updates
 
+    const handleSelectUser = (userId: number) => {
+        navigate(`/user-profile/${userId}`); // Navigate to the user's profile page
+        // setSearchQuery('');
+        setSearchResults([]);
+      };
+
 
     return (
         <div className="advanced-search-page">
@@ -74,11 +81,15 @@ const AdvancedSearch: React.FC = () => {
 
             <div className='advanced-search-content'>
                 <main className="main-content">
-                    <h1>External advanced-search</h1>
-                    <h2>External Scheduling Tool</h2>
-                    {searchResults.map((user) => (
-                        <li key={user.id}>{user.username}</li>
-                    ))}
+                    <h1>Advanced Search</h1>
+                    <h2>Search Results:</h2>
+                    <ul className="search-result-list">
+                        {searchResults.map((user) => (
+                            <p key={user.id} onClick={() => handleSelectUser(user.id)}>
+                                {user.firstName} {user.lastName} (@{user.username})
+                            </p>
+                        ))}
+                    </ul>
                 </main>
                 <FilterMenu />
 

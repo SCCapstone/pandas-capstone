@@ -6,6 +6,7 @@
 }
 
 .public-profile-container {
+    flex:1;
     justify-self: center;
     display: flex;
     flex-direction: column;

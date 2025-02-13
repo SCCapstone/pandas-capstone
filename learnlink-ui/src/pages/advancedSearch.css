@@ -100,3 +100,32 @@
     .tip-icon img:hover {
       transform: scale(1.1);
     }
+
+    /* Dropdown */
+.search-result-list {
+  /* border: 1px solid #ccc; Light gray border */
+  /* border-radius: 8px; Rounded corners */
+  /* left: 0;
+  right: 0; */
+  flex:1;
+  /* background-color: #fff; */
+  border-radius: 2px;
+  overflow-y: scroll;
+  /* box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); */
+  z-index: 1000;
+  padding-inline-start: 0;
+}
+
+.search-result-list p {
+  border-top: 1px solid #ccc; /* Light gray border */
+  color: black;
+  padding: 15px 20px;
+  cursor: pointer;
+  font-size: medium;
+  margin: 0;
+  /* border-bottom: #2c658f; */
+}
+
+.search-result-list p:hover {
+  background-color: #D4EAF7;
+}
