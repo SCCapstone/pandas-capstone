@@ -3,8 +3,6 @@ import '../pages/messaging.css';
 import './components.css';
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { useResolvedPath } from 'react-router-dom';
-import userEvent from '@testing-library/user-event';
 
 interface JoinRequestProps {
   currentUserId: number | null;
@@ -80,9 +78,7 @@ const JoinRequests: React.FC<JoinRequestProps> = ({ currentUserId, addNewChat })
   };
   
   // Approve request 
-  // adds someone to a study group or creates a chat between two users, where they can then create a study group if they want
-
-  
+  // adds someone to a study group or creates a chat between two users, where they can then create a study group if they want  
   const handleApproval = async (
     requestId: number,
     studyGroupId?: number | null,

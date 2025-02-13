@@ -1403,13 +1403,24 @@ app.post('/api/chats', async (req, res) : Promise<any> => {
     if (existingChat) {
       return res.status(200).json(existingChat); // Return existing chat if found
     }
+    
+    // Retrieve recipient's name
+    const recipient = await prisma.user.findUnique({
+      where: { id: userId1 },
+    });
 
+    if (!recipient) {
+      return res.status(404).json({ error: 'Recipient user not found' });
+    }
     // Create a new chat linking both users
     const newChat = await prisma.chat.create({
       data: {
-        name: `Chat between ${userId1} and ${userId2}`, // Optional chat name
+        name: recipient.firstName + " " + recipient.lastName,
         users: {
-          connect: [{ id: userId1 }, { id: userId2 }], // Connect both users
+          connect: [
+            { id: userId1 },
+            { id: userId2 },
+          ],
         },
       },
     });

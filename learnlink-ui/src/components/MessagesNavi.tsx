@@ -33,10 +33,11 @@ interface MessagesNaviProps {
     selectedChat: Chat | null;
     setSelectedChat: React.Dispatch<React.SetStateAction<Chat | null>>;
     handleDeleteChat: (id: number) => void;
+    getChatName: (chat: Chat) => string;
   }
   
 
-const MessagesNavi: React.FC<MessagesNaviProps> = ({ chats, selectedChat, setSelectedChat, handleDeleteChat }) => {
+const MessagesNavi: React.FC<MessagesNaviProps> = ({ chats, selectedChat, setSelectedChat, handleDeleteChat , getChatName}) => {
   return (
     <div className="messages-panel">
       <ul className="ChatList">
@@ -52,7 +53,7 @@ const MessagesNavi: React.FC<MessagesNaviProps> = ({ chats, selectedChat, setSel
               key={chat.id}
               className={`ChatListItem ${selectedChat?.id === chat.id ? 'active' : ''}`}
             >
-              <span onClick={() => setSelectedChat(chat)}>{chat.name}</span>
+              <span onClick={() => setSelectedChat(chat)}>{getChatName(chat)}</span>
               <button className="DeleteButton" onClick={() => handleDeleteChat(chat.id)}>
                 X
               </button>

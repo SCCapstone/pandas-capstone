@@ -341,12 +341,9 @@ const Messaging: React.FC = () => {
       const otherUser = chat.users?.find((user) => user.id !== currentUserId);
       
       if (otherUser) {
-        if (chat.name && chat.name.trim() !== '') {
-          return chat.name + " with " +  `${otherUser.firstName} ${otherUser.lastName}` ;
-        }
-        else{
+        
           return `${otherUser.firstName} ${otherUser.lastName}`;
-        }
+        
       }
     }
     if (chat.name && chat.name.trim() !== '') {
@@ -667,10 +664,11 @@ const Messaging: React.FC = () => {
           {/* Conditionally show the messages panel */}
           {showMessagesPanel && (
             <MessagesNavi 
-              chats={chats} 
+              chats={chats}
               selectedChat={selectedChat} 
               setSelectedChat={setSelectedChat} 
               handleDeleteChat={handleDeleteChat} 
+              getChatName={getChatName}
             />
           )}
           {showRequestsPanel && (
