@@ -95,14 +95,22 @@ const navigate = useNavigate();
   // Initialize filter criteria from URL
   useEffect(() => {
     setQuery(searchParams.get('query') || '');
-    const queryGender = searchParams.get('gender')?.split(',') || [];
-    const queryColleges = searchParams.get('college')?.split(',') || [];
-    const queryCourses = searchParams.get('course')?.split(',') || [];
+    const queryGender = searchParams.get('gender');
+    const parsedGender = queryGender ? queryGender.split(',').filter(course => course.trim() !== '') : [];
+
+
+    const queryColleges = searchParams.get('college');
+    const parsedColleges = queryColleges ? queryColleges.split(',').filter(course => course.trim() !== '') : [];
+
+    const queryCourses = searchParams.get('course');
+    const parsedCourses = queryCourses ? queryCourses.split(',').filter(course => course.trim() !== '') : [];
+
     const queryAgeRange = searchParams.get('ageRange')?.split(',').map(Number) || [0, 100];
 
-    setSelectedGenders(queryGender.map(gender => ({ value: gender, label: formatEnum(gender) })));
-    setSelectedColleges(queryColleges.map(college => ({ label: college, value: college })));
-    setSelectedCourses(queryCourses.map(course => ({ label: course, value: course })));
+    setSelectedGenders(parsedGender.map(gender => ({ value: gender, label: formatEnum(gender) })));
+    setSelectedColleges(parsedColleges.map(college => ({ label: college, value: college })));
+    setSelectedCourses(parsedCourses? parsedCourses.map(course => ({ label: course, value: course })):[]);
+    console.log(selectedCourses);
     setAgeRange(queryAgeRange as [number, number]);
   }, [searchParams]);
 

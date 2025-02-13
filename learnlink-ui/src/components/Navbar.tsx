@@ -287,6 +287,9 @@ const Navbar: React.FC = () => {
   const handleAccountDetails = () => {
     navigate('/accountDetails');
   }
+  const handleFilter = () => {
+    navigate('/advancedsearch');
+  };
   const [isNavOpen, setIsNavOpen] = useState(false);
 
   const handleClearFilters = () => {
@@ -311,7 +314,7 @@ const Navbar: React.FC = () => {
       </nav>
 
       <div className="search-bar">
-        <FaSlidersH className='hamburger-icon' onClick={() => setIsFilterVisible(!isFilterVisible)} />
+        <FaSlidersH className='hamburger-icon' onClick={handleFilter} />
         <input
           type="text"
           value={searchQuery}
