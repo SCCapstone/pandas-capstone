@@ -937,13 +937,16 @@ app.get('/api/users/search', authenticate, async (req, res): Promise<any> => {
       console.log('course:', course); // Log for debugging
     }
 
-    // Add age range filter if provided
-    if (ageRange && ageRange.length === 2) {
+    console.log('Age range:', ageRange);
+
+    if (typeof ageRange === 'string' && ageRange.length >= 2) {
       const [minAge, maxAge] = (ageRange as string).split(',').map(Number);
       filters.push({
         age: { gte: minAge, lte: maxAge },
       });
     }
+
+    console.log('Filters:', filters);
 
     // If no valid filters, return a 400 error
     if (filters.length === 0) {
