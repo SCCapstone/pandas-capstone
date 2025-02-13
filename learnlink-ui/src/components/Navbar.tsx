@@ -80,13 +80,13 @@ const Navbar: React.FC = () => {
     const courseParam = searchParams.get('course') || '';
     const ageRangeParam = (searchParams.get('ageRange')?.split(',').map(Number) as [number, number]) || [0, 100];
 
-    setSearchQuery(query);
+    // setSearchQuery(query);
     setSelectedGenders(genderParam ? genderParam.split(',').map(label => ({ value: label, label })) : []);
     setSelectedColleges(collegeParam ? collegeParam.split(',').map(label => ({ value: label, label })) : []);
     setSelectedCourses(courseParam ? courseParam.split(',').map(label => ({ value: label, label })) : []);
     setAgeRange(ageRangeParam);
 
-    // handleSearch(query); // Trigger search whenever the URL query parameters change
+    handleSearchFromAdvanced(query); // Trigger search whenever the URL query parameters change
   }, [searchParams]);
 
   // Function to handle search and display results
@@ -174,6 +174,80 @@ const Navbar: React.FC = () => {
 
     setSearchParams(queryParams);
   };
+
+    // Function to handle search and display results
+    const handleSearchFromAdvanced = async (query:string) => {
+      setSearchQuery(query);
+  
+      console.log("Searching for:", query);
+      // const query = e.target.value;
+      // setSearchQuery(query);
+    
+      if (query.trim() === '') {
+        setSearchResults([]);
+        setIsDropdownVisible(false);
+        return;
+      }
+    
+      const token = localStorage.getItem('token');
+      // const genderFilter = selectedGenders.map(gender => gender.label);
+      // const collegeFilter = selectedColleges.map(college => college.label); // Adjusted to `value` for consistency
+      // const courseFilter = selectedCourses.map(course => course.label); // Adjusted to `value` for consistency
+      // const ageRangeFilter = ageRange;
+    
+      // // Use URLSearchParams to construct the query string
+      // const queryParams = new URLSearchParams({
+      //   query,
+      //   gender: genderFilter.join(','),
+      //   college: collegeFilter.join(','),
+      //   ageRange: ageRangeFilter.join(','),
+      //   course: courseFilter.join(','),
+      // });
+  
+      const queryParams = new URLSearchParams({
+        query: query,
+        gender: selectedGenders.map(gender => gender.label).join(','),
+        college: selectedColleges.map(college => college.label).join(','),
+        course: selectedCourses.map(course => course.label).join(','),
+        ageRange: ageRange.join(','),
+      });
+  
+      console.log("Query Params:", queryParams.toString());
+    
+      try {
+        if (token) {
+          const response = await fetch(`${REACT_APP_API_URL}/api/users/search?${queryParams.toString()}`, {
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`,
+            },
+          });
+    
+          const data = await response.json();
+          
+          if (response.ok) {
+            setSearchResults(data.users);
+  
+            if (location === "/advancedsearch") {
+              // If on Advanced Search page, fetch and update results without dropdown
+              setIsDropdownVisible(false);
+              navigate(`/advancedsearch?${queryParams.toString()}`, { replace: true });
+  
+            } else {
+              // Otherwise, show dropdown results
+              setIsDropdownVisible(true);
+            }
+          } else {
+            setSearchResults([]);
+            setIsDropdownVisible(false);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching search results:', error);
+        setSearchResults([]);
+        setIsDropdownVisible(false);
+      }
+    };
 
 
   const handleApplyFilters = () => {

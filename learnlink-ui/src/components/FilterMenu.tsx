@@ -85,6 +85,7 @@ const navigate = useNavigate();
   const [collegeInputValue, setCollegeInputValue] = useState(""); // State to track the input value
   const [courseInputValue, setCourseInputValue] = useState(""); // State to track the input value
   const [filterCriteria, setFilterCriteria] = useState({ selectedColleges, selectedCourses, selectedGenders, ageRange });
+  const [query, setQuery] = useState(searchParams.get('query') || '');
 
   const { grade, gender, studyHabitTags } = useEnums();
   const { isLoading, colleges } = useColleges();
@@ -93,6 +94,7 @@ const navigate = useNavigate();
 
   // Initialize filter criteria from URL
   useEffect(() => {
+    setQuery(searchParams.get('query') || '');
     const queryGender = searchParams.get('gender')?.split(',') || [];
     const queryColleges = searchParams.get('college')?.split(',') || [];
     const queryCourses = searchParams.get('course')?.split(',') || [];
@@ -128,11 +130,13 @@ const navigate = useNavigate();
   const handleApplyFilters = () => {
     // Sync state with URL
     setSearchParams({
+        query,
       gender: selectedGenders.map(item => item.label).join(','),
       college: selectedColleges.map(item => item.label).join(','),
       course: selectedCourses.map(item => item.label).join(','),
       ageRange: ageRange.join(','),
     });
+    
   };
 
   
