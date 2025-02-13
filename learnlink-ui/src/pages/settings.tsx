@@ -72,25 +72,28 @@ const Settings: React.FC = () => {
     navigate('/changePassword');
 };
   return (
-    <div className='settingsPage'>
-      <div>
+    <div className="page-container">
+    <header>
       <Navbar />
-      </div>
+    </header>
 
+    <main className="content">
       <div className="settings">
-        <div className='heading'>Manage Account</div>
-          <div className="buttons">
-            <button onClick={logout}>Log Out</button>
-            <button onClick={handleUpdateEmail}>Update Email</button>
-            <button onClick={handleChangePassword}>Change Password</button>
-            <button onClick={handleDelete}>Delete Account</button>
-          </div>
+        <div className="heading">Manage Account</div>
+        <div className="buttons">
+          <button onClick={logout}>Log Out</button>
+          <button onClick={handleUpdateEmail}>Update Email</button>
+          <button onClick={handleChangePassword}>Change Password</button>
+          <button onClick={handleDelete}>Delete Account</button>
+        </div>
       </div>
+    </main>
 
-      <div>
-        <CopyrightFooter />
-      </div>
-    </div> 
+    <footer>
+      <CopyrightFooter />
+    </footer>
+</div>
+
   );
 };
 

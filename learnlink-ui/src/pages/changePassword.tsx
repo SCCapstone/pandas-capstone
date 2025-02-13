@@ -54,42 +54,44 @@ const ChangePassword: React.FC = () => {
   };
 
   return (
-    <div>
+    <div className="page-container">
       <header>
         <Navbar />
       </header>
-      <div className="update-password">
-        <div className="update-password-container">
-          <h1 className="p1">Update Password</h1>
-          <form onSubmit={handleSubmit}>
-            <label>Old Password</label>
-            <input 
-              type="password"
-              placeholder="********"
-              value={oldPassword}
-              onChange={handleOldPasswordChange}
-              required
-            />
-            <label>New Password</label>
-            <input
-              type="password"
-              placeholder="********"
-              value={newPassword}
-              onChange={handleNewPasswordChange}
-              required
-            />
-            {error && <p className="error">{error}</p>}
-
-            <button className="lButton" type="submit" disabled={loading}>
-              {loading ? "Updating..." : "Update Password"}
-            </button>
-          </form>
+      <main className="content">
+        <div className="change-password">
+          <div className="change-password-container">
+            <h1 className="p1">Change Password</h1>
+            <form onSubmit={handleSubmit}>
+              <label>Old Password</label>
+              <input 
+                type="password"
+                placeholder="********"
+                value={oldPassword}
+                onChange={handleOldPasswordChange}
+                required
+              />
+              <label>New Password</label>
+              <input
+                type="password"
+                placeholder="********"
+                value={newPassword}
+                onChange={handleNewPasswordChange}
+                required
+              />
+              {error && <p className="error">{error}</p>}
+              <button className="lButton" type="submit" disabled={loading}>
+                {loading ? "Updating..." : "Change Password"}
+              </button>
+            </form>
+          </div>
         </div>
-      </div>
-      <div>
+      </main>
+      <footer>
         <CopyrightFooter />
-      </div>
-    </div>
+      </footer>
+  </div>
+
   );
 }
 

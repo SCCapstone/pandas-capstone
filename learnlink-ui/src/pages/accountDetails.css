@@ -1,14 +1,39 @@
-/* Center the entire page content */
-.acccount-details-container {
-  flex:1;
+/* Outer flex container for the entire page */
+.page-container {
   display: flex;
   flex-direction: column;
-  align-items: center;  /* Horizontally centers content */
-  width: 100%;  /* Ensure the container takes full width */
-  text-align: center; /* Center the text */
+  min-height: 100vh; /* Ensures full viewport height */
 }
 
-/* Center the heading */
+/* Main content expands to push footer down */
+.content {
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-bottom: 300px;
+}
+
+/* Ensure proper flexbox alignment for account details */
+.account-details {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  text-align: center;
+}
+
+/* Center the content inside account-details */
+.account-details-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 600px; /* Keeps content readable */
+  padding: 20px;
+}
+
+/* Heading styles */
 .heading {
   text-align: center;
   color: #00668C;
@@ -16,34 +41,29 @@
   font-weight: 600;
 }
 
-.account-details {
-  overflow-y: scroll;
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-}
-
-/* Center the details box */
+/* Center and style the details box */
 .details {
   margin: 25px auto;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start; /* Aligns text to the left inside the box */
   justify-content: center;
-  text-align: center;
-  padding: 1rem;
+  padding: 1.5rem;
   width: 100%;
-  max-width: 350px;
+  max-width: 400px;
   background: white;
   border-radius: 15px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
+/* Ensure text within details is well-structured */
 .details p {
   font-size: 18px;
   margin: 10px 0;
+  text-align: left; /* Aligns text inside */
 }
 
 .details strong {
   color: #333;
 }
+
