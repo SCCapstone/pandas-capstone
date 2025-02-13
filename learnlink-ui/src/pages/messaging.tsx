@@ -541,7 +541,7 @@ const Messaging: React.FC = () => {
       <div className="Chat">
 
         {/** greyed out because its old but i dont want to delete yet */}
-        
+        {/*
         <div className="ChatOptions">
           <button
             onClick={() => setShowDropdown(!showDropdown)}
@@ -642,7 +642,7 @@ const Messaging: React.FC = () => {
           </ul>
         </div>
 
-
+          */}
 
         
         {/* Tabs for Messages and Requests */}
