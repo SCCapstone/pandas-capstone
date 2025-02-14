@@ -802,6 +802,39 @@ app.post('/api/study-groups', authenticate, async (req, res): Promise<any> => {
   }
 });
 
+app.get('/api/study-groups/:id', async (req, res): Promise<any> => {
+  const studyGroupId = parseInt(req.params.id);  // Extract study group ID from the request parameters
+
+  console.log('Received request to fetch study group with ID:', studyGroupId);
+
+  try {
+    // Validate the input data (check if ID is valid)
+    if (!studyGroupId) {
+      return res.status(400).json({ error: 'Study group ID is required' });
+    }
+
+    // Fetch the study group by ID from the database
+    const studyGroup = await prisma.studyGroup.findUnique({
+      where: { id: studyGroupId },
+      include: {
+        users: true,  // Optionally include users in the response
+        creator: true,  // Optionally include the creator information
+      },
+    });
+
+    if (!studyGroup) {
+      return res.status(404).json({ error: 'Study group not found' });
+    }
+
+    // Send back the found study group as a response
+    return res.status(200).json({ studyGroup });
+  } catch (error) {
+    console.error('Error fetching study group:', error);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
 app.get("/api/study-groups/chat/:chatId", async (req, res): Promise<any> => {
   const { chatId } = req.params;
   console.log('Fetching study group for chat:', chatId);
@@ -859,8 +892,103 @@ app.put('/api/study-groups/chat/:chatID', async (req, res) : Promise<any> =>  {
   }
 });
 
+app.get("/api/study-groups/:studyGroupId/chat", async (req, res): Promise<any> => {
+  const { studyGroupId } = req.params;
+  console.log('Fetching chat ID for study group:', studyGroupId);
+
+  try {
+    // Find the chat that is linked to the provided study group ID
+    const studyGroup = await prisma.studyGroup.findUnique({
+      where: { id: parseInt(studyGroupId) }, // Use studyGroupId to find the corresponding study group
+      select: { chatID: true } // Only retrieve the chatID field
+    });
+
+    // If a study group is found, return its chat ID; otherwise, return null
+    if (studyGroup && studyGroup.chatID) {
+      console.log('Chat ID found for study group:', studyGroup.chatID);
+      return res.json({ chatId: studyGroup.chatID });
+    } else {
+      return res.json({ chatId: null }); // No chat ID found for this study group
+    }
+  } catch (error) {
+    console.error("Error fetching chat ID for study group:", error);
+    return res.status(500).json({ error: "Server error" });
+  }
+});
+
+
+//adds user to the study group from request panel
+app.post('/api/add-to-study-group', async (req, res): Promise<any> => {
+  const userId = res.locals.userId;  // User making the request (authenticated user)
+  const { studyGroupId, requestUserId } = req.body; // Payload
+  
+  console.log('Received request to add user to study group:', req.body);
+
+  try {
+    if (!studyGroupId || !requestUserId) {
+      return res.status(400).json({ error: 'Study group ID and request user ID are required' });
+    }
+
+    // Find the study group to which the user will be added
+    const studyGroup = await prisma.studyGroup.findUnique({
+      where: { id: studyGroupId },
+      include: { users: true }, // Include the users in the study group
+    });
+
+    if (!studyGroup) {
+      return res.status(404).json({ error: 'Study group not found' });
+    }
+
+    // Check if the user is already in the study group
+    const isUserInGroup = studyGroup.users.some(user => user.id === requestUserId);
+
+    if (isUserInGroup) {
+      return res.status(400).json({ error: 'User is already in this study group' });
+    }
+
+    // Add the user to the study group
+    await prisma.studyGroup.update({
+      where: { id: studyGroupId },
+      data: {
+        users: {
+          connect: { id: requestUserId },
+        },
+      },
+    });
+
+    return res.status(200).json({ message: 'User added to study group successfully' });
+  } catch (error) {
+    console.error('Error adding user to study group:', error);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
+
 
 //for the request panel 
+
+//gets a study a group name
+app.get('/api/study-groups/:groupId', async (req, res):Promise<any> => {
+  const { groupId } = req.params;
+
+  try {
+    const studyGroup = await prisma.studyGroup.findUnique({
+      where: { id: parseInt(groupId, 10) },
+      select: { name: true },
+    });
+
+    if (!studyGroup) {
+      return res.status(404).json({ error: 'Study group not found' });
+    }
+
+    res.status(200).json({ name: studyGroup.name });
+  } catch (error) {
+    console.error('Error fetching study group name:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 
 // Endpoint to get a study group by ID
 app.get('/api/study-groups/:groupId', async (req, res): Promise<any> => {
@@ -1275,24 +1403,57 @@ app.patch('/api/messages/:id/like', authenticate, async (req, res):Promise<any> 
 
 
 // Create a new chat
-app.post('/api/chats', async (req, res) => {
-  const { name, userId } = req.body; // Assuming the user is the creator of the chat
+app.post('/api/chats', async (req, res) : Promise<any> => {
+  const { userId1, userId2 } = req.body; // Expecting both user IDs
+
+  if (!userId1 || !userId2) {
+    return res.status(400).json({ error: "Both user IDs are required." });
+  }
 
   try {
-    const newChat = await prisma.chat.create({
-      data: {
-        name,
+    // Check if a chat between these users already exists
+    const existingChat = await prisma.chat.findFirst({
+      where: {
         users: {
-          connect: { id: userId }, // Assuming a user creates the chat
+          every: {
+            id: { in: [userId1, userId2] },
+          },
         },
       },
     });
+
+    if (existingChat) {
+      return res.status(200).json(existingChat); // Return existing chat if found
+    }
+    
+    // Retrieve recipient's name
+    const recipient = await prisma.user.findUnique({
+      where: { id: userId1 },
+    });
+
+    if (!recipient) {
+      return res.status(404).json({ error: 'Recipient user not found' });
+    }
+    // Create a new chat linking both users
+    const newChat = await prisma.chat.create({
+      data: {
+        name: recipient.firstName + " " + recipient.lastName,
+        users: {
+          connect: [
+            { id: userId1 },
+            { id: userId2 },
+          ],
+        },
+      },
+    });
+
     res.status(201).json(newChat);
   } catch (error) {
     console.error("Error creating chat:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 });
+
 
 
 app.post('/api/chats/:userId', authenticate, async (req: Request, res: Response): Promise<any> => {

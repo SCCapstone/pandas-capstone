@@ -7,67 +7,73 @@ const AccountDetails: React.FC = () => {
 const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
 
 
-  // State to store user profile data
-  const [formData, setFormData] = useState({
-    first_name: '',
-    last_name: '',
-    email: '',
-    username: ''
-  });
+// State to store user profile data
+const [formData, setFormData] = useState({
+  first_name: '',
+  last_name: '',
+  email: '',
+  username: ''
+});
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // Fetch the current user profile data
-        const token = localStorage.getItem('token');
-        console.log('Token:', token);
-        if (token) {
-          const userResponse = await fetch(`${REACT_APP_API_URL}/api/users/profile`, {
-            headers: {
-              'Authorization': `Bearer ${token}`,
-            },
-          });
+useEffect(() => {
+  const fetchData = async () => {
+    try {
+      // Fetch the current user profile data
+      const token = localStorage.getItem('token');
+      console.log('Token:', token);
+      if (token) {
+        const userResponse = await fetch(`${REACT_APP_API_URL}/api/users/profile`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
 
-          const userData = await userResponse.json();
-          console.log('User data:', userData);
+        const userData = await userResponse.json();
+        console.log('User data:', userData);
 
-          setFormData({
-            first_name: userData.first_name || '',
-            last_name: userData.last_name || '',
-            email: userData.email || '',
-            username: userData.username || ''
-          });
+        setFormData({
+          first_name: userData.first_name || '',
+          last_name: userData.last_name || '',
+          email: userData.email || '',
+          username: userData.username || ''
+        });
 
-          
-        }
-      } catch (error) {
-        console.error('Error fetching data:', error);
+        
       }
-    };
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
 
-    fetchData();
-  }, []);
+  fetchData();
+}, []);
 
-  return (
-    <div className="account-details">
+return (
+  <div className="page-container">
+    <header>
       <Navbar />
-
-      <div className="account-details-container">
-        <div className='heading'>Account Details</div>
+    </header>
+    
+    <main className="content">
+      <div className="account-details">
+        <div className="account-details-container">
+          <div className="heading">Account Details</div>
           <div className="details">
             <p><strong>First Name:</strong> {formData.first_name}</p>
             <p><strong>Last Name:</strong> {formData.last_name}</p>
             <p><strong>Username:</strong> {formData.username}</p>
             <p><strong>Email:</strong> {formData.email || 'No email available'}</p>
           </div>
+        </div>
       </div>
+    </main>
 
-      <div>
-        <CopyrightFooter />
+    <footer>
+      <CopyrightFooter />
+    </footer>
+  </div>
 
-      </div>
-    </div>
-  );
+);
 };
 
 export default AccountDetails;

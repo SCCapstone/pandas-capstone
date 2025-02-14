@@ -11,7 +11,7 @@ interface StudyGroup {
   chatID: number;
 }
 
-const EditStudyGroup = ({ chatID, onClose }: { chatID: number; onClose: () => void }) => {
+const EditStudyGroup = ({ chatID, onClose, updateChatName}: { chatID: number; onClose: () => void ; updateChatName: (chatId: number, newName: string) => void}) => {
   const [studyGroup, setStudyGroup] = useState<StudyGroup | null>(null);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
@@ -74,6 +74,8 @@ const EditStudyGroup = ({ chatID, onClose }: { chatID: number; onClose: () => vo
     
 
       console.log('Study group updated:', response.data);
+
+      updateChatName(chatID, name);
       // alert('Study group updated successfully!');
       onClose(); // Close the panel or component after saving
     } catch (error) {
