@@ -968,6 +968,28 @@ app.post('/api/add-to-study-group', async (req, res): Promise<any> => {
 
 //for the request panel 
 
+//gets a study a group name
+app.get('/api/study-groups/:groupId', async (req, res):Promise<any> => {
+  const { groupId } = req.params;
+
+  try {
+    const studyGroup = await prisma.studyGroup.findUnique({
+      where: { id: parseInt(groupId, 10) },
+      select: { name: true },
+    });
+
+    if (!studyGroup) {
+      return res.status(404).json({ error: 'Study group not found' });
+    }
+
+    res.status(200).json({ name: studyGroup.name });
+  } catch (error) {
+    console.error('Error fetching study group name:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
 // Endpoint to get a study group by ID
 app.get('/api/study-groups/:groupId', async (req, res): Promise<any> => {
   const { groupId } = req.params;

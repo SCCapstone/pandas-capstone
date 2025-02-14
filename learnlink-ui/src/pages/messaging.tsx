@@ -69,7 +69,9 @@ const Messaging: React.FC = () => {
   const selectedUserId = searchParams.get('user'); // Get the matched user ID
   const [heartedMessages, setHeartedMessages] = useState<{ [key: number]: boolean }>({});
   const [messages, setMessages] = useState(selectedChat?.messages || []);
-
+  const [studyGroupNames, setStudyGroupNames] = useState<{ [key: number]: string }>({});
+  const [chatName, setChatName] = useState("");
+  const [chatNames, setChatNames] = useState<{ [key: number]: string }>({});
   //for matching stuff
   const [showMessagesPanel, setShowMessagesPanel] = useState(false);
   const [showRequestsPanel, setShowRequestsPanel] = useState(false);
@@ -202,7 +204,25 @@ const Messaging: React.FC = () => {
     };
   }, [selectedChat]); // Runs when messages update
   
+
+  useEffect(() => {
+    const fetchChatNames = async () => {
+      const newChatNames: { [key: number]: string } = { ...chatNames };
   
+      for (const chat of chats) {
+        if (!newChatNames[chat.id]) { // Only fetch if not already in state
+          newChatNames[chat.id] = await getChatName(chat);
+        }
+      }
+  
+      setChatNames(newChatNames);
+    };
+  
+    fetchChatNames();
+  }, [chats]); // Runs only when `chats` change
+
+
+
   const handleMessagesSwitch = () => {
     setActiveTab('messages');
     setShowRequestsPanel(false);
@@ -259,6 +279,7 @@ const Messaging: React.FC = () => {
     }
   };
   
+
 
 
   const createNewChat = async (user: User, chatName: string) => {
@@ -335,8 +356,18 @@ const Messaging: React.FC = () => {
   };
   
   
-  const getChatName = (chat: Chat): string => {
-  
+  const getChatName = async (chat: Chat) => {
+
+    try {
+      const response = await axios.get(`${REACT_APP_API_URL}/api/study-groups/chat/${chat.id}`);
+      if (response.data.name) {
+        setStudyGroupNames((prev) => ({ ...prev, [chat.id]: response.data.name }));
+        return response.data.name;
+      }
+    } catch (error) {
+      console.error("Error fetching study group name:", error);
+    }
+    
     if (currentUserId) {
       const otherUser = chat.users?.find((user) => user.id !== currentUserId);
       
@@ -346,9 +377,7 @@ const Messaging: React.FC = () => {
         
       }
     }
-    if (chat.name && chat.name.trim() !== '') {
-      return chat.name ;
-    }
+
   
     return " ";
   };
@@ -668,7 +697,8 @@ const Messaging: React.FC = () => {
               selectedChat={selectedChat} 
               setSelectedChat={setSelectedChat} 
               handleDeleteChat={handleDeleteChat} 
-              getChatName={getChatName}
+              chatNames={chatNames} 
+
             />
           )}
           {showRequestsPanel && (
@@ -685,7 +715,7 @@ const Messaging: React.FC = () => {
           {selectedChat ? (
             <>
               <div className='ChatHeader'>
-                <h2 className="ChatTitle">{getChatName(selectedChat)}</h2>
+                <h2 className="ChatTitle">{chatNames[selectedChat.id]}</h2>
                 {hasStudyGroup ?
                   <button
                     className="EditStudyGroupButton"

@@ -1,7 +1,7 @@
 import './JoinRequests.css';
 import '../pages/messaging.css';
 import './components.css';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 interface Chat {
@@ -33,11 +33,14 @@ interface MessagesNaviProps {
     selectedChat: Chat | null;
     setSelectedChat: React.Dispatch<React.SetStateAction<Chat | null>>;
     handleDeleteChat: (id: number) => void;
-    getChatName: (chat: Chat) => string;
+    chatNames: { [key: number]: string };
+
   }
   
 
-const MessagesNavi: React.FC<MessagesNaviProps> = ({ chats, selectedChat, setSelectedChat, handleDeleteChat , getChatName}) => {
+const MessagesNavi: React.FC<MessagesNaviProps> = ({ chats, selectedChat, setSelectedChat, handleDeleteChat , chatNames}) => {
+
+  
   return (
     <div className="messages-panel">
       <ul className="ChatList">
@@ -53,7 +56,9 @@ const MessagesNavi: React.FC<MessagesNaviProps> = ({ chats, selectedChat, setSel
               key={chat.id}
               className={`ChatListItem ${selectedChat?.id === chat.id ? 'active' : ''}`}
             >
-              <span onClick={() => setSelectedChat(chat)}>{getChatName(chat)}</span>
+              <span onClick={() => setSelectedChat(chat)}>
+                {chatNames[chat.id] || "Loading..."}
+              </span>
               <button className="DeleteButton" onClick={() => handleDeleteChat(chat.id)}>
                 X
               </button>
