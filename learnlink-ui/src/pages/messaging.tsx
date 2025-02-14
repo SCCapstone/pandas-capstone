@@ -204,7 +204,7 @@ const Messaging: React.FC = () => {
     };
   }, [selectedChat]); // Runs when messages update
   
-
+  //used for chat names
   useEffect(() => {
     const fetchChatNames = async () => {
       const newChatNames: { [key: number]: string } = { ...chatNames };
@@ -550,6 +550,14 @@ const Messaging: React.FC = () => {
     setChats((prevChats) => [...prevChats, newChat]);
   };
 
+  const updateChatName = (chatId: number, newName: string) => {
+    setChatNames((prevChatNames) => ({
+      ...prevChatNames,
+      [chatId]: newName,
+    }));
+  };
+  
+
 
   const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Enter') {
@@ -740,6 +748,7 @@ const Messaging: React.FC = () => {
                     // Pass necessary props to the EditStudyGroup component
                     chatID={selectedChat.id}
                     onClose={() => setIsPanelVisible(false)} // Close panel when done
+                    updateChatName={updateChatName} 
                   />
                 </div>
               )}
