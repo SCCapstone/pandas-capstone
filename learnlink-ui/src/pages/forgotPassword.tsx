@@ -62,7 +62,7 @@ const ForgotPassword: React.FC = () => {
         }
     };
 
-    return (
+    return ( 
         <div>
             <div className="Logo2">
                 <Logo />

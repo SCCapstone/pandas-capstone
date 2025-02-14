@@ -1,15 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
-import { formatEnum } from '../utils/format';
+import { useEnums, formatEnum, useColleges } from '../utils/format';
 import './profile.css';
 import CopyrightFooter from '../components/CopyrightFooter';
 import makeAnimated from 'react-select/animated';
 import Select from 'react-select';
 
+
 const animatedComponents = makeAnimated();
 
 const Profile: React.FC = () => {
   const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
+  const { isLoading, colleges } = useColleges();
+  
 
 
   const [formData, setFormData] = useState({
@@ -216,6 +219,28 @@ const Profile: React.FC = () => {
                 <label>
                   College: <input type="text" name="college" value={formData.college} onChange={handleChange} />
                 </label>
+                <div className="college-select">
+              <label>College: <br />
+              <Select
+                    name="college-select"
+                    components={animatedComponents}
+                    options={isLoading ? [] : colleges.map(college => ({ label: college.label, value: college.label }))}
+                    value={formData.college ? { label: formData.college, value: formData.college } : null}
+                    onChange={(selectedOption) => {
+                      setFormData((prevData) => ({
+                        ...prevData,
+                        college: selectedOption && !Array.isArray(selectedOption) && 'label' in selectedOption ? selectedOption.label : '',
+                      }));
+                    }}
+                    isClearable
+                    isSearchable
+                    placeholder="Type or select colleges..."
+                    className="basic-multi-select"
+                    classNamePrefix="select"
+                noOptionsMessage={() => "Type to add a new college"}
+            
+              /></label>
+            </div>
                 <label>
                   Major: <input type="text" name="major" value={formData.major} onChange={handleChange} />
                 </label>
