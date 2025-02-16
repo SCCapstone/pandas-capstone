@@ -11,6 +11,7 @@ import  makeAnimated from 'react-select/animated';
 import { set } from 'react-hook-form';
 import ReactSlider from 'react-slider'
 import { useEffect } from 'react';
+import NotificationDropdown from './NotificationDropdown';
 
 
 const animatedComponents = makeAnimated();
@@ -52,6 +53,7 @@ const Navbar: React.FC = () => {
   const [collegeInputValue, setCollegeInputValue] = useState(""); // State to track the input value
   const [courseInputValue, setCourseInputValue] = useState(""); // State to track the input value
   const [searchParams, setSearchParams] = useSearchParams();
+  const [isNotificationDropdownVisible, setIsNotificationDropdownVisible] = useState(false);
 
 
 
@@ -295,6 +297,11 @@ const Navbar: React.FC = () => {
   const handleFilter = () => {
     navigate('/advancedsearch');
   };
+
+  const handleNotifs = () => {
+    setIsNotificationDropdownVisible(!isNotificationDropdownVisible);
+  };
+
   const [isNavOpen, setIsNavOpen] = useState(false);
 
   const handleClearFilters = () => {
@@ -350,7 +357,8 @@ const Navbar: React.FC = () => {
       </div>
 
       <div className="nav-icons">
-        <FaBell className="icon" />
+        <FaBell className="icon" onClick={handleNotifs}/>
+        {isNotificationDropdownVisible && <NotificationDropdown />}
         <FaCog className="icon" onClick={handleSettings} />
         <FaUserCircle className="icon profile-icon" onClick={handleAccountDetails} />
       </div>

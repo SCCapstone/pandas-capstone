@@ -33,6 +33,7 @@ const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000'; // Loc
 const SERVER_PORT = process.env.SERVER_PORT ? parseInt(process.env.SERVER_PORT, 10) : (NODE_ENV === 'production' ? 2020 : 2020);
 const JWT_SECRET = env.JWT_SECRET || 'your_default_jwt_secret';
 const resend = new Resend(process.env.RESEND);
+const REACT_APP_EMAIL_URL = process.env.REACT_APP_EMAIL_URL || 'learnlinkserverhost.zapto.org';
 
 // Read certificates conditionally based on the environment
 const privateKey = NODE_ENV === 'production'
@@ -1679,7 +1680,7 @@ app.post("/api/sign-up-email", async (req, res) => {
     console.log('Sending email to:', to);
 
     const response = await resend.emails.send({
-      from: "onboarding@resend.dev",
+      from: `no-reply@${REACT_APP_EMAIL_URL}`,
       to,
       subject: "Welcome to LearnLink",
       html: `
@@ -1740,7 +1741,7 @@ app.post("/api/send-email", async (req, res) => {
     const { to, subject, html } = req.body; // Get data from frontend
 
     const response = await resend.emails.send({
-      from: "onboarding@resend.dev",
+      from: `no-reply@${REACT_APP_EMAIL_URL}`,
       to,
       subject,
       html,
@@ -1783,7 +1784,7 @@ app.post("/api/forgot-password/email", async (req, res):Promise<any> => {
   // Send email via Resend
   try {
     const resendResponse =await resend.emails.send({
-      from: "onboarding@resend.dev",
+      from: `no-reply@${REACT_APP_EMAIL_URL}`,
       to: email,
       subject: "Password Reset Request",
       html: `<p>Click <a href="${resetLink}">here</a> to reset your password. This link expires in 1 hour.</p>`,
