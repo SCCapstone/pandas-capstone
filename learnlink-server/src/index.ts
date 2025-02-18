@@ -853,7 +853,8 @@ app.get("/api/study-groups/chat/:chatId", async (req, res): Promise<any> => {
         studyGroupID: studyGroup.id,
         name: studyGroup.name,
         subject: studyGroup.subject,
-        description: studyGroup.description
+        description: studyGroup.description,
+        ideal_match_factor: studyGroup.ideal_match_factor,
       });
     } else {
       return res.json({ studyGroupID: null }); // No study group found
@@ -867,7 +868,7 @@ app.get("/api/study-groups/chat/:chatId", async (req, res): Promise<any> => {
 
 app.put('/api/study-groups/chat/:chatID', async (req, res) : Promise<any> =>  {
   const { chatID } = req.params; // Extract chatID from the URL
-  const { name, description, subject } = req.body; // Extract new study group data from the request body
+  const { name, description, subject, ideal_match_factor } = req.body; // Extract new study group data from the request body
 
   // Validate the input
   if (!name) {
@@ -882,6 +883,7 @@ app.put('/api/study-groups/chat/:chatID', async (req, res) : Promise<any> =>  {
         name,
         description,
         subject,
+        ideal_match_factor: ideal_match_factor.value,
       },
     });
 

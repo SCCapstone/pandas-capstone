@@ -3,12 +3,20 @@ import '../pages/messaging.css';
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { on } from 'events';
+import { useEnums, formatEnum } from '../utils/format';
+import Select from 'react-select';
+import makeAnimated from 'react-select/animated';
+
+
+
+const animatedComponents = makeAnimated();
 
 interface StudyGroup {
   name: string;
   description: string;
   subject: string;
   chatID: number;
+  ideal_match_factor: string;
 }
 
 const EditStudyGroup = ({ chatID, onClose, updateChatName}: { chatID: number; onClose: () => void ; updateChatName: (chatId: number, newName: string) => void}) => {
@@ -16,6 +24,9 @@ const EditStudyGroup = ({ chatID, onClose, updateChatName}: { chatID: number; on
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [subject, setSubject] = useState('');
+  const [ideal_match_factor, setIdealMatchFactor] = useState<{ value: string; label: string } | null>(null);
+  const [enumOptions, setEnumOptions] = useState({ studyHabitTags: [] });
+  
   const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
 
 
@@ -28,6 +39,11 @@ const EditStudyGroup = ({ chatID, onClose, updateChatName}: { chatID: number; on
           alert('You need to be logged in to edit the study group.');
           return;
         }
+        const enumsResponse = await fetch(`${REACT_APP_API_URL}/api/enums`);
+        const enumsData = await enumsResponse.json();
+        setEnumOptions({
+          studyHabitTags: enumsData.studyHabitTags,
+        });
 
         const response = await axios.get(
           `${REACT_APP_API_URL}/api/study-groups/chat/${chatID}`,
@@ -40,6 +56,7 @@ const EditStudyGroup = ({ chatID, onClose, updateChatName}: { chatID: number; on
         setName(data.name);
         setDescription(data.description);
         setSubject(data.subject);
+        setIdealMatchFactor({ value: data.ideal_match_factor, label: formatEnum(data.ideal_match_factor) });
       } catch (error) {
         console.error('Error fetching study group:', error);
         alert('Failed to load study group details.');
@@ -58,10 +75,15 @@ const EditStudyGroup = ({ chatID, onClose, updateChatName}: { chatID: number; on
         return;
       }
 
-      const updatedStudyGroup = { name, description, subject, chatID };
+      const updatedStudyGroup = { name, description, subject, chatID, ideal_match_factor };
 
       if (name==='' || name === null) {
         alert('Please enter a study group name.');
+        return;
+      }
+
+      if ( ideal_match_factor === null) {
+        alert('Please enter an ideal match factor.');
         return;
       }
 
@@ -71,7 +93,7 @@ const EditStudyGroup = ({ chatID, onClose, updateChatName}: { chatID: number; on
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-    
+
 
       console.log('Study group updated:', response.data);
 
@@ -114,6 +136,27 @@ const EditStudyGroup = ({ chatID, onClose, updateChatName}: { chatID: number; on
             onChange={(e) => setSubject(e.target.value)}
           />
         </div>
+        <div>
+          <label>Ideal Match Factor:</label>
+          <Select
+            name="ideal_match_factor"
+            options={enumOptions.studyHabitTags.map((tag) => ({
+              value: tag,
+              label: formatEnum(tag), // Formats the tag into a readable label
+            }))}
+            value={ideal_match_factor?.label ? { value: ideal_match_factor.value, label: ideal_match_factor.label } : null}
+            onChange={(newValue) => {
+              // Type assertion for SingleValue
+              const selectedOption = newValue as { value: string; label: string } | null;
+              setIdealMatchFactor(selectedOption);
+            }}
+            closeMenuOnSelect={true} // Close menu on select since it's single-select
+            components={animatedComponents}
+            className="basic-single-select"
+            classNamePrefix="select"
+            isMulti={false}
+          />
+          </div>
         <button type="button" onClick={handleSave}>Save</button>
         <button type="button" onClick={onClose}>Cancel</button>
       </form>
