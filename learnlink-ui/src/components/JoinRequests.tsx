@@ -36,6 +36,7 @@ const JoinRequests: React.FC<JoinRequestProps> = ({ currentUserId, addNewChat })
   const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
   const [requests, setRequests] = useState<SwipeRequest[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
   //console.log("JoinRequests component is rendering!");
 
   useEffect(() => {
@@ -48,6 +49,7 @@ const JoinRequests: React.FC<JoinRequestProps> = ({ currentUserId, addNewChat })
 
   // Fetch swipe requests where the current user/study group is the target
   const handleRetrievingRequests = async () => {
+    setLoading(true); 
     try {
       const requestResponse = await axios.get(`${REACT_APP_API_URL}/api/swipe/${currentUserId}`);
       const requestData = requestResponse.data;
@@ -63,6 +65,7 @@ const JoinRequests: React.FC<JoinRequestProps> = ({ currentUserId, addNewChat })
       // Fetch study group details only for requests with targetGroupId
       const updatedRequests = await Promise.all(
         userRequests.map(async (req: SwipeRequest) => {
+          console.log('target group ids:' , req.targetGroupId);
           if (req.targetGroupId) {
             const groupResponse = await axios.get(`${REACT_APP_API_URL}/api/study-groups/${req.targetGroupId}`);
             return { ...req, targetGroup: groupResponse.data }; // Attach group data to request
@@ -70,11 +73,13 @@ const JoinRequests: React.FC<JoinRequestProps> = ({ currentUserId, addNewChat })
           return req; // If no group, return request unchanged
         })
       );
-  
       setRequests(updatedRequests);
     } catch (err) {
       console.error('Error fetching requests:', err);
       setError('Failed to load requests.');
+    }
+    finally {
+      setLoading(false); // Stop loading
     }
   };
   
@@ -140,68 +145,61 @@ const JoinRequests: React.FC<JoinRequestProps> = ({ currentUserId, addNewChat })
       setError('Failed to reject request.');
     }
   };
-
   return (
     <div className="requests-panel">
       {error && <p className="error-message">{error}</p>}
-      
-      {requests.length === 0 ? (
+  
+      {loading ? (
+        <div className="loading-screen">
+          <p>Loading join requests...</p>
+        </div>
+      ) : requests.length === 0 ? (
         <p className="no-requests">No join requests.</p>
-      
       ) : (
-        
-        <ul className="requests-list">  
-        
-                
+        <ul className="requests-list">
           {requests
-          
-          .slice()
-          .sort((a, b) => {
-            const dateA = new Date(a.createdAt || 0).getTime();
-            const dateB = new Date(b.createdAt || 0).getTime();
-            return dateB - dateA; // Sort in descending order
-          })
-          .map((request)  => (
-
-            
-            <li key={request.id} className="request-item">
-              
-              <div className="request-details">
-                {/*Shows the name of the requestor*/}
-                <p><strong>Requester Name: </strong>{request.user.firstName +' ' +request.user.lastName} </p>
-                {/*Shows the group - if any - that they want to join*/}
-                {request.targetGroupId && (
-                  <p><strong>Target Group: </strong> {request.targetGroup.name}</p>
-                )}
-                {/*Shows the message from the requestor*/}
-                <p><strong>Message: </strong> {request.message}</p>
-              </div>
-              <div className="request-actions">
-                <button
-                  className="approve"
-                  onClick={() =>
-                    handleApproval(
-                      request.id,
-                      request.targetGroupId ?? undefined, // Passing the targetGroupId (or undefined)
-                      request.targetUserId ?? undefined, // Passing the targetUserId (or undefined)
-                      request.userId // Passing the requestUserId
-                    )
-                  }
-                >
-                  ✔️ Approve
-                </button>
-                <button className="reject" onClick={() => handleDenial(request.id)}>
-                  ❌ Reject
-                </button>
-              </div>
-
-
-            </li>
-          ))}
+            .slice()
+            .sort((a, b) => {
+              const dateA = new Date(a.createdAt || 0).getTime();
+              const dateB = new Date(b.createdAt || 0).getTime();
+              return dateB - dateA; // Sort in descending order
+            })
+            .map((request) => (
+              <li key={request.id} className="request-item">
+                <div className="request-details">
+                  <p><strong>Requester Name: </strong>{request.user.firstName + ' ' + request.user.lastName}</p>
+                  {request.targetGroupId && request.targetGroup ? (
+                    <p><strong>Target Group: </strong> {request.targetGroup.name}</p>
+                  ) : (
+                    <p><strong>Target Group: </strong> Loading...</p>
+                  )}
+                  <p><strong>Message: </strong> {request.message}</p>
+                </div>
+                <div className="request-actions">
+                  <button
+                    className="approve"
+                    onClick={() =>
+                      handleApproval(
+                        request.id,
+                        request.targetGroupId ?? undefined,
+                        request.targetUserId ?? undefined,
+                        request.userId
+                      )
+                    }
+                  >
+                    ✔️ Approve
+                  </button>
+                  <button className="reject" onClick={() => handleDenial(request.id)}>
+                    ❌ Reject
+                  </button>
+                </div>
+              </li>
+            ))}
         </ul>
       )}
     </div>
   );
+  
 };  
 
 export default JoinRequests;

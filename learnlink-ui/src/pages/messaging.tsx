@@ -769,9 +769,10 @@ const Messaging: React.FC = () => {
             <>
               <div className='ChatHeader'>
                 <h2 className="ChatTitle">{chatNames[selectedChat.id]}</h2>
-                
                   {/* User List Button */}
-                  <button 
+                
+                  {hasStudyGroup 
+                  && <button 
                     className="UserListButton"
                     onClick={() => {
                       handleGetUsers(selectedChat.id);
@@ -779,8 +780,7 @@ const Messaging: React.FC = () => {
                     }}
                   >
                     Users
-                  </button>
-
+                  </button>}
                   {/* User Panel - Separate from Study Group Panel */}
                   {isUserPanelVisible && selectedChatUsers && (
                     <div className="users-panel">
@@ -807,7 +807,7 @@ const Messaging: React.FC = () => {
                       setIsPanelVisible(true);
                     }}
                   > Create Study Group </button>}
-              </div>
+                </div>
               {isPanelVisible && (
                 <div className="study-group-panel">
                   <EditStudyGroup
