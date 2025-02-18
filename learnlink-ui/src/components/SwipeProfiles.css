@@ -294,24 +294,6 @@
   margin-bottom: 10px;
 }
 
-#fullname{
-  font-size: 2em;  /* Usually 32px (if base font-size is 16px) */
-  font-weight: bold;
-  margin-top: 0.67em;
-  margin-bottom: 0.67em;
-  line-height: 1.2;
-  color: #004c72;
-  padding:20px;
-}
-
-#username{
-  font-size: 1.17em; 
-  font-weight: bold;
-  margin-top: 1em;
-  margin-bottom: 1em;
-  line-height: 1.2;
-}
-
 /* mobile */
 
 @media (max-width: 768px) {
@@ -392,5 +374,10 @@
   .member-tag {
     font-size: 14px;
     padding: 3px 7px;
+  }
+
+  .swipe-right-side h3 {
+    font-size: 1.25rem;
+    text-align: left;
   }
 }
