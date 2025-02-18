@@ -67,7 +67,7 @@ model User {
   password            String
 
 
-  ideal_match_factor  String?
+  ideal_match_factor  StudyTags?
   age                 Int?
   college             String?
   major               String?
@@ -115,6 +115,9 @@ model StudyGroup {
   // Connection to Chat
   chatID       Int?     @unique // Link to a Chat table if each StudyGroup has its own chat
   chat         Chat?    @relation("StudyGroupChat") // Optional, if you want a relation with the Chat model
+  ideal_match_factor  StudyTags?
+
+
 }
 
 model Swipe {

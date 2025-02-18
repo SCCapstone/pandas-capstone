@@ -370,7 +370,7 @@ const Profile: React.FC = () => {
                       const selectedOption = newValue as { value: string; label: string } | null;
                       setFormData((prevData) => ({
                         ...prevData,
-                        ideal_match_factor: selectedOption?.value || '', // Save the single selected value
+                        ideal_match_factor: selectedOption ? selectedOption.value : '', // Store only the value, not the object
                       }));
                     }}
                     closeMenuOnSelect={true} // Close menu on select since it's single-select
