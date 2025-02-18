@@ -26,11 +26,16 @@
     font-size: small;
     max-width: 400px;
     box-sizing: border-box;
+    /* border: .7px solid #3B3C3D; */
   }
 
   .edit-study-group-panel input {
     padding: 19px 10px ;
 
+  }
+
+  .select_control {
+    border: #3B3C3D;
   }
 
   
