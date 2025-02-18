@@ -33,6 +33,7 @@ const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000'; // Loc
 const SERVER_PORT = process.env.SERVER_PORT ? parseInt(process.env.SERVER_PORT, 10) : (NODE_ENV === 'production' ? 2020 : 2020);
 const JWT_SECRET = env.JWT_SECRET || 'your_default_jwt_secret';
 const resend = new Resend(process.env.RESEND);
+const REACT_APP_EMAIL_URL = process.env.REACT_APP_EMAIL_URL || 'learnlinkserverhost.zapto.org';
 
 // Read certificates conditionally based on the environment
 const privateKey = NODE_ENV === 'production'
@@ -343,7 +344,7 @@ app.put('/api/users/update', async (req, res): Promise<any> => {
         college: college || undefined,
         major: major || undefined,
         grade: grade || undefined,
-        relevant_courses: relevant_courses || undefined,
+        relevant_courses: Array.isArray(relevant_courses) ? relevant_courses : (relevant_courses ? [relevant_courses] : undefined),
         study_method: study_method || undefined,
         gender: gender || undefined,
         bio: bio || undefined,
@@ -454,7 +455,7 @@ app.post('/api/update-password', authenticate, async (req, res):Promise<any> => 
 
 // Endpoint to handle swipe action and create a match if applicable
 app.post('/api/swipe', async (req, res) => {
-  const { userId, targetId, direction, isStudyGroup, message } = req.body;
+  const { userId, targetId, direction, isStudyGroup, message, targetGroup, user } = req.body;
 
   try {
     // Store the swipe in the database
@@ -464,7 +465,7 @@ app.post('/api/swipe', async (req, res) => {
         direction,
         targetUserId: isStudyGroup ? null : targetId,  // If study group, nullify targetUserId
         targetGroupId: isStudyGroup ? targetId : null,  // If user, nullify targetGroupId
-        message,
+        message
       },
     });
 
@@ -484,6 +485,76 @@ app.post('/api/swipe', async (req, res) => {
     console.error(error);
     res.status(500).json({ error: 'Something went wrong' });
   }
+});
+
+
+//endpoint for retrieving requests from the swipe table for matching logic
+app.get('/api/swipe/:currentUser', async (req, res): Promise<any> => {
+  let { currentUser } = req.params;
+  console.log('Fetching requests for user:', currentUser);
+
+  const userId = parseInt(currentUser, 10);
+  
+  if (isNaN(userId)) {
+    return res.status(400).json({ error: 'Invalid user ID' });
+  }
+
+  try {
+    // Fetch all study group IDs where the current user is a member
+    const userGroups = await prisma.studyGroup.findMany({
+      where: { users: { some: { id: userId } } },  // Check if user is in any study group
+      select: { id: true},
+    });
+
+    const userGroupIds = userGroups.map(g => g.id); // Extract group IDs
+
+    // Find swipes where the user is directly targeted OR their group is targeted
+    const swipes = await prisma.swipe.findMany({
+      where: {
+        OR: [
+          { targetUserId: userId },  // Direct match
+          { targetGroupId: { in: userGroupIds } } // User's study group is a target
+        ],
+      },
+    });
+
+    res.status(200).json(swipes);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Something went wrong' });
+  }
+});
+
+//for deleting a request in the reject button in requests panel
+app.delete('/api/swipe/:requestId', async(req, res): Promise<any> =>{
+  let {requestId} = req.params;
+  console.log('Deleting request with ID:', requestId);
+
+  try{
+
+    if (!requestId || isNaN(parseInt(requestId))) {
+      return res.status(400).json({ error: "Invalid swipe ID." });
+    }
+
+    const swipe = await prisma.swipe.findUnique({
+      where: { id: parseInt(requestId) }
+    });
+
+    if (!swipe) {
+      return res.status(404).json({ error: 'request not found' });
+    }
+
+    await prisma.swipe.delete({
+      where: { id: parseInt(requestId) },
+    });
+  
+
+    res.status(200).json({ message: 'request deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting request:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+
 });
 
 // Helper function to create user-to-user matches
@@ -732,6 +803,39 @@ app.post('/api/study-groups', authenticate, async (req, res): Promise<any> => {
   }
 });
 
+app.get('/api/study-groups/:id', async (req, res): Promise<any> => {
+  const studyGroupId = parseInt(req.params.id);  // Extract study group ID from the request parameters
+
+  console.log('Received request to fetch study group with ID:', studyGroupId);
+
+  try {
+    // Validate the input data (check if ID is valid)
+    if (!studyGroupId) {
+      return res.status(400).json({ error: 'Study group ID is required' });
+    }
+
+    // Fetch the study group by ID from the database
+    const studyGroup = await prisma.studyGroup.findUnique({
+      where: { id: studyGroupId },
+      include: {
+        users: true,  // Optionally include users in the response
+        creator: true,  // Optionally include the creator information
+      },
+    });
+
+    if (!studyGroup) {
+      return res.status(404).json({ error: 'Study group not found' });
+    }
+
+    // Send back the found study group as a response
+    return res.status(200).json({ studyGroup });
+  } catch (error) {
+    console.error('Error fetching study group:', error);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
 app.get("/api/study-groups/chat/:chatId", async (req, res): Promise<any> => {
   const { chatId } = req.params;
   console.log('Fetching study group for chat:', chatId);
@@ -750,6 +854,7 @@ app.get("/api/study-groups/chat/:chatId", async (req, res): Promise<any> => {
         name: studyGroup.name,
         subject: studyGroup.subject,
         description: studyGroup.description,
+        ideal_match_factor: studyGroup.ideal_match_factor,
       });
     } else {
       return res.json({ studyGroupID: null }); // No study group found
@@ -763,7 +868,7 @@ app.get("/api/study-groups/chat/:chatId", async (req, res): Promise<any> => {
 
 app.put('/api/study-groups/chat/:chatID', async (req, res) : Promise<any> =>  {
   const { chatID } = req.params; // Extract chatID from the URL
-  const { name, description, subject } = req.body; // Extract new study group data from the request body
+  const { name, description, subject, ideal_match_factor } = req.body; // Extract new study group data from the request body
 
   // Validate the input
   if (!name) {
@@ -778,6 +883,7 @@ app.put('/api/study-groups/chat/:chatID', async (req, res) : Promise<any> =>  {
         name,
         description,
         subject,
+        ideal_match_factor: ideal_match_factor.value,
       },
     });
 
@@ -789,24 +895,198 @@ app.put('/api/study-groups/chat/:chatID', async (req, res) : Promise<any> =>  {
   }
 });
 
+app.get("/api/study-groups/:studyGroupId/chat", async (req, res): Promise<any> => {
+  const { studyGroupId } = req.params;
+  console.log('Fetching chat ID for study group:', studyGroupId);
+
+  try {
+    // Find the chat that is linked to the provided study group ID
+    const studyGroup = await prisma.studyGroup.findUnique({
+      where: { id: parseInt(studyGroupId) }, // Use studyGroupId to find the corresponding study group
+      select: { chatID: true } // Only retrieve the chatID field
+    });
+
+    // If a study group is found, return its chat ID; otherwise, return null
+    if (studyGroup && studyGroup.chatID) {
+      console.log('Chat ID found for study group:', studyGroup.chatID);
+      return res.json({ chatId: studyGroup.chatID });
+    } else {
+      return res.json({ chatId: null }); // No chat ID found for this study group
+    }
+  } catch (error) {
+    console.error("Error fetching chat ID for study group:", error);
+    return res.status(500).json({ error: "Server error" });
+  }
+});
 
 
-// SEARCH FEATURE
+//adds user to the study group from request panel
+app.post('/api/add-to-study-group', async (req, res): Promise<any> => {
+  const userId = res.locals.userId;  // User making the request (authenticated user)
+  const { studyGroupId, requestUserId } = req.body; // Payload
+  
+  console.log('Received request to add user to study group:', req.body);
+
+  try {
+    if (!studyGroupId || !requestUserId) {
+      return res.status(400).json({ error: 'Study group ID and request user ID are required' });
+    }
+
+    // Find the study group to which the user will be added
+    const studyGroup = await prisma.studyGroup.findUnique({
+      where: { id: studyGroupId },
+      include: { users: true }, // Include the users in the study group
+    });
+
+    if (!studyGroup) {
+      return res.status(404).json({ error: 'Study group not found' });
+    }
+
+    // Check if the user is already in the study group
+    const isUserInGroup = studyGroup.users.some(user => user.id === requestUserId);
+
+    if (isUserInGroup) {
+      return res.status(400).json({ error: 'User is already in this study group' });
+    }
+
+    // Add the user to the study group
+    await prisma.studyGroup.update({
+      where: { id: studyGroupId },
+      data: {
+        users: {
+          connect: { id: requestUserId },
+        },
+      },
+    });
+
+    return res.status(200).json({ message: 'User added to study group successfully' });
+  } catch (error) {
+    console.error('Error adding user to study group:', error);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
+
+
+//for the request panel 
+
+//gets a study a group name
+app.get('/api/study-groups/:groupId', async (req, res):Promise<any> => {
+  const { groupId } = req.params;
+
+  try {
+    const studyGroup = await prisma.studyGroup.findUnique({
+      where: { id: parseInt(groupId, 10) },
+      select: { name: true },
+    });
+
+    if (!studyGroup) {
+      return res.status(404).json({ error: 'Study group not found' });
+    }
+
+    res.status(200).json({ name: studyGroup.name });
+  } catch (error) {
+    console.error('Error fetching study group name:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
+// Endpoint to get a study group by ID
+app.get('/api/study-groups/:groupId', async (req, res): Promise<any> => {
+  const { groupId } = req.params;
+  const studyGroupId = parseInt(groupId, 10);
+
+  if (isNaN(studyGroupId)) {
+    return res.status(400).json({ error: 'Invalid Study Group ID' });
+  }
+
+  try {
+    const studyGroup = await prisma.studyGroup.findUnique({
+      where: { id: studyGroupId },
+      include: {
+        creator: true, // Fetch creator details
+        users: true,   // Fetch all users in the study group
+        matches: true, // Fetch associated matches
+        chat: true,    // Fetch linked chat if exists
+      },
+    });
+
+    if (!studyGroup) {
+      return res.status(404).json({ error: 'Study Group not found' });
+    }
+
+    res.status(200).json(studyGroup);
+  } catch (error) {
+    console.error('Error fetching study group:', error);
+    res.status(500).json({ error: 'Something went wrong' });
+  }
+});
+
+
+
 app.get('/api/users/search', authenticate, async (req, res): Promise<any> => {
-  const { query } = req.query;
+  const { query, gender, college, ageRange, course } = req.query;
 
   if (!query) {
     return res.status(400).json({ error: 'Query parameter is required' });
   }
 
   try {
+    const filters: any = []; // Create an array to store valid filters
+
+    // Add search filters for username, firstName, and lastName
+    filters.push({
+      OR: [
+        { username: { contains: query as string, mode: 'insensitive' } },
+        { firstName: { contains: query as string, mode: 'insensitive' } },
+        { lastName: { contains: query as string, mode: 'insensitive' } },
+      ],
+    });
+
+    // Add gender filter if provided
+    if (typeof gender === 'string' && gender.length > 0) {
+      filters.push({ gender: { in: gender.split(',') } });
+    }
+
+    // Add college filter if provided
+    if (typeof college === 'string' && college.length > 0) {
+      filters.push({ college: { in: college.split(',') } });
+      console.log('College:', college);
+    }
+
+    // Add course filter if provided
+    if (typeof course === 'string' && course.length > 0) {
+      const courseArray = course.split(',').map((item) => item.trim())
+      console.log('courseArray:', courseArray);
+      filters.push({
+        relevant_courses: {
+          hasSome: courseArray // Split and trim course names
+        }
+      });
+      console.log('course:', course); // Log for debugging
+    }
+
+    console.log('Age range:', ageRange);
+
+    if (typeof ageRange === 'string' && ageRange.length >= 2) {
+      const [minAge, maxAge] = (ageRange as string).split(',').map(Number);
+      filters.push({
+        age: { gte: minAge, lte: maxAge },
+      });
+    }
+
+    console.log('Filters:', filters);
+
+    // If no valid filters, return a 400 error
+    if (filters.length === 0) {
+      return res.status(400).json({ error: 'At least one filter must be provided' });
+    }
+
     const users = await prisma.user.findMany({
       where: {
-        OR: [
-          { username: { contains: query as string, mode: 'insensitive' } },
-          { firstName: { contains: query as string, mode: 'insensitive' } },
-          { lastName: { contains: query as string, mode: 'insensitive' } },
-        ],
+        AND: filters,
       },
       select: {
         id: true,
@@ -822,9 +1102,6 @@ app.get('/api/users/search', authenticate, async (req, res): Promise<any> => {
     return res.status(500).json({ error: 'Internal server error' });
   }
 });
-
-
-
 
 
 /*************** MESSAGING END POINTS API */
@@ -873,6 +1150,35 @@ app.get('/api/users', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+//used for getting request list in messaging page
+app.get('/api/users/:id', async (req, res) : Promise<any> => {
+  try {
+    const userId = parseInt(req.params.id);
+
+    // Fetch a single user from the database using Prisma
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+      },
+    });
+
+    // If user not found, return a 404 error
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Respond with the user in JSON format
+    res.status(200).json(user);
+  } catch (error) {
+    // Log the error and send a response with a 500 status code in case of error
+    console.error('Error fetching user:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 
 // Get all chats for a user
 // WORKS
@@ -1100,24 +1406,57 @@ app.patch('/api/messages/:id/like', authenticate, async (req, res):Promise<any> 
 
 
 // Create a new chat
-app.post('/api/chats', async (req, res) => {
-  const { name, userId } = req.body; // Assuming the user is the creator of the chat
+app.post('/api/chats', async (req, res) : Promise<any> => {
+  const { userId1, userId2 } = req.body; // Expecting both user IDs
+
+  if (!userId1 || !userId2) {
+    return res.status(400).json({ error: "Both user IDs are required." });
+  }
 
   try {
-    const newChat = await prisma.chat.create({
-      data: {
-        name,
+    // Check if a chat between these users already exists
+    const existingChat = await prisma.chat.findFirst({
+      where: {
         users: {
-          connect: { id: userId }, // Assuming a user creates the chat
+          every: {
+            id: { in: [userId1, userId2] },
+          },
         },
       },
     });
+
+    if (existingChat) {
+      return res.status(200).json(existingChat); // Return existing chat if found
+    }
+    
+    // Retrieve recipient's name
+    const recipient = await prisma.user.findUnique({
+      where: { id: userId1 },
+    });
+
+    if (!recipient) {
+      return res.status(404).json({ error: 'Recipient user not found' });
+    }
+    // Create a new chat linking both users
+    const newChat = await prisma.chat.create({
+      data: {
+        name: recipient.firstName + " " + recipient.lastName,
+        users: {
+          connect: [
+            { id: userId1 },
+            { id: userId2 },
+          ],
+        },
+      },
+    });
+
     res.status(201).json(newChat);
   } catch (error) {
     console.error("Error creating chat:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 });
+
 
 
 app.post('/api/chats/:userId', authenticate, async (req: Request, res: Response): Promise<any> => {
@@ -1343,7 +1682,7 @@ app.post("/api/sign-up-email", async (req, res) => {
     console.log('Sending email to:', to);
 
     const response = await resend.emails.send({
-      from: "onboarding@resend.dev",
+      from: `no-reply@${REACT_APP_EMAIL_URL}`,
       to,
       subject: "Welcome to LearnLink",
       html: `
@@ -1404,7 +1743,7 @@ app.post("/api/send-email", async (req, res) => {
     const { to, subject, html } = req.body; // Get data from frontend
 
     const response = await resend.emails.send({
-      from: "onboarding@resend.dev",
+      from: `no-reply@${REACT_APP_EMAIL_URL}`,
       to,
       subject,
       html,
@@ -1447,7 +1786,7 @@ app.post("/api/forgot-password/email", async (req, res):Promise<any> => {
   // Send email via Resend
   try {
     const resendResponse =await resend.emails.send({
-      from: "onboarding@resend.dev",
+      from: `no-reply@${REACT_APP_EMAIL_URL}`,
       to: email,
       subject: "Password Reset Request",
       html: `<p>Click <a href="${resetLink}">here</a> to reset your password. This link expires in 1 hour.</p>`,

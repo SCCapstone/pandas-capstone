@@ -1,28 +1,48 @@
+/* Logo */
 .Logo {
-  width: 100%; /* Ensures the logo scales based on the container */
+  width: 100%;
   position: relative;
-  margin: auto; /* Centers the logo and adds space around it */
+  margin: auto;
   padding-bottom: 0;
 }
 
 .Logo svg {
-  width: 100%; /* Ensures SVG scales with the container */
+  width: 100%;
   height: auto;
 }
 
-.Copyright {
-  font-size: 14px;
+/* Footer */
+ .Copyright footer {
+  /*font-size: 14px;
   color: #00668C;
   text-align: center;
   width: 100%;
-  position: fixed;
+  position:absolute;
   line-height: 50px;
   bottom: 0;
   background-color: #D4EAF7;
-  height: 50px; /* Define a fixed height for the footer */
-  z-index: 1000; /* Ensure it stays on top of other elements */
+  height: 50px;
+  z-index: 1000;
+  display: block;
+  margin-top: auto;
+  display: inline-block; */
+  
+    font-size: 14px;
+    color: #00668C;
+    text-align: center;
+    width: 100%;
+    line-height: 50px;
+    background-color: #D4EAF7;
+    height: 50px;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: auto; 
 }
 
+
+/* Navigation Bar */
 .navbar {
   display: flex;
   align-items: center;
@@ -30,20 +50,20 @@
   padding: 1rem 2rem;
   background-color: #D4EAF7;
   box-sizing: border-box;
-  z-index: 10; /* Make sure it's below the dropdown */
-  overflow: visible; /* Ensure overflow is visible, so the dropdown shows up */
+  z-index: 10;
 }
 
 .nav-logo {
-  width: 200px; /* Set the desired width for the logo */
-  height: auto; /* Adjust the height to maintain the aspect ratio */
-  flex-shrink: 1; /* Ensure logo doesn't shrink */
+  width: 200px;
+  height: auto;
+  flex-shrink: 1;
 }
 
 .nav-links {
   display: flex;
-  flex-shrink: 1; /* Allow links to shrink */
+  flex-shrink: 1;
   overflow: hidden;
+  gap: 1rem;
 }
 
 .nav-links a {
@@ -52,7 +72,7 @@
   text-decoration: none;
   font-weight: 500;
   font-size: medium;
-  white-space: nowrap; /* Prevent links from wrapping */
+  white-space: nowrap;
 }
 
 .nav-links a:hover {
@@ -62,32 +82,40 @@
 .nav-icons {
   display: flex;
   align-items: center;
-  flex-shrink: 1; /* Prevent icons from shrinking */
+  flex-shrink: 1;
 }
 
 .search-bar {
   position: relative;
   margin-right: 1rem;
-  padding-right: 20px;
   flex-grow: 1;
-  min-width: 100px; /* Set a minimum width before it fully disappears */
-  overflow: visible; /* Prevent overflow */
-  transition: opacity 0.3s ease; /* Smooth disappearance */
+  min-width: 100px;
+  transition: opacity 0.3s ease;
 }
 
 .search-bar input {
   padding: 0.5rem;
+  padding-left: 35px;
+  padding-right: 0.5rem;
   border-radius: 5px;
   border: 1px solid #ddd;
-  width: 100%; /* Allow full shrinking */
+  width: 95%;
 }
 
 .search-icon {
   position: absolute;
   right: 10px;
-  top: 50%;
+  top: 40%;
   transform: translateY(-50%);
   color: #00668C;
+}
+
+.hamburger-icon {
+  position: absolute;
+  left: 10px;
+  top: 40%;
+  transform: translateY(-50%);
+  color: #D9D9D9;
 }
 
 .icon {
@@ -97,35 +125,98 @@
   cursor: pointer;
 }
 
+.hamburger {
+  display: none;
+  cursor: pointer;
+  font-size: 1.5rem;
+  margin-right: 1rem;
+  color: #00668C;
+}
+
+/* Full-Screen Overlay Menu - for navigation when for mobile*/
+.fullscreen-menu {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 102, 140, 0.9);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.5s ease, visibility 0.5s ease;
+  opacity: 0;
+  visibility: hidden;
+  z-index: 1100;
+}
+
+.fullscreen-menu.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+.fullscreen-menu a {
+  color: white;
+  text-decoration: none;
+  font-size: 2rem;
+  font-weight: bold;
+  margin: 1rem 0;
+}
+
+.fullscreen-menu a:hover {
+  text-decoration: underline;
+}
+
+.close-icon {
+  position: absolute;
+  top: 20px;
+  right: 30px;
+  font-size: 2rem;
+}
+
+/* Responsive Navigation */
 @media (max-width: 900px) {
   .navbar {
-    padding: 1rem; /* Adjust padding for smaller screens */
+    padding: 1rem;
   }
   .nav-logo {
-    display: none; /* Adjust logo size for smaller screens */
+    display: none;
   }
-  .nav-icons .icon{
+  .nav-icons .icon {
     font-size: small;
   }
-
   .nav-links a {
-    font-size: small; /* Adjust font size of links for better fit */
+    font-size: small;
     margin: 0 0.5rem;
   }
+}
 
+@media (max-width: 768px) {
+  .nav-links {
+    display: none;
+    flex-direction: column;
+    width: 100%;
+  }
+  .nav-links.show {
+    display: flex;
+  }
+  .hamburger {
+    display: block;
+  }
 }
 
 @media (max-width: 400px) {
   .search-bar {
-    display: none; /* Hide search bar on small screens */
+    display: none;
   }
 }
+
+/* Side Navigation */
 .sidenav {
-  /* margin-top: 90px;
-  margin-bottom: 50px; */
   width: 250px;
   min-width: 250px;
-  /* height:inherit; */
   position: relative;
   height: 100%;
   z-index: 1;
@@ -139,39 +230,70 @@
 }
 
 .sidenav a {
-  padding: 8px 8px 8px 8px;
-  margin-right: 15px;
-  margin-left: 15px;
-  margin-top: 7px;
+  padding: 8px;
+  margin: 7px 15px;
   text-decoration: none;
   font-size: 20px;
   color: #313D44;
   display: block;
 }
 
-/* When you mouse over the navigation links, change their color */
-.sidenav a.active,  .sidenav a:hover{
-  background-color: white; /* White background on hover */
-  border-radius: 5px; /* Rounded corners on hover */
-  font-weight: bold; /* Bold text on hover */
+.sidenav a.active, .sidenav a:hover {
+  background-color: white;
+  border-radius: 5px;
+  font-weight: bold;
 }
 
-/* On smaller screens, where height is less than 450px, change the style of the sidenav (less padding and a smaller font size) */
 @media screen and (max-height: 450px) {
-  .sidenav {padding-top: 15px;}
-  .sidenav a {font-size: 18px;}
+  .sidenav { padding-top: 15px; }
+  .sidenav a { font-size: 18px; }
 }
 
+/* Side Navigation */
+.filter-menu {
+  width: 400px;
+  min-width: 250px;
+  position: relative;
+  height: 100%;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  background-color: #D9D9D9;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding-top: 20px;
+  text-align: left;
+}
+
+.filter-menu a {
+  padding: 8px;
+  margin: 7px 15px;
+  text-decoration: none;
+  font-size: 20px;
+  color: #313D44;
+  display: block;
+}
+
+.filter-menu a.active, .filter-menu a:hover {
+  background-color: white;
+  border-radius: 5px;
+  font-weight: bold;
+}
+
+@media screen and (max-height: 450px) {
+  .filter-menu { padding-top: 15px; }
+  .filter-menu a { font-size: 18px; }
+}
+
+/* Dropdown */
 .dropdown {
   position: absolute;
-  top: 50%; /* Position dropdown below the input */
+  top: 50%;
   left: 0;
   right: 0;
   max-height: 300px;
   background-color: #fff;
-  border: 1px solid #00678c00;
   border-radius: 2px;
-  max-height: 300px;
   overflow-y: scroll;
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
   z-index: 1000;
@@ -180,20 +302,17 @@
 
 .dropdown p {
   color: black;
-  padding: 0.5rem;
-  padding-top: 15px;
-  padding-bottom: 15px;
+  padding: 15px 20px;
   cursor: pointer;
   font-size: small;
-  padding-inline-start: 20px;
-  margin:0;
-  /* border-bottom: 1px solid #00678c5c; */
+  margin: 0;
 }
 
 .dropdown p:hover {
   background-color: #D4EAF7;
 }
 
+/* Send Email Button */
 .send-email-btn {
   width: 100%;
   height: 40px;
@@ -203,4 +322,86 @@
   font-size: 14px;
   font-weight: 500;
   padding: 5px;
+}
+
+.filters {
+  flex:1;
+  width: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  position: absolute;
+  /* top: 75%; */
+  left: 0;
+  right: 0;
+  padding: 20px;
+  /* background-color: #fff; */
+  border-radius: 2px;
+  overflow-y: scroll;
+  /* box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); */
+  z-index: 1000;
+}
+
+.filters input {
+  color: black;
+  cursor: pointer;
+  font-size: small;
+  margin: 5px;
+  width : 90%;
+}
+
+.age-slider-container {
+  text-align: center;
+  width: 100%;
+}
+
+.slider-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  margin-top: 10px;
+  gap: 5px;
+}
+
+.slider-label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #333;
+}
+
+.age-slider {
+  flex:1;
+  width: auto;
+  height: 8px;
+  border-radius: 4px;
+  margin: 20px 0;
+  background: #00668C;
+
+}
+
+.thumb {
+  top: -60%;
+  width: 20px;
+  height: 20px;
+  background: #00668C;
+  border-radius: 50%;
+  cursor: grab;
+}
+
+.track {
+  background: #00668C;
+  height: 8px;
+  border-radius: 4px;
+}
+
+.college-filter {
+  z-index: 1000;
+}
+.coursework-filter{
+  z-index:999;
+}
+
+.gender-filter {
+  z-index: 998;
 }

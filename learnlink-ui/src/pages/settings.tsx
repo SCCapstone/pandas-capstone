@@ -60,8 +60,6 @@ const Settings: React.FC = () => {
     }
   };
   
-  
-
     const handleLogOut = () => {
         navigate('/welcome');
     };
@@ -74,24 +72,28 @@ const Settings: React.FC = () => {
     navigate('/changePassword');
 };
   return (
-    <div className="settings">
+    <div className="page-container">
+    <header>
       <Navbar />
-      <div className="settings-content">
-        <h1>{userId}</h1>
-        <button onClick={logout}>Log Out</button>
-        <button onClick={handleUpdateEmail}>Update Email</button>
-        <button onClick={handleChangePassword}>Change Password</button>
-        <button onClick={handleDelete}>Delete Account</button>
-        {message && <p>{message}</p>}
+    </header>
 
+    <main className="content">
+      <div className="settings">
+        <div className="heading">Manage Account</div>
+        <div className="buttons">
+          <button onClick={logout}>Log Out</button>
+          <button onClick={handleUpdateEmail}>Update Email</button>
+          <button onClick={handleChangePassword}>Change Password</button>
+          <button onClick={handleDelete}>Delete Account</button>
+        </div>
       </div>
-      <div>
-        <CopyrightFooter />
-      </div>
-      
-    </div> 
+    </main>
 
-        
+    <footer>
+      <CopyrightFooter />
+    </footer>
+</div>
+
   );
 };
 

@@ -20,6 +20,7 @@ import PublicProfile from './pages/publicProfile';
 import {PrivateRoutes} from './utils/privateRoutes';
 import {MatchRoute} from './utils/matchRoute';
 import ResetPasswordFromEmail from './pages/resetPasswordFromEmail';
+import AdvancedSearch from './pages/advancedSearch';
 
 function App() {
   return (
@@ -53,6 +54,7 @@ function App() {
             <Route path="/changepassword" element={<ChangePassword />} />
             <Route path="/accountDetails" element={<AccountDetails />} />
             <Route path="/user-profile/:id" element={<PublicProfile />} />
+            <Route path="/advancedsearch" element={<AdvancedSearch />} />
           </Route>
         </Routes> 
       </div>

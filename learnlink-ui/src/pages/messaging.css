@@ -110,11 +110,12 @@
   display: flex;
   flex-direction: column;
   width: 100%;
-  max-width: 1000px; /* Adjust to fit your design */
+  max-width: 90%; /* Adjust to fit your design */
   margin: 0 auto;
   padding: 10px;
   background-color: #f9f9f9;
   border-radius: 8px;
+  overflow-y: scroll;
 }
 
 .NoChatSelected {
@@ -323,11 +324,6 @@
   background-color: #e3e3e3; /* Highlight active chat */
 }
 
-
-
-
-
-
 .ChatNameActions button:first-child {
   background-color: #00668C;
   color: white;
@@ -385,20 +381,13 @@
   color: #0056b3;
 }
 
-
-
-.messages-panel {
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1;
-  overflow: hidden; /* Prevents overflow issues */
-}
-
-.ChatList {
-  flex-grow: 1;
-  overflow-y: auto; /* Enables scrolling when needed */
-  max-height: 100%;
-  padding-right: 10px;
+.MessagesSidebar {
+  overflow-y: auto; /* Allows smooth scrolling */
+  max-height: 80vh; /* Prevents it from taking up the entire screen */
+  width: 50vh;
+  border: 1px solid #ccc; /* Optional: Adds a subtle border */
+  padding: 10px;
+  background-color: #f9f9f9; /* Light background for better readability */
 }
 
 
@@ -416,7 +405,7 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 
 .MyMessage {
@@ -428,11 +417,15 @@
   align-self: flex-start;
 }
 
+.MyUsername {
+  align-self: flex-end;
+}
+
 .Heart {
   font-size: 16px;
   margin-top: 4px;
 }
-/*location of the hearts in relation to the messages*/
+/* location of the hearts in relation to the messages */
 .MyMessage + .Heart {
   align-self: flex-end;
 }
@@ -443,10 +436,15 @@
 
 /* Responsive Adjustments */
 @media (max-width: 768px) {
-  .DropdownMenu {
-    width: 100%;
-  }
+  /*todo fill in responsive stuff*/
 }
+
+.username {
+  font-weight: bold;
+  margin-bottom: 4px;
+  color: #555;
+}
+
 
 
 

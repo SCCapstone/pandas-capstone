@@ -3,15 +3,15 @@
     background-color: #ffff;
     display: flex;
     flex-direction: column;
-    overflow-y: scroll;
 }
 
 .swipe-content {
+    flex:1;
     margin-top: 20px;
     display: flex;
     flex-direction: column;
     width: 80%;
     align-self: center;
-    padding-bottom: 50px;
+    overflow-y: scroll;
 }
 

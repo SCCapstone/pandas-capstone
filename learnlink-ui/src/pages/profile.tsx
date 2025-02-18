@@ -1,15 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
-import { formatEnum } from '../utils/format';
+import { useEnums, formatEnum, useColleges } from '../utils/format';
 import './profile.css';
 import CopyrightFooter from '../components/CopyrightFooter';
 import makeAnimated from 'react-select/animated';
 import Select from 'react-select';
 
+
 const animatedComponents = makeAnimated();
 
 const Profile: React.FC = () => {
   const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
+  const { isLoading, colleges } = useColleges();
+  
 
 
   const [formData, setFormData] = useState({
@@ -130,10 +133,13 @@ const Profile: React.FC = () => {
     const dataToSend = {
       ...formData,
       age: formData.age ? parseInt(formData.age) : undefined,
-      relevant_courses: formData.relevant_courses ?
-        (Array.isArray(formData.relevant_courses) ? formData.relevant_courses : [formData.relevant_courses]) : [],
+      relevant_courses: formData.relevant_courses
+        ? Array.isArray(formData.relevant_courses)
+          ? formData.relevant_courses // If it's already an array, use it
+          : [formData.relevant_courses] // If it's a single string, make it an array
+        : [], // If no courses are provided, use an empty array
       studyHabitTags: formData.studyHabitTags ? formData.studyHabitTags : [],
-      
+
 
     };
 
@@ -213,6 +219,28 @@ const Profile: React.FC = () => {
                 <label>
                   College: <input type="text" name="college" value={formData.college} onChange={handleChange} />
                 </label>
+                <div className="college-select">
+              <label>College: <br />
+              <Select
+                    name="college-select"
+                    components={animatedComponents}
+                    options={isLoading ? [] : colleges.map(college => ({ label: college.label, value: college.label }))}
+                    value={formData.college ? { label: formData.college, value: formData.college } : null}
+                    onChange={(selectedOption) => {
+                      setFormData((prevData) => ({
+                        ...prevData,
+                        college: selectedOption && !Array.isArray(selectedOption) && 'label' in selectedOption ? selectedOption.label : '',
+                      }));
+                    }}
+                    isClearable
+                    isSearchable
+                    placeholder="Type or select colleges..."
+                    className="basic-multi-select"
+                    classNamePrefix="select"
+                noOptionsMessage={() => "Type to add a new college"}
+            
+              /></label>
+            </div>
                 <label>
                   Major: <input type="text" name="major" value={formData.major} onChange={handleChange} />
                 </label>
@@ -228,7 +256,20 @@ const Profile: React.FC = () => {
                   </select>
                 </label>
                 <label>
-                  Relevant Course: <input type="text" name="relevant_courses" value={formData.relevant_courses} onChange={handleChange} />
+                  {/* Relevant Course: <input type="text" name="relevant_courses" value={formData.relevant_courses} onChange={handleChange} /> */}
+                  Relevant Course:
+                  <input
+                    type="text"
+                    name="relevant_courses"
+                    value={formData.relevant_courses.join(', ')} // Convert array to string for display
+                    onChange={(e) => {
+                      const coursesArray = e.target.value.split(',').map((course) => course.trim());
+                      setFormData((prevData) => ({
+                        ...prevData,
+                        relevant_courses: coursesArray, // Store as an array
+                      }));
+                    }}
+                  />
                 </label>
                 <label>
                   Fav Study Method: <input type="text" name="study_method" value={formData.study_method} onChange={handleChange} />
@@ -329,7 +370,7 @@ const Profile: React.FC = () => {
                       const selectedOption = newValue as { value: string; label: string } | null;
                       setFormData((prevData) => ({
                         ...prevData,
-                        ideal_match_factor: selectedOption?.value || '', // Save the single selected value
+                        ideal_match_factor: selectedOption ? selectedOption.value : '', // Store only the value, not the object
                       }));
                     }}
                     closeMenuOnSelect={true} // Close menu on select since it's single-select

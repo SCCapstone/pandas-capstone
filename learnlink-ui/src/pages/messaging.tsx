@@ -8,6 +8,9 @@ import axios from 'axios';
 import { useSearchParams } from 'react-router-dom';
 import EditStudyGroup from '../components/EditStudyGroup';
 import MessagesNavi from "../components/MessagesNavi";
+import JoinRequests from '../components/JoinRequests';
+import GroupUserList from '../components/GroupUserList';
+
 
 
 interface Chat {
@@ -46,20 +49,14 @@ const socket = io(REACT_APP_API_URL, {
 });
 
 
-//TODO next sem -- updatedAt so when a chat is sent have it move to the top -- im not messing with the code that works rn tho
 const Messaging: React.FC = () => {
   const [chats, setChats] = useState<Chat[]>([]);
   const [selectedChat, setSelectedChat] = useState<Chat | null>(null);
   const [currentMessage, setCurrentMessage] = useState<string>('');
   const [users, setUsers] = useState<User[]>([]); // Store users
-  const [searchTerm, setSearchTerm] = useState<string>(''); // Store search term
-  const [showDropdown, setShowDropdown] = useState<boolean>(false); // Control dropdown visibility
   const [error, setError] = useState<string | null>(null);
   const [currentUserId, setCurrentUserId] = useState<number | null>(null);
-  const [customChatName, setCustomChatName] = useState<string>(''); // Track custom chat name
   const [showGroupNameInput, setShowGroupNameInput] = useState<boolean>(false);
-  //const [messages, setMessages] = useState([]);
-  const [newMessage, setNewMessage] = useState("");
   const chatWindowRef = React.useRef<HTMLDivElement | null>(null);
   const [hasStudyGroup, setHasStudyGroup] = useState(false);
   const [isPanelVisible, setIsPanelVisible] = useState(false);  // To control panel visibility
@@ -67,39 +64,28 @@ const Messaging: React.FC = () => {
   const [searchParams] = useSearchParams();
   const selectedUserId = searchParams.get('user'); // Get the matched user ID
   const [heartedMessages, setHeartedMessages] = useState<{ [key: number]: boolean }>({});
-  const [messages, setMessages] = useState(selectedChat?.messages || []);
-
-  //for matching stuff
+  const [studyGroupNames, setStudyGroupNames] = useState<{ [key: number]: string }>({});
+  const [chatNames, setChatNames] = useState<{ [key: number]: string }>({});
+  //for matching stuff ie chats tab and requests tab
   const [showMessagesPanel, setShowMessagesPanel] = useState(false);
   const [showRequestsPanel, setShowRequestsPanel] = useState(false);
   const [activeTab, setActiveTab] = useState<'messages' | 'requests'>('messages');
-  
-  
-  useEffect(() => {
-    if (selectedUserId) {
+  const [selectedChatUsers, setSelectedChatUsers] = useState<User[] | null>(null);
+  // for user panel
+  const [isUserPanelVisible, setIsUserPanelVisible] = useState(false);
+  // for displaying names above messages sent
+  const [usernames, setUsernames] = useState<{ [key: number]: string }>({});
 
-      const matchedUser = users.find(user => user.id === Number(selectedUserId)); // Convert to number
-      if (matchedUser) {
-        setSelectedUser(matchedUser);
-        console.log(matchedUser);
-        setShowGroupNameInput(true);
-      }
-    }
-  }, [selectedUserId, users]);
-
+  // Main use effect for mounting, gets users and chats and populates the UI
   useEffect(() => {
-    if (selectedChat) {
-      checkStudyGroup();
-    }
-  }, [selectedChat]);  
 
-  useEffect(() => {
+    handleMessagesSwitch();
     // Fetch users and chats from the API when the component mounts
     axios.get(`${REACT_APP_API_URL}/api/users`)
       .then((response) => setUsers(response.data))
       .catch((error) => console.error('Error fetching users:', error));
 
-
+    //console.log("current user id:", currentUserId);
     // Make the API request to fetch chats for the user
   
     const token = localStorage.getItem('token');
@@ -118,7 +104,7 @@ const Messaging: React.FC = () => {
         setChats(chatsWithMessages);
 
 
-        // Ensure we store liked messages correctly
+        // Ensure storing liked messages correctly
         const likedMessagesMap = response.data.reduce((acc: Record<number, boolean>, chat: Chat) => {
           chat.messages?.forEach((msg: Message) => {
             acc[msg.id] = msg.liked ?? false; // Default to false if missing
@@ -141,25 +127,45 @@ const Messaging: React.FC = () => {
     
   }, [isPanelVisible]);
 
-  
-  
-  //used for sending messages
+  // Used for editing study groups
   useEffect(() => {
-    //console.log("helloooooooooo");
-    
+    if (selectedUserId) {
+
+      const matchedUser = users.find(user => user.id === Number(selectedUserId)); // Convert to number
+      if (matchedUser) {
+        setSelectedUser(matchedUser);
+        console.log(matchedUser);
+        setShowGroupNameInput(true);
+      }
+    }
+  }, [selectedUserId, users]);
+
+  // Checks if a chat is a study group
+  useEffect(() => {
+    if (selectedChat) {
+      checkStudyGroup();
+    }
+  }, [selectedChat]);  
+
+  //Used for retrieving the user names of a chat and the users within
+  useEffect(() => {
+    if (selectedChat?.messages) {
+      selectedChat.messages.forEach((message) => handleGetUsername(message.userId));
+    }
+  }, [selectedChat]);
+
+  
+  // Web socket functionality for sending and receiving messages
+  useEffect(() => {
+
     socket.on('connect', () => {
       console.log('Connected to server');
     });
     
-   
-
-    
     socket.on('newMessage', (message) => {
       console.log('New message received!!!:', message);
-      //console.log('Received message:', JSON.stringify(message, null, 2));
-
       
-      
+      // updates chats with recieved messages
       setChats((prevChats) => {
         const updatedChats = prevChats.map((chat) =>
           chat.id === message.chatId
@@ -169,14 +175,6 @@ const Messaging: React.FC = () => {
         //console.log('Updated Chats:', updatedChats);
         return updatedChats;
       });
-      
-      
-      //console.log('Incoming Message Chat ID:', message.chatId);
-      //console.log('Existing Chat IDs:', chats.map((chat) => chat.id));
-
-
-      //console.log('Selected Chat:', selectedChat);
-     // console.log('Messages:', selectedChat?.messages);
      
       // Automatically scroll if the message belongs to the selected chat
       if (selectedChat?.id === message.chatId && chatWindowRef.current) {
@@ -190,27 +188,50 @@ const Messaging: React.FC = () => {
         
     });
     
-  
-   
-    
     return () => {
       socket.off('connect');
       socket.off('newMessage');
     };
   }, [selectedChat]); // Runs when messages update
   
+
+  //used for fetching chat names upon mounting
+  useEffect(() => {
+    const fetchChatNames = async () => {
+      const newChatNames: { [key: number]: string } = { ...chatNames };
   
+      for (const chat of chats) {
+        if (!newChatNames[chat.id]) { // Only fetch if not already in state
+          newChatNames[chat.id] = await getChatName(chat);
+        }
+      }
+  
+      setChatNames(newChatNames);
+    };
+  
+    fetchChatNames();
+  }, [chats]); // Runs only when `chats` change
+
+
+
+  // Switches from the Requests tab to the Chats tab
   const handleMessagesSwitch = () => {
     setActiveTab('messages');
+    setShowRequestsPanel(false);
     setShowMessagesPanel(true);
   };
   
+  // Switches from the Chats tab to the Requests Tab
   const handleRequestsSwitch = () => {
     setActiveTab('requests');
     setShowMessagesPanel(false);
+    setShowRequestsPanel(true);
   };
 
+
+  // sends messages between users
   const handleSendMessage = async () => {
+    // Authorization
     const token = localStorage.getItem('token');
     if (currentMessage.trim() && selectedChat) {
       try {
@@ -223,7 +244,7 @@ const Messaging: React.FC = () => {
           liked: false,
         };
   
-        
+        // sends the message via a websocket to the other user
         socket.emit(
           'message',
           { chatId: selectedChat.id, content: currentMessage, userId: currentUserId, token },
@@ -241,11 +262,11 @@ const Messaging: React.FC = () => {
         
   
         // Update the selectedChat to include the new message
-      setSelectedChat((prevSelectedChat) =>
-        prevSelectedChat
-          ? { ...prevSelectedChat, messages: [...(prevSelectedChat.messages || []), messageData] }
-          : null
-      );
+        setSelectedChat((prevSelectedChat) =>
+          prevSelectedChat
+            ? { ...prevSelectedChat, messages: [...(prevSelectedChat.messages || []), messageData] }
+            : null
+        );
   
         setCurrentMessage('');
       } catch (error) {
@@ -255,117 +276,48 @@ const Messaging: React.FC = () => {
   };
   
 
-
-  const createNewChat = async (user: User, chatName: string) => {
+  // Used to access the study group name or chat name for displaying properly on the UI
+  const getChatName = async (chat: Chat) => {
+    // getting the study group name
     try {
-    
-      // Check if a chat already exists with this user
-      const existingChat = chats.find(chat => 
-        chat.users?.some(u => u.id === user.id) // Safe check for undefined `users`
-      );
-  
-      if (existingChat) {
-        alert('A chat with this user already exists!');
-        return; // Prevent creating a duplicate chat
+      const response = await axios.get(`${REACT_APP_API_URL}/api/study-groups/chat/${chat.id}`);
+      if (response.data.name) {
+        setStudyGroupNames((prev) => ({ ...prev, [chat.id]: response.data.name }));
+        return response.data.name;
       }
-  
-      const payload = {
-        recipientUserId: user.id,
-        chatName, // Use the custom chat name
-      };
-  
-      const token = localStorage.getItem('token');
-      if (!token) {
-        alert('Please log in again.');
-        return;
-      }
-
-      console.log('Creating new chat with:', user, 'and name:', chatName);
-      console.log('Payload:', payload);
-      console.log('userid',user.id);
-  
-      const response = await axios.post(
-        `${REACT_APP_API_URL}/api/chats/${user.id}`,
-        payload,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-
-      console.log('New chat created:', response.data);
-  
-      const newChat: Chat = {
-        ...response.data,
-        name: `${chatName} with ${user.firstName} ${user.lastName}`, // Format the name
-        // ensure that users is SET
-        // users: [user], // Add the selected user to the chat
-      };
-      setChats((prevChats) => [...prevChats, newChat]);
-      setSelectedChat(newChat);
-  
-      // adding to study groups too eventually separate
-  
-      const studyGroupPayload = {
-        chatId: newChat.id, // Use the created chat ID
-        name: chatName, // Same name as the chat
-        subject: '',
-        description: '',
-        users: [user.id, currentUserId], // Include both users in the study group
-      };
-  
-      // const studyGroupResponse = await axios.post(
-      //   'http://localhost:2020/api/study-groups',
-      //   studyGroupPayload,
-      //   { headers: { Authorization: `Bearer ${token}` }}
-      // );
-  
-      // console.log('Study group created:', studyGroupResponse.data);
-  
     } catch (error) {
-      console.error('Error creating new chat and study group:', error);
-      if (axios.isAxiosError(error) && error.response) {
-        alert(`Error: ${error.response.status} - ${error.response.data.error}`);
-      } else {
-        alert('An unexpected error occurred.');
-      }
+      console.error("Error fetching study group name:", error);
     }
-  };
-  
-  
-  const getChatName = (chat: Chat): string => {
-  
+    
+    // not a study group option
     if (currentUserId) {
       const otherUser = chat.users?.find((user) => user.id !== currentUserId);
-      
       if (otherUser) {
-        if (chat.name && chat.name.trim() !== '') {
-          return chat.name + " with " +  `${otherUser.firstName} ${otherUser.lastName}` ;
-        }
-        else{
           return `${otherUser.firstName} ${otherUser.lastName}`;
-        }
       }
     }
-    if (chat.name && chat.name.trim() !== '') {
-      return chat.name ;
-    }
-  
     return " ";
   };
   
   
 
 
+  // Deletes a chat when clicking on the X 
   const handleDeleteChat = async (chatId: number) => {
     try {
+      //Authorization
       const token = localStorage.getItem('token');
       if (!token) {
         alert('You need to be logged in to delete a chat.');
         return;
       }
 
+      // deletes the chat from the database
       await axios.delete(`${REACT_APP_API_URL}/api/chats/${chatId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
+      // updates the displayed chats to delete the chat from the UI
       setChats((prevChats) => prevChats.filter((chat) => chat.id !== chatId));
       if (selectedChat?.id === chatId) {
         setSelectedChat(null);
@@ -378,6 +330,47 @@ const Messaging: React.FC = () => {
     }
   };
 
+  // Retrieves the users for the user list, such that users can view the users in a study group
+  const handleGetUsers = async (chatId: number) => {
+    try {
+      //Authorization
+      const token = localStorage.getItem('token');
+      if (!token) {
+        alert('You need to be logged in to view users.');
+        return;
+      }
+  
+      //gets the study group linked with that chat
+      const response = await axios.get(
+        `${REACT_APP_API_URL}/api/study-groups/chat/${chatId}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      
+  
+      const data = response.data;
+      //console.log ('data', data);
+      const groupId = data.studyGroupID;
+      //console.log( 'id', groupId);
+
+      // gets the users associated with that study group thats linked to the chat
+      const res = await axios.get(
+        `${REACT_APP_API_URL}/api/study-groups/${groupId}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      
+      const dat = res.data;
+      //console.log('Users in study group:', dat.studyGroup.users);
+      
+      setSelectedChatUsers(dat.studyGroup.users); // Store user data for the selected chat
+      setIsUserPanelVisible(true); // Open the panel to show users
+    } catch (error) {
+      console.error('Error fetching users:', error);
+      alert('Failed to load users.');
+    }
+  };
+  
+
+  // Creates new study groups
   const handleCreateStudyGroup = async (chatId: number) => {
     try {
       const token = localStorage.getItem('token');
@@ -457,7 +450,7 @@ const Messaging: React.FC = () => {
     }
   };
 
-
+  // Checks if a chat has a linked study group
   const checkStudyGroup = async () => {
     console.log('Checking study group for chat:', selectedChat);
     if(!selectedChat) {
@@ -510,135 +503,52 @@ const Messaging: React.FC = () => {
     } catch (error) {
       console.error('Error updating like status:', error);
     }
+    
+  };
+
+  // Used for retriving names for putting names above sent messages
+  const handleGetUsername = async (userId: number) => {
+    try {
+      const response = await axios.get(`${REACT_APP_API_URL}/api/users/${userId}`);
+      const username = response.data.firstName + " " + response.data.lastName;
+      setUsernames((prev) => ({ ...prev, [userId]: username }));
+      //console.log(username);
+    } catch (error) {
+      console.error("Error fetching username:", error);
+      setUsernames((prev) => ({ ...prev, [userId]: "Unknown" }));
+    }
+  };
+
+
+  // passed into joinrequests component, ensures the name is updated when a request is approved
+  const addNewChat = (newChat: any) => {
+    setChats((prevChats) => [...prevChats, newChat]); // Add new chat
+    setChatNames((prevNames) => ({
+      ...prevNames,
+      [newChat.id]: newChat.name, // Ensure new chat name is added
+    }));
+  };
+
+  // passed into editstudygroup component, ensures the name is updated when updated
+  const updateChatName = (chatId: number, newName: string) => {
+    setChatNames((prevChatNames) => ({
+      ...prevChatNames,
+      [chatId]: newName,
+    }));
   };
   
 
-
-
-  
-
-
+  //sends the message 
   const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Enter') {
       handleSendMessage();
     }
   };
 
-  const filteredUsers = users.filter((user) =>
-    `${user.firstName} ${user.lastName}`.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
   return (
     <div className="Messaging">
       <Navbar />
       <div className="Chat">
-
-        {/** greyed out because its old but i dont want to delete yet */}
-        
-        <div className="ChatOptions">
-          <button
-            onClick={() => setShowDropdown(!showDropdown)}
-            className="NewChatButton"
-          >
-            + New Group
-          </button>
-          {showDropdown && (
-            <div className="Dropdown">
-              <input className = "SearchBox"
-                type="text"
-                placeholder="Search users..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-              <ul className="UserList">
-                {filteredUsers.map((user) => (
-                  <li
-                    key={user.id}
-                    className="UserItem"
-                    onClick={() => {
-                      setSelectedUser(user); // Store the selected user
-                      setShowDropdown(false); // Hide the dropdown
-                      setShowGroupNameInput(true); // Show the group name input
-                      setSearchTerm(''); // Clear search term
-                    }}
-                  >
-                    {user.firstName} {user.lastName}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-          
-          
-          {showGroupNameInput && selectedUser && (
-            <div className="ChatNameInput">
-              <p>Creating group with: {selectedUser.firstName} {selectedUser.lastName}</p>
-              <input className = "GroupNameInput"
-                type="text"
-                placeholder="Enter a group name..."
-                value={customChatName}
-                onChange={(e) => setCustomChatName(e.target.value)}
-              />
-              <div className="ChatNameActions">
-                <button
-                  onClick={() => {
-                    if (customChatName.trim()) {
-                      createNewChat(selectedUser, customChatName.trim()); // Pass the chat name
-                      setSelectedUser(null); // Clear selected user
-                      setCustomChatName(''); // Clear custom chat name
-                      setShowGroupNameInput(false); // Hide group name input
-                    } else {
-                      alert('Please enter a chat name!');
-                    }
-                  }}
-                >
-                  Create Group
-                </button>
-                <button
-                  onClick={() => {
-                    setShowGroupNameInput(false); // Hide group name input
-                    setSelectedUser(null); // Clear selected user
-                    setCustomChatName(''); // Clear custom chat name
-                  }}
-                >
-                  Cancel
-                </button>
-              </div>
-            </div>
-          )}
-          
-          <ul className="ChatList">
-          <li className="ChatListHeader">
-            Groups
-          </li>
-            {chats
-              .slice()
-              .sort((a, b) => {
-                const dateA = new Date(a.updatedAt || a.createdAt || 0).getTime();
-                const dateB = new Date(b.updatedAt || b.createdAt || 0).getTime();
-                return dateB - dateA; // Sort in descending order
-              })
-              .map((chat) => (
-                <li
-                  key={chat.id}
-                  className={`ChatListItem ${selectedChat?.id === chat.id ? 'active' : ''}`}
-                >
-                  <span onClick={() => setSelectedChat(chat)}>{getChatName(chat)}</span>
-                  <button
-                    className="DeleteButton"
-                    onClick={() => handleDeleteChat(chat.id)}
-                  >
-                    X
-                  </button>
-                </li>
-              ))}
-          </ul>
-        </div>
-
-        
-              
-        
-        {/* Tabs for Messages and Requests */}
         {/* Tabs for Messages and Requests */}
         <div className="MessagesSidebar">
           <div className="TabsContainer">
@@ -660,12 +570,22 @@ const Messaging: React.FC = () => {
           {/* Conditionally show the messages panel */}
           {showMessagesPanel && (
             <MessagesNavi 
-              chats={chats} 
+              chats={chats}
               selectedChat={selectedChat} 
               setSelectedChat={setSelectedChat} 
               handleDeleteChat={handleDeleteChat} 
+              chatNames={chatNames} 
+
             />
           )}
+          {/* Conditionally show the requests panel */}
+          {showRequestsPanel && (
+            <JoinRequests 
+            currentUserId={currentUserId} 
+            addNewChat={addNewChat} // Passing addNewChat as a prop
+          />
+          )}
+      
         </div>
 
 
@@ -673,7 +593,29 @@ const Messaging: React.FC = () => {
           {selectedChat ? (
             <>
               <div className='ChatHeader'>
-                <h2 className="ChatTitle">{getChatName(selectedChat)}</h2>
+                <h2 className="ChatTitle">{chatNames[selectedChat.id]}</h2>
+                  {/* User List Button 
+                   ensures that a chat is a study group first */}
+                  {hasStudyGroup 
+                    && <button 
+                    className="UserListButton"
+                    onClick={() => {
+                      handleGetUsers(selectedChat.id);
+                      setIsUserPanelVisible(true);
+                    }}
+                  >
+                    Users
+                  </button>}
+                  {/* User List Panel */}
+                  {isUserPanelVisible && selectedChatUsers && (
+                    <div className="users-panel">
+                      <GroupUserList
+                        users={selectedChatUsers ?? []}
+                        onClose={() => setIsUserPanelVisible(false)}
+                      />
+                    </div>
+                  )}
+
                 {hasStudyGroup ?
                   <button
                     className="EditStudyGroupButton"
@@ -690,22 +632,31 @@ const Messaging: React.FC = () => {
                       setIsPanelVisible(true);
                     }}
                   > Create Study Group </button>}
-
-              </div>
+                </div>
               {isPanelVisible && (
                 <div className="study-group-panel">
                   <EditStudyGroup
                     // Pass necessary props to the EditStudyGroup component
                     chatID={selectedChat.id}
                     onClose={() => setIsPanelVisible(false)} // Close panel when done
+                    updateChatName={updateChatName} 
                   />
                 </div>
               )}
+
               <div className="ChatWindow">
                 {selectedChat && Array.isArray(selectedChat.messages) ? (
                   selectedChat.messages.length > 0 ? (
                     selectedChat.messages.map((message, index) => (
                       <div key={index} className="MessageContainer">
+
+                        {/* Display usernames */}
+                        {index === 0 || selectedChat.messages[index - 1].userId !== message.userId ? (
+                          <div className={`username ${message.userId === currentUserId ? 'MyUsername' : ''}`}>
+                            {usernames[message.userId] || "Loading..."}
+                          </div>
+                        ) : null}
+                        {/* Display messages */}
                         <div
                           className={`MessageBubble ${
                             message.userId === currentUserId ? 'MyMessage' : 'OtherMessage'

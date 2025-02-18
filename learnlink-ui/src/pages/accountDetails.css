@@ -1,24 +1,69 @@
-.user-details {
-    background-color: white;
-    padding: 20px;
-    margin: 20px auto;
-    max-width: 600px;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  }
-  
-  .user-details p {
-    font-size: 18px;
-    margin: 10px 0;
-  }
-  
-  .user-details strong {
-    color: #333;
-  }
-.detailHeader {
-  text-align: center ;
+/* Outer flex container for the entire page */
+.page-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* Ensures full viewport height */
+}
+
+/* Main content expands to push footer down */
+.content {
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-bottom: 300px;
+}
+
+/* Ensure proper flexbox alignment for account details */
+.account-details {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  text-align: center;
+}
+
+/* Center the content inside account-details */
+.account-details-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 600px; /* Keeps content readable */
+  padding: 20px;
+}
+
+/* Heading styles */
+.heading {
+  text-align: center;
   color: #00668C;
   font-size: 36px;
   font-weight: 600;
-
 }
+
+/* Center and style the details box */
+.details {
+  margin: 25px auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /* Aligns text to the left inside the box */
+  justify-content: center;
+  padding: 1.5rem;
+  width: 100%;
+  max-width: 400px;
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Ensure text within details is well-structured */
+.details p {
+  font-size: 18px;
+  margin: 10px 0;
+  text-align: left; /* Aligns text inside */
+}
+
+.details strong {
+  color: #333;
+}
+

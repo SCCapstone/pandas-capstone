@@ -49,6 +49,12 @@ enum SwipeAction {
   Yes
 }
 
+enum NotificationType {
+  Match
+  Message
+  StudyGroup
+}
+
 model User {
   id                  Int            @id @default(autoincrement())
   created_at          DateTime       @default(now())
@@ -61,7 +67,7 @@ model User {
   password            String
 
 
-  ideal_match_factor  String?
+  ideal_match_factor  StudyTags?
   age                 Int?
   college             String?
   major               String?
@@ -109,6 +115,9 @@ model StudyGroup {
   // Connection to Chat
   chatID       Int?     @unique // Link to a Chat table if each StudyGroup has its own chat
   chat         Chat?    @relation("StudyGroupChat") // Optional, if you want a relation with the Chat model
+  ideal_match_factor  StudyTags?
+
+
 }
 
 model Swipe {
@@ -166,7 +175,7 @@ model Message {
 model Notification {
   id         Int      @id @default(autoincrement())
   user_id    Int
-  type       String
+  type       NotificationType
   message    String
   read       Boolean  @default(false)
   created_at DateTime @default(now())
