@@ -109,6 +109,42 @@ const authenticate = (req: Request, res: Response, next: Function) => {
   }
 };
 
+interface User {
+  id: number;
+  firstName: string;
+  lastName: string;
+  username: string;
+  profilePic: string | null;
+  bio: string | null;
+  grade: string | null;
+  major: string | null;
+  relevant_courses: string[]; 
+  study_method: string | null;
+  gender: string | null;
+  age: number | null;
+  college: string | null;
+  studyHabitTags: string[]; 
+  ideal_match_factor: string | null;
+  similarityScore?: number; // Used for sorting
+}
+
+
+interface StudyGroup {
+  id: number;
+  name: string;
+  subject: string | null;
+  description: string | null;
+  created_by: number;
+  created_at: Date;
+  creator: User;
+  users: User[];
+  matches: any[];
+  swipesGiven: any[];
+  chatID: number | null;
+  chat: any;
+  ideal_match_factor: string | null;
+}
+
 // Signup endpoint
 app.post("/api/users", async (req, res): Promise<any> => {
   const { firstName, lastName, email, username, password, ideal_match_factor } = req.body;
@@ -626,15 +662,31 @@ app.get('/api/profiles', authenticate, async (req: Request, res: Response) => {
   }
 });
 
-app.get('/api/profiles/:userId', async (req, res) => {
+app.get('/api/profiles/:userId', async (req, res): Promise<any> => {
   const userId = parseInt(req.params.userId);
 
   try {
 
     const placeholderImage = "https://learnlink-public.s3.us-east-2.amazonaws.com/AvatarPlaceholder.svg";
 
+     // Fetch the current user's data to use for matching
+     const currentUser = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        ideal_match_factor: true,
+        major: true,
+        relevant_courses: true,
+        study_method: true,
+        studyHabitTags: true,
+      },
+    });
+
+    if (!currentUser) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
     // Fetch users and study groups that the current user has not swiped on yet
-    const usersToSwipeOn = await prisma.user.findMany({
+    let usersToSwipeOn = await prisma.user.findMany({
       where: {
         NOT: {
           id: userId,  // Exclude the current user from the profiles
@@ -656,15 +708,16 @@ app.get('/api/profiles/:userId', async (req, res) => {
         age: true,
         college: true,
         studyHabitTags: true,
+        ideal_match_factor: true,
       },
     });
 
-    const usersWithPlaceholder = usersToSwipeOn.map(user => ({
-      ...user,
-      profilePic: user.profilePic || placeholderImage,
-    }));
+    // const usersWithPlaceholder = usersToSwipeOn.map(user => ({
+    //   ...user,
+    //   profilePic: user.profilePic || placeholderImage,
+    // }));
 
-    const studyGroupsToSwipeOn = await prisma.studyGroup.findMany({
+    let studyGroupsToSwipeOn = await prisma.studyGroup.findMany({
       where: {
         NOT: {
           users: {
@@ -687,11 +740,48 @@ app.get('/api/profiles/:userId', async (req, res) => {
         swipesGiven: true,
         chatID: true,
         chat: true,
+        ideal_match_factor: true,
+
       },
     });
 
+    // Calculate similarity score
+    const calculateSimilarityUser = (user: User) => {
+      let score = 0;
+      if (user.ideal_match_factor === currentUser.ideal_match_factor) score += 15;
+      if (user.major === currentUser.major) score += 2;
+      if (user.study_method === currentUser.study_method) score += 3;
+      if (user.relevant_courses.some((course: string) => currentUser.relevant_courses.includes(course))) score += 5;
+      if (user.studyHabitTags.some((tag: string) => currentUser.studyHabitTags.includes(tag as StudyTags))) score += 2;
+      console.log('User Score:', user.username, score);
+      return score;
+    };
+
+    const calculateSimilarityStudyGroup = (studyGroup: StudyGroup): number => {
+      let score = 0;
+      if (studyGroup.ideal_match_factor === currentUser.ideal_match_factor) score += 15;
+      return score;
+    };
+
+    usersToSwipeOn = usersToSwipeOn
+      .map(user => ({
+        ...user,
+        profilePic: user.profilePic || placeholderImage,
+        similarityScore: calculateSimilarityUser(user),
+      }))
+      .sort((a, b) => b.similarityScore - a.similarityScore); // Sort by highest similarity
+
+      studyGroupsToSwipeOn = studyGroupsToSwipeOn
+      .map(studyGroup => ({
+        ...studyGroup,
+        similarityScore: calculateSimilarityStudyGroup(studyGroup),
+      }))
+      .sort((a, b) => b.similarityScore - a.similarityScore); // Sort by highest similarity
+
+
+
     res.status(200).json({
-      users: usersWithPlaceholder,
+      users: usersToSwipeOn,
       studyGroups: studyGroupsToSwipeOn,
     });
   } catch (error) {
