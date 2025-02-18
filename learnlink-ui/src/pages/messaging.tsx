@@ -587,7 +587,11 @@ const Messaging: React.FC = () => {
 
 
   const addNewChat = (newChat: any) => {
-    setChats((prevChats) => [...prevChats, newChat]);
+    setChats((prevChats) => [...prevChats, newChat]); // Add new chat
+    setChatNames((prevNames) => ({
+      ...prevNames,
+      [newChat.id]: newChat.name, // Ensure new chat name is added
+    }));
   };
 
   const updateChatName = (chatId: number, newName: string) => {
@@ -753,6 +757,7 @@ const Messaging: React.FC = () => {
             <JoinRequests 
             currentUserId={currentUserId} 
             addNewChat={addNewChat} // Passing addNewChat as a prop
+            updateChatName={updateChatName} 
           />
           )}
       
