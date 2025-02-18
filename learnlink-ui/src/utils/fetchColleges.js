@@ -1,11 +1,11 @@
 const fs = require('fs');
-const fetch = require('node-fetch');
+// const fetch = require('node-fetch');
 require('dotenv').config();
 
 console.log("API Key from pre-build script:", process.env.REACT_APP_API_KEY_DEPT_EDU);
 
-
-const REACT_APP_API_KEY_DEPT_EDU = process.env.REACT_APP_API_KEY_DEPT_EDU;
+import('node-fetch').then((fetch) => {
+  const REACT_APP_API_KEY_DEPT_EDU = process.env.REACT_APP_API_KEY_DEPT_EDU;
 
 const fetchCollegesData = async () => {
 
@@ -61,3 +61,5 @@ const fetchCollegesData = async () => {
 
 // Execute the function
 fetchCollegesData();
+
+});
