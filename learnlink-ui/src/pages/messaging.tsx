@@ -82,6 +82,8 @@ const Messaging: React.FC = () => {
   const [userList, setUserList] = useState<User[] | null>(null);
   const [selectedChatUsers, setSelectedChatUsers] = useState<User[] | null>(null);
   const [isUserPanelVisible, setIsUserPanelVisible] = useState(false);
+  const [usernames, setUsernames] = useState<{ [key: number]: string }>({});
+
   
   useEffect(() => {
     if (selectedUserId) {
@@ -100,6 +102,13 @@ const Messaging: React.FC = () => {
       checkStudyGroup();
     }
   }, [selectedChat]);  
+
+  //used for usernames
+  useEffect(() => {
+    if (selectedChat?.messages) {
+      selectedChat.messages.forEach((message) => handleGetUsername(message.userId));
+    }
+  }, [selectedChat]);
 
   useEffect(() => {
 
@@ -581,8 +590,21 @@ const Messaging: React.FC = () => {
     } catch (error) {
       console.error('Error updating like status:', error);
     }
+    
   };
-  
+
+  const handleGetUsername = async (userId: number) => {
+
+    try {
+      const response = await axios.get(`${REACT_APP_API_URL}/api/users/${userId}`);
+      const username = response.data.firstName + " " + response.data.lastName;
+      setUsernames((prev) => ({ ...prev, [userId]: username }));
+      //console.log(username);
+    } catch (error) {
+      console.error("Error fetching username:", error);
+      setUsernames((prev) => ({ ...prev, [userId]: "Unknown" }));
+    }
+  };
 
 
 
@@ -617,113 +639,6 @@ const Messaging: React.FC = () => {
     <div className="Messaging">
       <Navbar />
       <div className="Chat">
-
-        {/** greyed out because its old but i dont want to delete yet */}
-        {/*
-        <div className="ChatOptions">
-          <button
-            onClick={() => setShowDropdown(!showDropdown)}
-            className="NewChatButton"
-          >
-            + New Group
-          </button>
-          {showDropdown && (
-            <div className="Dropdown">
-              <input className = "SearchBox"
-                type="text"
-                placeholder="Search users..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-              <ul className="UserList">
-                {filteredUsers.map((user) => (
-                  <li
-                    key={user.id}
-                    className="UserItem"
-                    onClick={() => {
-                      setSelectedUser(user); // Store the selected user
-                      setShowDropdown(false); // Hide the dropdown
-                      setShowGroupNameInput(true); // Show the group name input
-                      setSearchTerm(''); // Clear search term
-                    }}
-                  >
-                    {user.firstName} {user.lastName}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-          
-          
-          {showGroupNameInput && selectedUser && (
-            <div className="ChatNameInput">
-              <p>Creating group with: {selectedUser.firstName} {selectedUser.lastName}</p>
-              <input className = "GroupNameInput"
-                type="text"
-                placeholder="Enter a group name..."
-                value={customChatName}
-                onChange={(e) => setCustomChatName(e.target.value)}
-              />
-              <div className="ChatNameActions">
-                <button
-                  onClick={() => {
-                    if (customChatName.trim()) {
-                      createNewChat(selectedUser, customChatName.trim()); // Pass the chat name
-                      setSelectedUser(null); // Clear selected user
-                      setCustomChatName(''); // Clear custom chat name
-                      setShowGroupNameInput(false); // Hide group name input
-                    } else {
-                      alert('Please enter a chat name!');
-                    }
-                  }}
-                >
-                  Create Group
-                </button>
-                <button
-                  onClick={() => {
-                    setShowGroupNameInput(false); // Hide group name input
-                    setSelectedUser(null); // Clear selected user
-                    setCustomChatName(''); // Clear custom chat name
-                  }}
-                >
-                  Cancel
-                </button>
-              </div>
-            </div>
-          )}
-          
-          <ul className="ChatList">
-          <li className="ChatListHeader">
-            Groups
-          </li>
-            {chats
-              .slice()
-              .sort((a, b) => {
-                const dateA = new Date(a.updatedAt || a.createdAt || 0).getTime();
-                const dateB = new Date(b.updatedAt || b.createdAt || 0).getTime();
-                return dateB - dateA; // Sort in descending order
-              })
-              .map((chat) => (
-                <li
-                  key={chat.id}
-                  className={`ChatListItem ${selectedChat?.id === chat.id ? 'active' : ''}`}
-                >
-                  <span onClick={() => setSelectedChat(chat)}>{getChatName(chat)}</span>
-                  <button
-                    className="DeleteButton"
-                    onClick={() => handleDeleteChat(chat.id)}
-                  >
-                    X
-                  </button>
-                </li>
-              ))}
-          </ul>
-        </div>
-
-          */}
-
-        
-        {/* Tabs for Messages and Requests */}
         {/* Tabs for Messages and Requests */}
         <div className="MessagesSidebar">
           <div className="TabsContainer">
@@ -824,6 +739,13 @@ const Messaging: React.FC = () => {
                   selectedChat.messages.length > 0 ? (
                     selectedChat.messages.map((message, index) => (
                       <div key={index} className="MessageContainer">
+
+                        {/* Display username */}
+                        {index === 0 || selectedChat.messages[index - 1].userId !== message.userId ? (
+                          <div className={`username ${message.userId === currentUserId ? 'MyUsername' : ''}`}>
+                            {usernames[message.userId] || "Loading..."}
+                          </div>
+                        ) : null}
                         <div
                           className={`MessageBubble ${
                             message.userId === currentUserId ? 'MyMessage' : 'OtherMessage'

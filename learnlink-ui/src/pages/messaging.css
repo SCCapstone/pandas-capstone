@@ -405,7 +405,7 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 
 .MyMessage {
@@ -415,6 +415,10 @@
 .OtherMessage {
   background-color: #f0f0f0; /* light gray */
   align-self: flex-start;
+}
+
+.MyUsername {
+  align-self: flex-end;
 }
 
 .Heart {
@@ -434,6 +438,13 @@
 @media (max-width: 768px) {
   /*todo fill in responsive stuff*/
 }
+
+.username {
+  font-weight: bold;
+  margin-bottom: 4px;
+  color: #555;
+}
+
 
 
 
