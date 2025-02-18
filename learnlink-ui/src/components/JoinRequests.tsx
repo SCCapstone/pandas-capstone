@@ -7,6 +7,7 @@ import axios from 'axios';
 interface JoinRequestProps {
   currentUserId: number | null;
   addNewChat: (newChat: any) => void;
+  updateChatName: (chatId: number, newName: string) => void;
 }
 
 interface SwipeRequest {
@@ -121,7 +122,6 @@ const JoinRequests: React.FC<JoinRequestProps> = ({ currentUserId, addNewChat })
     }
   };
   
-
   
   
 
