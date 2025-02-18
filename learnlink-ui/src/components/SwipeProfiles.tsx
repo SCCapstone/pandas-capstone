@@ -128,7 +128,7 @@ const SwipeProfiles = ({ userId }: { userId: number }) => {
                               />
                             </div>
                             <div className="member-card-top-right">
-                            <h1>{member.firstName} {member.lastName}</h1>
+                            <h1>{member.firstName} {member.lastName} </h1>
                             <h2>@{member.username}</h2>
                             </div>
                           </div>
@@ -186,8 +186,7 @@ const SwipeProfiles = ({ userId }: { userId: number }) => {
                   </div>
                 </div>
                 <div className="swipe-right-side">
-                  <h1>{currentProfile.firstName} {currentProfile.lastName}</h1>
-                  <h3>@{currentProfile.username}</h3>
+                  <span id="fullname">{currentProfile.firstName} {currentProfile.lastName}</span><span id="username"> @{currentProfile.username}</span>
                   <div className="profile-details-container">
                     <div className="swipe-profile-details">
                       <p><span className="bold-first-word">Age: </span>{currentProfile.age}</p>

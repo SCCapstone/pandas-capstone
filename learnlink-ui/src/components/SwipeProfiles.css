@@ -293,3 +293,104 @@
   margin-top: 10px;
   margin-bottom: 10px;
 }
+
+#fullname{
+  font-size: 2em;  /* Usually 32px (if base font-size is 16px) */
+  font-weight: bold;
+  margin-top: 0.67em;
+  margin-bottom: 0.67em;
+  line-height: 1.2;
+  color: #004c72;
+  padding:20px;
+}
+
+#username{
+  font-size: 1.17em; 
+  font-weight: bold;
+  margin-top: 1em;
+  margin-bottom: 1em;
+  line-height: 1.2;
+}
+
+/* mobile */
+
+@media (max-width: 768px) {
+  .swipe-main-container {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .swipe-main-container h1 {
+    font-size: 32px;
+  }
+
+  .swipe-main-container h2 {
+    font-size: 20px;
+  }
+
+  .swipe-right-side {
+    text-align: center;
+  }
+
+  .swipe-left-side {
+    width: 100%;
+    align-items: center;
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .profile-pic {
+    width: 100px;
+    height: 100px;
+  }
+
+  .profile-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .bio {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    text-align: left;
+    justify-content: center;
+  }
+
+  .bio h3 {
+    font-size: 16px;
+    font-weight: bold;
+    margin-right: 5px;
+  }
+
+  .bio p {
+    font-size: 16px;
+    display: inline;
+  }
+
+  .profile-details-container {
+    flex-direction: column;
+    width: 100%;
+    align-items: center;
+  }
+
+  .swipe-profile-details {
+    width: 100%;
+    text-align: center;
+  }
+
+  .member-card h1 {
+    font-size: 18px;
+  }
+
+  .member-card h2 {
+    font-size: 14px;
+  }
+
+  .member-tag {
+    font-size: 14px;
+    padding: 3px 7px;
+  }
+}
