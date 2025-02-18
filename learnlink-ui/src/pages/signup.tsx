@@ -139,7 +139,7 @@ const Signup: React.FC = () => {
             }
             
             // Navigate to landing page after successful signup
-            //navigate('/LandingPage');
+            navigate('/LandingPage');
         } catch (error) {
             //setError('Failed to sign up. Please try again later.');
         } finally {
