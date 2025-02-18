@@ -6,7 +6,7 @@ Users can message eachother, create a profile and match with other users for wha
 Users can use the resources and have a personal grade calculator as well.
 
 # Website Link
-https://main.d2g56146h95jhg.amplifyapp.com
+https://main.d31vpxqs9hcxco.amplifyapp.com
 
 ## External Requirements
 
@@ -50,7 +50,7 @@ make start
 2. **Deploy via AWS Amplify**  
    - Connected the frontend repository to AWS Amplify.  
    - Configured Amplify to automatically build and deploy the application on updates.  
-   - The frontend is accessible at the Amplify-provided URL [here](https://main.d2g56146h95jhg.amplifyapp.com).
+   - The frontend is accessible at the Amplify-provided URL [here](https://main.d31vpxqs9hcxco.amplifyapp.com).
 
 
 ### **Backend Deployment**
