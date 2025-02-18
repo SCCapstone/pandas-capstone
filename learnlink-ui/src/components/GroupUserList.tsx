@@ -6,53 +6,33 @@ import { on } from 'events';
 
 interface StudyGroup {
   name: string;
-  description: string;
-  subject: string;
   chatID: number;
+  users: User;
 }
 
-const GroupUserList = ({ chatID, onClose}: { chatID: number; onClose: () => void }) => {
-  const [studyGroup, setStudyGroup] = useState<StudyGroup | null>(null);
-  const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
+interface User {
+    id: number;
+    username: string;
+    firstName: string;
+    lastName: string;
+  }
+  
 
 
-  // Fetch the study group details when the component is mounted
-  useEffect(() => {
-    const fetchStudyGroup = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        if (!token) {
-          alert('You need to be logged in to edit the study group.');
-          return;
-        }
-
-        const response = await axios.get(
-          `${REACT_APP_API_URL}/api/study-groups/chat/${chatID}`,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-
-    
-        const data = response.data;
-        setStudyGroup(data);
-      } catch (error) {
-        console.error('Error fetching study group:', error);
-        alert('Failed to load study group details.');
-      }
-    };
-
-    fetchStudyGroup();
-  }, [chatID]);
- 
-
-  if (!studyGroup) return <div>Loading...</div>; // Show loading message while fetching the study group data
-
-  return (
-    <div className="user-list-panel">
-      
-      
-      
-    </div>
-  );
-};
-
-export default GroupUserList;
+const GroupUserList = ({ users, onClose }: { users: User[] | null; onClose: () => void }) => {
+    return (
+      <div className="user-list-panel">
+        <h3>Group Members</h3>
+        <ul>
+          {users && users.length > 0 ? (
+            users.map((user) => <li key={user.id}>{user.firstName} {user.lastName}</li>)
+          ) : (
+            <p>No users found.</p>
+          )}
+        </ul>
+        <button onClick={onClose}>Close</button>
+      </div>
+    );
+  };
+  export default GroupUserList;
+  

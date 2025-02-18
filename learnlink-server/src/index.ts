@@ -853,7 +853,7 @@ app.get("/api/study-groups/chat/:chatId", async (req, res): Promise<any> => {
         studyGroupID: studyGroup.id,
         name: studyGroup.name,
         subject: studyGroup.subject,
-        description: studyGroup.description,
+        description: studyGroup.description
       });
     } else {
       return res.json({ studyGroupID: null }); // No study group found

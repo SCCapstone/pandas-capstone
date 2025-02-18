@@ -9,6 +9,9 @@ import { useSearchParams } from 'react-router-dom';
 import EditStudyGroup from '../components/EditStudyGroup';
 import MessagesNavi from "../components/MessagesNavi";
 import JoinRequests from '../components/JoinRequests';
+import GroupUserList from '../components/GroupUserList';
+
+import { group } from 'console';
 
 
 interface Chat {
@@ -76,7 +79,9 @@ const Messaging: React.FC = () => {
   const [showMessagesPanel, setShowMessagesPanel] = useState(false);
   const [showRequestsPanel, setShowRequestsPanel] = useState(false);
   const [activeTab, setActiveTab] = useState<'messages' | 'requests'>('messages');
-  
+  const [userList, setUserList] = useState<User[] | null>(null);
+  const [selectedChatUsers, setSelectedChatUsers] = useState<User[] | null>(null);
+  const [isUserPanelVisible, setIsUserPanelVisible] = useState(false);
   
   useEffect(() => {
     if (selectedUserId) {
@@ -409,6 +414,41 @@ const Messaging: React.FC = () => {
     }
   };
 
+  const handleGetUsers = async (chatId: number) => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        alert('You need to be logged in to view users.');
+        return;
+      }
+  
+      const response = await axios.get(
+        `${REACT_APP_API_URL}/api/study-groups/chat/${chatId}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      
+  
+      const data = response.data;
+      console.log ('data', data);
+      const groupId = data.studyGroupID;
+      console.log( 'id', groupId);
+
+      const res = await axios.get(
+        `${REACT_APP_API_URL}/api/study-groups/${groupId}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      const dat = res.data;
+      console.log('Users in study group:', dat.studyGroup.users);
+      
+      setSelectedChatUsers(dat.studyGroup.users); // Store user data for the selected chat
+      setIsUserPanelVisible(true); // Open the panel to show users
+    } catch (error) {
+      console.error('Error fetching users:', error);
+      alert('Failed to load users.');
+    }
+  };
+  
+
   const handleCreateStudyGroup = async (chatId: number) => {
     try {
       const token = localStorage.getItem('token');
@@ -724,6 +764,28 @@ const Messaging: React.FC = () => {
             <>
               <div className='ChatHeader'>
                 <h2 className="ChatTitle">{chatNames[selectedChat.id]}</h2>
+                
+                  {/* User List Button */}
+                  <button 
+                    className="UserListButton"
+                    onClick={() => {
+                      handleGetUsers(selectedChat.id);
+                      setIsUserPanelVisible(true);
+                    }}
+                  >
+                    Users
+                  </button>
+
+                  {/* User Panel - Separate from Study Group Panel */}
+                  {isUserPanelVisible && selectedChatUsers && (
+                    <div className="users-panel">
+                      <GroupUserList
+                        users={selectedChatUsers ?? []}
+                        onClose={() => setIsUserPanelVisible(false)}
+                      />
+                    </div>
+                  )}
+
                 {hasStudyGroup ?
                   <button
                     className="EditStudyGroupButton"
@@ -740,7 +802,6 @@ const Messaging: React.FC = () => {
                       setIsPanelVisible(true);
                     }}
                   > Create Study Group </button>}
-
               </div>
               {isPanelVisible && (
                 <div className="study-group-panel">
@@ -752,6 +813,7 @@ const Messaging: React.FC = () => {
                   />
                 </div>
               )}
+
               <div className="ChatWindow">
                 {selectedChat && Array.isArray(selectedChat.messages) ? (
                   selectedChat.messages.length > 0 ? (
