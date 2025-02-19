@@ -420,6 +420,26 @@
   font-weight: bold;
 }
 
+.filter-buttons {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+}
+.filter-buttons button{
+  background-color: #00668C;
+  color: white;
+  border: 0;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 10px;
+  border-radius: 5px;
+  cursor:pointer;
+}
+
+.filter-buttons button:hover {
+  background-color: #005A7A;
+}
+
 @media screen and (max-height: 450px) {
   .filter-menu { padding-top: 15px; }
   .filter-menu a { font-size: 18px; }

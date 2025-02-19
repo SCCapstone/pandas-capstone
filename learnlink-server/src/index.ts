@@ -1234,6 +1234,8 @@ app.get('/api/study-groups/:groupId', async (req, res): Promise<any> => {
 app.get('/api/users/search', authenticate, async (req, res): Promise<any> => {
   const { query, gender, college, ageRange, course } = req.query;
   console.log('Received search query:', req.query);
+  const placeholderImage = "https://learnlink-public.s3.us-east-2.amazonaws.com/AvatarPlaceholder.svg";
+
   // if (!query) {
   //   return res.status(400).json({ error: 'Query parameter is required' });
   // }
@@ -1300,11 +1302,15 @@ app.get('/api/users/search', authenticate, async (req, res): Promise<any> => {
         username: true,
         firstName: true,
         lastName: true,
+        profilePic: true || placeholderImage,
       },
     });
     console.log('Prisma Query:', users); // Logs the query results for debugging
-
-    return res.json({ users });
+    const updatedUsers = users.map(user => ({
+  ...user,
+  profilePic: user.profilePic || placeholderImage,  // Fallback to placeholderImage if profilePic is missing
+}));
+    return res.json({ users: updatedUsers });
   } catch (error) {
     console.error('Error fetching users:', error);
     return res.status(500).json({ error: 'Internal server error' });
