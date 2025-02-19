@@ -389,3 +389,38 @@
 .gender-filter {
   z-index: 998;
 }
+
+.filter-menu {
+  width: 400px;
+  min-width: 250px;
+  position: relative;
+  height: 100%;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  background-color: #D9D9D9;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding-top: 20px;
+  text-align: left;
+}
+
+.filter-menu a {
+  padding: 8px;
+  margin: 7px 15px;
+  text-decoration: none;
+  font-size: 20px;
+  color: #313D44;
+  display: block;
+}
+
+.filter-menu a.active, .filter-menu a:hover {
+  background-color: white;
+  border-radius: 5px;
+  font-weight: bold;
+}
+
+@media screen and (max-height: 450px) {
+  .filter-menu { padding-top: 15px; }
+  .filter-menu a { font-size: 18px; }
+}

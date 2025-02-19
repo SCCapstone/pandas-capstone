@@ -151,7 +151,7 @@ const navigate = useNavigate();
     setSelectedCourses([]);
     setAgeRange([0, 100]);
     setSelectedGenders([]);
-    setSearchParams({query});
+    setSearchParams({ query });
 
     // setFilterCriteria({ selectedColleges: [], selectedCourses: [], selectedGenders: [], ageRange: [0, 100] });
   };
@@ -163,16 +163,16 @@ const navigate = useNavigate();
   const handleApplyFilters = () => {
     // Sync state with URL
     setSearchParams({
-        query,
+      query,
       gender: selectedGenders.map(item => item.label).join(','),
       college: selectedColleges.map(item => item.label).join(','),
       course: selectedCourses.map(item => item.label).join(','),
       ageRange: ageRange.join(','),
     });
-    
+
   };
 
-  
+
 
 
 
@@ -180,111 +180,111 @@ const navigate = useNavigate();
 
   return (
     <div className="filter-menu">
-    <div className="filters">
-            <div className="college-filter">
-              <label>College:</label>
-              <Select
-                isMulti
-                name="college-filter"
-                components={animatedComponents}
-                options={isLoading ? [] : colleges} // Only show colleges when they are loaded
-                value={selectedColleges}
-                onChange={handleCollegeChange}
-                isClearable
-                isSearchable
-                placeholder="Type or select colleges..."
-                className="basic-multi-select"
-                classNamePrefix="select"
-                noOptionsMessage={() => "Type to add a new college"}
-                inputValue={collegeInputValue}
-                onInputChange={(newInputValue) => setCollegeInputValue(newInputValue)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && collegeInputValue) {
-                    const newCollege = { label: collegeInputValue, value: collegeInputValue };
-                    setSelectedColleges([...selectedColleges, newCollege]);
-                    // setColleges([...colleges, newCollege]);
-                    setCollegeInputValue('');
-                  }
-                }}
-              />
-            </div>
-            <div className="coursework-filter">
-              <label>Course:</label>
-              <Select
-                isMulti
-                name="course-filter"
-                components={animatedComponents}
-                options={[]} // Can be prefilled with options if needed
-                value={selectedCourses}
-                onChange={handleCourseChange}
-                isClearable
-                isSearchable
-                placeholder="Type or select courses..."
-                className="basic-multi-select"
-                classNamePrefix="select"
-                noOptionsMessage={() => "Type to add a new course"}
-                inputValue={courseInputValue} // Set input value
-                onInputChange={(newInputValue) => setCourseInputValue(newInputValue)} // Update input value on change
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && courseInputValue) {
-                    setSelectedCourses([
-                      ...selectedCourses,
-                      { label: courseInputValue, value: courseInputValue }
-                    ]);
-                    setCourseInputValue(""); // Clear input
-                  }
-                }}
-              />
-            </div>
-            <div className="age-slider-container">
-              <label>Age Range: {ageRange[0]} - {ageRange[1]}</label>
+      <div className="filters">
+        <div className="college-filter">
+          <label>College:</label>
+          <Select
+            isMulti
+            name="college-filter"
+            components={animatedComponents}
+            options={isLoading ? [] : colleges} // Only show colleges when they are loaded
+            value={selectedColleges}
+            onChange={handleCollegeChange}
+            isClearable
+            isSearchable
+            placeholder="Type or select colleges..."
+            className="basic-multi-select"
+            classNamePrefix="select"
+            noOptionsMessage={() => "Type to add a new college"}
+            inputValue={collegeInputValue}
+            onInputChange={(newInputValue) => setCollegeInputValue(newInputValue)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && collegeInputValue) {
+                const newCollege = { label: collegeInputValue, value: collegeInputValue };
+                setSelectedColleges([...selectedColleges, newCollege]);
+                // setColleges([...colleges, newCollege]);
+                setCollegeInputValue('');
+              }
+            }}
+          />
+        </div>
+        <div className="coursework-filter">
+          <label>Course:</label>
+          <Select
+            isMulti
+            name="course-filter"
+            components={animatedComponents}
+            options={[]} // Can be prefilled with options if needed
+            value={selectedCourses}
+            onChange={handleCourseChange}
+            isClearable
+            isSearchable
+            placeholder="Type or select courses..."
+            className="basic-multi-select"
+            classNamePrefix="select"
+            noOptionsMessage={() => "Type to add a new course"}
+            inputValue={courseInputValue} // Set input value
+            onInputChange={(newInputValue) => setCourseInputValue(newInputValue)} // Update input value on change
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && courseInputValue) {
+                setSelectedCourses([
+                  ...selectedCourses,
+                  { label: courseInputValue, value: courseInputValue }
+                ]);
+                setCourseInputValue(""); // Clear input
+              }
+            }}
+          />
+        </div>
+        <div className="age-slider-container">
+          <label>Age Range: {ageRange[0]} - {ageRange[1]}</label>
 
-              <div className="slider-wrapper">
-                {/* Min Label */}
-                <span className="slider-label min-label">18</span>
+          <div className="slider-wrapper">
+            {/* Min Label */}
+            <span className="slider-label min-label">18</span>
 
-                {/* Slider */}
-                <ReactSlider
-                  className="age-slider"
-                  thumbClassName="thumb"
-                  trackClassName="track"
-                  min={18}
-                  max={100}
-                  value={ageRange}
-                  onChange={(newValue) => setAgeRange(newValue as [number, number])}
-                  pearling
-                  minDistance={1}
-                />
+            {/* Slider */}
+            <ReactSlider
+              className="age-slider"
+              thumbClassName="thumb"
+              trackClassName="track"
+              min={18}
+              max={100}
+              value={ageRange}
+              onChange={(newValue) => setAgeRange(newValue as [number, number])}
+              pearling
+              minDistance={1}
+            />
 
-                {/* Max Label */}
-                <span className="slider-label max-label">100</span>
-              </div>
-            </div>
-            <div className="gender-filter">
-              <label>Gender:</label>
-              <Select
-                isMulti
-                name="gender-filter"
-                options={gender.map((tag) => ({
-                  value: tag,
-                  label: formatEnum(tag), // Assuming formatEnum formats the tag as a readable label
-                }))}
-                value={selectedGenders} // Controlled state
-                onChange={(selectedOptions) => setSelectedGenders(selectedOptions as { value: string; label: string }[] || [])} // Updates state
-                closeMenuOnSelect={false}
-                components={animatedComponents}
-                className="basic-multi-select"
-                classNamePrefix="select"
-              />
-            </div>
-            <div className="filter-buttons">
-              <button onClick={handleApplyFilters} className="filter-btn">Apply Filters</button>
-              <button onClick={handleClearFilters} className="cancel-btn">Clear</button>
-            </div>
+            {/* Max Label */}
+            <span className="slider-label max-label">100</span>
           </div>
-          </div>
-          
-        
+        </div>
+        <div className="gender-filter">
+          <label>Gender:</label>
+          <Select
+            isMulti
+            name="gender-filter"
+            options={gender.map((tag) => ({
+              value: tag,
+              label: formatEnum(tag), // Assuming formatEnum formats the tag as a readable label
+            }))}
+            value={selectedGenders} // Controlled state
+            onChange={(selectedOptions) => setSelectedGenders(selectedOptions as { value: string; label: string }[] || [])} // Updates state
+            closeMenuOnSelect={false}
+            components={animatedComponents}
+            className="basic-multi-select"
+            classNamePrefix="select"
+          />
+        </div>
+        <div className="filter-buttons">
+          <button onClick={handleApplyFilters} className="filter-btn">Apply Filters</button>
+          <button onClick={handleClearFilters} className="cancel-btn">Clear</button>
+        </div>
+      </div>
+    </div>
+
+
   );
 };
 
