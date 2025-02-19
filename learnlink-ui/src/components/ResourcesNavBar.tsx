@@ -1,30 +1,25 @@
-import React from 'react';
-import { NavLink } from 'react-router-dom'; // Use NavLink for React Router
-import './components.css';
+import React, { useState } from "react";
+import { NavLink } from "react-router-dom"; 
+import "./components.css";
 
 const ResourcesNavBar: React.FC = () => {
+  const [isOpen, setIsOpen] = useState(false);
+
   return (
-    <div id="mySidenav" className="sidenav">
-      <NavLink
-        to="/resources/studyTips" // Use a real path here
-        className={({ isActive }) => (isActive ? "active" : "")}
-      >
-        Study Tips
-      </NavLink>
+    <div>
+      <div id="mySidenav" className={`sidenav ${isOpen ? "open" : ""}`}>
+        <NavLink to="/resources/studyTips" className={({ isActive }) => (isActive ? "active" : "")}>
+          Study Tips
+        </NavLink>
 
-      <NavLink
-        to="/resources/externalResources" // Use a real path here
-        className={({ isActive }) => (isActive ? "active" : "")}
-      >
-        External Resources
-      </NavLink>
+        <NavLink to="/resources/externalResources" className={({ isActive }) => (isActive ? "active" : "")}>
+          External Resources
+        </NavLink>
 
-      <NavLink
-        to="/resources/gradeCalculator" // Use a real path here
-        className={({ isActive }) => (isActive ? "active" : "")}
-      >
-        Grade Calculator
-      </NavLink>
+        <NavLink to="/resources/gradeCalculator" className={({ isActive }) => (isActive ? "active" : "")}>
+          Grade Calculator
+        </NavLink>
+      </div>
     </div>
   );
 };
