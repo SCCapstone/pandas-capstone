@@ -56,7 +56,7 @@ const EditStudyGroup = ({ chatID, onClose, updateChatName}: { chatID: number; on
         setName(data.name);
         setDescription(data.description);
         setSubject(data.subject);
-        setIdealMatchFactor({ value: data.ideal_match_factor, label: formatEnum(data.ideal_match_factor) });
+        setIdealMatchFactor(data.ideal_match_factor ? { value: data.ideal_match_factor, label: formatEnum(data.ideal_match_factor) } : null);
       } catch (error) {
         console.error('Error fetching study group:', error);
         alert('Failed to load study group details.');

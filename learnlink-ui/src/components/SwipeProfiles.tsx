@@ -26,16 +26,16 @@ const SwipeProfiles = ({ userId }: { userId: number }) => {
         // // Shuffle the combined profiles randomly
         // const shuffledProfiles = combinedProfiles.sort(() => Math.random() - 0.5);
 
-          const interLeavedProfiles: any[] = [];
-          const maxLength = Math.max(data.users.length, data.studyGroups.length);
+          // const interLeavedProfiles: any[] = [];
+          // const maxLength = Math.max(data.users.length, data.studyGroups.length);
       
-          for (let i = 0; i < maxLength; i++) {
-              if (i < data.users.length) interLeavedProfiles.push(data.users[i]);  // Add a user
-              if (i < data.studyGroups.length) interLeavedProfiles.push(data.studyGroups[i]);  // Add a study group
-          }
+          // for (let i = 0; i < maxLength; i++) {
+          //     if (i < data.users.length) interLeavedProfiles.push(data.users[i]);  // Add a user
+          //     if (i < data.studyGroups.length) interLeavedProfiles.push(data.studyGroups[i]);  // Add a study group
+          // }
       
       
-        setProfiles(interLeavedProfiles);
+        setProfiles(data.profiles);
       } catch (error) {
         console.error('Error fetching profiles:', error);
       }

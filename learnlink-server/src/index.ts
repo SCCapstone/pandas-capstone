@@ -664,6 +664,8 @@ app.get('/api/profiles', authenticate, async (req: Request, res: Response) => {
 
 app.get('/api/profiles/:userId', async (req, res): Promise<any> => {
   const userId = parseInt(req.params.userId);
+  type UserWithScore = User & { similarityScore: number; type: 'user' };
+  type StudyGroupWithScore = StudyGroup & { similarityScore: number; type: 'studyGroup' };
 
   try {
 
@@ -753,7 +755,6 @@ app.get('/api/profiles/:userId', async (req, res): Promise<any> => {
       if (user.study_method === currentUser.study_method) score += 3;
       if (user.relevant_courses.some((course: string) => currentUser.relevant_courses.includes(course))) score += 5;
       if (user.studyHabitTags.some((tag: string) => currentUser.studyHabitTags.includes(tag as StudyTags))) score += 2;
-      console.log('User Score:', user.username, score);
       return score;
     };
 
@@ -763,26 +764,35 @@ app.get('/api/profiles/:userId', async (req, res): Promise<any> => {
       return score;
     };
 
-    usersToSwipeOn = usersToSwipeOn
+    const usersWithScore: UserWithScore[] = usersToSwipeOn
       .map(user => ({
         ...user,
         profilePic: user.profilePic || placeholderImage,
         similarityScore: calculateSimilarityUser(user),
+        type: 'user' as 'user',
       }))
       .sort((a, b) => b.similarityScore - a.similarityScore); // Sort by highest similarity
 
-      studyGroupsToSwipeOn = studyGroupsToSwipeOn
+      const studyGroupsWithScore: StudyGroupWithScore[] = studyGroupsToSwipeOn
       .map(studyGroup => ({
         ...studyGroup,
         similarityScore: calculateSimilarityStudyGroup(studyGroup),
+        type: 'studyGroup' as 'studyGroup',
       }))
       .sort((a, b) => b.similarityScore - a.similarityScore); // Sort by highest similarity
 
 
-
+      const combinedProfiles = [
+        ...studyGroupsWithScore,
+        ...usersWithScore,
+      ].sort((a, b) => b.similarityScore - a.similarityScore); // Sort by similarity score
+  
+      console.log('Combined profiles:', combinedProfiles);
     res.status(200).json({
-      users: usersToSwipeOn,
-      studyGroups: studyGroupsToSwipeOn,
+      profiles: combinedProfiles, // Sorted profiles with similarityScore and type
+
+      // users: usersToSwipeOn,
+      // studyGroups: studyGroupsToSwipeOn,
     });
   } catch (error) {
     console.error(error);
