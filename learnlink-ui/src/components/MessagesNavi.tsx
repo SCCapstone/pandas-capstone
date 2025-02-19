@@ -59,9 +59,10 @@ const MessagesNavi: React.FC<MessagesNaviProps> = ({ chats, selectedChat, setSel
             <li
               key={chat.id}
               className={`ChatListItem ${selectedChat?.id === chat.id ? 'active' : ''}`} // Highlight selected chat
+              onClick={() => setSelectedChat(chat)}
             >
               {/* Clicking the chat name selects it */}
-              <span onClick={() => setSelectedChat(chat)}>
+              <span>
                 {chatNames[chat.id] || "Loading..."} {/* Display chat name or "Loading..." as a fallback */}
               </span>
               {/* Button to delete the chat */}

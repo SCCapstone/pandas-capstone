@@ -48,15 +48,18 @@
 
 .ChatList {
   list-style: none;
-  padding: 0;
+  padding: 0 0 0 0;
   margin: 0;
-  margin-top: 20px; /* Adds space above the chat list */
+  /* margin-top: 20px; Adds space above the chat list */
 }
 
 .ChatListItem {
-  padding: 10px;
+  /* padding: 10px; */
   border-bottom: 1px solid #ddd;
   cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .ChatListItem:hover,
@@ -313,11 +316,11 @@
 .ChatList {
   max-height: 500px; /* Adjust height as needed */
   overflow-y: auto; /* Enables vertical scrolling */
-  padding-right: 10px; /* Optional: prevent scrollbar from overlapping content */
+  /* padding-right: 10px; Optional: prevent scrollbar from overlapping content */
 }
 
 .ChatListItem {
-  padding: 10px;
+  padding: 15px;
   border-bottom: 1px solid #ccc;
   cursor: pointer;
 }
@@ -448,7 +451,7 @@
 }
 
 .messages-panel {
-  padding: 10px;
+  /* padding: 10px; */
 }
 
 
