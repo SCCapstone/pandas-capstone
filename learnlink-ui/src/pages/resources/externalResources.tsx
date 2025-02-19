@@ -11,11 +11,10 @@ const ExternalResources: React.FC = () => {
         <Navbar />
       </header>
 
-
       <div className='resources-content'>
         <ResourcesNavBar />
         <main className="main-content">
-          <h1>External Resources</h1>
+          <h1 id="title_external_resources">External Resources</h1>
           <h2>External Scheduling Tool</h2>
           <p>Use When2Meet for scheduling a time that works for all group members.</p>
           <p>Have one group memeber create the event and share the link via messaging to the group.</p>

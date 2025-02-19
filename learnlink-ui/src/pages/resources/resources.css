@@ -74,7 +74,6 @@
     font-weight: 300;
     text-align: left;
     color: black;
-  
   }
 
    .main-content a:link {
@@ -86,6 +85,10 @@
 
   .main-content a:hover {
     text-decoration:underline;
+  }
+  
+  .main-content a{
+    padding-bottom:15px;
   }
   
   .tip-icon img {
@@ -101,7 +104,7 @@
     transform: scale(1.1);
   }
 
-/* MOBILE VIEW: Make the sidebar horizontal */
+/* MOBILE VIEW */
 @media screen and (max-width: 768px) {
   .resources-content {
     flex-direction: column;
@@ -124,4 +127,14 @@
     text-align: center;
     margin: 0;
   }
+
+  #title_external_resources{
+    font-size:32pt;
+  }
+
+  #title_stdy_tips{
+    font-size:35pt;
+  }
+
+
 }
