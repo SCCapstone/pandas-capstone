@@ -2,6 +2,7 @@ import './JoinRequests.css';
 import '../pages/messaging.css';
 import './components.css';
 import React from 'react';
+import { FaXmark } from "react-icons/fa6";
 
 
 // Represents a chat conversation, including messages, users, and timestamps
@@ -67,7 +68,7 @@ const MessagesNavi: React.FC<MessagesNaviProps> = ({ chats, selectedChat, setSel
               </span>
               {/* Button to delete the chat */}
               <button className="DeleteButton" onClick={() => handleDeleteChat(chat.id)}>
-                X
+                <FaXmark />
               </button>
             </li>
           ))}
