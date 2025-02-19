@@ -213,7 +213,7 @@
   }
 }
 
-/* Side Navigation */
+/* Side Navigation - for resource pages*/
 .sidenav {
   width: 250px;
   min-width: 250px;
@@ -250,22 +250,18 @@
 }
 
 /* Side Navigation */
-.filter-menu {
-  width: 400px;
+.sidenav {
+  width: 250px;
   min-width: 250px;
-  position: relative;
-  height: 100%;
-  z-index: 1;
-  top: 0;
-  left: 0;
+  height: 100vh;
   background-color: #D9D9D9;
-  overflow-x: hidden;
   overflow-y: auto;
   padding-top: 20px;
   text-align: left;
 }
 
-.filter-menu a {
+/* Ensure links are styled properly */
+.sidenav a {
   padding: 8px;
   margin: 7px 15px;
   text-decoration: none;
@@ -274,16 +270,21 @@
   display: block;
 }
 
-.filter-menu a.active, .filter-menu a:hover {
+.sidenav a.active,
+.sidenav a:hover {
   background-color: white;
   border-radius: 5px;
   font-weight: bold;
 }
 
-@media screen and (max-height: 450px) {
-  .filter-menu { padding-top: 15px; }
-  .filter-menu a { font-size: 18px; }
+/* Hide sidebar on mobile screens */
+@media screen and (max-width: 768px) {
+  .sidenav {
+    display: none;
+  }
 }
+
+
 
 /* Dropdown */
 .dropdown {
