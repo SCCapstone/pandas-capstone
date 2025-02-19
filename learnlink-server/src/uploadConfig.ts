@@ -3,9 +3,14 @@ import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import dotenv from "dotenv";
 import sharp from "sharp";
 import { Request, Response, NextFunction } from "express";
+import { PrismaClient } from "@prisma/client";
+import { DeleteObjectCommand } from "@aws-sdk/client-s3";
+
 
 const envFile = process.env.NODE_ENV === 'production' ? './.env.production' : './.env.development';
 dotenv.config({ path: envFile });
+
+const prisma = new PrismaClient();
 
 const s3 = new S3Client({
   credentials: {
@@ -28,6 +33,8 @@ const upload = multer({
 // ✅ Middleware: Resize Image and Upload to S3
 const resizeAndUpload = async (req: Request, res: Response, next: NextFunction) => {
   if (!req.file) return res.status(400).json({ error: "No file uploaded" });
+  const userId = res.locals.userId; // Get the current user ID
+
 
   try {
     // Resize image
@@ -60,7 +67,41 @@ const resizeAndUpload = async (req: Request, res: Response, next: NextFunction) 
     );
 
     // Generate image URL
-    req.body.profilePicUrl = `https://${process.env.S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${fileName}`;
+    const newProfilePicUrl = `https://${process.env.S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${fileName}`;
+    
+    // Fetch the current profile picture URL (if it exists)
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { profilePic: true },
+    });
+
+    if (user?.profilePic) {
+      // Extract the S3 key from the old image URL
+      const oldImageKey = user.profilePic.split("/").slice(-2).join("/");
+
+      // Delete the old image from S3
+      try {
+        await s3.send(
+          new DeleteObjectCommand({
+            Bucket: process.env.S3_BUCKET_NAME!,
+            Key: oldImageKey,
+          })
+        );
+      } catch (deleteError) {
+        console.error("Failed to delete old image:", deleteError);
+      }
+    }
+
+    // Update the user's profile picture URL in the database
+    await prisma.user.update({
+      where: { id: userId },
+      data: { profilePic: newProfilePicUrl },
+    });
+
+    // Set the new profile picture URL in the request body to pass to the next middleware
+    req.body.profilePicUrl = newProfilePicUrl;
+
+    
     next();
   } catch (error) {
     console.error("Image processing error:", error);
