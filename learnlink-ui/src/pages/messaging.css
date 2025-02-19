@@ -108,14 +108,15 @@
 
 .ChatWindow {
   display: flex;
+  flex:1;
   flex-direction: column;
   width: 100%;
-  max-width: 90%; /* Adjust to fit your design */
   margin: 0 auto;
   padding: 10px;
-  background-color: #f9f9f9;
-  border-radius: 8px;
+  /* background-color: #f9f9f9; */
   overflow-y: scroll;
+  box-sizing: border-box;
+
 }
 
 .NoChatSelected {
@@ -150,12 +151,13 @@
 .ChatInput button {
   font-weight: 700;
   font-size: large;
-  padding: 10px 20px;
+  padding: 10px 20px ;
   background-color: #00668C;
   color: white;
   border: none;
   border-radius: 5px;
   cursor: pointer;
+  height: 45px;
 }
 
 .ChatInput button:hover {
@@ -355,7 +357,8 @@
 .TabsContainer {
   display: flex;
   justify-content: center;
-  background-color: #f0f4f8;
+  /* background-color: #f0f4f8; */
+  background-color: #00668C;
   padding: 10px;
   border-bottom: 2px solid #ccc;
 }
@@ -365,7 +368,7 @@
   cursor: pointer;
   font-size: 20px;
   font-weight: bold;
-  color: #333;
+  color: #B6CCD8;
   background-color: transparent;
   border: none;
   outline: none;
@@ -373,20 +376,19 @@
 }
 
 .Tab.active {
-  border-bottom: 3px solid #007bff; /* Highlight the active tab */
-  color: #007bff;
+  border-bottom: 3px solid #fff; /* Highlight the active tab */
+  color: #fff;
 }
 
 .Tab:hover {
-  color: #0056b3;
+  color: #ACACAC;
 }
 
 .MessagesSidebar {
   overflow-y: auto; /* Allows smooth scrolling */
   max-height: 80vh; /* Prevents it from taking up the entire screen */
   width: 50vh;
-  border: 1px solid #ccc; /* Optional: Adds a subtle border */
-  padding: 10px;
+  border-right: 1px solid #ccc; /* Optional: Adds a subtle border */
   background-color: #f9f9f9; /* Light background for better readability */
 }
 
@@ -445,6 +447,9 @@
   color: #555;
 }
 
+.messages-panel {
+  padding: 10px;
+}
 
 
 
