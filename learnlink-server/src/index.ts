@@ -340,6 +340,7 @@ app.get('/api/users/profile/:userId', authenticate, async (req, res):Promise<any
       ideal_match_factor: user.ideal_match_factor,
       studyHabitTags: user.studyHabitTags,
       profilePic: user.profilePic || placeholderImage,
+      id: user.id,
     });
 
 
@@ -493,6 +494,7 @@ app.post('/api/update-password', authenticate, async (req, res):Promise<any> => 
 app.post('/api/swipe', async (req, res) => {
   const { userId, targetId, direction, isStudyGroup, message, targetGroup, user } = req.body;
 
+  console.log('Received swipe:', req.body);
   try {
     // Store the swipe in the database
     const swipe = await prisma.swipe.create({
@@ -693,10 +695,14 @@ app.get('/api/profiles/:userId', async (req, res): Promise<any> => {
     // Fetch users and study groups that the current user has not swiped on yet
     let usersToSwipeOn = await prisma.user.findMany({
       where: {
-        NOT: {
-          id: userId,  // Exclude the current user from the profiles
-        },
-        // You can add additional filters here like matching preferences, etc.
+        NOT: [
+          {
+            id: userId,  // Exclude the current user from the profiles
+          },
+          {
+            swipesReceived: { some: { userId: userId } },  // Exclude users where the current user has already swiped
+          },
+        ],
       },
       select: {
         id: true,
@@ -714,6 +720,7 @@ app.get('/api/profiles/:userId', async (req, res): Promise<any> => {
         college: true,
         studyHabitTags: true,
         ideal_match_factor: true,
+        swipesReceived: true,
       },
     });
 
@@ -724,13 +731,22 @@ app.get('/api/profiles/:userId', async (req, res): Promise<any> => {
 
     let studyGroupsToSwipeOn = await prisma.studyGroup.findMany({
       where: {
-        NOT: {
-          users: {
-            some: {
-              id: userId, // Exclude study groups where the user is already a member
+        NOT: [
+          {
+            users: {
+              some: {
+                id: userId, // Exclude study groups where the user is already a member
+              },
             },
           },
-        },
+          {
+            swipesGiven: {
+              some: {
+                userId: userId, // Exclude study groups where the user has already swiped
+              },
+            },
+          },
+        ],
       },
       select: {
         id: true,
