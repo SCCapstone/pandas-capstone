@@ -15,7 +15,7 @@ const StudyTips: React.FC = () => {
       <div className='resources-content'>
         <ResourcesNavBar />
         <main className="main-content">
-          <h1>Study Tips</h1>
+          <h1 id="title_stdy_tips">Study Tips</h1>
           <div className="tip-icon">
           </div>
           <h2>Collaborate Asynchronously</h2>

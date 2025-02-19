@@ -76,7 +76,7 @@ const GradeCalculator: React.FC = () => {
       <div className="resources-content">
         <ResourcesNavBar />
         <main className="main-content">
-          <h1>Grade Calculator</h1>
+          <h1 id="title">Grade Calculator</h1>
           <p>Calculate your grade based on the weights of each assignment.</p>
           <div className="final-calculation">
             <button onClick={calculateFinalGrade}>Calculate</button>
