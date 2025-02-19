@@ -325,17 +325,22 @@ const Profile: React.FC = () => {
                         style={{ width: "200px", height: "200px", objectFit: "cover", cursor: "pointer" }}
                       />
                     ) : (
-                      // <button
-                      //   className="upload-button"
-                      //   onClick={() => document.getElementById("image-upload")?.click()}
-                      // >
-                      //   CLICK TO ADD PICTURE
-                      // </button>
+                      <div>
+                      {/* <button
+                        className="upload-button"
+                        onClick={() => document.getElementById("image-upload")?.click()}
+                      >
+                        CLICK TO ADD PICTURE
+                      </button> */}
                       <img
                         src={formData?.profilePic || 'https://learnlink-public.s3.us-east-2.amazonaws.com/AvatarPlaceholder.svg'}
                         alt="Profile"
                         width="100"
+                        height={100}
+                        onClick={() => document.getElementById("image-upload")?.click()}
+
                       />
+                      </div>
                     )}
 
                     {/* Hidden file input */}

@@ -16,7 +16,7 @@ import fs from 'fs';
 import https from 'https';
 import dotenv from 'dotenv';
 import { Resend } from 'resend';
-import upload from './uploadConfig';
+import {upload, resizeAndUpload} from './uploadConfig';
 
 
 interface CustomJwtPayload extends JwtPayload {
@@ -2100,22 +2100,22 @@ app.post("/api/reset-password/email", async (req, res): Promise<any> => {
   res.json({ message: "Password reset successful" });
 });
 
-app.post('/api/users/upload-pfp', authenticate, upload.single('profilePic'), async (req, res):Promise<any> => {
-  const userId = res.locals.userId;
-  if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
+app.post('/api/users/upload-pfp', authenticate, upload as express.RequestHandler, resizeAndUpload as express.RequestHandler, async (req, res):Promise<any> => {
+  const userId = res.locals.userId; // Authenticated user ID
 
   try {
     const updatedUser = await prisma.user.update({
       where: { id: userId },
-      data: { profilePic: (req.file as any).location },
+      data: { profilePic: req.body.profilePicUrl }, // Save S3 URL
     });
 
-    res.status(200).json({ message: 'Profile picture updated', profilePic: updatedUser.profilePic });
+    res.status(200).json({ message: "Profile picture updated", profilePic: updatedUser.profilePic });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Failed to update profile picture' });
+    console.error("Database update error:", error);
+    res.status(500).json({ error: "Failed to update profile picture" });
   }
 });
+
 
 export { app }; // Export the app for testing
 
