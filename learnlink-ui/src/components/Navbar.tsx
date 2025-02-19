@@ -47,7 +47,7 @@ const Navbar: React.FC = () => {
   const [filterCriteria, setFilterCriteria] = useState<FilterCriteria>({});
   const [isFilterVisible, setIsFilterVisible] = useState(false);
   const [selectedGenders, setSelectedGenders] = useState<{ value: string; label: string }[]>([]);
-  const [ageRange, setAgeRange] = useState<[number, number]>([0, 100]); // Default range
+  const [ageRange, setAgeRange] = useState<[number, number] | null>(null); // Default range can be null  
   const [selectedColleges, setSelectedColleges] = useState<{ label: string; value: string }[]>([]);
   const [selectedCourses, setSelectedCourses] = useState<{ label: string; value: string }[]>([]);
   const [collegeInputValue, setCollegeInputValue] = useState(""); // State to track the input value
@@ -63,25 +63,17 @@ const Navbar: React.FC = () => {
   
   const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
 
-  // const getLocation = () => {
-  //   const location = useLocation().pathname;
-  //   return location;
-  // }
-
-  // useEffect(() => {
-  //   const query = searchParams.get('query') || '';
-  //   setSearchQuery(query);
-  //   handleSearch(query); // Trigger search whenever query param changes
-  // }, [searchParams]);
-
   useEffect(() => {
     // Sync the search query and filter criteria from URL params whenever the URL changes
     const query = searchParams.get('query') || '';
     const genderParam = searchParams.get('gender') || '';
     const collegeParam = searchParams.get('college') || '';
     const courseParam = searchParams.get('course') || '';
-    const ageRangeParam = (searchParams.get('ageRange')?.split(',').map(Number) as [number, number]) || [0, 100];
+    let ageRangeParam: [number, number] | null = (searchParams.get('ageRange')?.split(',').map(Number) as [number, number]) || '';
   
+    if (!(ageRangeParam.length === 2 && ageRangeParam.every(age => !isNaN(age)))) {
+      ageRangeParam = null;
+    }
     // Convert params into expected format
     const parsedGenders = genderParam ? genderParam.split(',').map(g => ({ value: g, label: formatEnum(g) })) : [];
     const parsedColleges = collegeParam ? collegeParam.split(',').map(c => ({ label: c, value: c })) : [];
@@ -105,33 +97,23 @@ const Navbar: React.FC = () => {
     // const query = e.target.value;
     // setSearchQuery(query);
   
+    if (location !== "/advancedsearch") {
+
     if (query.trim() === '') {
       setSearchResults([]);
       setIsDropdownVisible(false);
       return;
     }
+  }
   
     const token = localStorage.getItem('token');
-    // const genderFilter = selectedGenders.map(gender => gender.label);
-    // const collegeFilter = selectedColleges.map(college => college.label); // Adjusted to `value` for consistency
-    // const courseFilter = selectedCourses.map(course => course.label); // Adjusted to `value` for consistency
-    // const ageRangeFilter = ageRange;
-  
-    // // Use URLSearchParams to construct the query string
-    // const queryParams = new URLSearchParams({
-    //   query,
-    //   gender: genderFilter.join(','),
-    //   college: collegeFilter.join(','),
-    //   ageRange: ageRangeFilter.join(','),
-    //   course: courseFilter.join(','),
-    // });
 
     const queryParams = new URLSearchParams({
       query: query,
       gender: selectedGenders.map(gender => gender.label).join(','),
       college: selectedColleges.map(college => college.label).join(','),
       course: selectedCourses.map(course => course.label).join(','),
-      ageRange: ageRange.join(','),
+      ageRange: ageRange ? ageRange.join(',') : '',
     });
 
     console.log("Query Params:", queryParams.toString());
@@ -177,7 +159,8 @@ const Navbar: React.FC = () => {
     queryParams.set('gender', selectedGenders.map(gender => gender.label).join(','));
     queryParams.set('college', selectedColleges.map(college => college.label).join(','));
     queryParams.set('course', selectedCourses.map(course => course.label).join(','));
-    queryParams.set('ageRange', ageRange.join(','));
+    queryParams.set('ageRange', ageRange ? ageRange.join(',') : '',
+  );
 
     setSearchParams(queryParams);
   };
@@ -197,26 +180,13 @@ const Navbar: React.FC = () => {
       }
     
       const token = localStorage.getItem('token');
-      // const genderFilter = selectedGenders.map(gender => gender.label);
-      // const collegeFilter = selectedColleges.map(college => college.label); // Adjusted to `value` for consistency
-      // const courseFilter = selectedCourses.map(course => course.label); // Adjusted to `value` for consistency
-      // const ageRangeFilter = ageRange;
-    
-      // // Use URLSearchParams to construct the query string
-      // const queryParams = new URLSearchParams({
-      //   query,
-      //   gender: genderFilter.join(','),
-      //   college: collegeFilter.join(','),
-      //   ageRange: ageRangeFilter.join(','),
-      //   course: courseFilter.join(','),
-      // });
   
       const queryParams = new URLSearchParams({
         query: query,
         gender: selectedGenders.map(gender => gender.label).join(','),
         college: selectedColleges.map(college => college.label).join(','),
         course: selectedCourses.map(course => course.label).join(','),
-        ageRange: ageRange.join(','),
+        ageRange: ageRange ? ageRange.join(',') : '',
       });
   
       console.log("Query Params:", queryParams.toString());
@@ -307,7 +277,7 @@ const Navbar: React.FC = () => {
   const handleClearFilters = () => {
     setSelectedColleges([]);
     setSelectedCourses([]);
-    setAgeRange([0,100]);
+    setAgeRange(null);
     setSelectedGenders([]);
     setFilterCriteria({});
   };

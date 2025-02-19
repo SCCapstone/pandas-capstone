@@ -9,6 +9,8 @@ COPY package*.json ./
 
 # Step 4: Install dependencies
 RUN npm install
+RUN apt-get update && apt-get install -y libheif-dev
+
 
 # Step 5: Copy the rest of the app code into the container
 COPY . .

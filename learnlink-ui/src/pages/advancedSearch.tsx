@@ -6,6 +6,7 @@ import './advancedSearch.css';
 import CopyrightFooter from '../components/CopyrightFooter';
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { query } from 'express';
 
 const AdvancedSearch: React.FC = () => {
     const location = useLocation();
@@ -24,6 +25,7 @@ const AdvancedSearch: React.FC = () => {
     }
 
     const [searchResults, setSearchResults] = useState<User[]>([]);
+    const[userQuery, setUserQuery] = useState<string>('');
     const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
 
 
@@ -39,7 +41,8 @@ const AdvancedSearch: React.FC = () => {
                 // const ageRange = queryParams.get("ageRange") || "";
                 // const course = queryParams.get("course") || "";
                 const searchQuery = queryParams.get("query") || "";
-                if (!searchQuery) return;
+                setUserQuery(searchQuery);
+                // if (!searchQuery) return;
 
 
 
@@ -81,8 +84,10 @@ const AdvancedSearch: React.FC = () => {
 
             <div className='advanced-search-content'>
                 <main className="main-content">
-                    <h1>Advanced Search</h1>
-                    <h2>Search Results:</h2>
+                    {/* <h1>Advanced Search</h1> */}
+                    {userQuery !== '' && <h2>Results for "{userQuery}"</h2>}
+                    {userQuery == '' && <h2>Filtered User List</h2>}
+                    {searchResults.length === 0 && <p>No results found.</p>}
                     <ul className="search-result-list">
                         {searchResults.map((user) => (
                             <p key={user.id} onClick={() => handleSelectUser(user.id)}>

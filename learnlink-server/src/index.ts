@@ -1233,14 +1233,15 @@ app.get('/api/study-groups/:groupId', async (req, res): Promise<any> => {
 
 app.get('/api/users/search', authenticate, async (req, res): Promise<any> => {
   const { query, gender, college, ageRange, course } = req.query;
-
-  if (!query) {
-    return res.status(400).json({ error: 'Query parameter is required' });
-  }
+  console.log('Received search query:', req.query);
+  // if (!query) {
+  //   return res.status(400).json({ error: 'Query parameter is required' });
+  // }
 
   try {
     const filters: any = []; // Create an array to store valid filters
 
+    if (query) {
     // Add search filters for username, firstName, and lastName
     filters.push({
       OR: [
@@ -1249,6 +1250,7 @@ app.get('/api/users/search', authenticate, async (req, res): Promise<any> => {
         { lastName: { contains: query as string, mode: 'insensitive' } },
       ],
     });
+  }
 
     // Add gender filter if provided
     if (typeof gender === 'string' && gender.length > 0) {
@@ -1282,12 +1284,12 @@ app.get('/api/users/search', authenticate, async (req, res): Promise<any> => {
       });
     }
 
-    console.log('Filters:', filters);
+    console.log('Filters:', JSON.stringify(filters, null, 2));
 
-    // If no valid filters, return a 400 error
-    if (filters.length === 0) {
-      return res.status(400).json({ error: 'At least one filter must be provided' });
-    }
+    // // If no valid filters, return a 400 error
+    // if (filters.length === 0) {
+    //   return res.status(400).json({ error: 'At least one filter must be provided' });
+    // }
 
     const users = await prisma.user.findMany({
       where: {
@@ -1300,8 +1302,31 @@ app.get('/api/users/search', authenticate, async (req, res): Promise<any> => {
         lastName: true,
       },
     });
+    console.log('Prisma Query:', users); // Logs the query results for debugging
 
     return res.json({ users });
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+app.get('/api/users/ages', async (req, res): Promise<any> => {
+  try {
+    // Get the min and max age from all users
+    const ageStats = await prisma.user.aggregate({
+      _min: {
+        age: true, // Get the minimum age
+      },
+      _max: {
+        age: true, // Get the maximum age
+      },
+    });
+
+    return res.json({
+      minAge: ageStats._min.age,
+      maxAge: ageStats._max.age,
+    });
   } catch (error) {
     console.error('Error fetching users:', error);
     return res.status(500).json({ error: 'Internal server error' });

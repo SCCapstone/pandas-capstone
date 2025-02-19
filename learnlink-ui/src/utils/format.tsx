@@ -81,3 +81,30 @@ export const useColleges = () => {
   }, []);
   return { colleges, isLoading };
 };
+
+export const useUserAgeRange = () => {
+  const [userAgeRange, setUserAgeRange] = useState<{ maxAge: number, minAge: number } | null>(null);
+
+  useEffect(() => {
+    const fetchUserAgeRange = async () => {
+      try {
+        const response = await fetch(`${REACT_APP_API_URL}/api/users/ages`);
+        const data = await response.json();
+        setUserAgeRange(data); // Set the fetched data in the state
+      } catch (error) {
+        console.error('Error fetching user age range:', error);
+      }
+    };
+
+    fetchUserAgeRange();
+  }, []);
+
+  // Ensure that the data is available before trying to access maxAge and minAge
+  if (userAgeRange) {
+    const { maxAge, minAge } = userAgeRange;
+    return { maxAge, minAge };
+  }
+
+  // Return null or default values if data is not yet available
+  return { maxAge: 0, minAge: 100 };
+};
