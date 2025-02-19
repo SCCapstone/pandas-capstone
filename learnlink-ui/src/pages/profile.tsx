@@ -152,6 +152,7 @@ const Profile: React.FC = () => {
 
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
+    handleUpload();
     e.preventDefault();
 
     // Convert age to a number if provided
@@ -333,6 +334,7 @@ const Profile: React.FC = () => {
                         CLICK TO ADD PICTURE
                       </button> */}
                       <img
+                      className='upload-button'
                         src={formData?.profilePic || 'https://learnlink-public.s3.us-east-2.amazonaws.com/AvatarPlaceholder.svg'}
                         alt="Profile"
                         width="100"
@@ -351,7 +353,7 @@ const Profile: React.FC = () => {
                       onChange={handleImageChange}
                       style={{ display: "none" }}
                     />
-                    <button onClick={handleUpload}>Upload</button>
+                    {/* <button onClick={handleUpload}>Upload</button> */}
 
                   </div>
                   
@@ -420,7 +422,7 @@ const Profile: React.FC = () => {
                 </label>
 
                 <div className="profile-buttons">
-                  <button type="button" className="back-button">BACK</button>
+                  <button type="button" className="back-button">CANCEL</button>
                   <button type="submit" className="save-button">SAVE</button>
                 </div>
               </div>

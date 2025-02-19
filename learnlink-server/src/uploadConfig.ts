@@ -32,8 +32,17 @@ const resizeAndUpload = async (req: Request, res: Response, next: NextFunction) 
   try {
     // Resize image
     const resizedBuffer = await sharp(req.file.buffer)
-      .resize(200, 200, { fit: "cover" }) // Crop to 200x200
-      .jpeg({ quality: 90 }) // Convert to JPEG
+      .resize(400, 400, { fit: "cover" }) // Crop to 200x200
+
+      .composite([
+        {
+          input: Buffer.from(
+            `<svg><circle cx="200" cy="200" r="200" fill="white"/></svg>`
+          ),
+          blend: "dest-in",
+        },
+      ]) // Apply a circular mask
+      .png()
       .toBuffer();
 
     // Generate unique file name
