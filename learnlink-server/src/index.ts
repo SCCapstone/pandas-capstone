@@ -16,6 +16,7 @@ import fs from 'fs';
 import https from 'https';
 import dotenv from 'dotenv';
 import { Resend } from 'resend';
+import upload from './uploadConfig';
 
 
 interface CustomJwtPayload extends JwtPayload {
@@ -296,6 +297,7 @@ app.get('/api/users/profile', authenticate, async (req, res):Promise<any> => {
       email:user.email,
       ideal_match_factor: user.ideal_match_factor,
       studyHabitTags: user.studyHabitTags,
+      profilePic: user.profilePic,
     });
   } catch (error) {
     console.error('Error fetching user profile:', error);
@@ -1959,6 +1961,23 @@ app.post("/api/reset-password/email", async (req, res): Promise<any> => {
   });
 
   res.json({ message: "Password reset successful" });
+});
+
+app.post('/api/users/upload-pfp', authenticate, upload.single('profilePic'), async (req, res):Promise<any> => {
+  const userId = res.locals.userId;
+  if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
+
+  try {
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: { profilePic: (req.file as any).location },
+    });
+
+    res.status(200).json({ message: 'Profile picture updated', profilePic: updatedUser.profilePic });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to update profile picture' });
+  }
 });
 
 export { app }; // Export the app for testing

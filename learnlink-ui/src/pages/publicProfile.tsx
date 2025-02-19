@@ -33,7 +33,6 @@ const PublicProfile: React.FC = () => {
             }
 
           const currentProfile = user;
-            console.log(currentProfile);
     
           await fetch(`${REACT_APP_API_URL}/api/swipe`, {
             method: 'POST',
