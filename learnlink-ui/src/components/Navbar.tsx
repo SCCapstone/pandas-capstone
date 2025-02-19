@@ -79,12 +79,12 @@ const Navbar: React.FC = () => {
     const parsedColleges = collegeParam ? collegeParam.split(',').map(c => ({ label: c, value: c })) : [];
     const parsedCourses = courseParam ? courseParam.split(',').map(c => ({ label: c, value: c })) : [];
   
-    console.log("early age", ageRangeParam);
     // Only update state if the values have changed (prevents infinite loops)
     setSelectedGenders(prev => JSON.stringify(prev) !== JSON.stringify(parsedGenders) ? parsedGenders : prev);
     setSelectedColleges(prev => JSON.stringify(prev) !== JSON.stringify(parsedColleges) ? parsedColleges : prev);
     setSelectedCourses(prev => JSON.stringify(prev) !== JSON.stringify(parsedCourses) ? parsedCourses : prev);
     setAgeRange(prev => JSON.stringify(prev) !== JSON.stringify(ageRangeParam) ? ageRangeParam : prev);
+
     //handleSearchFromAdvanced(query); // Trigger search whenever the URL query parameters change
   }, [searchParams]);
 
@@ -107,7 +107,6 @@ const Navbar: React.FC = () => {
   }
   
     const token = localStorage.getItem('token');
-    console.log("age", ageRange);
 
     const queryParams = new URLSearchParams({
       query: query,

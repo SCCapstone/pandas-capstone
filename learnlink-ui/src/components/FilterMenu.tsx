@@ -37,7 +37,6 @@ const navigate = useNavigate();
   const { grade, gender, studyHabitTags } = useEnums();
   const { isLoading, colleges } = useColleges();
   const { maxAge, minAge } = useUserAgeRange();
-  console.log(maxAge,minAge);
 
   const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
 
@@ -75,6 +74,7 @@ const navigate = useNavigate();
       : prev
   );
 
+
   setAgeRange(prev => {
     // If the previous value is different from the query range and the query is a valid [number, number] tuple, update
     if (
@@ -86,11 +86,10 @@ const navigate = useNavigate();
     ) {
       return queryAgeRange as [number, number]; // Set a valid [number, number] tuple
     } else {
-      return null; // Otherwise, set to null
+      return prev; // Otherwise, set to null
     }
   });
   
-  console.log("NEW VALUE3",ageRange);
   
 
     // setSelectedGenders(parsedGender.map(gender => ({ value: gender, label: formatEnum(gender) })));
@@ -113,7 +112,6 @@ const navigate = useNavigate();
     setSelectedColleges([]);
     setSelectedCourses([]);
     setAgeRange(null);
-    console.log("NEW VALUE1",ageRange);
 
     setSelectedGenders([]);
     setSearchParams({ query });
@@ -223,10 +221,8 @@ const navigate = useNavigate();
                 // Check if the new value is a valid [number, number] tuple
                 if (Array.isArray(newValue) && newValue.length === 2 && newValue.every(age => typeof age === 'number' && !isNaN(age))) {
                   setAgeRange(newValue as [number, number]); // Set as [number, number] tuple
-                  console.log("NEW VALUE",newValue);
                 } else {
                   setAgeRange(null); // Set to null if invalid
-                  console.log("NEW VALUE",newValue);
 
                 }
               }}
