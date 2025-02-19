@@ -1309,6 +1309,28 @@ app.get('/api/users/search', authenticate, async (req, res): Promise<any> => {
   }
 });
 
+app.get('/api/users/ages', async (req, res): Promise<any> => {
+  try {
+    // Get the min and max age from all users
+    const ageStats = await prisma.user.aggregate({
+      _min: {
+        age: true, // Get the minimum age
+      },
+      _max: {
+        age: true, // Get the maximum age
+      },
+    });
+
+    return res.json({
+      minAge: ageStats._min.age,
+      maxAge: ageStats._max.age,
+    });
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 
 /*************** MESSAGING END POINTS API */
 

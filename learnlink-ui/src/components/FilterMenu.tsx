@@ -6,7 +6,7 @@ import './components.css';
 import Logo from '../components/Logo';
 import { FaSearch, FaBell, FaCog, FaUserCircle, FaTimes, FaSlidersH } from 'react-icons/fa';
 import Select from 'react-select';
-import { useEnums, formatEnum, useColleges } from '../utils/format';
+import { useEnums, formatEnum, useColleges,useUserAgeRange } from '../utils/format';
 import  makeAnimated from 'react-select/animated';
 import { set } from 'react-hook-form';
 import ReactSlider from 'react-slider'
@@ -79,7 +79,7 @@ const navigate = useNavigate();
 
   // Filter Consts
   const [selectedGenders, setSelectedGenders] = useState<{ value: string; label: string }[]>([]);
-  const [ageRange, setAgeRange] = useState<[number, number]>([0, 100]); // Default range
+  const [ageRange, setAgeRange] = useState<[number, number] | null>(null); // Default range can be null  
   const [selectedColleges, setSelectedColleges] = useState<{ label: string; value: string }[]>([]);
   const [selectedCourses, setSelectedCourses] = useState<{ label: string; value: string }[]>([]);
   const [collegeInputValue, setCollegeInputValue] = useState(""); // State to track the input value
@@ -89,6 +89,8 @@ const navigate = useNavigate();
 
   const { grade, gender, studyHabitTags } = useEnums();
   const { isLoading, colleges } = useColleges();
+  const { maxAge, minAge } = useUserAgeRange();
+  console.log(maxAge,minAge);
 
   const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
 
@@ -105,7 +107,7 @@ const navigate = useNavigate();
     const queryCourses = searchParams.get('course');
     const parsedCourses = queryCourses ? queryCourses.split(',').filter(course => course.trim() !== '') : [];
 
-    const queryAgeRange = searchParams.get('ageRange')?.split(',').map(Number) || [0, 100];
+    const queryAgeRange = searchParams.get('ageRange')?.split(',').map(Number) || '';
 
     // Only update state if values have changed
   setSelectedGenders(prev => 
@@ -149,7 +151,7 @@ const navigate = useNavigate();
   const handleClearFilters = () => {
     setSelectedColleges([]);
     setSelectedCourses([]);
-    setAgeRange([0, 100]);
+    setAgeRange(null);
     setSelectedGenders([]);
     setSearchParams({ query });
 
@@ -167,7 +169,7 @@ const navigate = useNavigate();
       gender: selectedGenders.map(item => item.label).join(','),
       college: selectedColleges.map(item => item.label).join(','),
       course: selectedCourses.map(item => item.label).join(','),
-      ageRange: ageRange.join(','),
+      ageRange: ageRange ? ageRange.join(',') : '',
     });
 
   };
@@ -237,27 +239,27 @@ const navigate = useNavigate();
           />
         </div>
         <div className="age-slider-container">
-          <label>Age Range: {ageRange[0]} - {ageRange[1]}</label>
+          <label>Age Range: {ageRange ? `${ageRange[0]} - ${ageRange[1]}` : "Not set"}</label>
 
           <div className="slider-wrapper">
             {/* Min Label */}
-            <span className="slider-label min-label">18</span>
+            <span className="slider-label min-label">{minAge}</span>
 
             {/* Slider */}
             <ReactSlider
               className="age-slider"
               thumbClassName="thumb"
               trackClassName="track"
-              min={18}
-              max={100}
-              value={ageRange}
+              min={minAge}
+              max={maxAge}
+              value={ageRange || [minAge, maxAge]}
               onChange={(newValue) => setAgeRange(newValue as [number, number])}
               pearling
               minDistance={1}
             />
 
             {/* Max Label */}
-            <span className="slider-label max-label">100</span>
+            <span className="slider-label max-label">{maxAge}</span>
           </div>
         </div>
         <div className="gender-filter">
