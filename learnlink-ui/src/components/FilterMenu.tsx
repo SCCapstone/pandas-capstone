@@ -183,6 +183,7 @@ const navigate = useNavigate();
   return (
     <div className="filter-menu">
       <div className="filters">
+        <h2>Search Filters</h2>
         <div className="college-filter">
           <label>College:</label>
           <Select

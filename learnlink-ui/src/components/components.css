@@ -235,7 +235,7 @@
   font-size: 20px;
   color: #313D44;
   display: block;
-  text-align: center;
+  text-align: left;
 }
 
 .sidenav a.active,
@@ -313,7 +313,7 @@
   width: auto;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 20px;
   position: absolute;
   /* top: 75%; */
   left: 0;
