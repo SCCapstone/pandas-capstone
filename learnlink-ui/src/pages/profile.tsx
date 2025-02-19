@@ -5,6 +5,7 @@ import './profile.css';
 import CopyrightFooter from '../components/CopyrightFooter';
 import makeAnimated from 'react-select/animated';
 import Select from 'react-select';
+import { profile } from 'console';
 
 
 const animatedComponents = makeAnimated();
@@ -29,11 +30,14 @@ const Profile: React.FC = () => {
     bio: '',
     studyHabitTags: [] as string[],
     ideal_match_factor: '',
+    profilePic: '',
   });
 
 
   // State to store enum options
   const [enumOptions, setEnumOptions] = useState({ grade: [], gender: [], studyHabitTags: [] });
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+
 
   // Fetch enum values on component mount
   useEffect(() => {
@@ -74,6 +78,7 @@ const Profile: React.FC = () => {
             bio: userData.bio || '',
             studyHabitTags: userData.studyHabitTags || [],
             ideal_match_factor: userData.ideal_match_factor || '',
+            profilePic: userData.profilePic || '',
           });
         }
         console.log('Form Data after set:', formData); // Debug log
@@ -108,6 +113,26 @@ const Profile: React.FC = () => {
       }));
     }
   };
+
+  const handleUpload = async () => {
+    if (!image) return;
+
+    const formData = new FormData();
+    formData.append('profilePic', image);
+    const token = localStorage.getItem('token');
+    if (token) {
+      const res = await fetch(`${REACT_APP_API_URL}/api/users/upload-pfp`, {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      const data = await res.json();
+      if (res.ok) setImageUrl(data.profilePic);
+    }
+  };
+
   
   // const handleSelectChange = (newValue: MultiValue<{ value: string; label: string }>, actionMeta: ActionMeta<{ value: string; label: string }>) => {
   //   // Update the formData state with the selected values
@@ -127,6 +152,7 @@ const Profile: React.FC = () => {
 
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
+    handleUpload();
     e.preventDefault();
 
     // Convert age to a number if provided
@@ -300,12 +326,23 @@ const Profile: React.FC = () => {
                         style={{ width: "200px", height: "200px", objectFit: "cover", cursor: "pointer" }}
                       />
                     ) : (
-                      <button
+                      <div>
+                      {/* <button
                         className="upload-button"
                         onClick={() => document.getElementById("image-upload")?.click()}
                       >
                         CLICK TO ADD PICTURE
-                      </button>
+                      </button> */}
+                      <img
+                      className='upload-button'
+                        src={formData?.profilePic || 'https://learnlink-public.s3.us-east-2.amazonaws.com/AvatarPlaceholder.svg'}
+                        alt="Profile"
+                        width="100"
+                        height={100}
+                        onClick={() => document.getElementById("image-upload")?.click()}
+
+                      />
+                      </div>
                     )}
 
                     {/* Hidden file input */}
@@ -316,7 +353,10 @@ const Profile: React.FC = () => {
                       onChange={handleImageChange}
                       style={{ display: "none" }}
                     />
+                    {/* <button onClick={handleUpload}>Upload</button> */}
+
                   </div>
+                  
 
 
                 </div>
@@ -382,7 +422,7 @@ const Profile: React.FC = () => {
                 </label>
 
                 <div className="profile-buttons">
-                  <button type="button" className="back-button">BACK</button>
+                  <button type="button" className="back-button">CANCEL</button>
                   <button type="submit" className="save-button">SAVE</button>
                 </div>
               </div>

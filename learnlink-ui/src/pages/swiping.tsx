@@ -24,24 +24,22 @@ const Swiping: React.FC = () => {
 
   return (
     <div className="swiping-page">
-      <header>
+      <header className="header">
         <Navbar />
       </header>
       <main className="swipe-content">
-        {/* Show a message if the user is not logged in */}
         {!userId ? (
           <p>Loading user profile...</p>
         ) : (
-          <>
-            <SwipeProfiles userId={userId} />  {/* Render the SwipeProfiles component */}
-          </>
+          <SwipeProfiles userId={userId} />
         )}
       </main>
-      <footer>
+      <footer className="footer">
         <CopyrightFooter />
       </footer>
     </div>
   );
+  
 };
 
 export default Swiping;

@@ -20,6 +20,7 @@ interface SwipeRequest {
   createdAt: string;          // Timestamp of when the request was made
   user: User;                 // User details of the requester
   targetGroup: Group;         // Group details (if applicable)
+  direction: 'Yes' | 'No';
 }
 
 // Interface for a user object
@@ -58,8 +59,11 @@ const JoinRequests: React.FC<JoinRequestProps> = ({ currentUserId, addNewChat })
   const handleRetrievingRequests = async () => {
     try {
       const requestResponse = await axios.get(`${REACT_APP_API_URL}/api/swipe/${currentUserId}`);
-      const requestData = requestResponse.data;
   
+      // Filter swipes to only include those with direction === "YES"
+      let requestData = requestResponse.data.filter((req: SwipeRequest) => req.direction === 'Yes');
+
+
       // Fetch user details for each request
       const userRequests = await Promise.all(
         requestData.map(async (req: SwipeRequest) => {
@@ -120,6 +124,12 @@ const JoinRequests: React.FC<JoinRequestProps> = ({ currentUserId, addNewChat })
         if (targetUserId) {
           addNewChat(response.data);
         }
+
+          // Call the API to sync the study group chat users
+        if (studyGroupId) {
+          await axios.post(`${REACT_APP_API_URL}/api/sync-study-group-chat`, { studyGroupId });
+        }
+
         handleDeleteRequest(requestId); // Remove request after approval
       } else {
         setError("Failed to approve request. Please try again.");

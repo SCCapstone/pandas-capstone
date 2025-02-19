@@ -16,6 +16,7 @@ import fs from 'fs';
 import https from 'https';
 import dotenv from 'dotenv';
 import { Resend } from 'resend';
+import {upload, resizeAndUpload} from './uploadConfig';
 
 
 interface CustomJwtPayload extends JwtPayload {
@@ -108,6 +109,42 @@ const authenticate = (req: Request, res: Response, next: Function) => {
     res.status(401).json({ error: 'Invalid token' });
   }
 };
+
+interface User {
+  id: number;
+  firstName: string;
+  lastName: string;
+  username: string;
+  profilePic: string | null;
+  bio: string | null;
+  grade: string | null;
+  major: string | null;
+  relevant_courses: string[]; 
+  study_method: string | null;
+  gender: string | null;
+  age: number | null;
+  college: string | null;
+  studyHabitTags: string[]; 
+  ideal_match_factor: string | null;
+  similarityScore?: number; // Used for sorting
+}
+
+
+interface StudyGroup {
+  id: number;
+  name: string;
+  subject: string | null;
+  description: string | null;
+  created_by: number;
+  created_at: Date;
+  creator: User;
+  users: User[];
+  matches: any[];
+  swipesGiven: any[];
+  chatID: number | null;
+  chat: any;
+  ideal_match_factor: string | null;
+}
 
 // Signup endpoint
 app.post("/api/users", async (req, res): Promise<any> => {
@@ -260,6 +297,7 @@ app.get('/api/users/profile', authenticate, async (req, res):Promise<any> => {
       email:user.email,
       ideal_match_factor: user.ideal_match_factor,
       studyHabitTags: user.studyHabitTags,
+      profilePic: user.profilePic,
     });
   } catch (error) {
     console.error('Error fetching user profile:', error);
@@ -304,6 +342,7 @@ app.get('/api/users/profile/:userId', authenticate, async (req, res):Promise<any
       ideal_match_factor: user.ideal_match_factor,
       studyHabitTags: user.studyHabitTags,
       profilePic: user.profilePic || placeholderImage,
+      id: user.id,
     });
 
 
@@ -457,6 +496,7 @@ app.post('/api/update-password', authenticate, async (req, res):Promise<any> => 
 app.post('/api/swipe', async (req, res) => {
   const { userId, targetId, direction, isStudyGroup, message, targetGroup, user } = req.body;
 
+  console.log('Received swipe:', req.body);
   try {
     // Store the swipe in the database
     const swipe = await prisma.swipe.create({
@@ -626,20 +666,45 @@ app.get('/api/profiles', authenticate, async (req: Request, res: Response) => {
   }
 });
 
-app.get('/api/profiles/:userId', async (req, res) => {
+app.get('/api/profiles/:userId', async (req, res): Promise<any> => {
   const userId = parseInt(req.params.userId);
+  type UserWithScore = User & { similarityScore: number; type: 'user' };
+  type StudyGroupWithScore = StudyGroup & { similarityScore: number; type: 'studyGroup' };
 
   try {
 
     const placeholderImage = "https://learnlink-public.s3.us-east-2.amazonaws.com/AvatarPlaceholder.svg";
 
+     // Fetch the current user's data to use for matching
+     const currentUser = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        ideal_match_factor: true,
+        major: true,
+        relevant_courses: true,
+        study_method: true,
+        studyHabitTags: true,
+        grade: true,
+        age: true,
+        college: true,
+      },
+    });
+
+    if (!currentUser) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
     // Fetch users and study groups that the current user has not swiped on yet
-    const usersToSwipeOn = await prisma.user.findMany({
+    let usersToSwipeOn = await prisma.user.findMany({
       where: {
-        NOT: {
-          id: userId,  // Exclude the current user from the profiles
-        },
-        // You can add additional filters here like matching preferences, etc.
+        NOT: [
+          {
+            id: userId,  // Exclude the current user from the profiles
+          },
+          {
+            swipesReceived: { some: { userId: userId } },  // Exclude users where the current user has already swiped
+          },
+        ],
       },
       select: {
         id: true,
@@ -656,23 +721,34 @@ app.get('/api/profiles/:userId', async (req, res) => {
         age: true,
         college: true,
         studyHabitTags: true,
+        ideal_match_factor: true,
+        swipesReceived: true,
       },
     });
 
-    const usersWithPlaceholder = usersToSwipeOn.map(user => ({
-      ...user,
-      profilePic: user.profilePic || placeholderImage,
-    }));
+    // const usersWithPlaceholder = usersToSwipeOn.map(user => ({
+    //   ...user,
+    //   profilePic: user.profilePic || placeholderImage,
+    // }));
 
-    const studyGroupsToSwipeOn = await prisma.studyGroup.findMany({
+    let studyGroupsToSwipeOn = await prisma.studyGroup.findMany({
       where: {
-        NOT: {
-          users: {
-            some: {
-              id: userId, // Exclude study groups where the user is already a member
+        NOT: [
+          {
+            users: {
+              some: {
+                id: userId, // Exclude study groups where the user is already a member
+              },
             },
           },
-        },
+          {
+            swipesGiven: {
+              some: {
+                userId: userId, // Exclude study groups where the user has already swiped
+              },
+            },
+          },
+        ],
       },
       select: {
         id: true,
@@ -687,12 +763,71 @@ app.get('/api/profiles/:userId', async (req, res) => {
         swipesGiven: true,
         chatID: true,
         chat: true,
+        ideal_match_factor: true,
+
       },
     });
 
+    // Calculate similarity score
+    const calculateSimilarityUser = (user: User, forStudyGroup: boolean) => {
+      let score = 0;
+      if (!forStudyGroup) {
+      if (user.ideal_match_factor === currentUser.ideal_match_factor) score += 15;
+      }
+      if (user.major === currentUser.major) score += 2;
+      if (user.study_method === currentUser.study_method) score += 3;
+      if (user.relevant_courses.some((course: string) => currentUser.relevant_courses.includes(course))) score += 5;
+      if (user.studyHabitTags.some((tag: string) => currentUser.studyHabitTags.includes(tag as StudyTags))) score += 2;
+      if (user.grade === currentUser.grade) score += 2;
+      // if user age is within 2 years of current user age, add 2 points
+      if(user.age && currentUser.age) {if (Math.abs(user.age - currentUser.age) <= 2) score += 2};
+
+      return score;
+    };
+
+    // Calculate similarity score for study groups (average similarity of members)
+    const calculateSimilarityStudyGroup = (studyGroup: StudyGroup): number => {
+      if (!studyGroup.users || studyGroup.users.length === 0) return 0; // Avoid division by 0
+
+      // Sum the similarity scores of all users in the study group
+      let totalScore = 0;
+      for (let user of studyGroup.users) {
+        totalScore += calculateSimilarityUser(user, true); // Calculate the similarity score for each user
+      }
+      totalScore / studyGroup.users.length;
+
+      if (studyGroup.ideal_match_factor === currentUser.ideal_match_factor) totalScore += 15
+
+      // Divide by the number of users to get the average similarity score
+      return totalScore;
+    };
+
+    const usersWithScore: UserWithScore[] = usersToSwipeOn
+      .map(user => ({
+        ...user,
+        profilePic: user.profilePic || placeholderImage,
+        similarityScore: calculateSimilarityUser(user, false),
+        type: 'user' as 'user',
+      }))
+      .sort((a, b) => b.similarityScore - a.similarityScore); // Sort by highest similarity
+
+      const studyGroupsWithScore: StudyGroupWithScore[] = studyGroupsToSwipeOn
+      .map(studyGroup => ({
+        ...studyGroup,
+        similarityScore: calculateSimilarityStudyGroup(studyGroup),
+        type: 'studyGroup' as 'studyGroup',
+      }))
+      .sort((a, b) => b.similarityScore - a.similarityScore); // Sort by highest similarity
+
+
+      const combinedProfiles = [
+        ...studyGroupsWithScore,
+        ...usersWithScore,
+      ].sort((a, b) => b.similarityScore - a.similarityScore); // Sort by similarity score
+  
+      //console.log('Combined profiles:', combinedProfiles);
     res.status(200).json({
-      users: usersWithPlaceholder,
-      studyGroups: studyGroupsToSwipeOn,
+      profiles: combinedProfiles, // Sorted profiles with similarityScore and type
     });
   } catch (error) {
     console.error(error);
@@ -920,11 +1055,11 @@ app.get("/api/study-groups/:studyGroupId/chat", async (req, res): Promise<any> =
 });
 
 
-//adds user to the study group from request panel
+// Adds user to the study group and its corresponding chat
 app.post('/api/add-to-study-group', async (req, res): Promise<any> => {
-  const userId = res.locals.userId;  // User making the request (authenticated user)
+  const userId = res.locals.userId; // User making the request (authenticated user)
   const { studyGroupId, requestUserId } = req.body; // Payload
-  
+
   console.log('Received request to add user to study group:', req.body);
 
   try {
@@ -935,7 +1070,7 @@ app.post('/api/add-to-study-group', async (req, res): Promise<any> => {
     // Find the study group to which the user will be added
     const studyGroup = await prisma.studyGroup.findUnique({
       where: { id: studyGroupId },
-      include: { users: true }, // Include the users in the study group
+      include: { users: true, chat: true }, // Include the users and chat in the study group
     });
 
     if (!studyGroup) {
@@ -959,13 +1094,83 @@ app.post('/api/add-to-study-group', async (req, res): Promise<any> => {
       },
     });
 
-    return res.status(200).json({ message: 'User added to study group successfully' });
+    // Ensure the user is also added to the chat
+    if (studyGroup.chat) {
+      // If the chat exists, add the user to it
+      await prisma.chat.update({
+        where: { id: studyGroup.chat.id },
+        data: {
+          users: {
+            connect: { id: requestUserId },
+          },
+        },
+      });
+    } else {
+      // If no chat exists, create a new one and add the user
+      const newChat = await prisma.chat.create({
+        data: {
+          name: `Study Group ${studyGroupId}`,
+          users: { connect: [{ id: requestUserId }] },
+        },
+      });
+
+      // Link the chat to the study group
+      await prisma.studyGroup.update({
+        where: { id: studyGroupId },
+        data: { chat: { connect: { id: newChat.id } } },
+      });
+    }
+
+    return res.status(200).json({ message: 'User added to study group and chat successfully' });
   } catch (error) {
-    console.error('Error adding user to study group:', error);
+    console.error('Error adding user to study group and chat:', error);
     return res.status(500).json({ error: 'Internal server error' });
   }
 });
 
+
+// Sync chat members with study group members
+app.post('/api/sync-study-group-chat', async (req, res): Promise<any> => {
+  const { studyGroupId } = req.body; // Get study group ID from request
+
+  try {
+    if (!studyGroupId) {
+      return res.status(400).json({ error: 'Study group ID is required' });
+    }
+
+    // Fetch study group with users and chat info
+    const studyGroup = await prisma.studyGroup.findUnique({
+      where: { id: studyGroupId },
+      include: { users: true, chat: true },
+    });
+
+    if (!studyGroup) {
+      return res.status(404).json({ error: 'Study group not found' });
+    }
+
+    if (!studyGroup.chat) {
+      return res.status(404).json({ error: 'Chat for study group not found' });
+    }
+
+    // Get list of all user IDs in the study group
+    const studyGroupUserIds = studyGroup.users.map(user => ({ id: user.id }));
+
+    // Ensure chat contains the same users as the study group
+    await prisma.chat.update({
+      where: { id: studyGroup.chat.id },
+      data: {
+        users: {
+          set: studyGroupUserIds, // Ensures only study group members are in the chat
+        },
+      },
+    });
+
+    return res.status(200).json({ message: 'Chat users synced with study group successfully' });
+  } catch (error) {
+    console.error('Error syncing chat with study group:', error);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+});
 
 
 
@@ -1589,6 +1794,7 @@ app.get('/socket-io', (req, res) => {
   res.send('Socket.IO server is running');
 });
 
+/*
 // Real-time WebSocket chat functionality
 io.on("connection", (socket) => {
   console.log("User connected");
@@ -1636,6 +1842,72 @@ io.on("connection", (socket) => {
     }
   });
   
+  socket.on('disconnect', () => {
+    console.log('A user disconnected:', socket.id);
+  });
+});
+*/
+
+// Real-time WebSocket chat functionality
+io.on("connection", (socket) => {
+  console.log("User connected");
+
+  socket.on('message', async (data, callback) => {
+    try {
+      // Validate the incoming data
+      if (!data.content || !data.chatId || !data.userId) {
+        throw new Error('Missing required fields: content, chatId, or userId');
+      }
+
+      // Create a new message in the database using Prisma
+      const newMessage = await prisma.message.create({
+        data: {
+          content: data.content,
+          createdAt: new Date(),
+          user: { connect: { id: data.userId } },
+          chat: { connect: { id: data.chatId } },
+        },
+        include: { user: true, chat: { include: { users: true } } }, // Include chat members
+      });
+
+      // Get all user IDs in the chat
+      const chatUsers = newMessage.chat.users.map(user => user.id);
+
+      // Broadcast message only to users in this chat
+      chatUsers.forEach(userId => {
+        io.to(`user_${userId}`).emit('newMessage', newMessage);
+      });
+
+      console.log('Broadcasting message to chat users:', chatUsers);
+
+      // Send success callback to the sender
+      callback({ success: true, message: 'Message sent from server successfully!' });
+    } catch (error) {
+      console.error('Error handling message:', error);
+      callback({ success: false, error: error });
+    }
+  });
+
+  socket.on("joinChat", async ({ chatId, userId }) => {
+    try {
+      socket.join(`chat_${chatId}`);
+      console.log(`User ${userId} joined chat ${chatId}`);
+  
+      // Fetch updated chat users
+      const chat = await prisma.chat.findUnique({
+        where: { id: chatId },
+        include: { users: true },
+      });
+  
+      if (chat) {
+        io.to(`chat_${chatId}`).emit("chatUpdated", chat.users);
+      }
+    } catch (error) {
+      console.error("Error joining chat:", error);
+    }
+  });
+  
+
   socket.on('disconnect', () => {
     console.log('A user disconnected:', socket.id);
   });
@@ -1827,6 +2099,23 @@ app.post("/api/reset-password/email", async (req, res): Promise<any> => {
 
   res.json({ message: "Password reset successful" });
 });
+
+app.post('/api/users/upload-pfp', authenticate, upload as express.RequestHandler, resizeAndUpload as express.RequestHandler, async (req, res):Promise<any> => {
+  const userId = res.locals.userId; // Authenticated user ID
+
+  try {
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: { profilePic: req.body.profilePicUrl }, // Save S3 URL
+    });
+
+    res.status(200).json({ message: "Profile picture updated", profilePic: updatedUser.profilePic });
+  } catch (error) {
+    console.error("Database update error:", error);
+    res.status(500).json({ error: "Failed to update profile picture" });
+  }
+});
+
 
 export { app }; // Export the app for testing
 
