@@ -120,6 +120,12 @@ const JoinRequests: React.FC<JoinRequestProps> = ({ currentUserId, addNewChat })
         if (targetUserId) {
           addNewChat(response.data);
         }
+
+          // Call the API to sync the study group chat users
+        if (studyGroupId) {
+          await axios.post(`${REACT_APP_API_URL}/api/sync-study-group-chat`, { studyGroupId });
+        }
+        
         handleDeleteRequest(requestId); // Remove request after approval
       } else {
         setError("Failed to approve request. Please try again.");

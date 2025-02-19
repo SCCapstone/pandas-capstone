@@ -1037,11 +1037,11 @@ app.get("/api/study-groups/:studyGroupId/chat", async (req, res): Promise<any> =
 });
 
 
-//adds user to the study group from request panel
+// Adds user to the study group and its corresponding chat
 app.post('/api/add-to-study-group', async (req, res): Promise<any> => {
-  const userId = res.locals.userId;  // User making the request (authenticated user)
+  const userId = res.locals.userId; // User making the request (authenticated user)
   const { studyGroupId, requestUserId } = req.body; // Payload
-  
+
   console.log('Received request to add user to study group:', req.body);
 
   try {
@@ -1052,7 +1052,7 @@ app.post('/api/add-to-study-group', async (req, res): Promise<any> => {
     // Find the study group to which the user will be added
     const studyGroup = await prisma.studyGroup.findUnique({
       where: { id: studyGroupId },
-      include: { users: true }, // Include the users in the study group
+      include: { users: true, chat: true }, // Include the users and chat in the study group
     });
 
     if (!studyGroup) {
@@ -1076,13 +1076,83 @@ app.post('/api/add-to-study-group', async (req, res): Promise<any> => {
       },
     });
 
-    return res.status(200).json({ message: 'User added to study group successfully' });
+    // Ensure the user is also added to the chat
+    if (studyGroup.chat) {
+      // If the chat exists, add the user to it
+      await prisma.chat.update({
+        where: { id: studyGroup.chat.id },
+        data: {
+          users: {
+            connect: { id: requestUserId },
+          },
+        },
+      });
+    } else {
+      // If no chat exists, create a new one and add the user
+      const newChat = await prisma.chat.create({
+        data: {
+          name: `Study Group ${studyGroupId}`,
+          users: { connect: [{ id: requestUserId }] },
+        },
+      });
+
+      // Link the chat to the study group
+      await prisma.studyGroup.update({
+        where: { id: studyGroupId },
+        data: { chat: { connect: { id: newChat.id } } },
+      });
+    }
+
+    return res.status(200).json({ message: 'User added to study group and chat successfully' });
   } catch (error) {
-    console.error('Error adding user to study group:', error);
+    console.error('Error adding user to study group and chat:', error);
     return res.status(500).json({ error: 'Internal server error' });
   }
 });
 
+
+// Sync chat members with study group members
+app.post('/api/sync-study-group-chat', async (req, res): Promise<any> => {
+  const { studyGroupId } = req.body; // Get study group ID from request
+
+  try {
+    if (!studyGroupId) {
+      return res.status(400).json({ error: 'Study group ID is required' });
+    }
+
+    // Fetch study group with users and chat info
+    const studyGroup = await prisma.studyGroup.findUnique({
+      where: { id: studyGroupId },
+      include: { users: true, chat: true },
+    });
+
+    if (!studyGroup) {
+      return res.status(404).json({ error: 'Study group not found' });
+    }
+
+    if (!studyGroup.chat) {
+      return res.status(404).json({ error: 'Chat for study group not found' });
+    }
+
+    // Get list of all user IDs in the study group
+    const studyGroupUserIds = studyGroup.users.map(user => ({ id: user.id }));
+
+    // Ensure chat contains the same users as the study group
+    await prisma.chat.update({
+      where: { id: studyGroup.chat.id },
+      data: {
+        users: {
+          set: studyGroupUserIds, // Ensures only study group members are in the chat
+        },
+      },
+    });
+
+    return res.status(200).json({ message: 'Chat users synced with study group successfully' });
+  } catch (error) {
+    console.error('Error syncing chat with study group:', error);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+});
 
 
 
@@ -1706,6 +1776,7 @@ app.get('/socket-io', (req, res) => {
   res.send('Socket.IO server is running');
 });
 
+/*
 // Real-time WebSocket chat functionality
 io.on("connection", (socket) => {
   console.log("User connected");
@@ -1753,6 +1824,72 @@ io.on("connection", (socket) => {
     }
   });
   
+  socket.on('disconnect', () => {
+    console.log('A user disconnected:', socket.id);
+  });
+});
+*/
+
+// Real-time WebSocket chat functionality
+io.on("connection", (socket) => {
+  console.log("User connected");
+
+  socket.on('message', async (data, callback) => {
+    try {
+      // Validate the incoming data
+      if (!data.content || !data.chatId || !data.userId) {
+        throw new Error('Missing required fields: content, chatId, or userId');
+      }
+
+      // Create a new message in the database using Prisma
+      const newMessage = await prisma.message.create({
+        data: {
+          content: data.content,
+          createdAt: new Date(),
+          user: { connect: { id: data.userId } },
+          chat: { connect: { id: data.chatId } },
+        },
+        include: { user: true, chat: { include: { users: true } } }, // Include chat members
+      });
+
+      // Get all user IDs in the chat
+      const chatUsers = newMessage.chat.users.map(user => user.id);
+
+      // Broadcast message only to users in this chat
+      chatUsers.forEach(userId => {
+        io.to(`user_${userId}`).emit('newMessage', newMessage);
+      });
+
+      console.log('Broadcasting message to chat users:', chatUsers);
+
+      // Send success callback to the sender
+      callback({ success: true, message: 'Message sent from server successfully!' });
+    } catch (error) {
+      console.error('Error handling message:', error);
+      callback({ success: false, error: error });
+    }
+  });
+
+  socket.on("joinChat", async ({ chatId, userId }) => {
+    try {
+      socket.join(`chat_${chatId}`);
+      console.log(`User ${userId} joined chat ${chatId}`);
+  
+      // Fetch updated chat users
+      const chat = await prisma.chat.findUnique({
+        where: { id: chatId },
+        include: { users: true },
+      });
+  
+      if (chat) {
+        io.to(`chat_${chatId}`).emit("chatUpdated", chat.users);
+      }
+    } catch (error) {
+      console.error("Error joining chat:", error);
+    }
+  });
+  
+
   socket.on('disconnect', () => {
     console.log('A user disconnected:', socket.id);
   });

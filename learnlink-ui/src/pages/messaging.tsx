@@ -76,8 +76,83 @@ const Messaging: React.FC = () => {
   // for displaying names above messages sent
   const [usernames, setUsernames] = useState<{ [key: number]: string }>({});
 
+
+  useEffect(() => {
+    const syncStudyGroupChats = async () => {
+      const token = localStorage.getItem('token');
+      console.log(token);
+  
+      try {
+        // Fetch the user's study groups or chats (assumed from user context or current user API)
+        const response = await axios.get(`${REACT_APP_API_URL}/api/chats`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+  
+        // Loop through each chat and sync study group chats first
+        for (const chat of response.data) {
+          if (chat.studyGroupId) {  // Ensure it's a study group chat
+            await axios.post(`${REACT_APP_API_URL}/api/sync-study-group-chat`, {
+              studyGroupId: chat.studyGroupId,
+            });
+          }
+        }
+  
+        handleMessagesSwitch();
+        
+        // Proceed with fetching users and chats after sync
+        axios.get(`${REACT_APP_API_URL}/api/users`)
+          .then((userResponse) => setUsers(userResponse.data))
+          .catch((error) => console.error('Error fetching users:', error));
+  
+        // Proceed with fetching chats after sync
+        axios.get(`${REACT_APP_API_URL}/api/chats`, {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+          .then((chatResponse) => {
+            const chatsWithMessages = chatResponse.data.map((chat: Chat) => ({
+              ...chat,
+              messages: chat.messages || [], // Ensure messages is always an array
+              users: chat.users || [], // Ensure users is always an array
+            }));
+  
+            setChats(chatsWithMessages);
+  
+            // Ensure storing liked messages correctly
+            const likedMessagesMap = chatResponse.data.reduce((acc: Record<number, boolean>, chat: Chat) => {
+              chat.messages?.forEach((msg: Message) => {
+                acc[msg.id] = msg.liked ?? false; // Default to false if missing
+              });
+              return acc;
+            }, {});
+  
+            setHeartedMessages(likedMessagesMap); // Store liked states
+          })
+          .catch((error) => console.error('Error fetching chats:', error));
+  
+        // Fetch current user if token exists
+        if (token) {
+          axios.get(`${REACT_APP_API_URL}/api/currentUser`, {
+            headers: { Authorization: `Bearer ${token}` },
+          })
+            .then((response) => setCurrentUserId(response.data.id))
+            .catch((error) => console.error('Error fetching current user:', error));
+        }
+      } catch (error) {
+        console.error('Error syncing study group chats:', error);
+      }
+    };
+  
+    // Call the sync function first
+    syncStudyGroupChats();
+  
+  }, [isPanelVisible]);  // Trigger when panel visibility changes
+  
+
+/*
   // Main use effect for mounting, gets users and chats and populates the UI
   useEffect(() => {
+
+    
 
     handleMessagesSwitch();
     // Fetch users and chats from the API when the component mounts
@@ -93,28 +168,34 @@ const Messaging: React.FC = () => {
     axios.get(`${REACT_APP_API_URL}/api/chats`, {
       headers: { Authorization: `Bearer ${token}` },
     })
-      .then((response) => {
-        const chatsWithMessages = response.data.map((chat: Chat) => ({
-          ...chat,
-          messages: chat.messages || [], // Ensure messages is always an array
-          users: chat.users || [] // Ensure users is always an array
-        }));
+    .then(async (response) => {
+      const chatsWithMessages = response.data.map((chat: Chat) => ({
+        ...chat,
+        messages: chat.messages || [], // Ensure messages is always an array
+        users: chat.users || [], // Ensure users is always an array
+      }));
 
+      setChats(chatsWithMessages);
 
-        setChats(chatsWithMessages);
+      // Ensure storing liked messages correctly
+      const likedMessagesMap = response.data.reduce((acc: Record<number, boolean>, chat: Chat) => {
+        chat.messages?.forEach((msg: Message) => {
+          acc[msg.id] = msg.liked ?? false; // Default to false if missing
+        });
+        return acc;
+      }, {});
 
+      setHeartedMessages(likedMessagesMap); // Store liked states
 
-        // Ensure storing liked messages correctly
-        const likedMessagesMap = response.data.reduce((acc: Record<number, boolean>, chat: Chat) => {
-          chat.messages?.forEach((msg: Message) => {
-            acc[msg.id] = msg.liked ?? false; // Default to false if missing
+      for (const chat of response.data) {
+        if (chat.studyGroupId) { // Ensure it's a study group chat
+          await axios.post(`${REACT_APP_API_URL}/api/sync-study-group-chat`, {
+            studyGroupId: chat.studyGroupId,
           });
-          return acc;
-        }, {});
-
-        setHeartedMessages(likedMessagesMap); // Store liked states
-      })
-      .catch((error) => console.error('Error fetching chats:', error));
+        }
+      }
+    })
+    .catch((error) => console.error('Error fetching chats:', error));
     
 
     if (token) {
@@ -126,6 +207,28 @@ const Messaging: React.FC = () => {
     }
     
   }, [isPanelVisible]);
+  */
+
+  useEffect(() => {
+    if (selectedChat) {
+      socket.emit('joinChat', selectedChat.id, currentUserId);
+    }
+  }, [selectedChat, currentUserId]);
+
+  useEffect(() => {
+    socket.on("chatUpdated", (updatedUsers) => {
+      setChats((prevChats) =>
+        prevChats.map((chat) =>
+          chat.id === selectedChat?.id ? { ...chat, users: updatedUsers } : chat
+        )
+      );
+    });
+  
+    return () => {
+      socket.off("chatUpdated");
+    };
+  }, [selectedChat]);
+  
 
   // Used for editing study groups
   useEffect(() => {
@@ -163,20 +266,16 @@ const Messaging: React.FC = () => {
     });
     
     socket.on('newMessage', (message) => {
-      console.log('New message received!!!:', message);
-      
-      // updates chats with recieved messages
+      console.log('New message received:', message);
+    
       setChats((prevChats) => {
-        const updatedChats = prevChats.map((chat) =>
+        return prevChats.map((chat) =>
           chat.id === message.chatId
-            ? { ...chat, messages: [...(chat.messages || []), message] }
+            ? { ...chat, messages: [...chat.messages, message] }
             : chat
         );
-        //console.log('Updated Chats:', updatedChats);
-        return updatedChats;
       });
-     
-      // Automatically scroll if the message belongs to the selected chat
+    
       if (selectedChat?.id === message.chatId && chatWindowRef.current) {
         setTimeout(() => {
           chatWindowRef.current?.scrollTo({
@@ -185,7 +284,6 @@ const Messaging: React.FC = () => {
           });
         }, 100);
       }
-        
     });
     
     return () => {
@@ -247,13 +345,17 @@ const Messaging: React.FC = () => {
         // sends the message via a websocket to the other user
         socket.emit(
           'message',
-          { chatId: selectedChat.id, content: currentMessage, userId: currentUserId, token },
+          {
+            chatId: selectedChat.id,
+            content: currentMessage,
+            userId: currentUserId,
+            token,
+          },
           (response: { success: boolean; message?: string; error?: string }) => {
-            //console.log('Received response:', response);
             if (response.success) {
-              console.log('Message sent from client successfully:', response.message);
+              console.log('Message sent successfully:', response.message);
             } else {
-              console.log('Message send from client failed:', response.error);
+              console.log('Message send failed:', response.error);
             }
           }
         );
@@ -274,6 +376,7 @@ const Messaging: React.FC = () => {
       }
     }
   };
+    
   
 
   // Used to access the study group name or chat name for displaying properly on the UI
