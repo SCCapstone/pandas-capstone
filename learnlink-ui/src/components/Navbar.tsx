@@ -69,13 +69,17 @@ const Navbar: React.FC = () => {
     const genderParam = searchParams.get('gender') || '';
     const collegeParam = searchParams.get('college') || '';
     const courseParam = searchParams.get('course') || '';
-    const ageRangeParam = (searchParams.get('ageRange')?.split(',').map(Number) as [number, number]) || '';
+    let ageRangeParam: [number, number] | null = (searchParams.get('ageRange')?.split(',').map(Number) as [number, number]) || '';
   
+    if (!(ageRangeParam.length === 2 && ageRangeParam.every(age => !isNaN(age)))) {
+      ageRangeParam = null;
+    }
     // Convert params into expected format
     const parsedGenders = genderParam ? genderParam.split(',').map(g => ({ value: g, label: formatEnum(g) })) : [];
     const parsedColleges = collegeParam ? collegeParam.split(',').map(c => ({ label: c, value: c })) : [];
     const parsedCourses = courseParam ? courseParam.split(',').map(c => ({ label: c, value: c })) : [];
   
+    console.log("early age", ageRangeParam);
     // Only update state if the values have changed (prevents infinite loops)
     setSelectedGenders(prev => JSON.stringify(prev) !== JSON.stringify(parsedGenders) ? parsedGenders : prev);
     setSelectedColleges(prev => JSON.stringify(prev) !== JSON.stringify(parsedColleges) ? parsedColleges : prev);
@@ -93,13 +97,17 @@ const Navbar: React.FC = () => {
     // const query = e.target.value;
     // setSearchQuery(query);
   
+    if (location !== "/advancedsearch") {
+
     if (query.trim() === '') {
       setSearchResults([]);
       setIsDropdownVisible(false);
       return;
     }
+  }
   
     const token = localStorage.getItem('token');
+    console.log("age", ageRange);
 
     const queryParams = new URLSearchParams({
       query: query,

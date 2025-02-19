@@ -42,7 +42,7 @@ const AdvancedSearch: React.FC = () => {
                 // const course = queryParams.get("course") || "";
                 const searchQuery = queryParams.get("query") || "";
                 setUserQuery(searchQuery);
-                if (!searchQuery) return;
+                // if (!searchQuery) return;
 
 
 

@@ -1234,13 +1234,14 @@ app.get('/api/study-groups/:groupId', async (req, res): Promise<any> => {
 app.get('/api/users/search', authenticate, async (req, res): Promise<any> => {
   const { query, gender, college, ageRange, course } = req.query;
   console.log('Received search query:', req.query);
-  if (!query) {
-    return res.status(400).json({ error: 'Query parameter is required' });
-  }
+  // if (!query) {
+  //   return res.status(400).json({ error: 'Query parameter is required' });
+  // }
 
   try {
     const filters: any = []; // Create an array to store valid filters
 
+    if (query) {
     // Add search filters for username, firstName, and lastName
     filters.push({
       OR: [
@@ -1249,6 +1250,7 @@ app.get('/api/users/search', authenticate, async (req, res): Promise<any> => {
         { lastName: { contains: query as string, mode: 'insensitive' } },
       ],
     });
+  }
 
     // Add gender filter if provided
     if (typeof gender === 'string' && gender.length > 0) {
@@ -1284,10 +1286,10 @@ app.get('/api/users/search', authenticate, async (req, res): Promise<any> => {
 
     console.log('Filters:', JSON.stringify(filters, null, 2));
 
-    // If no valid filters, return a 400 error
-    if (filters.length === 0) {
-      return res.status(400).json({ error: 'At least one filter must be provided' });
-    }
+    // // If no valid filters, return a 400 error
+    // if (filters.length === 0) {
+    //   return res.status(400).json({ error: 'At least one filter must be provided' });
+    // }
 
     const users = await prisma.user.findMany({
       where: {

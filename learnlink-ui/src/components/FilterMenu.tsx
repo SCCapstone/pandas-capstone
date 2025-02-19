@@ -20,59 +20,6 @@ interface FilterCriteria {
 }
 
 const FilterMenu = () => {
-// const navigate = useNavigate();
-// //   const [searchQuery, setSearchQuery] = useState('');
-// //   const [searchResults, setSearchResults] = useState<User[]>([]);
-// //   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
-//   // Filter Consts
-//   const [selectedGenders, setSelectedGenders] = useState<{ value: string; label: string }[]>([]);
-//   const [ageRange, setAgeRange] = useState<[number, number]>([0, 100]); // Default range
-//   const [selectedColleges, setSelectedColleges] = useState<{ label: string; value: string }[]>([]);
-//   const [selectedCourses, setSelectedCourses] = useState<{ label: string; value: string }[]>([]);
-//   const [collegeInputValue, setCollegeInputValue] = useState(""); // State to track the input value
-//   const [courseInputValue, setCourseInputValue] = useState(""); // State to track the input value
-//   const [filterCriteria, setFilterCriteria] = useState({ selectedColleges, selectedCourses, selectedGenders, ageRange });   // State to track the filter criteria
-//   const [searchParams, setSearchParams] = useSearchParams();
-
-
-//   const { grade, gender, studyHabitTags } = useEnums();
-//   const {isLoading, colleges} = useColleges();
-
-  
-//   const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
-
-
-//   // Handler to update selected options
-//   const handleCollegeChange = (selected: any) => {
-//     setSelectedColleges(selected);
-//   };
-
-//   const handleCourseChange = (selected: any) => {
-//     setSelectedCourses(selected);
-//   };
-
-//   const handleClearFilters = () => {
-//     setSelectedColleges([]);
-//     setSelectedCourses([]);
-//     setAgeRange([0,100]);
-//     setSelectedGenders([]);
-//     setFilterCriteria({ selectedColleges: [], selectedCourses: [], selectedGenders: [], ageRange: [0, 100] });
-//   };
-
-
-//     const handleSetFilterCriteria = () => {
-//         setFilterCriteria({ selectedColleges, selectedCourses, selectedGenders, ageRange });
-//       };
-
-
-// const handleApplyFilters = () => {
-    
-
-//     Object.entries(filterCriteria).forEach(([key, value]) => {
-//         searchParams.set(key, JSON.stringify(value));
-//     });
-//     setSearchParams(searchParams);
-// };
 
 const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -128,9 +75,23 @@ const navigate = useNavigate();
       : prev
   );
 
-  setAgeRange(prev => 
-    JSON.stringify(prev) !== JSON.stringify(queryAgeRange) ? queryAgeRange as [number, number] : prev
-  );
+  setAgeRange(prev => {
+    // If the previous value is different from the query range and the query is a valid [number, number] tuple, update
+    if (
+      JSON.stringify(prev) !== JSON.stringify(queryAgeRange) &&
+      queryAgeRange &&
+      Array.isArray(queryAgeRange) &&
+      queryAgeRange.length === 2 &&
+      queryAgeRange.every(age => typeof age === 'number' && !isNaN(age))
+    ) {
+      return queryAgeRange as [number, number]; // Set a valid [number, number] tuple
+    } else {
+      return null; // Otherwise, set to null
+    }
+  });
+  
+  console.log("NEW VALUE3",ageRange);
+  
 
     // setSelectedGenders(parsedGender.map(gender => ({ value: gender, label: formatEnum(gender) })));
     // setSelectedColleges(parsedColleges.map(college => ({ label: college, value: college })));
@@ -152,6 +113,8 @@ const navigate = useNavigate();
     setSelectedColleges([]);
     setSelectedCourses([]);
     setAgeRange(null);
+    console.log("NEW VALUE1",ageRange);
+
     setSelectedGenders([]);
     setSearchParams({ query });
 
@@ -241,6 +204,7 @@ const navigate = useNavigate();
         </div>
         <div className="age-slider-container">
           <label>Age Range: {ageRange ? `${ageRange[0]} - ${ageRange[1]}` : "Not set"}</label>
+        {/* <label>Age Range: {ageRange && ageRange.length === 2 ? `${ageRange[0]} - ${ageRange[1]}` : "Not set"}</label> */}
 
           <div className="slider-wrapper">
             {/* Min Label */}
@@ -254,7 +218,18 @@ const navigate = useNavigate();
               min={minAge}
               max={maxAge}
               value={ageRange || [minAge, maxAge]}
-              onChange={(newValue) => setAgeRange(newValue as [number, number])}
+              onChange={(newValue) => {
+                
+                // Check if the new value is a valid [number, number] tuple
+                if (Array.isArray(newValue) && newValue.length === 2 && newValue.every(age => typeof age === 'number' && !isNaN(age))) {
+                  setAgeRange(newValue as [number, number]); // Set as [number, number] tuple
+                  console.log("NEW VALUE",newValue);
+                } else {
+                  setAgeRange(null); // Set to null if invalid
+                  console.log("NEW VALUE",newValue);
+
+                }
+              }}
               pearling
               minDistance={1}
             />
