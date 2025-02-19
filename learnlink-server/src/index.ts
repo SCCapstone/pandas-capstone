@@ -1233,7 +1233,7 @@ app.get('/api/study-groups/:groupId', async (req, res): Promise<any> => {
 
 app.get('/api/users/search', authenticate, async (req, res): Promise<any> => {
   const { query, gender, college, ageRange, course } = req.query;
-
+  console.log('Received search query:', req.query);
   if (!query) {
     return res.status(400).json({ error: 'Query parameter is required' });
   }
@@ -1282,7 +1282,7 @@ app.get('/api/users/search', authenticate, async (req, res): Promise<any> => {
       });
     }
 
-    console.log('Filters:', filters);
+    console.log('Filters:', JSON.stringify(filters, null, 2));
 
     // If no valid filters, return a 400 error
     if (filters.length === 0) {
@@ -1300,6 +1300,7 @@ app.get('/api/users/search', authenticate, async (req, res): Promise<any> => {
         lastName: true,
       },
     });
+    console.log('Prisma Query:', users); // Logs the query results for debugging
 
     return res.json({ users });
   } catch (error) {
