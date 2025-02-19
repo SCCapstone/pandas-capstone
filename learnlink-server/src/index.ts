@@ -340,6 +340,7 @@ app.get('/api/users/profile/:userId', authenticate, async (req, res):Promise<any
       ideal_match_factor: user.ideal_match_factor,
       studyHabitTags: user.studyHabitTags,
       profilePic: user.profilePic || placeholderImage,
+      id: user.id,
     });
 
 
@@ -493,6 +494,7 @@ app.post('/api/update-password', authenticate, async (req, res):Promise<any> => 
 app.post('/api/swipe', async (req, res) => {
   const { userId, targetId, direction, isStudyGroup, message, targetGroup, user } = req.body;
 
+  console.log('Received swipe:', req.body);
   try {
     // Store the swipe in the database
     const swipe = await prisma.swipe.create({

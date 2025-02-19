@@ -5,17 +5,65 @@ import CopyrightFooter from '../components/CopyrightFooter';
 import './LandingPage.css';
 import './publicProfile.css';
 import { formatEnum } from '../utils/format';
+import InviteMessagePanel from '../components/InviteMessagePanel';
+import { getLoggedInUserId } from '../utils/auth';
+
+
 
 const PublicProfile: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const [user, setUser] = useState<any>(null);
     const [error, setError] = useState<string | null>(null);
+    const [showInvitePanel, setShowInvitePanel] = useState(false);
+    const loggedInUserId = getLoggedInUserId();
+    
+
     const navigate = useNavigate();
     const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
     
     const handleMessage = () => {
         navigate('/messaging');
     };
+    const handleSwipe = async (direction: 'Yes' | 'No', targetId: number, isStudyGroup: boolean, message:string | undefined) => {
+        try {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                alert('You need to be logged in to swipe.');
+                return;
+            }
+
+          const currentProfile = user;
+            console.log(currentProfile);
+    
+          await fetch(`${REACT_APP_API_URL}/api/swipe`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              userId: loggedInUserId,
+              targetId: currentProfile.id,
+              direction,
+              isStudyGroup: !!currentProfile.chatID, // Check if it's a study group
+              message: message
+            }),
+          });
+    
+          setShowInvitePanel(false);
+    
+        } catch (error) {
+          console.error('Error swiping:', error);
+        }
+      };
+
+    const handleSendMessage = async (message: string) => {
+        handleSwipe("Yes", user.id, !!user.studyGroupId, message);
+      };
+      const handleInvite = () => {
+        // navigate(`/messaging?user=${currentProfile.id}`);
+        setShowInvitePanel(true);
+        
+      };
 
     useEffect(() => {
         const fetchUser = async () => {
@@ -104,9 +152,10 @@ const PublicProfile: React.FC = () => {
 
 
                                     <div className="public-action-buttons">
-                                        <button onClick={handleMessage}>
-                                            Message
+                                        <button onClick={handleInvite}>
+                                            Match
                                         </button>
+                                        
                                     </div>
                             </>
                         ) : (
@@ -120,6 +169,11 @@ const PublicProfile: React.FC = () => {
             <footer>
                 <CopyrightFooter />
             </footer>
+            <InviteMessagePanel
+                open={showInvitePanel}
+                onClose={() => setShowInvitePanel(false)}
+                onConfirm={handleSendMessage}
+            />
         </div>
     );
 };
