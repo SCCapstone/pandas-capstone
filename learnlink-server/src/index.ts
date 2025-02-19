@@ -680,6 +680,9 @@ app.get('/api/profiles/:userId', async (req, res): Promise<any> => {
         relevant_courses: true,
         study_method: true,
         studyHabitTags: true,
+        grade: true,
+        age: true,
+        college: true,
       },
     });
 
@@ -748,27 +751,44 @@ app.get('/api/profiles/:userId', async (req, res): Promise<any> => {
     });
 
     // Calculate similarity score
-    const calculateSimilarityUser = (user: User) => {
+    const calculateSimilarityUser = (user: User, forStudyGroup: boolean) => {
       let score = 0;
+      if (!forStudyGroup) {
       if (user.ideal_match_factor === currentUser.ideal_match_factor) score += 15;
+      }
       if (user.major === currentUser.major) score += 2;
       if (user.study_method === currentUser.study_method) score += 3;
       if (user.relevant_courses.some((course: string) => currentUser.relevant_courses.includes(course))) score += 5;
       if (user.studyHabitTags.some((tag: string) => currentUser.studyHabitTags.includes(tag as StudyTags))) score += 2;
+      if (user.grade === currentUser.grade) score += 2;
+      // if user age is within 2 years of current user age, add 2 points
+      if(user.age && currentUser.age) {if (Math.abs(user.age - currentUser.age) <= 2) score += 2};
+
       return score;
     };
 
+    // Calculate similarity score for study groups (average similarity of members)
     const calculateSimilarityStudyGroup = (studyGroup: StudyGroup): number => {
-      let score = 0;
-      if (studyGroup.ideal_match_factor === currentUser.ideal_match_factor) score += 15;
-      return score;
+      if (!studyGroup.users || studyGroup.users.length === 0) return 0; // Avoid division by 0
+
+      // Sum the similarity scores of all users in the study group
+      let totalScore = 0;
+      for (let user of studyGroup.users) {
+        totalScore += calculateSimilarityUser(user, true); // Calculate the similarity score for each user
+      }
+      totalScore / studyGroup.users.length;
+
+      if (studyGroup.ideal_match_factor === currentUser.ideal_match_factor) totalScore += 15
+
+      // Divide by the number of users to get the average similarity score
+      return totalScore;
     };
 
     const usersWithScore: UserWithScore[] = usersToSwipeOn
       .map(user => ({
         ...user,
         profilePic: user.profilePic || placeholderImage,
-        similarityScore: calculateSimilarityUser(user),
+        similarityScore: calculateSimilarityUser(user, false),
         type: 'user' as 'user',
       }))
       .sort((a, b) => b.similarityScore - a.similarityScore); // Sort by highest similarity
@@ -787,12 +807,9 @@ app.get('/api/profiles/:userId', async (req, res): Promise<any> => {
         ...usersWithScore,
       ].sort((a, b) => b.similarityScore - a.similarityScore); // Sort by similarity score
   
-      console.log('Combined profiles:', combinedProfiles);
+      //console.log('Combined profiles:', combinedProfiles);
     res.status(200).json({
       profiles: combinedProfiles, // Sorted profiles with similarityScore and type
-
-      // users: usersToSwipeOn,
-      // studyGroups: studyGroupsToSwipeOn,
     });
   } catch (error) {
     console.error(error);
