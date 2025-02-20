@@ -16,7 +16,9 @@
 
 .Chat {
   display: flex;
-  max-height: calc(100vh - 50px - 86px); /* Header + Input */
+  /* max-height: calc(100vh - 50px - 86px); Header + Input */
+  flex:1;
+  overflow-y: hidden;
 }
 
 .ChatOptions {
