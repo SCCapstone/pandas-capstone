@@ -174,6 +174,8 @@
   flex-direction: column;
   justify-content: flex-start;
   gap: 1rem;
+  min-width: fit-content;
+
 }
 
 .group-right {
@@ -183,6 +185,7 @@
   justify-content: flex-start;
   gap: 1rem;
   overflow-y: scroll;
+  min-width: fit-content;
 }
 
 .group-title {
@@ -380,4 +383,10 @@
     font-size: 1.25rem;
     text-align: left;
   }
+
+  .group-info {
+    flex-direction: column;
+    align-items: center;
+  }
+
 }

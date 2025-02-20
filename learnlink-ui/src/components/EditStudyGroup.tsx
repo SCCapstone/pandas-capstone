@@ -3,9 +3,11 @@ import '../pages/messaging.css';
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { on } from 'events';
-import { useEnums, formatEnum } from '../utils/format';
+import { selectStyles, formatEnum } from '../utils/format';
 import Select from 'react-select';
 import makeAnimated from 'react-select/animated';
+import { StylesConfig, ControlProps, CSSObjectWithLabel } from 'react-select';
+
 
 
 
@@ -155,6 +157,7 @@ const EditStudyGroup = ({ chatID, onClose, updateChatName}: { chatID: number; on
             className="basic-single-select"
             classNamePrefix="select"
             isMulti={false}
+            styles={selectStyles}
           />
           </div>
         <button type="button" onClick={handleSave}>Save</button>
