@@ -213,15 +213,6 @@ const Messaging: React.FC = () => {
             : chat
         );
       });
-    
-      if (selectedChat?.id === message.chatId && chatWindowRef.current) {
-        setTimeout(() => {
-          chatWindowRef.current?.scrollTo({
-            top: chatWindowRef.current.scrollHeight,
-            behavior: 'smooth',
-          });
-        }, 100);
-      }
     });
     
     return () => {
@@ -248,7 +239,17 @@ const Messaging: React.FC = () => {
     fetchChatNames();
   }, [chats]); // Runs only when `chats` change
 
-
+  useEffect(() => {
+    if (selectedChat?.messages?.length && chatWindowRef.current) {
+      requestAnimationFrame(() => {
+        chatWindowRef.current?.scrollTo({
+          top: chatWindowRef.current.scrollHeight,
+          behavior: 'smooth',
+        });
+      });
+    }
+  }, [selectedChat?.messages]); // Runs every time messages change
+  
 
   // Switches from the Requests tab to the Chats tab
   const handleMessagesSwitch = () => {
@@ -688,7 +689,7 @@ const Messaging: React.FC = () => {
                 </div>
               )}
 
-              <div className="ChatWindow">
+              <div className="ChatWindow" ref={chatWindowRef}>
                 {selectedChat ? (
                   // If selectedChat exists
                   Array.isArray(selectedChat.messages) ? (
