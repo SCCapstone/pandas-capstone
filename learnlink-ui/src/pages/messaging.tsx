@@ -703,13 +703,14 @@ const Messaging: React.FC = () => {
                       setIsUserPanelVisible(true);
                     }}
                   >
-                    Users
+                    Fellow Members
                   </button>}
                   {/* User List Panel */}
                   {isUserPanelVisible && selectedChatUsers && (
                     <div className="users-panel">
                       <GroupUserList
                         groupId={groupId}
+                        currentId={currentUserId}
                         users={selectedChatUsers ?? []}
                         onClose={() => setIsUserPanelVisible(false)}
                         onRemoveUser={removeUser}

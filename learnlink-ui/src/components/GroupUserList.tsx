@@ -1,6 +1,6 @@
 import './GroupUserList.css';
 import '../pages/messaging.css';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState , useRef} from 'react';
 import axios from 'axios';
 import { on } from 'events';
 
@@ -20,18 +20,37 @@ interface User {
 const GroupUserList = (
   {
   groupId,
+  currentId,
   users,
   onClose,
   onRemoveUser,
   updateUsers,
 }: {
   groupId: number | null;
+  currentId: number | null;
   users: User[] | null;
   onClose: () => void;
   onRemoveUser: (userId: number, groupId: number | null) => void; // Update type here
   updateUsers: (userId: number) => void;
 }) => {
   
+  const panelRef = useRef<HTMLDivElement>(null);
+
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (panelRef.current && !panelRef.current.contains(event.target as Node)) {
+        onClose();
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [onClose]);
+
+
   const handleRemoveUser = (userId: number) => {
     if (groupId !== null) {
       onRemoveUser(userId, groupId); // Pass both userId and groupId
@@ -42,7 +61,7 @@ const GroupUserList = (
   };
 
   return (
-    <div className="user-list-panel">
+    <div ref={panelRef} className="user-list-panel">
       <h3>Group Members</h3>
       <ul>
         {users && users.length > 0 ? (
@@ -58,7 +77,21 @@ const GroupUserList = (
           <p>No users found.</p>
         )}
       </ul>
-      <button onClick={onClose}>Close</button>
+      <ul>
+        <button
+          onClick={() => {
+            if (currentId !== null) {
+              handleRemoveUser(currentId);
+            } else {
+              console.error('Current user ID is not available');
+            }
+          }}
+          className="leave-button"
+        >
+          Leave
+        </button>
+      </ul>
+      <button onClick={onClose} className="close-button">Close</button>
     </div>
   );
 };
