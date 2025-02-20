@@ -1173,6 +1173,58 @@ app.post('/api/sync-study-group-chat', async (req, res): Promise<any> => {
 });
 
 
+// Deletes a user by userId from a study group 
+app.delete('/api/study-groups/:groupId/users/:userId', async (req, res): Promise<any> => {
+  const { groupId, userId } = req.params;
+
+  try {
+    // Check if the study group exists
+    const studyGroup = await prisma.studyGroup.findUnique({
+      where: { id: parseInt(groupId, 10) },
+      include: { users: true, chat: true }, // Include users and chat to remove user and handle chat
+    });
+
+    if (!studyGroup) {
+      return res.status(404).json({ error: 'Study group not found' });
+    }
+
+    // Check if the user is in the study group
+    const userInGroup = studyGroup.users.some(user => user.id === parseInt(userId, 10));
+
+    if (!userInGroup) {
+      return res.status(404).json({ error: 'User is not in this study group' });
+    }
+
+    // Remove the user from the study group
+    await prisma.studyGroup.update({
+      where: { id: parseInt(groupId, 10) },
+      data: {
+        users: {
+          disconnect: { id: parseInt(userId, 10) }, // Disconnect user from the study group
+        },
+      },
+    });
+
+    // Remove the user from the chat (if the chat exists)
+    if (studyGroup.chat) {
+      await prisma.chat.update({
+        where: { id: studyGroup.chat.id },
+        data: {
+          users: {
+            disconnect: { id: parseInt(userId, 10) }, // Disconnect user from the chat
+          },
+        },
+      });
+    }
+
+    return res.status(200).json({ message: 'User removed successfully from study group and chat' });
+  } catch (error) {
+    console.error('Error deleting user from study group:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
 
 //for the request panel 
 

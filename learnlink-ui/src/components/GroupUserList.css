@@ -64,3 +64,15 @@
     color: red;
   }
   
+
+  .remove-button {
+    background: none;
+    border: none;
+    color: red;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  .remove-button:hover {
+    color: darkred;
+  }
+  

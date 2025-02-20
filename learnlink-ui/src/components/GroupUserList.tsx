@@ -17,25 +17,47 @@ interface User {
   firstName: string; // User's first name
   lastName: string;  // User's last name
 }
+const GroupUserList = (
+  {
+  groupId,
+  users,
+  onClose,
+  onRemoveUser,
+}: {
+  groupId: number | null;
+  users: User[] | null;
+  onClose: () => void;
+  onRemoveUser: (userId: number, groupId: number | null) => void; // Update type here
+}) => {
+  
+  const handleRemoveUser = (userId: number) => {
+    if (groupId !== null) {
+      onRemoveUser(userId, groupId); // Pass both userId and groupId
+    } else {
+      console.error('Group ID is not available');
+    }
+  };
 
-// Functional component to display a list of users in a group
-const GroupUserList = ({ users, onClose }: { users: User[] | null; onClose: () => void }) => {
   return (
-    <div className="user-list-panel"> {/* Container for the user list */}
-      <h3>Group Members</h3> {/* Title */}
+    <div className="user-list-panel">
+      <h3>Group Members</h3>
       <ul>
-        {/* Checking if users exist and rendering the list */}
         {users && users.length > 0 ? (
           users.map((user) => (
-            <li key={user.id}>{user.firstName} {user.lastName}</li> // Displaying each user's full name
+            <li key={user.id}>
+              {user.firstName} {user.lastName}
+              <button onClick={() => handleRemoveUser(user.id)} className="remove-button">
+                X
+              </button>
+            </li>
           ))
         ) : (
-          <p>No users found.</p> // Message displayed if no users are found
+          <p>No users found.</p>
         )}
       </ul>
-      <button onClick={onClose}>Close</button> {/* Button to close the user list panel */}
+      <button onClick={onClose}>Close</button>
     </div>
   );
 };
-  export default GroupUserList;
-  
+
+export default GroupUserList;

@@ -75,7 +75,7 @@ const Messaging: React.FC = () => {
   const [isUserPanelVisible, setIsUserPanelVisible] = useState(false);
   // for displaying names above messages sent
   const [usernames, setUsernames] = useState<{ [key: number]: string }>({});
-
+  const [groupId, setGroupId] = useState<number | null>(null);
 
   useEffect(() => {
     handleMessagesSwitch();
@@ -409,6 +409,7 @@ const Messaging: React.FC = () => {
       const data = response.data;
       //console.log ('data', data);
       const groupId = data.studyGroupID;
+      setGroupId(data.studyGroupID);
       //console.log( 'id', groupId);
 
       // gets the users associated with that study group thats linked to the chat
@@ -596,6 +597,25 @@ const Messaging: React.FC = () => {
     }));
   };
   
+  //deletes a user from a study group
+  const removeUser = async (userId: number, groupId: number | null)=> {
+    if (!groupId) {
+      console.error('Group ID is missing.');
+      return; // Don't proceed if groupId is null
+    }
+    try {
+      const response = await axios.delete(`${REACT_APP_API_URL}/api/study-groups/${groupId}/users/${userId}`);
+      
+      if (response.status === 200) {
+        // If successful, filter out the deleted user from the state
+        setUsers(prevUsers => prevUsers.filter(user => user.id !== userId));
+      } else {
+        console.error('Failed to delete the user.');
+      }
+    } catch (error) {
+      console.error('Error deleting user:', error);
+    }
+  };
 
   //sends the message 
   const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -672,8 +692,10 @@ const Messaging: React.FC = () => {
                   {isUserPanelVisible && selectedChatUsers && (
                     <div className="users-panel">
                       <GroupUserList
+                        groupId={groupId}
                         users={selectedChatUsers ?? []}
                         onClose={() => setIsUserPanelVisible(false)}
+                        onRemoveUser={removeUser}
                       />
                     </div>
                   )}
