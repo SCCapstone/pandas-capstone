@@ -421,7 +421,12 @@ const Messaging: React.FC = () => {
       const dat = res.data;
       //console.log('Users in study group:', dat.studyGroup.users);
       
-      setSelectedChatUsers(dat.studyGroup.users); // Store user data for the selected chat
+      //setSelectedChatUsers(dat.studyGroup.users); // Store user data for the selected chat
+      setSelectedChatUsers(
+        dat.studyGroup.users.filter((user: User) => user.id !== currentUserId)
+      );
+      
+
       setIsUserPanelVisible(true); // Open the panel to show users
     } catch (error) {
       console.error('Error fetching users:', error);
