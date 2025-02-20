@@ -1546,7 +1546,6 @@ app.delete('/api/chats/:chatId', async (req, res): Promise<any> => {
       console.log(`Study group with chatID ${chatId} deleted.`);
     }
     else{
-      // Delete the chat
       await prisma.chat.delete({
         where: { id: parseInt(chatId) },
       });
@@ -1586,7 +1585,7 @@ app.post('/api/chats/:chatId/messages', authenticate, async (req, res): Promise<
       },
     });
 
-    res.status(201).json(newMessage);
+    res.status(201).json('new message' + newMessage);
   } catch (error) {
     console.error('Error adding message:', error);
     res.status(500).json({ error: 'Internal server error' });
@@ -1911,6 +1910,13 @@ io.on("connection", (socket) => {
         include: { user: true, chat: { include: { users: true } } }, // Include chat members
       });
 
+      // After saving the message, update the chat's `updatedAt` timestamp
+      const updatedChat = await prisma.chat.update({
+        where: { id: data.chatId },
+        data: { updatedAt: new Date() },
+        include: { users: true }, // Optionally, include users if you want to broadcast updated users list
+      });
+
       // Get all user IDs in the chat
       const chatUsers = newMessage.chat.users.map(user => user.id);
 
@@ -1922,7 +1928,8 @@ io.on("connection", (socket) => {
       console.log('Broadcasting message to chat users:', chatUsers);
 
       // Send success callback to the sender
-      callback({ success: true, message: 'Message sent from server successfully!' });
+      callback({ success: true, message: 'Message sent from server successfully!' }); 
+      callback({ success: true, message: newMessage, updatedChat });
     } catch (error) {
       console.error('Error handling message:', error);
       callback({ success: false, error: error });
@@ -1931,6 +1938,11 @@ io.on("connection", (socket) => {
 
   socket.on("joinChat", async ({ chatId, userId }) => {
     try {
+      if (!chatId) {
+        console.error("Chat ID is required");
+        return; // Early exit if chatId is not provided
+      }
+  
       socket.join(`chat_${chatId}`);
       console.log(`User ${userId} joined chat ${chatId}`);
   
@@ -1942,6 +1954,8 @@ io.on("connection", (socket) => {
   
       if (chat) {
         io.to(`chat_${chatId}`).emit("chatUpdated", chat.users);
+      } else {
+        console.error("Chat not found");
       }
     } catch (error) {
       console.error("Error joining chat:", error);

@@ -209,7 +209,7 @@ const Messaging: React.FC = () => {
       setChats((prevChats) => {
         return prevChats.map((chat) =>
           chat.id === message.chatId
-            ? { ...chat, messages: [...chat.messages, message] }
+            ? { ...chat, messages: [...chat.messages, message]}
             : chat
         );
       });
@@ -301,13 +301,30 @@ const Messaging: React.FC = () => {
         setCurrentMessage('');
         
         
-  
         // Update the selectedChat to include the new message
         setSelectedChat((prevSelectedChat) =>
           prevSelectedChat
             ? { ...prevSelectedChat, messages: [...(prevSelectedChat.messages || []), messageData] }
             : null
         );
+
+        setChats((prevChats) => {
+          const updatedChats = prevChats.map((chat) =>
+            chat.id === selectedChat.id
+              ? {
+                  ...chat,
+                  messages: [...(chat.messages || []), messageData],
+                  updatedAt: new Date().toISOString(), // Convert Date to string here
+                }
+              : chat
+          );
+          // Sort chats by updatedAt (most recent first)
+          return updatedChats.sort(
+            (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+          );
+        });
+        
+
   
         setCurrentMessage('');
       } catch (error) {
