@@ -153,12 +153,12 @@ const Signup: React.FC = () => {
                 <Logo />
             </div>
             <div className="signup">
-                <div className="container">
+                <div className="signup-container">
                     <h1 className="l1">Sign Up</h1>
                     <h2 className="t2">Enter your credentials to join LearnLink.</h2>
 
                     {/* Form to collect user data */}
-                    <form onSubmit={handleSignup}>
+                    <form onSubmit={handleSignup} className='signup-form'>
                         <div className="nameFields">
                             <label>First Name</label>
                             <input

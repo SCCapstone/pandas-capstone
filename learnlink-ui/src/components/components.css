@@ -91,30 +91,42 @@
   flex-grow: 1;
   min-width: 100px;
   transition: opacity 0.3s ease;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content:flex-start;
+  flex:1;
+  border-radius: 5px;
+  box-sizing: border-box;
+  height: 40px;
 }
 
 .search-bar input {
+  display: flex;
+
   padding: 0.5rem;
   padding-left: 35px;
   padding-right: 0.5rem;
   border-radius: 5px;
   border: 1px solid #ddd;
-  width: 95%;
+  box-sizing: border-box;
+  height: 40px;
+  flex:1;
 }
 
 .search-icon {
   position: absolute;
   right: 10px;
-  top: 40%;
-  transform: translateY(-50%);
+  /* top: 40%;
+  transform: translateY(-50%); */
   color: #00668C;
 }
 
 .hamburger-icon {
   position: absolute;
-  left: 10px;
-  top: 40%;
-  transform: translateY(-50%);
+  left: 10px; 
+  /* top: 40%; */
+  /* transform: translateY(-50%); */
   color: #D9D9D9;
 }
 

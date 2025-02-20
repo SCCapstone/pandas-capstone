@@ -588,7 +588,10 @@ const Messaging: React.FC = () => {
 
   return (
     <div className="Messaging">
-      <Navbar />
+      <div>
+              <Navbar />
+
+      </div>
       <div className="Chat">
         {/* Tabs for Messages and Requests */}
         <div className="MessagesSidebar">

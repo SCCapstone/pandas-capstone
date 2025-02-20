@@ -10,6 +10,7 @@
   display: flex;
   flex-direction: column;
   height: 100vh;
+  max-width: 100%;
 }
 
 .content {
@@ -20,7 +21,7 @@
 
 .Chat {
   display: flex;
-  height: calc(100vh - 140px);
+  flex:1;
 }
 
 .ChatOptions {
@@ -68,7 +69,7 @@
 }
 
 .ChatSection {
-  flex-grow: 1;
+  flex: 1;
   display: flex;
   flex-direction: column;
 }
@@ -142,6 +143,9 @@
   display: flex;
   gap: 10px;
   padding: 10px;
+  min-width: fit-content;
+  max-width: 100%;
+  width: auto;
 }
 
 .ChatInput input {
@@ -392,9 +396,10 @@
 .MessagesSidebar {
   overflow-y: auto; /* Allows smooth scrolling */
   max-height: 80vh; /* Prevents it from taking up the entire screen */
-  width: 50vh;
+  width: 24vw;
   border-right: 1px solid #ccc; /* Optional: Adds a subtle border */
   background-color: #f9f9f9; /* Light background for better readability */
+  min-width: fit-content;
 }
 
 
