@@ -2,16 +2,11 @@
 .Messaging {
   display: flex;
   flex-direction: column;
-  height: 100vh;
   background-color: #fff;
+  overflow-y: scroll;
+  height: 100vh;
 }
 
-.chat {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  max-width: 100%;
-}
 
 .content {
   flex-direction: column;
@@ -21,8 +16,9 @@
 
 .Chat {
   display: flex;
+  /* max-height: calc(100vh - 50px - 86px); Header + Input */
   flex:1;
-  max-height: 80%;
+  overflow-y: hidden;
 }
 
 .ChatOptions {
@@ -73,6 +69,10 @@
   flex: 1;
   display: flex;
   flex-direction: column;
+  height: 100%; /* Change from auto to 100% */
+  box-sizing: border-box;
+  overflow: hidden; /* Prevents overflow */
+
 }
 
 .ChatHeader {
@@ -118,8 +118,6 @@
   width: 100%;
   margin: 0 auto;
   padding: 10px;
-  max-width: 98%; 
-  /* background-color: #f9f9f9; */
   overflow-y: scroll;
   box-sizing: border-box;
   border-radius: 8px;
@@ -323,7 +321,6 @@
 }
 
 .ChatList {
-  max-height: 500px; /* Adjust height as needed */
   overflow-y: auto; /* Enables vertical scrolling */
   /* padding-right: 10px; Optional: prevent scrollbar from overlapping content */
 }
@@ -397,12 +394,12 @@
 }
 
 .MessagesSidebar {
-  overflow-y: auto; /* Allows smooth scrolling */
-  max-height: 80vh; /* Prevents it from taking up the entire screen */
+  overflow-y: scroll; /* Allows smooth scrolling */
   width: 24vw;
   border-right: 1px solid #ccc; /* Optional: Adds a subtle border */
   background-color: #f9f9f9; /* Light background for better readability */
   min-width: fit-content;
+  height:100%;
 }
 
 
@@ -421,6 +418,8 @@
   flex-direction: column;
   align-items: flex-start;
   margin-bottom: 10px;
+  box-sizing: border-box;
+
 }
 
 .MyMessage {
@@ -466,8 +465,4 @@
   color: #888;
   padding: 20px;
 }
-
-
-
-
 

@@ -769,9 +769,9 @@ const Messaging: React.FC = () => {
           )}
         </div>
       </div>
-      <footer>
+      <div>
         <CopyrightFooter />
-      </footer>
+      </div>
     </div>
   );
 };
