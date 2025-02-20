@@ -588,7 +588,10 @@ const Messaging: React.FC = () => {
 
   return (
     <div className="Messaging">
-      <Navbar />
+      <div>
+              <Navbar />
+
+      </div>
       <div className="Chat">
         {/* Tabs for Messages and Requests */}
         <div className="MessagesSidebar">
@@ -686,41 +689,47 @@ const Messaging: React.FC = () => {
               )}
 
               <div className="ChatWindow">
-                {selectedChat && Array.isArray(selectedChat.messages) ? (
-                  selectedChat.messages.length > 0 ? (
-                    selectedChat.messages.map((message, index) => (
-                      <div key={index} className="MessageContainer">
-
-                        {/* Display usernames */}
-                        {index === 0 || selectedChat.messages[index - 1].userId !== message.userId ? (
-                          <div className={`username ${message.userId === currentUserId ? 'MyUsername' : ''}`}>
-                            {usernames[message.userId] || "Loading..."}
+                {selectedChat ? (
+                  // If selectedChat exists
+                  Array.isArray(selectedChat.messages) ? (
+                    selectedChat.messages.length > 0 ? (
+                      selectedChat.messages.map((message, index) => (
+                        <div key={index} className="MessageContainer">
+                          {/* Display usernames */}
+                          {index === 0 || selectedChat.messages[index - 1].userId !== message.userId ? (
+                            <div className={`username ${message.userId === currentUserId ? 'MyUsername' : ''}`}>
+                              {usernames[message.userId] || "Loading..."}
+                            </div>
+                          ) : null}
+                          {/* Display messages */}
+                          <div
+                            className={`MessageBubble ${
+                              message.userId === currentUserId ? 'MyMessage' : 'OtherMessage'
+                            }`}
+                            onDoubleClick={() => handleDoubleClick(message.id)}
+                          >
+                            {typeof message === 'string'
+                              ? message
+                              : typeof message.content === 'string'
+                              ? message.content
+                              : JSON.stringify(message)}
                           </div>
-                        ) : null}
-                        {/* Display messages */}
-                        <div
-                          className={`MessageBubble ${
-                            message.userId === currentUserId ? 'MyMessage' : 'OtherMessage'
-                          }`}
-                          onDoubleClick={() => handleDoubleClick(message.id)}
-                        >
-                          {typeof message === 'string'
-                            ? message
-                            : typeof message.content === 'string'
-                            ? message.content
-                            : JSON.stringify(message)}
+                          {/* Show heart if message was double-clicked */}
+                          {heartedMessages[message.id] && <div className="Heart">❤️</div>}
                         </div>
-                        {/* Show heart if message was double-clicked */}
-                        {heartedMessages[message.id] && <div className="Heart">❤️</div>}
-                      </div>
-                    ))
+                      ))
+                    ) : (
+                      <div className="NoMessages">No messages to display.</div>
+                    )
                   ) : (
-                    <div className="NoMessages">No messages to display.</div>
+                    <div className="NoChatSelected">Please select a chat</div> // Show message if no chat is selected
                   )
                 ) : (
-                  <div className="NoChatSelected"></div>
+                  // If selectedChat is null or undefined
+                  <div className="NoChatSelected">Please select a chat</div> // Show message if no chat is selected
                 )}
               </div>
+
 
 
 

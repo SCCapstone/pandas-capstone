@@ -10,6 +10,7 @@
   display: flex;
   flex-direction: column;
   height: 100vh;
+  max-width: 100%;
 }
 
 .content {
@@ -20,7 +21,7 @@
 
 .Chat {
   display: flex;
-  height: calc(100vh - 140px);
+  flex:1;
 }
 
 .ChatOptions {
@@ -48,15 +49,18 @@
 
 .ChatList {
   list-style: none;
-  padding: 0;
+  padding: 0 0 0 0;
   margin: 0;
-  margin-top: 20px; /* Adds space above the chat list */
+  /* margin-top: 20px; Adds space above the chat list */
 }
 
 .ChatListItem {
-  padding: 10px;
+  /* padding: 10px; */
   border-bottom: 1px solid #ddd;
   cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .ChatListItem:hover,
@@ -65,7 +69,7 @@
 }
 
 .ChatSection {
-  flex-grow: 1;
+  flex: 1;
   display: flex;
   flex-direction: column;
 }
@@ -108,14 +112,15 @@
 
 .ChatWindow {
   display: flex;
+  flex:1;
   flex-direction: column;
   width: 100%;
-  max-width: 90%; /* Adjust to fit your design */
   margin: 0 auto;
   padding: 10px;
-  background-color: #f9f9f9;
-  border-radius: 8px;
+  /* background-color: #f9f9f9; */
   overflow-y: scroll;
+  box-sizing: border-box;
+
 }
 
 .NoChatSelected {
@@ -138,6 +143,9 @@
   display: flex;
   gap: 10px;
   padding: 10px;
+  min-width: fit-content;
+  max-width: 100%;
+  width: auto;
 }
 
 .ChatInput input {
@@ -150,12 +158,13 @@
 .ChatInput button {
   font-weight: 700;
   font-size: large;
-  padding: 10px 20px;
+  padding: 10px 20px ;
   background-color: #00668C;
   color: white;
   border: none;
   border-radius: 5px;
   cursor: pointer;
+  height: 45px;
 }
 
 .ChatInput button:hover {
@@ -279,16 +288,18 @@
 }
 
 .DeleteButton {
+  display: flex;
   background-color: transparent;
   border: none;
-  color: red;
+  color: #ACACAC;
   font-size: 1.2rem;
   cursor: pointer;
   margin-left: 10px;
+  justify-content: center;
 }
 
 .DeleteButton:hover {
-  color: darkred;
+  color: brown;
 }
 
 
@@ -311,11 +322,11 @@
 .ChatList {
   max-height: 500px; /* Adjust height as needed */
   overflow-y: auto; /* Enables vertical scrolling */
-  padding-right: 10px; /* Optional: prevent scrollbar from overlapping content */
+  /* padding-right: 10px; Optional: prevent scrollbar from overlapping content */
 }
 
 .ChatListItem {
-  padding: 10px;
+  padding: 15px;
   border-bottom: 1px solid #ccc;
   cursor: pointer;
 }
@@ -355,7 +366,8 @@
 .TabsContainer {
   display: flex;
   justify-content: center;
-  background-color: #f0f4f8;
+  /* background-color: #f0f4f8; */
+  background-color: #00668C;
   padding: 10px;
   border-bottom: 2px solid #ccc;
 }
@@ -365,7 +377,7 @@
   cursor: pointer;
   font-size: 20px;
   font-weight: bold;
-  color: #333;
+  color: #B6CCD8;
   background-color: transparent;
   border: none;
   outline: none;
@@ -373,21 +385,21 @@
 }
 
 .Tab.active {
-  border-bottom: 3px solid #007bff; /* Highlight the active tab */
-  color: #007bff;
+  border-bottom: 3px solid #fff; /* Highlight the active tab */
+  color: #fff;
 }
 
 .Tab:hover {
-  color: #0056b3;
+  color: #fff;
 }
 
 .MessagesSidebar {
   overflow-y: auto; /* Allows smooth scrolling */
   max-height: 80vh; /* Prevents it from taking up the entire screen */
-  width: 50vh;
-  border: 1px solid #ccc; /* Optional: Adds a subtle border */
-  padding: 10px;
+  width: 24vw;
+  border-right: 1px solid #ccc; /* Optional: Adds a subtle border */
   background-color: #f9f9f9; /* Light background for better readability */
+  min-width: fit-content;
 }
 
 
@@ -445,7 +457,16 @@
   color: #555;
 }
 
+.messages-panel {
+  /* padding: 10px; */
+}
 
+.NoChatSelected {
+  text-align: center;
+  font-size: 18px;
+  color: #888;
+  padding: 20px;
+}
 
 
 

@@ -157,7 +157,7 @@ model Chat {
   users         User[]    @relation("ChatUsers") // One-to-many through the join table
   messages      Message[] // One-to-many relationship to Message
   studyGroupId  Int?      @unique // Add this line to define the studyGroupId field
-  studyGroup    StudyGroup? @relation("StudyGroupChat", fields: [studyGroupId], references: [id], onDelete: Cascade) // Optional relation to StudyGroup
+  studyGroup    StudyGroup? @relation("StudyGroupChat", fields: [studyGroupId], references: [id]) // Optional relation to StudyGroup
 }
 
 
@@ -168,7 +168,7 @@ model Message {
   userId       Int
   chatId       Int
   user         User        @relation(fields: [userId], references: [id]) // One-to-many relation to User
-  chat         Chat        @relation(fields: [chatId], references: [id]) // One-to-many relation to Chat
+  chat         Chat        @relation(fields: [chatId], references: [id], onDelete: Cascade) // One-to-many relation to Chat
   liked        Boolean     @default(false)
 }
 

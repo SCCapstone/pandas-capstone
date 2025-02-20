@@ -1234,6 +1234,8 @@ app.get('/api/study-groups/:groupId', async (req, res): Promise<any> => {
 app.get('/api/users/search', authenticate, async (req, res): Promise<any> => {
   const { query, gender, college, ageRange, course } = req.query;
   console.log('Received search query:', req.query);
+  const placeholderImage = "https://learnlink-public.s3.us-east-2.amazonaws.com/AvatarPlaceholder.svg";
+
   // if (!query) {
   //   return res.status(400).json({ error: 'Query parameter is required' });
   // }
@@ -1300,11 +1302,15 @@ app.get('/api/users/search', authenticate, async (req, res): Promise<any> => {
         username: true,
         firstName: true,
         lastName: true,
+        profilePic: true || placeholderImage,
       },
     });
     console.log('Prisma Query:', users); // Logs the query results for debugging
-
-    return res.json({ users });
+    const updatedUsers = users.map(user => ({
+  ...user,
+  profilePic: user.profilePic || placeholderImage,  // Fallback to placeholderImage if profilePic is missing
+}));
+    return res.json({ users: updatedUsers });
   } catch (error) {
     console.error('Error fetching users:', error);
     return res.status(500).json({ error: 'Internal server error' });
@@ -1502,14 +1508,15 @@ app.get('/api/chats/:chatId', authenticate, async (req, res): Promise<any> => {
 
 //WORKS
 // Delete a chat
-app.delete('/api/chats/:chatId', async (req, res):Promise<any> => {
+app.delete('/api/chats/:chatId', async (req, res): Promise<any> => {
   const { chatId } = req.params;
   const userId = res.locals.userId;
 
   try {
-    // Ensure the user is part of the chat
+    console.log(`Received request to delete chat: ${chatId} by user: ${userId}`);
 
     if (!chatId || isNaN(parseInt(chatId))) {
+      console.error('Invalid chat ID:', chatId);
       return res.status(400).json({ error: "Invalid chat ID." });
     }
 
@@ -1518,34 +1525,43 @@ app.delete('/api/chats/:chatId', async (req, res):Promise<any> => {
       include: { users: true },
     });
 
+    console.log('Chat found:', chat);
+
     if (!chat) {
+      console.error('Chat not found:', chatId);
       return res.status(404).json({ error: 'Chat not found' });
     }
 
-    //const isUserInChat = chat.users.some((user) => user.id === userId);
-
-    // Delete the chat
-    await prisma.chat.delete({
-      where: { id: parseInt(chatId) },
-    });
-
-    // Delete study Group too
+    // Check if the chat has a linked study group
     const studyGroup = await prisma.studyGroup.findUnique({
       where: { chatID: parseInt(chatId) },
     });
+
+    console.log('Study group found:', studyGroup);
 
     if (studyGroup) {
       await prisma.studyGroup.delete({
         where: { chatID: parseInt(chatId) },
       });
-    }    
+      console.log(`Study group with chatID ${chatId} deleted.`);
+    }
+    else{
+      // Delete the chat
+      await prisma.chat.delete({
+        where: { id: parseInt(chatId) },
+      });
+    }
 
+  
+
+    console.log(`Chat ${chatId} deleted successfully.`);
     res.status(200).json({ message: 'Chat deleted successfully' });
   } catch (error) {
     console.error('Error deleting chat:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
 
 
 // WORKS

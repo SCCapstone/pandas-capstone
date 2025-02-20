@@ -1,5 +1,6 @@
 import e from 'express';
 import { useState } from 'react';
+import { StylesConfig, ControlProps, CSSObjectWithLabel } from 'react-select';
 import { useEffect } from 'react';
 const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
 const REACT_APP_API_KEY_DEPT_EDU = process.env.REACT_APP_API_KEY_DEPT_EDU;
@@ -107,4 +108,41 @@ export const useUserAgeRange = () => {
 
   // Return null or default values if data is not yet available
   return { maxAge: 0, minAge: 100 };
+};
+ interface SelectStyles extends StylesConfig<{ value: string; label: string }, false> {
+    control: (base: CSSObjectWithLabel, props: ControlProps<{ value: string; label: string }, false>) => CSSObjectWithLabel;
+    menu: (provided: CSSObjectWithLabel) => CSSObjectWithLabel;
+  }
+
+export const selectStyles: SelectStyles = {
+  control: (styles, state) => ({
+    ...styles,
+    marginBottom: "20px !important", // Add margin below the select
+    height: "40px", // Adjust height
+    border: state.isFocused ? "2px solid #4A90E2" : ".7px solid #3B3C3D", // Border color when focused vs normal
+    borderRadius: "5px", // Rounded corners
+    boxShadow: state.isFocused ? "0 0 5px rgba(74, 144, 226, 0.5)" : "none", // Add shadow when focused
+  }),
+  valueContainer: (styles) => ({
+  ...styles,
+  padding: "0 8px", // Adjust padding inside the select
+  height: "100%", // Ensure it fills the control height
+  fontSize: "small", // Adjust font size
+}),
+input: (styles) => ({
+  ...styles,
+  margin: "0px", // Remove extra margins
+  padding: "0px", // Adjust input padding
+}),
+singleValue: (styles) => ({
+  ...styles,
+  padding: "0px", // Remove padding around the selected value
+}),
+  menu: (provided) => ({
+    ...provided,
+    borderRadius: "0 !important", // Border radius for dropdown
+    marginTop: "0 !important", // Border radius for dropdown
+    fontSize: "small", // Adjust font size
+
+  }),
 };

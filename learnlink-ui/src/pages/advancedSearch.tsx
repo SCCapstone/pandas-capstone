@@ -22,6 +22,7 @@ const AdvancedSearch: React.FC = () => {
         gender: string;
         college: string;
         coursework: string[];
+        profilePic: string;
     }
 
     const [searchResults, setSearchResults] = useState<User[]>([]);
@@ -90,9 +91,13 @@ const AdvancedSearch: React.FC = () => {
                     {searchResults.length === 0 && <p>No results found.</p>}
                     <ul className="search-result-list">
                         {searchResults.map((user) => (
-                            <p key={user.id} onClick={() => handleSelectUser(user.id)}>
-                                {user.firstName} {user.lastName} (@{user.username})
-                            </p>
+                            <ul key={user.id} onClick={() => handleSelectUser(user.id)}>
+                                <img src={user.profilePic} alt={`${user.firstName} ${user.lastName}`} className='search-profile-pic' />
+                                <div className='search-bio'>
+                                <h3>{user.username}</h3>
+                                <p>{user.firstName} {user.lastName}</p>
+                                </div>
+                            </ul>
                         ))}
                     </ul>
                 </main>

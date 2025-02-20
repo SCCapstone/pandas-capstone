@@ -19,8 +19,8 @@
   }
   
   .edit-study-group-panel input,
-  .edit-study-group-panel textarea,
-  .edit-study-group-panel .basic-single-select {
+  .edit-study-group-panel textarea
+ {
     margin-bottom: 20px;
     display:block;
     font-size: small;
@@ -28,15 +28,15 @@
     box-sizing: border-box;
     /* border: .7px solid #3B3C3D; */
   }
-
-  .edit-study-group-panel input {
-    padding: 19px 10px ;
-
-  }
-
-  .css-13cymwt-control {
-    border: #3B3C3D;
-  }
+  
+.edit-study-group-panel input {
+  height: 40px;
+  margin-bottom: 15px;
+  padding: 5px;
+  border: .7px solid #3B3C3D;
+  border-radius: 5px;
+  width: 100%;
+}
 
   
   .edit-study-group-panel button {
