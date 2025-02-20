@@ -118,6 +118,7 @@
   padding: 10px;
   overflow-y: scroll;
   box-sizing: border-box;
+  border-radius: 8px;
 
 }
 
@@ -454,10 +455,6 @@
   font-weight: bold;
   margin-bottom: 4px;
   color: #555;
-}
-
-.messages-panel {
-  /* padding: 10px; */
 }
 
 .NoChatSelected {
