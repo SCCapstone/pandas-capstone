@@ -23,11 +23,13 @@ const GroupUserList = (
   users,
   onClose,
   onRemoveUser,
+  updateUsers,
 }: {
   groupId: number | null;
   users: User[] | null;
   onClose: () => void;
   onRemoveUser: (userId: number, groupId: number | null) => void; // Update type here
+  updateUsers: (userId: number) => void;
 }) => {
   
   const handleRemoveUser = (userId: number) => {
@@ -36,6 +38,7 @@ const GroupUserList = (
     } else {
       console.error('Group ID is not available');
     }
+    updateUsers(userId);
   };
 
   return (

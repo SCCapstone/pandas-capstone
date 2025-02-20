@@ -596,19 +596,29 @@ const Messaging: React.FC = () => {
       [chatId]: newName,
     }));
   };
+
+  const updateUsers = (userId: number) => {
+    setSelectedChatUsers(prevUsers => (prevUsers || []).filter(user => user.id !== userId));
+  };
+  
   
   //deletes a user from a study group
-  const removeUser = async (userId: number, groupId: number | null)=> {
+  const removeUser = async (userId: number, groupId: number | null) => {
     if (!groupId) {
       console.error('Group ID is missing.');
-      return; // Don't proceed if groupId is null
+      return;
     }
     try {
       const response = await axios.delete(`${REACT_APP_API_URL}/api/study-groups/${groupId}/users/${userId}`);
       
       if (response.status === 200) {
-        // If successful, filter out the deleted user from the state
-        setUsers(prevUsers => prevUsers.filter(user => user.id !== userId));
+        // Log the updated users state to ensure it reflects the change
+        //setSelectedChatUsers(prevUsers => (prevUsers || []).filter(user => user.id !== userId));
+
+        setSelectedChatUsers((prevUsers) => (prevUsers|| []).filter(user => user.id !== userId));
+        if (selectedChat?.id === userId) {
+          setSelectedChat(null);
+        }
       } else {
         console.error('Failed to delete the user.');
       }
@@ -616,6 +626,8 @@ const Messaging: React.FC = () => {
       console.error('Error deleting user:', error);
     }
   };
+  
+  
 
   //sends the message 
   const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -696,6 +708,7 @@ const Messaging: React.FC = () => {
                         users={selectedChatUsers ?? []}
                         onClose={() => setIsUserPanelVisible(false)}
                         onRemoveUser={removeUser}
+                        updateUsers = {updateUsers}
                       />
                     </div>
                   )}
