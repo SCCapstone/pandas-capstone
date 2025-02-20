@@ -693,18 +693,46 @@ const Messaging: React.FC = () => {
             <>
               <div className='ChatHeader'>
                 <h2 className="ChatTitle">{chatNames[selectedChat.id]}</h2>
-                  {/* User List Button 
-                   ensures that a chat is a study group first */}
-                  {hasStudyGroup 
-                    && <button 
-                    className="UserListButton"
-                    onClick={() => {
-                      handleGetUsers(selectedChat.id);
-                      setIsUserPanelVisible(true);
-                    }}
-                  >
-                    Fellow Members
-                  </button>}
+                 
+
+                {/* Button Container for grouping buttons together */}
+                  <div className="ButtonContainer">
+                    {/* User List Button */}
+                    {hasStudyGroup && (
+                      <button
+                        className="UserListButton"
+                        onClick={() => {
+                          handleGetUsers(selectedChat.id);
+                          setIsUserPanelVisible(true);
+                        }}
+                      >
+                        Members
+                      </button>
+                    )}
+
+                    {/* Edit/Create Study Group Button */}
+                    {hasStudyGroup ? (
+                      <button
+                        className="EditStudyGroupButton"
+                        onClick={() => {
+                          setIsPanelVisible(true);
+                        }}
+                      >
+                        Edit Study Group
+                      </button>
+                    ) : (
+                      <button
+                        className="CreateStudyGroupButton"
+                        onClick={() => {
+                          handleCreateStudyGroup(selectedChat.id);
+                          setIsPanelVisible(true);
+                        }}
+                      >
+                        Create Study Group
+                      </button>
+                    )}
+                  </div>
+
                   {/* User List Panel */}
                   {isUserPanelVisible && selectedChatUsers && (
                     <div className="users-panel">
@@ -714,38 +742,23 @@ const Messaging: React.FC = () => {
                         users={selectedChatUsers ?? []}
                         onClose={() => setIsUserPanelVisible(false)}
                         onRemoveUser={removeUser}
-                        updateUsers = {updateUsers}
+                        updateUsers={updateUsers}
                       />
                     </div>
                   )}
 
-                {hasStudyGroup ?
-                  <button
-                    className="EditStudyGroupButton"
-                    onClick={() => {
-                      ;
-                      setIsPanelVisible(true);
-                    }}
-                  > Edit Study Group </button>
-                  :
-                  <button
-                    className="CreateStudyGroupButton"
-                    onClick={() => {
-                      handleCreateStudyGroup(selectedChat.id);
-                      setIsPanelVisible(true);
-                    }}
-                  > Create Study Group </button>}
-                </div>
-              {isPanelVisible && (
-                <div className="study-group-panel">
-                  <EditStudyGroup
-                    // Pass necessary props to the EditStudyGroup component
-                    chatID={selectedChat.id}
-                    onClose={() => setIsPanelVisible(false)} // Close panel when done
-                    updateChatName={updateChatName} 
-                  />
-                </div>
-              )}
+                  {/* Study Group Panel */}
+                  {isPanelVisible && (
+                    <div className="study-group-panel">
+                      <EditStudyGroup
+                        chatID={selectedChat.id}
+                        onClose={() => setIsPanelVisible(false)}
+                        updateChatName={updateChatName}
+                      />
+                    </div>
+                  )}
+                                  </div>
+             
 
               <div className="ChatWindow" ref={chatWindowRef}>
                 {selectedChat ? (
