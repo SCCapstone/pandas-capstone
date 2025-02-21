@@ -81,12 +81,12 @@ label {
 }
 
 .forgot {
-  width: 100%;
   height: 50px;
   color: #00668C;
   font-size: 14px;
   font-weight: 400;
   text-align: right;
+  text-decoration: underline;
 }
 
 .or {
