@@ -97,6 +97,7 @@ const SwipeProfiles = ({ userId }: { userId: number }) => {
 
   const handleSendMessage = async (message: string) => {
     handleSwipe("Yes", currentProfile.id, !!currentProfile.studyGroupId, message);
+    //TODO add -- add notifications when a request is sent 
   };
   return (
     <div className="whole-swipe-component">

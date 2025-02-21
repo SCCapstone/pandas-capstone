@@ -327,6 +327,9 @@ const Messaging: React.FC = () => {
 
   
         setCurrentMessage('');
+
+        //TODO add -- add notifications when messages are sent
+
       } catch (error) {
         console.error('Error sending message:', error);
       }

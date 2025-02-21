@@ -130,6 +130,8 @@ const JoinRequests: React.FC<JoinRequestProps> = ({ currentUserId, addNewChat })
           await axios.post(`${REACT_APP_API_URL}/api/sync-study-group-chat`, { studyGroupId });
         }
 
+        //TODO add -- add notifications here for approval
+
         handleDeleteRequest(requestId); // Remove request after approval
       } 
       else if (response.status === 405) {
