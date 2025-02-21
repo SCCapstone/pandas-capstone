@@ -60,6 +60,10 @@ const GroupUserList = (
     updateUsers(userId);
   };
 
+  const closeComponent = () => {
+    onClose(); // Calls the parent's function to unmount
+  };
+
   return (
     <div ref={panelRef} className="user-list-panel">
       <h3>Group Members</h3>
@@ -82,13 +86,14 @@ const GroupUserList = (
           onClick={() => {
             if (currentId !== null) {
               handleRemoveUser(currentId);
+              closeComponent();
             } else {
               console.error('Current user ID is not available');
             }
           }}
           className="leave-button"
         >
-          Leave
+          Leave Study Group
         </button>
       </ul>
       <button onClick={onClose} className="close-button">Close</button>
