@@ -35,6 +35,7 @@ const SERVER_PORT = process.env.SERVER_PORT ? parseInt(process.env.SERVER_PORT, 
 const JWT_SECRET = env.JWT_SECRET || 'your_default_jwt_secret';
 const resend = new Resend(process.env.RESEND);
 const REACT_APP_EMAIL_URL = process.env.REACT_APP_EMAIL_URL || 'learnlinkserverhost.zapto.org';
+const MAX_USERS_IN_A_GROUP = 6;
 
 // Read certificates conditionally based on the environment
 const privateKey = NODE_ENV === 'production'
@@ -1075,6 +1076,11 @@ app.post('/api/add-to-study-group', async (req, res): Promise<any> => {
 
     if (!studyGroup) {
       return res.status(404).json({ error: 'Study group not found' });
+    }
+
+    // Check if the study group has reached the maximum user limit
+    if (studyGroup.users.length >= MAX_USERS_IN_A_GROUP) {
+      return res.status(400).json({ error: `Study group has reached the maximum of ${MAX_USERS_IN_A_GROUP} users` });
     }
 
     // Check if the user is already in the study group
