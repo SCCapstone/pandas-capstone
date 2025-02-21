@@ -1899,59 +1899,6 @@ app.get('/socket-io', (req, res) => {
   res.send('Socket.IO server is running');
 });
 
-/*
-// Real-time WebSocket chat functionality
-io.on("connection", (socket) => {
-  console.log("User connected");
-
-  socket.on('message', async (data, callback) => {
-    try {
-      // Validate the incoming data
-      if (!data.content || !data.chatId || !data.userId) {
-        throw new Error('Missing required fields: content, chatId, or userId');
-      }
-  
-      // Create a new message in the database using Prisma
-      const newMessage = await prisma.message.create({
-        data: {
-          content: data.content,
-          createdAt: new Date(),
-          user: {
-            connect: { id: data.userId }, // Connect the User by its ID
-          },
-          chat: {
-            connect: { id: data.chatId }, // Connect the Chat by its ID
-          },
-        },
-      });
-      
-      const savedMessage = await prisma.message.findUnique({
-        where: { id: newMessage.id },
-      });
-      //console.log('Saved message in database:', savedMessage);
-      
-  
-      //console.log('Message saved to database:', newMessage);
-  
-      // Emit the new message to all clients (broadcasting to all connected clients)
-      io.emit('newMessage', newMessage);
-      console.log('Broadcasting message:', newMessage);
-
-
-
-      // Send success callback to the sender
-      callback({ success: true, message: 'Message sent from server successfully!' });
-    } catch (error) {
-      console.error('Error handling message:', error);
-      callback({ success: false, error: error });
-    }
-  });
-  
-  socket.on('disconnect', () => {
-    console.log('A user disconnected:', socket.id);
-  });
-});
-*/
 
 // Real-time WebSocket chat functionality
 io.on("connection", (socket) => {
