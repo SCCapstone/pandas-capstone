@@ -350,10 +350,10 @@ const Profile: React.FC = () => {
                     {/* If an image is selected, display it; otherwise, show the button */}
                     {imagePreview ? (
                       <img
+                      className='upload-button'
                         src={imagePreview}  // Display the preview returned by the backend
                         alt="Selected Profile"
                         onClick={() => document.getElementById("image-upload")?.click()} // Allow re-selecting an image
-                        style={{ width: "200px", height: "200px", objectFit: "cover", cursor: "pointer" }}
                       />
                     ) : (
                       <div>
