@@ -21,9 +21,9 @@ const s3 = new S3Client({
 });// ✅ Store in memory first to allow processing
 const upload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 2 * 1024 * 1024 }, // 2MB file limit
+  limits: { fileSize: 5 * 1024 * 1024 }, // 2MB file limit
   fileFilter: (req, file, cb) => {
-    if (!file.mimetype.startsWith("image/")) {
+    if (!file.mimetype.startsWith("image/") && file.mimetype !== "image/heic" && file.mimetype !== "image/heif") {
       return cb(new Error("Only image uploads are allowed"));
     }
     cb(null, true);
@@ -37,10 +37,18 @@ const resizeAndUpload = async (req: Request, res: Response, next: NextFunction) 
 
 
   try {
-    // Resize image
-    const resizedBuffer = await sharp(req.file.buffer)
-      .resize(400, 400, { fit: "cover" }) // Crop to 200x200
+    let imageBuffer = req.file.buffer;
+    let format = "png"; // Default format
 
+    // 🔄 Convert HEIC to PNG if needed
+    if (req.file.mimetype === "image/heic" || req.file.mimetype === "image/heif") {
+      imageBuffer = await sharp(imageBuffer).toFormat("png").toBuffer();
+      format = "png";
+    }
+
+    // 📏 Resize image and apply circular crop
+    const resizedBuffer = await sharp(imageBuffer)
+      .resize(400, 400, { fit: "cover" }) // Crop to 400x400
       .composite([
         {
           input: Buffer.from(
@@ -51,7 +59,6 @@ const resizeAndUpload = async (req: Request, res: Response, next: NextFunction) 
       ]) // Apply a circular mask
       .png()
       .toBuffer();
-
     // Generate unique file name
     const fileName = `profile-pictures/${Date.now()}_${req.file.originalname.replace(/\s+/g, "_")}`;
 
