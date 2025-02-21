@@ -391,7 +391,7 @@
   color: #fff;
 }
 
-.MessagesSidebar {
+.ChatsSidebar {
   overflow-y: scroll; /* Allows smooth scrolling */
   width: 24vw;
   border-right: 1px solid #ccc; /* Optional: Adds a subtle border */
