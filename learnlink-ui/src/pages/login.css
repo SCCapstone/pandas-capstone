@@ -1,27 +1,28 @@
 /* Login css */
+.login {
+  background-color: #D4EAF7;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  overflow-y: scroll;
+  flex-grow: 1;
+}
+
 .loginPage {
   display: flex;
   flex-direction: column;
   height: 100vh;
 }
 
-.login {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  overflow-y: auto;
-  flex-grow: 1;
-}
-
 .login-container {
   width: 80vw;
   padding: 20px;
   display: flex;
-  flex-direction: row;
   align-items: center;
   text-align: left;
-  /* margin-bottom: 50px; */
   justify-content: center;
 }
 
@@ -80,12 +81,12 @@ label {
 }
 
 .forgot {
+  width: 100%;
   height: 50px;
   color: #00668C;
   font-size: 14px;
   font-weight: 400;
   text-align: right;
-  text-decoration: underline;
 }
 
 .or {
@@ -98,6 +99,8 @@ label {
 .or label {
   font-size: 16px;
   text-align: center;
+  padding-top:15px;
+  padding-bottom:15px;
 }
 
 .login-container button {
@@ -110,5 +113,4 @@ label {
   font-weight: 500;
   border-radius: 5px;
   border: 0;
-
 }
