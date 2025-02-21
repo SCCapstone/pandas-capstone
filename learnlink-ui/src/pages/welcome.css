@@ -26,14 +26,17 @@ h1, h2, h3, h4, h5, h6 {
   padding: 20px;
 }
 
-.WelcomeLogo {
-  width: 600px;
+.Logo2 {
+  position: absolute; /* Position the logo absolutely */
+  top: 20px; /* Adjust this value as needed for vertical spacing */
+  left: 20px; /* Adjust this value for horizontal spacing */
+  width: 150px; /* Adjust the width of the logo if needed */
   height: auto;
 }
 
 .WelcomePage {
   width: 70%;
-  margin-top: 70px;
+  margin-top: 60px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -162,8 +165,5 @@ p {
     width: 100%;
     font-size: 16px;
     min-height: 100px;
-  }
-  .well {
-    margin-top: 30px;
   }
 }
