@@ -21,6 +21,7 @@ const s3 = new S3Client({
   },
   region: process.env.AWS_REGION,
 });// ✅ Store in memory first to allow processing
+
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: 5 * 1024 * 1024 }, // 2MB file limit
@@ -123,4 +124,52 @@ const resizeAndUpload = async (req: Request, res: Response, next: NextFunction) 
   }
 };
 
-export { upload, resizeAndUpload };
+// Endpoint to handle the image upload and preview creation
+const handleImagePreview = async (req: Request, res: Response) => {
+  if (!req.file) {
+    return res.status(400).json({ error: "No file uploaded" });
+  }
+  let contentType = req.file.mimetype;
+  let imageBuffer = req.file.buffer
+
+  try {
+    
+    if (contentType === "image/heic" || contentType === "image/heif") {
+      const convertedBuffer = await heicConvert({
+        buffer: req.file.buffer,
+        format: "JPEG",
+        quality: 0.9,
+      });
+      imageBuffer = Buffer.from(convertedBuffer);
+      contentType = "image/jpeg";
+    }
+
+    // Process the image (resize to 400x400 for preview)
+    const resizedBuffer = await sharp(imageBuffer)
+    .resize(400, 400, { fit: "cover" }) // Crop to 400x400
+    .composite([
+      {
+        input: Buffer.from(
+          `<svg><circle cx="200" cy="200" r="200" fill="white"/></svg>`
+        ),
+        blend: "dest-in",
+      },
+    ]) // Apply a circular mask
+    .png()
+    .toBuffer();
+
+    // Generate a preview URL or send the buffer to the frontend
+    // You can store this in a temporary location or use S3, etc.
+    // For this example, we're just sending the image as a base64 encoded string
+    const base64Image = resizedBuffer.toString("base64");
+
+    res.json({
+      preview: `data:image/jpeg;base64,${base64Image}`,  // Send as base64 for the frontend
+    });
+  } catch (error) {
+    console.error("Image processing error:", error);
+    res.status(500).json({ error: "Image processing failed" });
+  }
+};
+
+export { upload, resizeAndUpload, handleImagePreview };

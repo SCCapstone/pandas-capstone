@@ -115,6 +115,7 @@ const Profile: React.FC = () => {
   };
 
   const handleUpload = async () => {
+    console.log('Uploading image...'); // Debug log
     if (!image) return;
 
     const formData = new FormData();
@@ -207,6 +208,35 @@ const Profile: React.FC = () => {
     const file = e.target.files ? e.target.files[0] : null;
     if (file) {
       setImage(file); // Store the selected file
+    }
+  };
+  const [imagePreview, setImagePreview] = useState(null);
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formData = new FormData();
+    
+    const file = e.target.files ? e.target.files[0] : null;
+    if (!file) return;  // If no file is selected, exit
+      setImage(file);  // Store the selected file for later use
+
+    formData.append("profilePic", file);  // Append the file to FormData with the field name 'profilePic'
+    try {
+      // Send the image to the backend
+      const response = await fetch(`${REACT_APP_API_URL}/api/upload-preview`, {
+        method: "POST",
+        body: formData,  // Send the FormData
+      });
+  
+      if (response.ok) {
+        const data = await response.json();
+        if (data.preview) {
+          setImagePreview(data.preview);  // Set the preview image
+        }
+      } else {
+        console.error("Failed to upload image:", response.statusText);
+      }
+    } catch (error) {
+      console.error("Error uploading image:", error);
     }
   };
 
@@ -318,16 +348,16 @@ const Profile: React.FC = () => {
 
                   <div className="profile-picture">
                     {/* If an image is selected, display it; otherwise, show the button */}
-                    {image ? (
+                    {imagePreview ? (
                       <img
-                        src={URL.createObjectURL(image)}
+                        src={imagePreview}  // Display the preview returned by the backend
                         alt="Selected Profile"
                         onClick={() => document.getElementById("image-upload")?.click()} // Allow re-selecting an image
                         style={{ width: "200px", height: "200px", objectFit: "cover", cursor: "pointer" }}
                       />
                     ) : (
                       <div>
-                      {/* <button
+                        {/* <button
                         className="upload-button"
                         onClick={() => document.getElementById("image-upload")?.click()}
                       >
@@ -350,7 +380,7 @@ const Profile: React.FC = () => {
                       id="image-upload"
                       type="file"
                       accept="image/*"
-                      onChange={handleImageChange}
+                      onChange={handleImageUpload}
                       style={{ display: "none" }}
                     />
                     {/* <button onClick={handleUpload}>Upload</button> */}

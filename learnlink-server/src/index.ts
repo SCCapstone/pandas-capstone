@@ -16,7 +16,9 @@ import fs from 'fs';
 import https from 'https';
 import dotenv from 'dotenv';
 import { Resend } from 'resend';
-import {upload, resizeAndUpload} from './uploadConfig';
+import {upload, resizeAndUpload, handleImagePreview} from './uploadConfig';
+import multer from "multer";
+
 
 
 interface CustomJwtPayload extends JwtPayload {
@@ -2255,6 +2257,14 @@ app.get('/api/notifications', authenticate, async (req: Request, res: Response) 
     res.status(500).json({ error: 'Failed to fetch notifications' });
   }
 });
+
+const upload_preview = multer({ storage: multer.memoryStorage() });  // Store file in memory
+
+app.post("/api/upload-preview", upload_preview.single("profilePic"), (req, res, next) => {
+  console.log("Received file:", req.file);  // Log the file info to ensure it's being uploaded
+  handleImagePreview(req, res).catch(next);
+});
+
 
 
 export { app }; // Export the app for testing
