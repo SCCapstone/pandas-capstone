@@ -149,7 +149,7 @@ const Signup: React.FC = () => {
 
     return (
         <div className="signupPage">
-            <div className="Logo2">
+            <div className="Logo2-signup">
                 <Logo />
             </div>
             <div className="signup">
