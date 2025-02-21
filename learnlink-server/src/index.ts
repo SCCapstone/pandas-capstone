@@ -749,10 +749,14 @@ app.get('/api/profiles/:userId', async (req, res): Promise<any> => {
               },
             },
           },
+          
         ],
       },
       select: {
         id: true,
+        _count: {
+          select: { users: true }, // Get the number of users in each study group
+        },
         name: true,
         subject: true,
         description: true,
@@ -765,9 +769,10 @@ app.get('/api/profiles/:userId', async (req, res): Promise<any> => {
         chatID: true,
         chat: true,
         ideal_match_factor: true,
-
       },
     });
+
+    studyGroupsToSwipeOn = studyGroupsToSwipeOn.filter((group) => group._count.users <= 6); // filter groups with 6+ members
 
     // Calculate similarity score
     const calculateSimilarityUser = (user: User, forStudyGroup: boolean) => {
