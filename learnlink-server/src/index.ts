@@ -2234,6 +2234,28 @@ app.post('/api/users/upload-pfp', authenticate, upload as express.RequestHandler
   }
 });
 
+app.get('/api/notifications', authenticate, async (req: Request, res: Response) => {
+  const userId = res.locals.userId;
+  try {
+    // Disable caching to always get fresh data
+    res.setHeader('Cache-Control', 'no-store'); // Prevent caching
+
+    const notifications = await prisma.notification.findMany({
+      where: { user_id: userId, read: false },
+      orderBy: { created_at: 'desc' },
+    });
+
+    if (notifications.length === 0) {
+      res.status(200).json([]);
+    } else {
+      res.json(notifications);
+    }
+  } catch (error) {
+    console.error('Error fetching notifications:', error);
+    res.status(500).json({ error: 'Failed to fetch notifications' });
+  }
+});
+
 
 export { app }; // Export the app for testing
 
