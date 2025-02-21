@@ -376,11 +376,7 @@ const Messaging: React.FC = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      // updates the displayed chats to delete the chat from the UI
-      setChats((prevChats) => prevChats.filter((chat) => chat.id !== chatId));
-      if (selectedChat?.id === chatId) {
-        setSelectedChat(null);
-      }
+      updateChats(chatId);
     } catch (error) {
       console.error('Error deleting chat:', error);
       if (axios.isAxiosError(error) && error.response) {
@@ -606,7 +602,14 @@ const Messaging: React.FC = () => {
     setSelectedChatUsers(prevUsers => (prevUsers || []).filter(user => user.id !== userId));
   };
   
-  
+  const updateChats = (chatId: number) => {
+    // updates the displayed chats to delete the chat from the UI
+    setChats((prevChats) => prevChats.filter((chat) => chat.id !== chatId));
+    if (selectedChat?.id === chatId) {
+      setSelectedChat(null);
+    }
+  }
+
   //deletes a user from a study group
   const removeUser = async (userId: number, groupId: number | null) => {
     if (!groupId) {
