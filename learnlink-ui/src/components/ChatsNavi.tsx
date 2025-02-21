@@ -32,8 +32,8 @@ interface User {
   lastName: string;  
 }
 
-// Props interface defining expected properties for the MessagesNavi component
-interface MessagesNaviProps {
+// Props interface defining expected properties for the ChatsNavi component
+interface ChatsNaviProps {
   chats: Chat[];                       
   selectedChat: Chat | null;           
   setSelectedChat: React.Dispatch<React.SetStateAction<Chat | null>>; 
@@ -41,8 +41,8 @@ interface MessagesNaviProps {
   chatNames: { [key: number]: string };  
 }
 
-// MessagesNavi component handles displaying a list of chats and allows selecting or deleting them
-const MessagesNavi: React.FC<MessagesNaviProps> = ({ chats, selectedChat, setSelectedChat, handleDeleteChat, chatNames }) => {
+// ChatsNavi component handles displaying a list of chats and allows selecting or deleting them
+const ChatsNavi: React.FC<ChatsNaviProps> = ({ chats, selectedChat, setSelectedChat, handleDeleteChat, chatNames }) => {
   const [sortedChats, setSortedChats] = useState<Chat[]>([]);
 
   // Sort chats by most recent update when chats change
@@ -80,4 +80,4 @@ const MessagesNavi: React.FC<MessagesNaviProps> = ({ chats, selectedChat, setSel
   );
 };
 
-export default MessagesNavi;
+export default ChatsNavi;

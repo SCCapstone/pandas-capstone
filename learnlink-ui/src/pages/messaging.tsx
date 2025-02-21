@@ -7,7 +7,7 @@ import './LandingPage.css';
 import axios from 'axios';
 import { useSearchParams } from 'react-router-dom';
 import EditStudyGroup from '../components/EditStudyGroup';
-import MessagesNavi from "../components/MessagesNavi";
+import ChatsNavi from "../components/ChatsNavi";
 import JoinRequests from '../components/JoinRequests';
 import GroupUserList from '../components/GroupUserList';
 
@@ -78,7 +78,7 @@ const Messaging: React.FC = () => {
   const [groupId, setGroupId] = useState<number | null>(null);
 
   useEffect(() => {
-    handleMessagesSwitch();
+    handleChatsSwitch();
     const token = localStorage.getItem('token');
       console.log(token);
       const syncStudyGroupChats = async () => {
@@ -252,7 +252,7 @@ const Messaging: React.FC = () => {
   
 
   // Switches from the Requests tab to the Chats tab
-  const handleMessagesSwitch = () => {
+  const handleChatsSwitch = () => {
     setActiveTab('messages');
     setShowRequestsPanel(false);
     setShowMessagesPanel(true);
@@ -652,13 +652,13 @@ const Messaging: React.FC = () => {
       </div>
       <div className="Chat">
         {/* Tabs for Messages and Requests */}
-        <div className="MessagesSidebar">
+        <div className="ChatsSidebar">
           <div className="TabsContainer">
             <button 
               className={`Tab ${activeTab === 'messages' ? 'active' : ''}`} 
-              onClick={handleMessagesSwitch}
+              onClick={handleChatsSwitch}
             >
-              Messages
+              Chats
             </button>
 
             <button 
@@ -671,7 +671,7 @@ const Messaging: React.FC = () => {
 
           {/* Conditionally show the messages panel */}
           {showMessagesPanel && (
-            <MessagesNavi 
+            <ChatsNavi 
               chats={chats}
               selectedChat={selectedChat} 
               setSelectedChat={setSelectedChat} 

@@ -1085,7 +1085,7 @@ app.post('/api/add-to-study-group', async (req, res): Promise<any> => {
 
     // Check if the study group has reached the maximum user limit
     if (studyGroup.users.length >= MAX_USERS_IN_A_GROUP) {
-      return res.status(400).json({ error: `Study group has reached the maximum of ${MAX_USERS_IN_A_GROUP} users` });
+      return res.status(405).json({ error: `Study group has reached the maximum of ${MAX_USERS_IN_A_GROUP} users` });
     }
 
     // Check if the user is already in the study group

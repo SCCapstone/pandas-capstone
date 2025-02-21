@@ -131,7 +131,12 @@ const JoinRequests: React.FC<JoinRequestProps> = ({ currentUserId, addNewChat })
         }
 
         handleDeleteRequest(requestId); // Remove request after approval
-      } else {
+      } 
+      else if (response.status === 405) {
+        setError("This study group is full. You cannot approve this request.");
+        handleDeleteRequest(requestId);
+      }
+      else {
         setError("Failed to approve request. Please try again.");
       }
     } catch (err) {
