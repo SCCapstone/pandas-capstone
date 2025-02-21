@@ -1,5 +1,6 @@
 import Logo from '../components/Logo';
 import './forgotPassword.css';
+
 import CopyrightFooter from '../components/CopyrightFooter';
 import {useNavigate} from 'react-router-dom';
 import React, {useState} from 'react';
