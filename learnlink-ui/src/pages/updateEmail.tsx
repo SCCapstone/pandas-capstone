@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import Navbar from '../components/Navbar';
 import CopyrightFooter from '../components/CopyrightFooter'; 
+import './updateEmail.css';
 
 const UpdateEmail: React.FC = () => {
   const [oldEmail, setOldEmail] = useState('');
@@ -52,13 +53,14 @@ const UpdateEmail: React.FC = () => {
   };
 
   return (
-    <div>
+    <div className="page-container">
       <header>
         <Navbar />
       </header>
-      <div className="login">
-        <div className="container">
-          <h1 className="l1">Update Email</h1>
+      <main className="content">
+        <div className="update-email">
+          <h1 className="p1">Update Email</h1>
+          <div className="update-email-container">
           <form onSubmit={handleSubmit}>
             <label>Old Email</label>
             <input 
@@ -82,11 +84,12 @@ const UpdateEmail: React.FC = () => {
               {loading ? "Updating..." : "Update Email"}
             </button>
           </form>
+          </div>
         </div>
-      </div>
-      <div>
+      </main>
+      <footer>
         <CopyrightFooter />
-      </div>
+      </footer>
     </div>
   );
 }

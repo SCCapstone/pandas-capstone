@@ -7,7 +7,7 @@ import './LandingPage.css';
 import axios from 'axios';
 import { useSearchParams } from 'react-router-dom';
 import EditStudyGroup from '../components/EditStudyGroup';
-import MessagesNavi from "../components/MessagesNavi";
+import ChatsNavi from "../components/ChatsNavi";
 import JoinRequests from '../components/JoinRequests';
 import GroupUserList from '../components/GroupUserList';
 
@@ -75,10 +75,10 @@ const Messaging: React.FC = () => {
   const [isUserPanelVisible, setIsUserPanelVisible] = useState(false);
   // for displaying names above messages sent
   const [usernames, setUsernames] = useState<{ [key: number]: string }>({});
-
+  const [groupId, setGroupId] = useState<number | null>(null);
 
   useEffect(() => {
-    handleMessagesSwitch();
+    handleChatsSwitch();
     const token = localStorage.getItem('token');
       console.log(token);
       const syncStudyGroupChats = async () => {
@@ -209,7 +209,7 @@ const Messaging: React.FC = () => {
       setChats((prevChats) => {
         return prevChats.map((chat) =>
           chat.id === message.chatId
-            ? { ...chat, messages: [...chat.messages, message] }
+            ? { ...chat, messages: [...chat.messages, message]}
             : chat
         );
       });
@@ -252,7 +252,7 @@ const Messaging: React.FC = () => {
   
 
   // Switches from the Requests tab to the Chats tab
-  const handleMessagesSwitch = () => {
+  const handleChatsSwitch = () => {
     setActiveTab('messages');
     setShowRequestsPanel(false);
     setShowMessagesPanel(true);
@@ -301,13 +301,30 @@ const Messaging: React.FC = () => {
         setCurrentMessage('');
         
         
-  
         // Update the selectedChat to include the new message
         setSelectedChat((prevSelectedChat) =>
           prevSelectedChat
             ? { ...prevSelectedChat, messages: [...(prevSelectedChat.messages || []), messageData] }
             : null
         );
+
+        setChats((prevChats) => {
+          const updatedChats = prevChats.map((chat) =>
+            chat.id === selectedChat.id
+              ? {
+                  ...chat,
+                  messages: [...(chat.messages || []), messageData],
+                  updatedAt: new Date().toISOString(), // Convert Date to string here
+                }
+              : chat
+          );
+          // Sort chats by updatedAt (most recent first)
+          return updatedChats.sort(
+            (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+          );
+        });
+        
+
   
         setCurrentMessage('');
       } catch (error) {
@@ -359,11 +376,7 @@ const Messaging: React.FC = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      // updates the displayed chats to delete the chat from the UI
-      setChats((prevChats) => prevChats.filter((chat) => chat.id !== chatId));
-      if (selectedChat?.id === chatId) {
-        setSelectedChat(null);
-      }
+      updateChats(chatId);
     } catch (error) {
       console.error('Error deleting chat:', error);
       if (axios.isAxiosError(error) && error.response) {
@@ -392,6 +405,7 @@ const Messaging: React.FC = () => {
       const data = response.data;
       //console.log ('data', data);
       const groupId = data.studyGroupID;
+      setGroupId(data.studyGroupID);
       //console.log( 'id', groupId);
 
       // gets the users associated with that study group thats linked to the chat
@@ -403,7 +417,12 @@ const Messaging: React.FC = () => {
       const dat = res.data;
       //console.log('Users in study group:', dat.studyGroup.users);
       
-      setSelectedChatUsers(dat.studyGroup.users); // Store user data for the selected chat
+      //setSelectedChatUsers(dat.studyGroup.users); // Store user data for the selected chat
+      setSelectedChatUsers(
+        dat.studyGroup.users.filter((user: User) => user.id !== currentUserId)
+      );
+      
+
       setIsUserPanelVisible(true); // Open the panel to show users
     } catch (error) {
       console.error('Error fetching users:', error);
@@ -578,6 +597,44 @@ const Messaging: React.FC = () => {
       [chatId]: newName,
     }));
   };
+
+  const updateUsers = (userId: number) => {
+    setSelectedChatUsers(prevUsers => (prevUsers || []).filter(user => user.id !== userId));
+  };
+  
+  const updateChats = (chatId: number) => {
+    // updates the displayed chats to delete the chat from the UI
+    setChats((prevChats) => prevChats.filter((chat) => chat.id !== chatId));
+    if (selectedChat?.id === chatId) {
+      setSelectedChat(null);
+    }
+  }
+
+  //deletes a user from a study group
+  const removeUser = async (userId: number, groupId: number | null) => {
+    if (!groupId) {
+      console.error('Group ID is missing.');
+      return;
+    }
+    try {
+      const response = await axios.delete(`${REACT_APP_API_URL}/api/study-groups/${groupId}/users/${userId}`);
+      
+      if (response.status === 200) {
+        // Log the updated users state to ensure it reflects the change
+        //setSelectedChatUsers(prevUsers => (prevUsers || []).filter(user => user.id !== userId));
+
+        setSelectedChatUsers((prevUsers) => (prevUsers|| []).filter(user => user.id !== userId));
+        if (selectedChat?.id === userId) {
+          setSelectedChat(null);
+        }
+      } else {
+        console.error('Failed to delete the user.');
+      }
+    } catch (error) {
+      console.error('Error deleting user:', error);
+    }
+  };
+  
   
 
   //sends the message 
@@ -595,13 +652,13 @@ const Messaging: React.FC = () => {
       </div>
       <div className="Chat">
         {/* Tabs for Messages and Requests */}
-        <div className="MessagesSidebar">
+        <div className="ChatsSidebar">
           <div className="TabsContainer">
             <button 
               className={`Tab ${activeTab === 'messages' ? 'active' : ''}`} 
-              onClick={handleMessagesSwitch}
+              onClick={handleChatsSwitch}
             >
-              Messages
+              Chats
             </button>
 
             <button 
@@ -614,7 +671,7 @@ const Messaging: React.FC = () => {
 
           {/* Conditionally show the messages panel */}
           {showMessagesPanel && (
-            <MessagesNavi 
+            <ChatsNavi 
               chats={chats}
               selectedChat={selectedChat} 
               setSelectedChat={setSelectedChat} 
@@ -639,55 +696,74 @@ const Messaging: React.FC = () => {
             <>
               <div className='ChatHeader'>
                 <h2 className="ChatTitle">{chatNames[selectedChat.id]}</h2>
-                  {/* User List Button 
-                   ensures that a chat is a study group first */}
-                  {hasStudyGroup 
-                    && <button 
-                    className="UserListButton"
-                    onClick={() => {
-                      handleGetUsers(selectedChat.id);
-                      setIsUserPanelVisible(true);
-                    }}
-                  >
-                    Users
-                  </button>}
+                 
+
+                {/* Button Container for grouping buttons together */}
+                  <div className="ButtonContainer">
+                    {/* User List Button */}
+                    {hasStudyGroup && (
+                      <button
+                        className="UserListButton"
+                        onClick={() => {
+                          handleGetUsers(selectedChat.id);
+                          setIsUserPanelVisible(true);
+                        }}
+                      >
+                        Members
+                      </button>
+                    )}
+
+                    {/* Edit/Create Study Group Button */}
+                    {hasStudyGroup ? (
+                      <button
+                        className="EditStudyGroupButton"
+                        onClick={() => {
+                          setIsPanelVisible(true);
+                        }}
+                      >
+                        Edit Study Group
+                      </button>
+                    ) : (
+                      <button
+                        className="CreateStudyGroupButton"
+                        onClick={() => {
+                          handleCreateStudyGroup(selectedChat.id);
+                          setIsPanelVisible(true);
+                        }}
+                      >
+                        Create Study Group
+                      </button>
+                    )}
+                  </div>
+
                   {/* User List Panel */}
                   {isUserPanelVisible && selectedChatUsers && (
                     <div className="users-panel">
                       <GroupUserList
+                        groupId={groupId}
+                        currentId={currentUserId}
                         users={selectedChatUsers ?? []}
+                        chatId={selectedChat.id}
                         onClose={() => setIsUserPanelVisible(false)}
+                        onRemoveUser={removeUser}
+                        updateUsers={updateUsers}
+                        updateChats = {updateChats}
                       />
                     </div>
                   )}
 
-                {hasStudyGroup ?
-                  <button
-                    className="EditStudyGroupButton"
-                    onClick={() => {
-                      ;
-                      setIsPanelVisible(true);
-                    }}
-                  > Edit Study Group </button>
-                  :
-                  <button
-                    className="CreateStudyGroupButton"
-                    onClick={() => {
-                      handleCreateStudyGroup(selectedChat.id);
-                      setIsPanelVisible(true);
-                    }}
-                  > Create Study Group </button>}
-                </div>
-              {isPanelVisible && (
-                <div className="study-group-panel">
-                  <EditStudyGroup
-                    // Pass necessary props to the EditStudyGroup component
-                    chatID={selectedChat.id}
-                    onClose={() => setIsPanelVisible(false)} // Close panel when done
-                    updateChatName={updateChatName} 
-                  />
-                </div>
-              )}
+                  {/* Study Group Panel */}
+                  {isPanelVisible && (
+                    <div className="study-group-panel">
+                      <EditStudyGroup
+                        chatID={selectedChat.id}
+                        onClose={() => setIsPanelVisible(false)}
+                        updateChatName={updateChatName}
+                      />
+                    </div>
+                  )}
+                                  </div>
+             
 
               <div className="ChatWindow" ref={chatWindowRef}>
                 {selectedChat ? (

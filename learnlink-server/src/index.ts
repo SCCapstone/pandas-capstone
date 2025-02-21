@@ -35,6 +35,7 @@ const SERVER_PORT = process.env.SERVER_PORT ? parseInt(process.env.SERVER_PORT, 
 const JWT_SECRET = env.JWT_SECRET || 'your_default_jwt_secret';
 const resend = new Resend(process.env.RESEND);
 const REACT_APP_EMAIL_URL = process.env.REACT_APP_EMAIL_URL || 'learnlinkserverhost.zapto.org';
+const MAX_USERS_IN_A_GROUP = 6;
 
 // Read certificates conditionally based on the environment
 const privateKey = NODE_ENV === 'production'
@@ -748,10 +749,14 @@ app.get('/api/profiles/:userId', async (req, res): Promise<any> => {
               },
             },
           },
+          
         ],
       },
       select: {
         id: true,
+        _count: {
+          select: { users: true }, // Get the number of users in each study group
+        },
         name: true,
         subject: true,
         description: true,
@@ -764,9 +769,10 @@ app.get('/api/profiles/:userId', async (req, res): Promise<any> => {
         chatID: true,
         chat: true,
         ideal_match_factor: true,
-
       },
     });
+
+    studyGroupsToSwipeOn = studyGroupsToSwipeOn.filter((group) => group._count.users <= 6); // filter groups with 6+ members
 
     // Calculate similarity score
     const calculateSimilarityUser = (user: User, forStudyGroup: boolean) => {
@@ -1077,6 +1083,11 @@ app.post('/api/add-to-study-group', async (req, res): Promise<any> => {
       return res.status(404).json({ error: 'Study group not found' });
     }
 
+    // Check if the study group has reached the maximum user limit
+    if (studyGroup.users.length >= MAX_USERS_IN_A_GROUP) {
+      return res.status(405).json({ error: `Study group has reached the maximum of ${MAX_USERS_IN_A_GROUP} users` });
+    }
+
     // Check if the user is already in the study group
     const isUserInGroup = studyGroup.users.some(user => user.id === requestUserId);
 
@@ -1169,6 +1180,58 @@ app.post('/api/sync-study-group-chat', async (req, res): Promise<any> => {
   } catch (error) {
     console.error('Error syncing chat with study group:', error);
     return res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
+// Deletes a user by userId from a study group 
+app.delete('/api/study-groups/:groupId/users/:userId', async (req, res): Promise<any> => {
+  const { groupId, userId } = req.params;
+
+  try {
+    // Check if the study group exists
+    const studyGroup = await prisma.studyGroup.findUnique({
+      where: { id: parseInt(groupId, 10) },
+      include: { users: true, chat: true }, // Include users and chat to remove user and handle chat
+    });
+
+    if (!studyGroup) {
+      return res.status(404).json({ error: 'Study group not found' });
+    }
+
+    // Check if the user is in the study group
+    const userInGroup = studyGroup.users.some(user => user.id === parseInt(userId, 10));
+
+    if (!userInGroup) {
+      return res.status(404).json({ error: 'User is not in this study group' });
+    }
+
+    // Remove the user from the study group
+    await prisma.studyGroup.update({
+      where: { id: parseInt(groupId, 10) },
+      data: {
+        users: {
+          disconnect: { id: parseInt(userId, 10) }, // Disconnect user from the study group
+        },
+      },
+    });
+
+    // Remove the user from the chat (if the chat exists)
+    if (studyGroup.chat) {
+      await prisma.chat.update({
+        where: { id: studyGroup.chat.id },
+        data: {
+          users: {
+            disconnect: { id: parseInt(userId, 10) }, // Disconnect user from the chat
+          },
+        },
+      });
+    }
+
+    return res.status(200).json({ message: 'User removed successfully from study group and chat' });
+  } catch (error) {
+    console.error('Error deleting user from study group:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
@@ -1546,7 +1609,6 @@ app.delete('/api/chats/:chatId', async (req, res): Promise<any> => {
       console.log(`Study group with chatID ${chatId} deleted.`);
     }
     else{
-      // Delete the chat
       await prisma.chat.delete({
         where: { id: parseInt(chatId) },
       });
@@ -1586,7 +1648,7 @@ app.post('/api/chats/:chatId/messages', authenticate, async (req, res): Promise<
       },
     });
 
-    res.status(201).json(newMessage);
+    res.status(201).json('new message' + newMessage);
   } catch (error) {
     console.error('Error adding message:', error);
     res.status(500).json({ error: 'Internal server error' });
@@ -1911,6 +1973,13 @@ io.on("connection", (socket) => {
         include: { user: true, chat: { include: { users: true } } }, // Include chat members
       });
 
+      // After saving the message, update the chat's `updatedAt` timestamp
+      const updatedChat = await prisma.chat.update({
+        where: { id: data.chatId },
+        data: { updatedAt: new Date() },
+        include: { users: true }, // Optionally, include users if you want to broadcast updated users list
+      });
+
       // Get all user IDs in the chat
       const chatUsers = newMessage.chat.users.map(user => user.id);
 
@@ -1922,7 +1991,8 @@ io.on("connection", (socket) => {
       console.log('Broadcasting message to chat users:', chatUsers);
 
       // Send success callback to the sender
-      callback({ success: true, message: 'Message sent from server successfully!' });
+      callback({ success: true, message: 'Message sent from server successfully!' }); 
+      callback({ success: true, message: newMessage, updatedChat });
     } catch (error) {
       console.error('Error handling message:', error);
       callback({ success: false, error: error });
@@ -1931,6 +2001,11 @@ io.on("connection", (socket) => {
 
   socket.on("joinChat", async ({ chatId, userId }) => {
     try {
+      if (!chatId) {
+        console.error("Chat ID is required");
+        return; // Early exit if chatId is not provided
+      }
+  
       socket.join(`chat_${chatId}`);
       console.log(`User ${userId} joined chat ${chatId}`);
   
@@ -1942,6 +2017,8 @@ io.on("connection", (socket) => {
   
       if (chat) {
         io.to(`chat_${chatId}`).emit("chatUpdated", chat.users);
+      } else {
+        console.error("Chat not found");
       }
     } catch (error) {
       console.error("Error joining chat:", error);

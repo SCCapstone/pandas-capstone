@@ -107,6 +107,33 @@
   height:60%;
   align-self: center;
 }
+.EditStudyGroupButton:hover {
+  background-color: #01506d;;
+}
+
+.UserListButton {
+  font-weight: 700;
+  font-size: large;
+  padding: 10px;
+  background-color: #007b9e; /* Slightly lighter shade for distinction */
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  height: 60%;
+  align-self: center;
+  margin-left: 10px; /* Space between the buttons */
+}
+
+/* Flex container to position buttons side by side */
+.ButtonContainer {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 10px; /* Adds space between buttons */
+}
+
+
 .ChatTitle {
   padding: 10px;
 }
@@ -243,36 +270,7 @@
   box-shadow: 0 0 0 2px rgba(0, 102, 140, 0.3);
 }
 
-/* Chat Name Input Section */
-.ChatNameInput {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  background-color: #f9f9f9;
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  margin-top: 20px; /* Adds space above the chat name input */
-}
 
-.GroupNameInput {
-  width: 80%;
-  max-width: 350px;
-  padding: 10px 15px;
-  margin: 0 auto 15px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  font-size: 16px;
-  background-color: #fff;
-  outline: none;
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
-  box-sizing: border-box;
-}
-
-.GroupNameInput:focus {
-  border-color: #00668C;
-  box-shadow: 0 0 5px rgba(0, 102, 140, 0.3);
-}
 
 .ChatNameActions {
   display: flex;
@@ -393,7 +391,7 @@
   color: #fff;
 }
 
-.MessagesSidebar {
+.ChatsSidebar {
   overflow-y: scroll; /* Allows smooth scrolling */
   width: 24vw;
   border-right: 1px solid #ccc; /* Optional: Adds a subtle border */
