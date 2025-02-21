@@ -1,18 +1,17 @@
 /* Login css */
-.login {
-  background-color: #D4EAF7;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  overflow-y: scroll;
-}
 .loginPage {
   display: flex;
   flex-direction: column;
   height: 100vh;
+}
+
+.login {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  overflow-y: auto;
+  flex-grow: 1;
 }
 
 .login-container {
@@ -20,8 +19,8 @@
   padding: 20px;
   display: flex;
   flex-direction: row;
-  align-items: center; /* This will center the form contents */
-  text-align: left; /* Centers the text inside the container */
+  align-items: center;
+  text-align: left;
   /* margin-bottom: 50px; */
   justify-content: center;
 }
