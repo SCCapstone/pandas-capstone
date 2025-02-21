@@ -231,7 +231,7 @@
   width: 250px;
   min-width: 250px;
   height: 100vh;
-  background-color: #D9D9D9;
+  background-color: #00668C;
   overflow-y: auto;
   padding-top: 20px;
   text-align: left;
@@ -245,7 +245,7 @@
   margin: 7px 15px;
   text-decoration: none;
   font-size: 20px;
-  color: #313D44;
+  color: white;
   display: block;
   text-align: left;
 }
@@ -255,6 +255,7 @@
   background-color: white;
   border-radius: 5px;
   font-weight: bold;
+  color:#313D44;
 }
 
 /* Mobile view: transform sidebar into a top bar */

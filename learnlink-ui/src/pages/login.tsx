@@ -90,8 +90,8 @@ const Login: React.FC = () => {
                         />
                         {error && <p className="error">{error}</p>}
 
-                        <div className="forgot" onClick={() => navigate('/forgotpassword')}>
-                            Forgot password?
+                        <div className="forgot">
+                            <span onClick={() => navigate('/forgotpassword')}>Forgot password?</span>
                         </div>
 
                         <button type="submit" disabled={loading}>
