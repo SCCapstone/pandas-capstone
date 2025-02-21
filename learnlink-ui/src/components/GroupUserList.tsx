@@ -22,16 +22,20 @@ const GroupUserList = (
   groupId,
   currentId,
   users,
+  chatId,
   onClose,
   onRemoveUser,
   updateUsers,
+  updateChats,
 }: {
   groupId: number | null;
   currentId: number | null;
   users: User[] | null;
+  chatId: number | null;
   onClose: () => void;
   onRemoveUser: (userId: number, groupId: number | null) => void; // Update type here
   updateUsers: (userId: number) => void;
+  updateChats: (chatId: number) => void;
 }) => {
   
   const panelRef = useRef<HTMLDivElement>(null);
@@ -86,6 +90,11 @@ const GroupUserList = (
           onClick={() => {
             if (currentId !== null) {
               handleRemoveUser(currentId);
+              if (chatId !== null) {
+                updateChats(chatId); // Only call if chatId is valid
+              } else {
+                console.error('Chat ID is not available');
+              }
               closeComponent();
             } else {
               console.error('Current user ID is not available');

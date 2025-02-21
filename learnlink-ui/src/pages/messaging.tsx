@@ -743,9 +743,11 @@ const Messaging: React.FC = () => {
                         groupId={groupId}
                         currentId={currentUserId}
                         users={selectedChatUsers ?? []}
+                        chatId={selectedChat.id}
                         onClose={() => setIsUserPanelVisible(false)}
                         onRemoveUser={removeUser}
                         updateUsers={updateUsers}
+                        updateChats = {updateChats}
                       />
                     </div>
                   )}
