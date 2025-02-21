@@ -18,14 +18,17 @@
 }
 
 .login-container {
+  margin-top: 30px;
   width: 80vw;
   padding: 20px;
   display: flex;
-  align-items: center;
-  text-align: left;
+  flex-direction: column;
+  align-items: center; /* This will center the form contents */
+  text-align: left; /* Centers the text inside the container */
+  /* margin-bottom: 50px; */
   justify-content: center;
+  max-width: 800px;
 }
-
 .login_title {
   width: 100%;
   height: auto; /* Adjust the height */
@@ -113,4 +116,18 @@ label {
   font-weight: 500;
   border-radius: 5px;
   border: 0;
+}
+
+.Logo2-login {
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+  margin: 20px 20px;
+  box-sizing: border-box;
+  height:auto;
+
+}
+.Logo2-login svg {
+  width:150px;
+
 }
