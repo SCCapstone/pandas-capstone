@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import './signup.css';
 import Logo from '../components/Logo';
 import Copyright from '../components/CopyrightFooter';
+import { set } from 'react-hook-form';
 
 type User = {
     id: number;
@@ -51,14 +52,17 @@ const Signup: React.FC = () => {
 
     // Form submission
     const handleSignup = async (e: React.FormEvent) => {
+        setError(null);
         e.preventDefault();
 
         if (formData.password !== confirmPassword) {
+            console.log('Passwords do not match');
             setError('Passwords do not match');
             return;
         }
 
         if (!formData.firstName || !formData.lastName || !formData.email || !formData.username || !formData.password) {
+            console.log('All fields are required');
             setError('All fields are required');
             return;
         }
@@ -86,16 +90,21 @@ const Signup: React.FC = () => {
             
             // Handle unique warnings
             if (errorData.error === 'UsernameAlreadyExists') {
+                console.log('Username is already taken');
                 setError('Username is already taken');
-                throw new Error('Username is already taken');
+                // throw new Error('Username is already taken');
+                return;
 
             } else if (errorData.error === 'EmailAlreadyExists') {
+                console.log('Email is already registered');
                 setError('Email is already registered');
                 throw new Error('Email is already registered');
             } else if (errorData.error === 'NotEdu') {
+                console.log('Please use a .edu email');
                 setError('Please use a .edu email');
                 throw new Error('Non .edu email');
             } else {
+                console.log('Failed to create user');
                 throw new Error('Failed to create user');
             }
             }
@@ -154,30 +163,34 @@ const Signup: React.FC = () => {
             </div>
             <div className="signup">
                 <div className="signup-container">
-                    <form onSubmit={handleSignup} className='signup-form'>
                     <h1 className="l1">Sign Up</h1>
                     <h2 className="t2">Enter your credentials to join LearnLink.</h2>
-                        
-                        <label>First Name</label>
-                        <input
-                            type="text"
-                            placeholder="John"
-                            name="firstName"
-                            value={formData.firstName}
-                            onChange={handleChange}
-                            required
-                        />
-                    
-            
-                        <label>Last Name</label>
-                        <input
-                            type="text"
-                            placeholder="Doe"
-                            name="lastName"
-                            value={formData.lastName}
-                            onChange={handleChange}
-                            required
-                        />
+
+                    {/* Form to collect user data */}
+                    <div className="signup-form">
+                    <form onSubmit={handleSignup}>
+                        <div className="nameFields">
+                            <label>First Name</label>
+                            <input
+                                type="text"
+                                placeholder="John"
+                                name="firstName"
+                                value={formData.firstName}
+                                onChange={handleChange}
+                                required
+                            />
+                        </div>
+                        <div className="nameFields">
+                            <label>Last Name</label>
+                            <input
+                                type="text"
+                                placeholder="Doe"
+                                name="lastName"
+                                value={formData.lastName}
+                                onChange={handleChange}
+                                required
+                            />
+                        </div>
 
                         <label>Username</label>
                         <input
@@ -187,6 +200,13 @@ const Signup: React.FC = () => {
                             value={formData.username}
                             onChange={handleChange}
                         />
+                        <label>&nbsp;
+                            {error === 'Username is already taken' && (
+                        
+                                <span className="alert">* {error}</span>
+                            )}
+                        </label>
+
 
                         <label>Email</label>
                         <input
@@ -197,7 +217,17 @@ const Signup: React.FC = () => {
                             onChange={handleChange}
                             required
                         />
-            
+                        <label>&nbsp;
+                        {error === 'Email is already registered'  || error === "Please use a .edu email" && (
+                                <span className="alert">* {error}</span>
+                            )}
+                        </label>
+                        {/* <label>&nbsp;
+                        {error === 'Please use a .edu email' && (
+                                <span className="alert">* {error}</span>
+                            )}
+                        </label> */}
+
                         <label>Password</label>
                         <input
                             type="password"
@@ -230,16 +260,15 @@ const Signup: React.FC = () => {
                         <button className="signUpButton" type="submit" disabled={loading} data-testid="su-button">
                             {loading ? 'Signing Up...' : 'Sign Up'}
                         </button>
-                        <div className="loginRedirect">
-                            <label>Already have an account? <a href="/login">Log in</a></label>
-                        </div>
                     </form>
+                    </div>
 
+                    <div className="loginRedirect">
+                        <label>Already have an account? <a href="/login">Log in</a></label>
+                    </div>
                 </div>
             </div>
-            <footer>
-                <Copyright />
-            </footer>
+            <Copyright />
         </div>
     );
 };

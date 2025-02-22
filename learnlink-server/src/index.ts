@@ -160,6 +160,7 @@ app.post("/api/users", async (req, res): Promise<any> => {
     });
 
     if (emailExists) {
+      console.log('Email already exists');
       return res.status(400).json({ error: "EmailAlreadyExists" });
     }
 
@@ -167,6 +168,7 @@ app.post("/api/users", async (req, res): Promise<any> => {
     const lastExtension = domainParts ? domainParts.pop() : "";
 
     if (lastExtension !== "edu") {
+      console.log('Not an edu email');
       return res.status(400).json({ error: "NotEdu" });
     }
 
@@ -176,6 +178,7 @@ app.post("/api/users", async (req, res): Promise<any> => {
     });
 
     if (usernameExists) {
+      console.log('Username already exists');
       return res.status(400).json({ error: "UsernameAlreadyExists" });
     }
     // Hash the password before storing it in the database -> for security
@@ -2015,60 +2018,24 @@ io.on("connection", (socket) => {
   
 // };
 
-app.post("/api/sign-up-email", async (req, res) => {
+app.post("/api/sign-up-email", async (req: Request, res: Response): Promise<any>  => {
   try {
     const { to } = req.body; // Get data from frontend
+    const user = await prisma.user.findUnique({ where: { email:to } });
+    if (!user) return res.status(400).json({ error: "User not found" });
+
+    const username = user.username;
+
+    const emailHtml = welcomeEmailTemplate(username);
+
     console.log('Sending email to:', to);
 
     const response = await resend.emails.send({
       from: `no-reply@${REACT_APP_EMAIL_URL}`,
       to,
       subject: "Welcome to LearnLink",
-      html: `
-      <html>
-      <head>
-        <style>
-          @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
-          
-          body {
-            font-family: 'Inter', Arial, sans-serif;
-            color: #333;
-            margin: 0;
-            padding: 0;
-            background-color: #f9f9f9;
-          }
-          .email-container {
-            text-align: left;
-            padding: 20px;
-          }
-          h1 {
-            color: #00668c;
-          }
-          p {
-            font-size: 16px;
-          }
-        </style>
-      </head>
-      <body>
-        <div class="email-container">
-          <img src="../../learnlink-ui/src/components/LearnLink.svg" alt="LearnLink Logo" width="100" />
-          <h1>Welcome to LearnLink!</h1>
-          <p>Thank you for signing up with LearnLink. We're excited to have you on board!</p>
-          <p>If you have any questions, feel free to reach out to our support team.</p>
-          <p>Best regards,<br />The LearnLink Team</p>
-        </div>
-      </body>
-    </html>
-    `
-    ,
+      html: emailHtml,
     });
-
-    // const response = resend.emails.send({
-    //   from: 'onboarding@resend.dev',
-    //   to: 'jonessara141@gmail.com',
-    //   subject: 'Hello World',
-    //   html: '<p>Congrats on sending your <strong>first email</strong>!</p>'
-    // });
 
     res.json({ to, success: true, response, message: 'Email sent successfully' });
   } catch (error) {
@@ -2107,6 +2074,8 @@ app.post("/api/forgot-password/email", async (req, res):Promise<any> => {
   const user = await prisma.user.findUnique({ where: { email } });
   if (!user) return res.status(400).json({ error: "User not found" });
 
+  const username = user.username;
+
   // Generate a secure reset token
   const resetToken = crypto.randomBytes(32).toString("hex");
   const hashedResetToken = await bcrypt.hash(resetToken, 10);
@@ -2122,13 +2091,14 @@ app.post("/api/forgot-password/email", async (req, res):Promise<any> => {
   // Construct password reset link
   const resetLink = `${FRONTEND_URL}/resetpassword/${resetToken}`;
 
+  const emailHtml = passwordResetEmailTemplate(username, resetLink);
   // Send email via Resend
   try {
     const resendResponse =await resend.emails.send({
       from: `no-reply@${REACT_APP_EMAIL_URL}`,
       to: email,
       subject: "Password Reset Request",
-      html: `<p>Click <a href="${resetLink}">here</a> to reset your password. This link expires in 1 hour.</p>`,
+      html: emailHtml,
     });
 
     res.json({ success: true, resendResponse });
@@ -2196,6 +2166,13 @@ app.post('/api/study-groups/upload-pfp', authenticate, upload as express.Request
     console.error("Database update error:", error);
     res.status(500).json({ error: "Failed to update profile picture" });
   }
+});
+
+const upload_preview = multer({ storage: multer.memoryStorage() });  // Store file in memory
+
+app.post("/api/upload-preview", upload_preview.single("profilePic"), (req, res, next) => {
+  console.log("Received file:", req.file);  // Log the file info to ensure it's being uploaded
+  handleImagePreview(req, res).catch(next);
 });
 
 
@@ -2285,15 +2262,7 @@ app.delete('/api/notifications/delete/:id', async (req, res):Promise<any> => {
 
 
 
-
-const upload_preview = multer({ storage: multer.memoryStorage() });  // Store file in memory
-
-app.post("/api/upload-preview", upload_preview.single("profilePic"), (req, res, next) => {
-  console.log("Received file:", req.file);  // Log the file info to ensure it's being uploaded
-  handleImagePreview(req, res).catch(next);
-});
-
-
+// DO NOT EDIT BELOW THIS LINE
 
 export { app }; // Export the app for testing
 
