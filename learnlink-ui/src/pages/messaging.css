@@ -7,7 +7,6 @@
   height: 100vh;
 }
 
-
 .content {
   flex-direction: column;
   align-items: center;
@@ -16,7 +15,6 @@
 
 .Chat {
   display: flex;
-  /* max-height: calc(100vh - 50px - 86px); Header + Input */
   flex:1;
   overflow-y: hidden;
 }
@@ -46,18 +44,16 @@
 
 .ChatList {
   list-style: none;
-  padding: 0 0 0 0;
+  padding: 0;
   margin: 0;
-  /* margin-top: 20px; Adds space above the chat list */
 }
 
 .ChatListItem {
-  /* padding: 10px; */
-  border-bottom: 1px solid #ddd;
-  cursor: pointer;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  border-bottom: 1px solid #ddd;
+  cursor: pointer;
 }
 
 .ChatListItem:hover,
@@ -69,33 +65,22 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  height: 100%; /* Change from auto to 100% */
+  height: 100%;
   box-sizing: border-box;
-  overflow: hidden; /* Prevents overflow */
-
+  overflow: hidden;
 }
 
 .ChatHeader {
-  display:flex;
-  justify-content:space-between;
+  display: flex;
+  justify-content: space-between;
   padding-right: 20px;
   border-bottom: 1px solid #ddd;
   background-color: #f9f9f9;
 }
 
-.CreateStudyGroupButton {
-  font-weight: 700;
-  font-size: large;
-  padding: 10px;
-  background-color: #FEAD2B;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  height:60%;
-  align-self: center;
-}
-.EditStudyGroupButton {
+.CreateStudyGroupButton, 
+.EditStudyGroupButton, 
+.UserListButton {
   font-weight: 700;
   font-size: large;
   padding: 10px;
@@ -104,35 +89,26 @@
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  height:60%;
+  height: 60%;
   align-self: center;
 }
-.EditStudyGroupButton:hover {
-  background-color: #01506d;;
+
+.EditStudyGroupButton:hover, 
+.CreateStudyGroupButton:hover {
+  background-color: #01506d;
 }
 
 .UserListButton {
-  font-weight: 700;
-  font-size: large;
-  padding: 10px;
-  background-color: #007b9e; /* Slightly lighter shade for distinction */
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  height: 60%;
-  align-self: center;
-  margin-left: 10px; /* Space between the buttons */
+  background-color: #007b9e;
+  margin-left: 10px;
 }
 
-/* Flex container to position buttons side by side */
 .ButtonContainer {
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  gap: 10px; /* Adds space between buttons */
+  gap: 10px;
 }
-
 
 .ChatTitle {
   padding: 10px;
@@ -140,7 +116,7 @@
 
 .ChatWindow {
   display: flex;
-  flex:1;
+  flex: 1;
   flex-direction: column;
   width: 100%;
   margin: 0 auto;
@@ -148,7 +124,6 @@
   overflow-y: scroll;
   box-sizing: border-box;
   border-radius: 8px;
-
 }
 
 .NoChatSelected {
@@ -186,7 +161,7 @@
 .ChatInput button {
   font-weight: 700;
   font-size: large;
-  padding: 10px 20px ;
+  padding: 10px 20px;
   background-color: #00668C;
   color: white;
   border: none;
@@ -198,7 +173,6 @@
 .ChatInput button:hover {
   background-color: #01506d;
 }
-
 
 /* User List */
 .UserList {
@@ -229,8 +203,6 @@
   box-shadow: 0 0 0 2px rgba(0, 102, 140, 0.3);
 }
 
-
-
 .ChatNameActions {
   display: flex;
   gap: 10px;
@@ -260,26 +232,21 @@
   color: brown;
 }
 
-
-
-
 .ChatListHeader {
-  font-size: 1.5rem; /* Sets a larger font size */
-  font-weight: bold; /* Makes the text bold */
+  font-size: 1.5rem;
+  font-weight: bold;
   padding-top: 50px;
-  padding: 15px; /* Adds padding around the header */
-  background-color: #00668C; /* Gives the header a blue background */
-  color: white; /* White text color */
-  text-align: center; /* Centers the text */
-  border-top-left-radius: 10px; /* Rounded corners for top left */
-  border-top-right-radius: 10px; /* Rounded corners for top right */
-  margin-bottom: 10px; /* Adds some space below the header */
-  margin-top: 20px;
+  padding: 15px;
+  background-color: #00668C;
+  color: white;
+  text-align: center;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  margin-bottom: 10px;
 }
 
 .ChatList {
-  overflow-y: auto; /* Enables vertical scrolling */
-  /* padding-right: 10px; Optional: prevent scrollbar from overlapping content */
+  overflow-y: auto;
 }
 
 .ChatListItem {
@@ -289,7 +256,7 @@
 }
 
 .ChatListItem.active {
-  background-color: #e3e3e3; /* Highlight active chat */
+  background-color: #e3e3e3;
 }
 
 .ChatNameActions button:first-child {
@@ -314,6 +281,7 @@
   color: green;
   margin-left: 5px;
 }
+
 .Offline::after {
   content: '•';
   color: red;
@@ -323,7 +291,6 @@
 .TabsContainer {
   display: flex;
   justify-content: center;
-  /* background-color: #f0f4f8; */
   background-color: #00668C;
   padding: 10px;
   border-bottom: 2px solid #ccc;
@@ -342,7 +309,7 @@
 }
 
 .Tab.active {
-  border-bottom: 3px solid #fff; /* Highlight the active tab */
+  border-bottom: 3px solid #fff;
   color: #fff;
 }
 
@@ -351,14 +318,13 @@
 }
 
 .ChatsSidebar {
-  overflow-y: scroll; /* Allows smooth scrolling */
+  overflow-y: scroll;
   width: 30%;
   max-width: 30%;
-  border-right: 1px solid #ccc; /* Optional: Adds a subtle border */
-  background-color: #f9f9f9; /* Light background for better readability */
-  height:100%;
+  border-right: 1px solid #ccc;
+  background-color: #f9f9f9;
+  height: 100%;
 }
-
 
 /* Individual message */
 .message {
@@ -376,15 +342,15 @@
   align-items: flex-start;
   margin-bottom: 10px;
   box-sizing: border-box;
-
 }
 
 .MyMessage {
-  background-color: #daf8cb; /* light green */
+  background-color: #daf8cb;
   align-self: flex-end;
 }
+
 .OtherMessage {
-  background-color: #f0f0f0; /* light gray */
+  background-color: #f0f0f0;
   align-self: flex-start;
 }
 
@@ -396,30 +362,121 @@
   font-size: 16px;
   margin-top: 4px;
 }
-/* location of the hearts in relation to the messages */
+
 .MyMessage + .Heart {
   align-self: flex-end;
 }
 
-.OtherMessage +.Heart{
-  align-self: flex-start
+.OtherMessage + .Heart {
+  align-self: flex-start;
 }
 
 /* Responsive Adjustments */
 @media (max-width: 768px) {
-  /*todo fill in responsive stuff*/
-}
+  .Messaging {
+    flex-direction: column;
+    height: auto;
+  }
 
-.username {
-  font-weight: bold;
-  margin-bottom: 4px;
-  color: #555;
-}
+  .Chat {
+    flex-direction: column;
+    height: auto;
+    overflow: auto;
+  }
 
-.NoChatSelected {
-  text-align: center;
-  font-size: 18px;
-  color: #888;
-  padding: 20px;
-}
+  .ChatOptions {
+    width: 100%;
+    border-right: none;
+    padding: 10px;
+  }
 
+  .ChatSection {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    box-sizing: border-box;
+    overflow: auto;
+  }
+
+  .ChatHeader {
+    flex-direction: column;
+    padding: 10px;
+    border-bottom: none;
+    background-color: #f9f9f9;
+    text-align: center;
+  }
+
+  /* Chat window settings for mobile */
+  .ChatWindow {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    width: 100%;
+    margin: 0;
+    padding: 10px;
+    box-sizing: border-box;
+    border-radius: 8px;
+    max-height: 50vh; /* Limit the height of the chat window to 50% of the viewport height */
+    overflow-y: auto; /* Allow vertical scrolling */
+  }
+
+  .ChatInput {
+    flex-direction: column;
+    width: 100%;
+    padding: 10px;
+  }
+
+  .ChatInput input {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+  .ChatInput button {
+    width: 100%;
+  }
+
+  .ButtonContainer {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .CreateStudyGroupButton,
+  .EditStudyGroupButton,
+  .UserListButton {
+    width: 100%;
+    height: auto;
+  }
+
+  .TabsContainer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .Tab {
+    width: 100%;
+    text-align: center;
+    font-size: 18px;
+    padding: 15px;
+  }
+
+  .ChatsSidebar {
+    width: 100%;
+    max-width: 100%;
+    border-right: none;
+  }
+
+  .MessageBubble {
+    max-width: 100%;
+    margin: 5px 0;
+    padding: 10px;
+    background-color: #e0e0e0;
+    border-radius: 10px;
+  }
+
+  .MyMessage,
+  .OtherMessage {
+    max-width: 100%;
+  }
+}
