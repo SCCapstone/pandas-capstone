@@ -4,33 +4,38 @@
     /* top: 50%;
     left: 0;
     right: 0; */
-    top: 40px; /* Adjust based on your icon's position */
+    top: 55px; /* Adjust based on your icon's position */
     right: 0; /* Aligns it to the right */
     width: 180px; /* Set a proper width */
 
     /*transform: translateX(-100%); /* Moves it completely to the left */
     /*right:0;*/
     max-height: 300px;
-    background-color: #fff;
     border-radius: 8px;
+    background-color: #fff;
     overflow-y: auto;
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
     z-index: 1000;
     padding: 10px;
     padding-inline-start: 0;
-}
-
-.notif-dropdown:hover {
-    background-color: #D4EAF7;
+    transition: background-color 0.3s ease-in-out;
 }
 
 .notif-dropdown p {
     color: black;
+    font-size: 24px;
+    font-family: Arial, Helvetica, sans-serif;
     padding: 12px 16px;
     cursor: pointer;
     font-size: 14px;
     margin: 0;
-    border: 1px #eee;
+    border: 0px solid #eee;
+    text-align: center;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.notif-dropdown p:last-child {
+    border-bottom: none;
 }
 
 .notif-dropdown p:hover {
