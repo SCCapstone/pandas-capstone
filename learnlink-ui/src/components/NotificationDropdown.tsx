@@ -53,6 +53,7 @@ const NotificationDropdown: React.FC = () => {
   }, []); // Runs once when component mounts
 
   // Handle notification click (delete notification)
+  // TODO - when you click I want it to also take you to the chat
   const handleSelectNotif = async (notif: Notification) => {
     try {
       console.log('Deleting notification with ID:', notif.id);
