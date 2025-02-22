@@ -2,7 +2,7 @@ import './JoinReqProfile.css'
 import '../pages/messaging.css';
 import { formatEnum } from '../utils/format';
 import './components.css';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 
 interface JoinReqProfileProps {
@@ -12,6 +12,8 @@ interface JoinReqProfileProps {
 }
 
 const JoinReqProfile: React.FC<JoinReqProfileProps> = ({ id, name, onClose }) => {
+
+  const panelRef = useRef<HTMLDivElement>(null);
   const [user, setUser] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
   const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
@@ -32,6 +34,19 @@ const JoinReqProfile: React.FC<JoinReqProfileProps> = ({ id, name, onClose }) =>
     fetchUser();
   }, [id]);
 
+  useEffect(() => {
+      const handleClickOutside = (event: MouseEvent) => {
+        if (panelRef.current && !panelRef.current.contains(event.target as Node)) {
+          onClose();
+        }
+      };
+  
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => {
+        document.removeEventListener('mousedown', handleClickOutside);
+      };
+    }, [onClose]);
+
   if (error) {
     return <div className="popup-profile-panel"><p>{error}</p></div>;
   }
@@ -41,7 +56,7 @@ const JoinReqProfile: React.FC<JoinReqProfileProps> = ({ id, name, onClose }) =>
   }
 
   return (
-    <div className="popup-profile-panel">
+    <div ref={panelRef} className="popup-profile-panel">
       <div className="popup-profile-header">
         <h1>{name}'s Profile</h1>
         <button className="popup-close-button" onClick={onClose}>X</button>
