@@ -164,6 +164,7 @@ const JoinRequests: React.FC<JoinRequestProps> = ({ currentUserId, addNewChat })
     }
   };
 
+
   return (
     <div className="requests-panel">
       {/* Display error message if any */}
@@ -185,18 +186,28 @@ const JoinRequests: React.FC<JoinRequestProps> = ({ currentUserId, addNewChat })
             .map((request) => (
               <li key={request.id} className="request-item">
                 <div className="request-details">
-                  {/* Display requester's name */}
-                  <p><strong>Requester Name: </strong>{request.user.firstName} {request.user.lastName}</p>
+                  {/* Profile button before requester's name */}
+                  <p className="requester-info">
+                  
+                    <strong className='requester-name'> Requester Name: </strong>{request.user.firstName} {request.user.lastName}
+                    <button 
+                      className="requester-profile-button"
+                      //onClick={() => window.location.href = `/profile/${request.user.id}`}
+                    >
+                      👤 
+                    </button>
+                   </p>
                   
                   {/* Display target group if applicable */}
                   {request.targetGroupId && request.targetGroup && (
-                    <p><strong>Target Group: </strong> {request.targetGroup.studyGroup.name}</p>
+                    <p className='request-target-group-name'><strong>Target Group: </strong> {request.targetGroup.studyGroup.name}</p>
                   )}
                   
                   {/* Display request message */}
-                  <p><strong>Message: </strong> {request.message}</p>
+                  <p className='request-message'><strong>Message: </strong> {request.message}</p>
+                  
                 </div>
-
+  
                 {/* Approve and reject buttons */}
                 <div className="request-actions">
                   <button
@@ -223,5 +234,4 @@ const JoinRequests: React.FC<JoinRequestProps> = ({ currentUserId, addNewChat })
     </div>
   );
 };  
-
 export default JoinRequests;
