@@ -263,6 +263,7 @@ const Messaging: React.FC = () => {
   
   // Switches from the Chats tab to the Requests Tab
   const handleRequestsSwitch = () => {
+    setSelectedChat(null);
     setActiveTab('requests');
     setShowMessagesPanel(false);
     setShowRequestsPanel(true);
