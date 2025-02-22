@@ -3,12 +3,12 @@ import '../pages/messaging.css';
 import './components.css';
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import JoinReqProfile from './JoinReqProfile';
 
 // Props interface defining the expected properties for the JoinRequests component
 interface JoinRequestProps {
-  currentUserId: number | null;  // ID of the currently logged-in user
-  addNewChat: (newChat: any) => void; // Callback function to update the parent component with new chat data
+  currentUserId: number | null;
+  addNewChat: (newChat: any) => void;
+  openProfilePopup: (profile: { id: number; name: string }) => void;
 }
 
 // Interface defining the structure of a swipe request
@@ -43,7 +43,7 @@ interface StudyGroup {
 }
 
 // JoinRequests component handles fetching, displaying, approving, and rejecting join requests
-const JoinRequests: React.FC<JoinRequestProps> = ({ currentUserId, addNewChat }) => {
+const JoinRequests: React.FC<JoinRequestProps> = ({ currentUserId, addNewChat, openProfilePopup }) => {
   const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
   const [requests, setRequests] = useState<SwipeRequest[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -62,8 +62,18 @@ const JoinRequests: React.FC<JoinRequestProps> = ({ currentUserId, addNewChat })
     try {
       const requestResponse = await axios.get(`${REACT_APP_API_URL}/api/swipe/${currentUserId}`);
   
-      // Filter swipes to only include those with direction === "YES"
+      // Filter swipes to only include those with direction === "Yes"
       let requestData = requestResponse.data.filter((req: SwipeRequest) => req.direction === 'Yes');
+
+      // Eliminate duplicates by using a Set to track unique request keys
+      const uniqueRequestsMap = new Map();
+      requestData.forEach((req: SwipeRequest) => {
+        const uniqueKey = `${req.userId}-${req.targetGroupId || req.targetUserId}`;
+        if (!uniqueRequestsMap.has(uniqueKey)) {
+          uniqueRequestsMap.set(uniqueKey, req);
+        }
+      });
+      const uniqueRequests = Array.from(uniqueRequestsMap.values());
 
 
       // Fetch user details for each request
@@ -176,12 +186,13 @@ const JoinRequests: React.FC<JoinRequestProps> = ({ currentUserId, addNewChat })
     }
   };
 
-  const handleProfilePopup = async (userId: number) => {
+  const handleProfilePopup = (userId: number) => {
     const user = requests.find((req) => req.user.id === userId)?.user;
     if (user) {
-      setSelectedProfile({ id: user.id, name: `${user.firstName} ${user.lastName}` });
+      openProfilePopup({ id: user.id, name: `${user.firstName} ${user.lastName}` });
     }
   };
+  
 
   const closeProfilePopup = () => {
     setSelectedProfile(null);
@@ -252,13 +263,6 @@ const JoinRequests: React.FC<JoinRequestProps> = ({ currentUserId, addNewChat })
               </li>
             ))}
         </ul>
-      )}
-      {selectedProfile && (
-        <JoinReqProfile
-          id={selectedProfile.id}
-          name={selectedProfile.name}
-          onClose={closeProfilePopup}
-        />
       )}
     </div>
   );
