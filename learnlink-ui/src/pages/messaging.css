@@ -199,47 +199,6 @@
   background-color: #01506d;
 }
 
-/* Dropdown Container */
-.DropdownContainer {
-  position: relative;
-  display: inline-block;
-  width: 100%;
-  margin-bottom: 20px; /* Adds space below the dropdown */
-}
-
-/* Dropdown Menu */
-.DropdownMenu {
-  display: none;
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  background-color: white;
-  border: 1px solid #ccc;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  width: 100%;
-  z-index: 1;
-  max-height: 300px;
-  overflow-y: auto;
-  padding: 10px 0;
-  border-radius: 4px;
-}
-
-.DropdownMenu.open {
-  display: block;
-}
-
-/* Search Input */
-.SearchInput {
-  width: 100%;
-  max-width: 100px;
-  padding: 8px 12px;
-  margin: 0 auto 10px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 14px;
-  box-sizing: border-box;
-}
 
 /* User List */
 .UserList {
@@ -393,10 +352,10 @@
 
 .ChatsSidebar {
   overflow-y: scroll; /* Allows smooth scrolling */
-  width: 24vw;
+  width: 30%;
+  max-width: 30%;
   border-right: 1px solid #ccc; /* Optional: Adds a subtle border */
   background-color: #f9f9f9; /* Light background for better readability */
-  min-width: fit-content;
   height:100%;
 }
 
