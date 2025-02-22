@@ -2198,6 +2198,8 @@ app.post('/api/study-groups/upload-pfp', authenticate, upload as express.Request
 });
 
 
+
+// NOTIFICATIONS
 app.get('/api/notifications', authenticate, async (req: Request, res: Response) => {
   const userId = res.locals.userId;
   try {
@@ -2219,6 +2221,69 @@ app.get('/api/notifications', authenticate, async (req: Request, res: Response) 
     res.status(500).json({ error: 'Failed to fetch notifications' });
   }
 });
+
+
+app.post('/notifications/send', async (req, res):Promise<any> => {
+  try {
+    const { userId, message, type } = req.body;
+
+    if (!userId || !message || !type) {
+      return res.status(400).json({ error: 'Missing required fields' });
+    }
+
+    if (!['Match', 'Message', 'StudyGroup'].includes(type)) {
+      return res.status(400).json({ error: 'Invalid notification type' });
+    }
+
+    // Create the notification
+    const notification = await prisma.notification.create({
+      data: {
+        user_id: userId,
+        message,
+        read: false,
+        type,
+      },
+    });
+
+    // Send via WebSocket
+    io.to(userId.toString()).emit('notification', notification);
+
+    // Return the notification in the response
+    return res.status(201).json(notification);
+  } catch (error) {
+    console.error('Error sending notification:', error);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+app.delete('/api/notifications/delete/:id', async (req, res):Promise<any> => {
+  const notificationId = parseInt(req.params.id);
+
+  if (!notificationId) {
+    return res.status(400).json({ error: 'Invalid notification ID' });
+  }
+
+  try {
+    const deletedNotification = await prisma.notification.delete({
+      where: {
+        id: notificationId,
+      },
+    });
+
+    if (deletedNotification) {
+      return res.status(200).json({ message: 'Notification deleted successfully' });
+    } else {
+      return res.status(404).json({ error: 'Notification not found' });
+    }
+  } catch (error) {
+    console.error('Error deleting notification:', error);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
+
+
 
 const upload_preview = multer({ storage: multer.memoryStorage() });  // Store file in memory
 
