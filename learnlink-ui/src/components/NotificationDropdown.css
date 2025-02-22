@@ -5,7 +5,7 @@
     left: 0;
     right: 0; */
     top: 55px; /* Adjust based on your icon's position */
-    right:25px; /* Aligns it to the right */
+    right:30px; /* Aligns it to the right */
     width: 180px; /* Set a proper width */
 
     /*transform: translateX(-100%); /* Moves it completely to the left */
@@ -40,4 +40,8 @@
 
 .notif-dropdown p:hover {
     background-color: #D4EAF7;
+}
+
+#none{
+    background-color: white;
 }

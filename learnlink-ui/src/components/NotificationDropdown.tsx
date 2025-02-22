@@ -91,7 +91,7 @@ const NotificationDropdown: React.FC = () => {
       <ul className="notif-dropdown">
         {loading && <p>Loading notifications...</p>}
         {error && <p>{error}</p>}
-        {notifs.length === 0 && !loading && <p>No new notifications</p>}
+        {notifs.length === 0 && !loading && <p id="none">No new notifications</p>}
         {notifs.map((notif) => (
           <li key={notif.id} onClick={() => handleSelectNotif(notif)} className={notif.read ? 'read' : 'unread'}>
             <p>{notif.message}</p>
