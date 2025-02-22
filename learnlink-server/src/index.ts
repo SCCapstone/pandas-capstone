@@ -2183,6 +2183,8 @@ app.post('/api/users/upload-pfp', authenticate, upload as express.RequestHandler
   }
 });
 
+
+// NOTIFICATIONS
 app.get('/api/notifications', authenticate, async (req: Request, res: Response) => {
   const userId = res.locals.userId;
   try {

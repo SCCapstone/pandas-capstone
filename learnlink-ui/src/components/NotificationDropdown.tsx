@@ -94,7 +94,6 @@ const NotificationDropdown: React.FC = () => {
         {notifs.map((notif) => (
           <li key={notif.id} onClick={() => handleSelectNotif(notif)} className={notif.read ? 'read' : 'unread'}>
             <p>{notif.message}</p>
-            <p>{new Date(notif.created_at).toLocaleString()}</p>
           </li>
         ))}
       </ul>
