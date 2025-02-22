@@ -74,7 +74,7 @@
     display: flex;
     align-items: center;
     gap: 24px; /* Large gap between name and button */
-    margin-bottom: 12px; /* Space below the name section */
+    margin-bottom: 12åpx; /* Space below the name section */
     font-size: 1rem;
     color: #444;
   }
