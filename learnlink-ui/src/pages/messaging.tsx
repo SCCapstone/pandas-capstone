@@ -10,6 +10,7 @@ import EditStudyGroup from '../components/EditStudyGroup';
 import ChatsNavi from "../components/ChatsNavi";
 import JoinRequests from '../components/JoinRequests';
 import GroupUserList from '../components/GroupUserList';
+import JoinReqProfile from '../components/JoinReqProfile';
 
 
 
@@ -76,6 +77,8 @@ const Messaging: React.FC = () => {
   // for displaying names above messages sent
   const [usernames, setUsernames] = useState<{ [key: number]: string }>({});
   const [groupId, setGroupId] = useState<number | null>(null);
+
+  const [selectedProfile, setSelectedProfile] = useState<{ id: number; name: string } | null>(null);
 
   useEffect(() => {
     handleChatsSwitch();
@@ -702,6 +705,14 @@ const Messaging: React.FC = () => {
   
   
 
+  const openProfilePopup = (profile: { id: number; name: string }) => {
+    setSelectedProfile(profile);
+  };
+
+  const closeProfilePopup = () => {
+    setSelectedProfile(null);
+  };
+
   //sends the message 
   const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Enter') {
@@ -717,6 +728,7 @@ const Messaging: React.FC = () => {
       </div>
       <div className="Chat">
         {/* Tabs for Messages and Requests */}
+
         <div className="ChatsSidebar">
           <div className="TabsContainer">
             <button 
@@ -750,8 +762,10 @@ const Messaging: React.FC = () => {
             <JoinRequests 
             currentUserId={currentUserId} 
             addNewChat={addNewChat} // Passing addNewChat as a prop
+            openProfilePopup={openProfilePopup}
           />
           )}
+
       
         </div>
 
@@ -892,7 +906,16 @@ const Messaging: React.FC = () => {
             <div className="NoChatSelected">Select a chat to start messaging</div>
           )}
         </div>
+         {/* Render the popup at the Messaging level */}
+         
       </div>
+      {selectedProfile && (
+            <JoinReqProfile
+              id={selectedProfile.id}
+              name={selectedProfile.name}
+              onClose={closeProfilePopup}
+            />
+          )}
       <div>
         <CopyrightFooter />
       </div>
