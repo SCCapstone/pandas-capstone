@@ -3,6 +3,7 @@ import '../pages/messaging.css';
 import './components.css';
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import JoinReqProfile from './JoinReqProfile';
 
 // Props interface defining the expected properties for the JoinRequests component
 interface JoinRequestProps {
@@ -46,6 +47,7 @@ const JoinRequests: React.FC<JoinRequestProps> = ({ currentUserId, addNewChat })
   const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
   const [requests, setRequests] = useState<SwipeRequest[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [selectedProfile, setSelectedProfile] = useState<{ id: number; name: string } | null>(null);
 
   // Fetch requests when currentUserId changes
   useEffect(() => {
@@ -164,6 +166,16 @@ const JoinRequests: React.FC<JoinRequestProps> = ({ currentUserId, addNewChat })
     }
   };
 
+  const handleProfilePopup = async (userId: number) => {
+    const user = requests.find((req) => req.user.id === userId)?.user;
+    if (user) {
+      setSelectedProfile({ id: user.id, name: `${user.firstName} ${user.lastName}` });
+    }
+  };
+
+  const closeProfilePopup = () => {
+    setSelectedProfile(null);
+  };
 
   return (
     <div className="requests-panel">
@@ -192,7 +204,7 @@ const JoinRequests: React.FC<JoinRequestProps> = ({ currentUserId, addNewChat })
                     <strong className='requester-name'> Requester Name: </strong>{request.user.firstName} {request.user.lastName}
                     <button 
                       className="requester-profile-button"
-                      //onClick={() => window.location.href = `/profile/${request.user.id}`}
+                      onClick={() => handleProfilePopup(request.user.id)}
                     >
                       👤 
                     </button>
@@ -230,6 +242,13 @@ const JoinRequests: React.FC<JoinRequestProps> = ({ currentUserId, addNewChat })
               </li>
             ))}
         </ul>
+      )}
+      {selectedProfile && (
+        <JoinReqProfile
+          id={selectedProfile.id}
+          name={selectedProfile.name}
+          onClose={closeProfilePopup}
+        />
       )}
     </div>
   );
