@@ -332,10 +332,7 @@ const Messaging: React.FC = () => {
   
         setCurrentMessage('');
 
-    // TODO add -- add notifications when messages are sent
-    // TODO doesn't work for group chats - only sends to one group member
-
-    // **Handling Notifications for Messages**
+    // Notifications for messaging - Done
     console.log('Sending notification request to backend...');
 
     let senderName = "Unknown Sender";
@@ -354,13 +351,12 @@ const Messaging: React.FC = () => {
     if (recipients.length > 0) {
       
       const isGroupChat = selectedChat.users.length > 2;
-      const groupChatName = selectedChat.id || "Group Chat";
+      const chatName = await getChatName(selectedChat);
 
       // Create the notification message
       let notificationMessage = `New message from ${senderName}`;
       if (isGroupChat) {
-        //notificationMessage += ` in ${groupChatName}`;
-        notificationMessage += ` in study group`;
+        notificationMessage += ` in ${chatName}`;
       }
 
       console.log('Notification message:', notificationMessage);
