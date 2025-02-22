@@ -5,7 +5,7 @@
     left: 0;
     right: 0; */
     top: 55px; /* Adjust based on your icon's position */
-    right: 0; /* Aligns it to the right */
+    right:25px; /* Aligns it to the right */
     width: 180px; /* Set a proper width */
 
     /*transform: translateX(-100%); /* Moves it completely to the left */
@@ -16,13 +16,13 @@
     overflow-y: auto;
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
     z-index: 1000;
-    padding: 10px;
+    border: 1px solid #00668C;
     padding-inline-start: 0;
     transition: background-color 0.3s ease-in-out;
 }
 
 .notif-dropdown p {
-    color: black;
+    color: #00668C;
     font-size: 24px;
     font-family: Arial, Helvetica, sans-serif;
     padding: 12px 16px;
