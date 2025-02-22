@@ -10,8 +10,6 @@ import http from "http";
 import { Server } from "socket.io";
 import path, { parse } from 'path';
 import { JwtPayload } from "jsonwebtoken";
-import nodemailer from "nodemailer";
-import { profile } from "console";
 import fs from 'fs';
 import https from 'https';
 import dotenv from 'dotenv';
@@ -36,7 +34,7 @@ const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000'; // Loc
 const SERVER_PORT = process.env.SERVER_PORT ? parseInt(process.env.SERVER_PORT, 10) : (NODE_ENV === 'production' ? 2020 : 2020);
 const JWT_SECRET = env.JWT_SECRET || 'your_default_jwt_secret';
 const resend = new Resend(process.env.RESEND);
-const REACT_APP_EMAIL_URL = process.env.REACT_APP_EMAIL_URL || 'learnlinkserverhost.zapto.org';
+const REACT_APP_EMAIL_URL = process.env.REACT_APP_EMAIL_URL || 'learnlink.site';
 const MAX_USERS_IN_A_GROUP = 6;
 
 // Read certificates conditionally based on the environment
@@ -998,6 +996,7 @@ app.get("/api/study-groups/chat/:chatId", async (req, res): Promise<any> => {
         subject: studyGroup.subject,
         description: studyGroup.description,
         ideal_match_factor: studyGroup.ideal_match_factor,
+        profilePic: studyGroup.profilePic,
       });
     } else {
       return res.json({ studyGroupID: null }); // No study group found
@@ -2182,6 +2181,22 @@ app.post('/api/users/upload-pfp', authenticate, upload as express.RequestHandler
     res.status(500).json({ error: "Failed to update profile picture" });
   }
 });
+
+app.post('/api/study-groups/upload-pfp', authenticate, upload as express.RequestHandler, resizeAndUpload as express.RequestHandler, async (req, res):Promise<any> => {
+  const chatID = req.body.chatID;
+  try {
+    const updatedStudyGroup = await prisma.studyGroup.update({
+      where: { chatID },
+      data: { profilePic: req.body.profilePicUrl }, // Save S3 URL
+    });
+
+    res.status(200).json({ message: "Profile picture updated", profilePic: updatedStudyGroup.profilePic });
+  } catch (error) {
+    console.error("Database update error:", error);
+    res.status(500).json({ error: "Failed to update profile picture" });
+  }
+});
+
 
 app.get('/api/notifications', authenticate, async (req: Request, res: Response) => {
   const userId = res.locals.userId;

@@ -272,9 +272,6 @@ const Profile: React.FC = () => {
                 <label>
                   Age: <input type="number" name="age" value={formData.age} onChange={handleChange} />
                 </label>
-                <label>
-                  College: <input type="text" name="college" value={formData.college} onChange={handleChange} />
-                </label>
                 <div className="college-select">
               <label>College: <br />
               <Select
