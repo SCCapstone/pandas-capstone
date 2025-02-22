@@ -34,7 +34,7 @@ const JoinReqProfile: React.FC<JoinReqProfileProps> = ({ id, name, onClose }) =>
     fetchUser();
   }, [id]);
 
-  useEffect(() => {
+    useEffect(() => {
       const handleClickOutside = (event: MouseEvent) => {
         if (panelRef.current && !panelRef.current.contains(event.target as Node)) {
           onClose();
