@@ -184,7 +184,6 @@
   justify-content: flex-start;
   gap: 1rem;
   overflow-y: scroll;
-  min-width: fit-content;
 }
 
 .group-title {
@@ -381,6 +380,9 @@
   .swipe-right-side h3 {
     font-size: 1.25rem;
     text-align: left;
+  }
+  .group-right {
+    min-width: fit-content;
   }
 
   .group-info {
