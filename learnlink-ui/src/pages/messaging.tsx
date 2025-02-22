@@ -330,6 +330,44 @@ const Messaging: React.FC = () => {
 
         //TODO add -- add notifications when messages are sent
 
+      // Get the other user's name (recipient)
+      let recipientName = "Unknown Recipient";  // Fallback in case no name is found
+
+      if (selectedChat.users && currentUserId) {
+        // Find the other user in the chat users list
+        const otherUser = selectedChat.users.find((user) => user.id !== currentUserId);
+
+        if (otherUser) {
+          recipientName = `${otherUser.firstName} ${otherUser.lastName}`;
+        }
+      }
+
+      console.log('Recipient name for notification:', recipientName); // Log the recipient's name
+
+      // **Send Notification to Backend**
+      console.log('Sending notification request to backend...');
+
+      // Create the notification message with the sender's and recipient's names
+      const notificationMessage = `New message from ${recipientName}`;
+      console.log('Notification message:', notificationMessage); // Log the notification message
+
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/notifications/send`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          userId: currentUserId,  // The sender of the message
+          message: notificationMessage,  // Send the custom message
+          type: "Message",  // Notification type (Message)
+          chatId: selectedChat.id,  // The chat id to determine the recipient
+        }),
+      });
+
+      console.log('Notification sent, response:', response); // Log the response from sending the notification
+      console.log('Done: Sending notification request to backend...');
+
       } catch (error) {
         console.error('Error sending message:', error);
       }

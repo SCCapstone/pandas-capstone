@@ -14,42 +14,75 @@ const NotificationDropdown: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
 
-  // Fetch notifications from the backend
   useEffect(() => {
     const fetchNotifications = async () => {
-        try {
-          const token = localStorage.getItem('token');
-          const userResponse = await fetch(`${REACT_APP_API_URL}/api/notifications`, {
-            headers: {
-              'Authorization': `Bearer ${token}`,
-            },
-          });
-      
-          if (!userResponse.ok) {
-            const errorText = await userResponse.text();
-            console.error('Error response:', errorText);
-            throw new Error(`Error: ${userResponse.status}`);
-          }
-      
-          const data = await userResponse.json();
-          console.log('Fetched notifications:', data); // Log the data here to see what is returned
-          setNotifs(data);
-        } catch (err) {
-          console.error('Error loading notifications:', err);
-          setError('Error loading notifications');
-        } finally {
+      console.log('Fetching notifications...');
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+          console.error('No authentication token found.');
+          setError('Unauthorized: No token found');
           setLoading(false);
+          return;
         }
-      };
-      
+
+        const response = await fetch(`${REACT_APP_API_URL}/api/notifications`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('Error response from server:', errorText);
+          throw new Error(`Error: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log('Fetched notifications:', data); // Debugging log
+        setNotifs(data);
+      } catch (err) {
+        console.error('Error loading notifications:', err);
+        setError('Error loading notifications');
+      } finally {
+        setLoading(false);
+      }
+    };
 
     fetchNotifications();
-  }, []); // Empty dependency array ensures this runs once when the component mounts
+  }, []); // Runs once when component mounts
 
-  // Handle selecting a notification
-  const handleSelectNotif = (notif: Notification) => {
-    // Mark as read or take other actions based on the selected notification
-    console.log('Selected notification:', notif);
+  // Handle notification click (delete notification)
+  const handleSelectNotif = async (notif: Notification) => {
+    try {
+      console.log('Deleting notification with ID:', notif.id);
+
+      const token = localStorage.getItem('token');
+      if (!token) {
+        console.error('No authentication token found.');
+        return;
+      }
+
+      const response = await fetch(`${REACT_APP_API_URL}/api/notifications/delete/${notif.id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        console.error('Failed to delete notification:', await response.text());
+        return;
+      }
+
+      console.log('Notification deleted successfully:', notif.id);
+
+      // Update state to reflect the deletion in UI
+      setNotifs((prevNotifs) => prevNotifs.filter((n) => n.id !== notif.id));
+    } catch (error) {
+      console.error('Error deleting notification:', error);
+    }
   };
 
   return (
@@ -59,7 +92,7 @@ const NotificationDropdown: React.FC = () => {
         {error && <p>{error}</p>}
         {notifs.length === 0 && !loading && <p>No new notifications</p>}
         {notifs.map((notif) => (
-          <li key={notif.id} onClick={() => handleSelectNotif(notif)}>
+          <li key={notif.id} onClick={() => handleSelectNotif(notif)} className={notif.read ? 'read' : 'unread'}>
             <p>{notif.message}</p>
             <p>{new Date(notif.created_at).toLocaleString()}</p>
           </li>
