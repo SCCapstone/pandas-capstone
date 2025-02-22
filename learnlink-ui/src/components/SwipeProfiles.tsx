@@ -96,8 +96,41 @@ const SwipeProfiles = ({ userId }: { userId: number }) => {
   console.log(currentProfile)
 
   const handleSendMessage = async (message: string) => {
+
     handleSwipe("Yes", currentProfile.id, !!currentProfile.studyGroupId, message);
+
+    
     //TODO add -- add notifications when a request is sent 
+    // working but doesn't tell you who sent the request
+
+    console.log("Sending match notification...");
+    // Send a notification when a match occurs
+    try {
+    
+    const notificationMessage = `You have a new pending request`;
+
+    const response = await fetch(`${REACT_APP_API_URL}/notifications/send`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        userId: currentProfile.id,  // The recipient of the match (i.e., the person receiving the notification)
+        message: notificationMessage,
+        type: "Match",
+      }),
+    });
+    
+      if (response.ok) {
+        console.log("Notification sent successfully!");
+      } else {
+        const errorResponse = await response.json();
+        console.error("Failed to send notification:", errorResponse);
+      }
+    } catch (error) {
+      console.error("Error sending notification:", error);
+    }
+
   };
   return (
     <div className="whole-swipe-component">
