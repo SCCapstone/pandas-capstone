@@ -328,9 +328,10 @@ const Messaging: React.FC = () => {
   
         setCurrentMessage('');
 
-    //TODO add -- add notifications when messages are sent
+    // TODO add -- add notifications when messages are sent
+    // TODO doesn't work for group chats - only sends to one group member
 
-    // **Send Notification to Backend**
+    // Send Notification to Backend
     console.log('Sending notification request to backend...');
 
     // Get the sender's name (currentUserId is the sender)

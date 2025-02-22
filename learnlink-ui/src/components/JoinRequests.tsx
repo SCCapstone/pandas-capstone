@@ -132,6 +132,7 @@ const JoinRequests: React.FC<JoinRequestProps> = ({ currentUserId, addNewChat })
 
         //TODO add -- add notifications here for approval
 
+
         handleDeleteRequest(requestId); // Remove request after approval
       } 
       else if (response.status === 405) {
