@@ -16,6 +16,7 @@ import dotenv from 'dotenv';
 import { Resend } from 'resend';
 import {upload, resizeAndUpload, handleImagePreview} from './uploadConfig';
 import multer from "multer";
+import { welcomeEmailTemplate, passwordResetEmailTemplate } from "./emailTemplates";
 
 
 
@@ -2037,7 +2038,7 @@ app.post("/api/sign-up-email", async (req, res) => {
             background-color: #f9f9f9;
           }
           .email-container {
-            text-align: center;
+            text-align: left;
             padding: 20px;
           }
           h1 {
