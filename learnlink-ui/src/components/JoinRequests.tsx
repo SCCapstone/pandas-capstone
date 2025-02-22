@@ -62,8 +62,18 @@ const JoinRequests: React.FC<JoinRequestProps> = ({ currentUserId, addNewChat, o
     try {
       const requestResponse = await axios.get(`${REACT_APP_API_URL}/api/swipe/${currentUserId}`);
   
-      // Filter swipes to only include those with direction === "YES"
+      // Filter swipes to only include those with direction === "Yes"
       let requestData = requestResponse.data.filter((req: SwipeRequest) => req.direction === 'Yes');
+
+      // Eliminate duplicates by using a Set to track unique request keys
+      const uniqueRequestsMap = new Map();
+      requestData.forEach((req: SwipeRequest) => {
+        const uniqueKey = `${req.userId}-${req.targetGroupId || req.targetUserId}`;
+        if (!uniqueRequestsMap.has(uniqueKey)) {
+          uniqueRequestsMap.set(uniqueKey, req);
+        }
+      });
+      const uniqueRequests = Array.from(uniqueRequestsMap.values());
 
 
       // Fetch user details for each request
