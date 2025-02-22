@@ -134,6 +134,16 @@ const JoinRequests: React.FC<JoinRequestProps> = ({ currentUserId, addNewChat })
 
         //TODO add -- add notifications here for approval
 
+        const notificationMessage = `Your request has been accepted by ${currentUserId}`; 
+
+        await axios.post(`${REACT_APP_API_URL}/notifications/send`, {
+          userId: requestUserId,  
+          message: notificationMessage,
+          type: "StudyGroup",
+        });
+
+        
+
 
         handleDeleteRequest(requestId); // Remove request after approval
       } 
