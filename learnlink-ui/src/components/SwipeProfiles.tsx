@@ -102,8 +102,7 @@ const SwipeProfiles = ({ userId }: { userId: number }) => {
     handleSwipe("Yes", currentProfile.id, !!currentProfile.studyGroupId, message);
 
     
-    //TODO add -- add notifications when a request is sent 
-    // working but doesn't tell you who sent the request
+    // NOTIFICATION for requests
 
     // Fetch current user if token exists
     const token = localStorage.getItem('token');
@@ -123,18 +122,10 @@ const SwipeProfiles = ({ userId }: { userId: number }) => {
 
     const isStudyGroup = Array.isArray(currentProfile.users) && currentProfile.users.length > 0;
 
-
-    console.log("Sending match notification...");
-
-    console.log("Current Profile Data:", currentProfile);
-    console.log("Is Study Group:", currentProfile.studyGroupId ? "Yes" : "No");
-    console.log("Users in Study Group:", currentProfile.users);
-
     try {
       let notificationRecipients: number[] = [];
       let notificationMessage = `You have a new pending request from ${requesterName}`;
 
-    
       if (isStudyGroup) {
         // Notify all members of the study group
         notificationRecipients = currentProfile.users.map((user: any) => user.id);
