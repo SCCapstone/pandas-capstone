@@ -11,7 +11,6 @@ import axios from 'axios';
 const SwipeProfiles = ({ userId }: { userId: number }) => {
   const [profiles, setProfiles] = useState<any>({ users: [], studyGroups: [] });
   const [currentUserId, setCurrentUserId] = useState<number | null>(null);
-  const [currentUserName, setCurrentUserName] = useState<string | null>(null);
   const [currentProfileIndex, setCurrentProfileIndex] = useState(0);
   const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
   const [showInvitePanel, setShowInvitePanel] = useState(false);
@@ -108,7 +107,7 @@ const SwipeProfiles = ({ userId }: { userId: number }) => {
 
     // Fetch current user if token exists
     const token = localStorage.getItem('token');
-    let groupName = "unknown";
+    let requesterName = "unknown";
 
     if (token) {
       try {
@@ -116,7 +115,7 @@ const SwipeProfiles = ({ userId }: { userId: number }) => {
           headers: { Authorization: `Bearer ${token}` },
         });
         setCurrentUserId(response.data.id);
-        groupName = `${response.data.firstName} ${response.data.lastName}`;
+        requesterName = `${response.data.firstName} ${response.data.lastName}`;
       } catch (error) {
         console.error("Error fetching current user:", error);
       }
@@ -130,18 +129,16 @@ const SwipeProfiles = ({ userId }: { userId: number }) => {
     console.log("Current Profile Data:", currentProfile);
     console.log("Is Study Group:", currentProfile.studyGroupId ? "Yes" : "No");
     console.log("Users in Study Group:", currentProfile.users);
-    console.log("currentUserName",currentUserName)
-
 
     try {
       let notificationRecipients: number[] = [];
-      let notificationMessage = `You have a new pending request from ${currentUserName}`;
+      let notificationMessage = `You have a new pending request from ${requesterName}`;
 
     
       if (isStudyGroup) {
         // Notify all members of the study group
         notificationRecipients = currentProfile.users.map((user: any) => user.id);
-        notificationMessage = `You have a new pending request from ${groupName} in ${currentProfile.name} group`;
+        notificationMessage = `You have a new pending request from ${requesterName} in ${currentProfile.name} group`;
 
       } else {
         // Notify the individual user
