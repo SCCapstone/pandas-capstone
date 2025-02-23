@@ -5,10 +5,13 @@ import { formatEnum } from '../utils/format';
 import { ReactComponent as GroupLogo } from './GroupLogo.svg'
 import InviteMessagePanel from '../components/InviteMessagePanel';
 import { set } from 'react-hook-form';
+import axios from 'axios';
 
 
 const SwipeProfiles = ({ userId }: { userId: number }) => {
   const [profiles, setProfiles] = useState<any>({ users: [], studyGroups: [] });
+  const [currentUserId, setCurrentUserId] = useState<number | null>(null);
+  const [currentUserName, setCurrentUserName] = useState<string | null>(null);
   const [currentProfileIndex, setCurrentProfileIndex] = useState(0);
   const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
   const [showInvitePanel, setShowInvitePanel] = useState(false);
@@ -103,33 +106,66 @@ const SwipeProfiles = ({ userId }: { userId: number }) => {
     //TODO add -- add notifications when a request is sent 
     // working but doesn't tell you who sent the request
 
-    console.log("Sending match notification...");
-    // Send a notification when a match occurs
-    try {
-    
-    const notificationMessage = `You have a new pending request`;
+    // Fetch current user if token exists
+    const token = localStorage.getItem('token');
+    let groupName = "unknown";
 
-    const response = await fetch(`${REACT_APP_API_URL}/notifications/send`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        userId: currentProfile.id,  // The recipient of the match (i.e., the person receiving the notification)
-        message: notificationMessage,
-        type: "Match",
-      }),
-    });
-    
-      if (response.ok) {
-        console.log("Notification sent successfully!");
-      } else {
-        const errorResponse = await response.json();
-        console.error("Failed to send notification:", errorResponse);
+    if (token) {
+      try {
+        const response = await axios.get(`${REACT_APP_API_URL}/api/currentUser`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setCurrentUserId(response.data.id);
+        groupName = `${response.data.firstName} ${response.data.lastName}`;
+      } catch (error) {
+        console.error("Error fetching current user:", error);
       }
-    } catch (error) {
-      console.error("Error sending notification:", error);
     }
+
+    const isStudyGroup = Array.isArray(currentProfile.users) && currentProfile.users.length > 0;
+
+
+    console.log("Sending match notification...");
+
+    console.log("Current Profile Data:", currentProfile);
+    console.log("Is Study Group:", currentProfile.studyGroupId ? "Yes" : "No");
+    console.log("Users in Study Group:", currentProfile.users);
+    console.log("currentUserName",currentUserName)
+
+
+    try {
+      let notificationRecipients: number[] = [];
+      let notificationMessage = `You have a new pending request from ${currentUserName}`;
+
+    
+      if (isStudyGroup) {
+        // Notify all members of the study group
+        notificationRecipients = currentProfile.users.map((user: any) => user.id);
+        notificationMessage = `You have a new pending request from ${groupName} in ${currentProfile.name} group`;
+
+      } else {
+        // Notify the individual user
+        notificationRecipients = [currentProfile.id];
+      }
+    
+      await Promise.all(
+        notificationRecipients.map(async (recipientId) => {
+          await fetch(`${REACT_APP_API_URL}/notifications/send`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              userId: recipientId,
+              message: notificationMessage,
+              type: "Match",
+            }),
+          });
+        })
+      );
+
+    console.log("Notification(s) sent successfully!");
+  } catch (error) {
+    console.error("Error sending notification:", error);
+  }
 
   };
   return (
