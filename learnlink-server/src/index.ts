@@ -10,13 +10,14 @@ import http from "http";
 import { Server } from "socket.io";
 import path, { parse } from 'path';
 import { JwtPayload } from "jsonwebtoken";
-import nodemailer from "nodemailer";
-import { profile } from "console";
 import fs from 'fs';
 import https from 'https';
 import dotenv from 'dotenv';
 import { Resend } from 'resend';
-import {upload, resizeAndUpload} from './uploadConfig';
+import {upload, resizeAndUpload, handleImagePreview} from './uploadConfig';
+import multer from "multer";
+import { welcomeEmailTemplate, passwordResetEmailTemplate } from "./emailTemplates";
+
 
 
 interface CustomJwtPayload extends JwtPayload {
@@ -34,7 +35,8 @@ const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000'; // Loc
 const SERVER_PORT = process.env.SERVER_PORT ? parseInt(process.env.SERVER_PORT, 10) : (NODE_ENV === 'production' ? 2020 : 2020);
 const JWT_SECRET = env.JWT_SECRET || 'your_default_jwt_secret';
 const resend = new Resend(process.env.RESEND);
-const REACT_APP_EMAIL_URL = process.env.REACT_APP_EMAIL_URL || 'learnlinkserverhost.zapto.org';
+const REACT_APP_EMAIL_URL = process.env.REACT_APP_EMAIL_URL || 'learnlink.site';
+const MAX_USERS_IN_A_GROUP = 6;
 
 // Read certificates conditionally based on the environment
 const privateKey = NODE_ENV === 'production'
@@ -158,6 +160,7 @@ app.post("/api/users", async (req, res): Promise<any> => {
     });
 
     if (emailExists) {
+      console.log('Email already exists');
       return res.status(400).json({ error: "EmailAlreadyExists" });
     }
 
@@ -165,6 +168,7 @@ app.post("/api/users", async (req, res): Promise<any> => {
     const lastExtension = domainParts ? domainParts.pop() : "";
 
     if (lastExtension !== "edu") {
+      console.log('Not an edu email');
       return res.status(400).json({ error: "NotEdu" });
     }
 
@@ -174,6 +178,7 @@ app.post("/api/users", async (req, res): Promise<any> => {
     });
 
     if (usernameExists) {
+      console.log('Username already exists');
       return res.status(400).json({ error: "UsernameAlreadyExists" });
     }
     // Hash the password before storing it in the database -> for security
@@ -748,10 +753,14 @@ app.get('/api/profiles/:userId', async (req, res): Promise<any> => {
               },
             },
           },
+          
         ],
       },
       select: {
         id: true,
+        _count: {
+          select: { users: true }, // Get the number of users in each study group
+        },
         name: true,
         subject: true,
         description: true,
@@ -764,9 +773,10 @@ app.get('/api/profiles/:userId', async (req, res): Promise<any> => {
         chatID: true,
         chat: true,
         ideal_match_factor: true,
-
       },
     });
+
+    studyGroupsToSwipeOn = studyGroupsToSwipeOn.filter((group) => group._count.users < 6); // filter groups with 6+ members
 
     // Calculate similarity score
     const calculateSimilarityUser = (user: User, forStudyGroup: boolean) => {
@@ -990,6 +1000,7 @@ app.get("/api/study-groups/chat/:chatId", async (req, res): Promise<any> => {
         subject: studyGroup.subject,
         description: studyGroup.description,
         ideal_match_factor: studyGroup.ideal_match_factor,
+        profilePic: studyGroup.profilePic,
       });
     } else {
       return res.json({ studyGroupID: null }); // No study group found
@@ -1075,6 +1086,11 @@ app.post('/api/add-to-study-group', async (req, res): Promise<any> => {
 
     if (!studyGroup) {
       return res.status(404).json({ error: 'Study group not found' });
+    }
+
+    // Check if the study group has reached the maximum user limit
+    if (studyGroup.users.length >= MAX_USERS_IN_A_GROUP) {
+      return res.status(405).json({ error: `Study group has reached the maximum of ${MAX_USERS_IN_A_GROUP} users` });
     }
 
     // Check if the user is already in the study group
@@ -1169,6 +1185,58 @@ app.post('/api/sync-study-group-chat', async (req, res): Promise<any> => {
   } catch (error) {
     console.error('Error syncing chat with study group:', error);
     return res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
+// Deletes a user by userId from a study group 
+app.delete('/api/study-groups/:groupId/users/:userId', async (req, res): Promise<any> => {
+  const { groupId, userId } = req.params;
+
+  try {
+    // Check if the study group exists
+    const studyGroup = await prisma.studyGroup.findUnique({
+      where: { id: parseInt(groupId, 10) },
+      include: { users: true, chat: true }, // Include users and chat to remove user and handle chat
+    });
+
+    if (!studyGroup) {
+      return res.status(404).json({ error: 'Study group not found' });
+    }
+
+    // Check if the user is in the study group
+    const userInGroup = studyGroup.users.some(user => user.id === parseInt(userId, 10));
+
+    if (!userInGroup) {
+      return res.status(404).json({ error: 'User is not in this study group' });
+    }
+
+    // Remove the user from the study group
+    await prisma.studyGroup.update({
+      where: { id: parseInt(groupId, 10) },
+      data: {
+        users: {
+          disconnect: { id: parseInt(userId, 10) }, // Disconnect user from the study group
+        },
+      },
+    });
+
+    // Remove the user from the chat (if the chat exists)
+    if (studyGroup.chat) {
+      await prisma.chat.update({
+        where: { id: studyGroup.chat.id },
+        data: {
+          users: {
+            disconnect: { id: parseInt(userId, 10) }, // Disconnect user from the chat
+          },
+        },
+      });
+    }
+
+    return res.status(200).json({ message: 'User removed successfully from study group and chat' });
+  } catch (error) {
+    console.error('Error deleting user from study group:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
@@ -1546,7 +1614,6 @@ app.delete('/api/chats/:chatId', async (req, res): Promise<any> => {
       console.log(`Study group with chatID ${chatId} deleted.`);
     }
     else{
-      // Delete the chat
       await prisma.chat.delete({
         where: { id: parseInt(chatId) },
       });
@@ -1586,7 +1653,7 @@ app.post('/api/chats/:chatId/messages', authenticate, async (req, res): Promise<
       },
     });
 
-    res.status(201).json(newMessage);
+    res.status(201).json('new message' + newMessage);
   } catch (error) {
     console.error('Error adding message:', error);
     res.status(500).json({ error: 'Internal server error' });
@@ -1835,59 +1902,6 @@ app.get('/socket-io', (req, res) => {
   res.send('Socket.IO server is running');
 });
 
-/*
-// Real-time WebSocket chat functionality
-io.on("connection", (socket) => {
-  console.log("User connected");
-
-  socket.on('message', async (data, callback) => {
-    try {
-      // Validate the incoming data
-      if (!data.content || !data.chatId || !data.userId) {
-        throw new Error('Missing required fields: content, chatId, or userId');
-      }
-  
-      // Create a new message in the database using Prisma
-      const newMessage = await prisma.message.create({
-        data: {
-          content: data.content,
-          createdAt: new Date(),
-          user: {
-            connect: { id: data.userId }, // Connect the User by its ID
-          },
-          chat: {
-            connect: { id: data.chatId }, // Connect the Chat by its ID
-          },
-        },
-      });
-      
-      const savedMessage = await prisma.message.findUnique({
-        where: { id: newMessage.id },
-      });
-      //console.log('Saved message in database:', savedMessage);
-      
-  
-      //console.log('Message saved to database:', newMessage);
-  
-      // Emit the new message to all clients (broadcasting to all connected clients)
-      io.emit('newMessage', newMessage);
-      console.log('Broadcasting message:', newMessage);
-
-
-
-      // Send success callback to the sender
-      callback({ success: true, message: 'Message sent from server successfully!' });
-    } catch (error) {
-      console.error('Error handling message:', error);
-      callback({ success: false, error: error });
-    }
-  });
-  
-  socket.on('disconnect', () => {
-    console.log('A user disconnected:', socket.id);
-  });
-});
-*/
 
 // Real-time WebSocket chat functionality
 io.on("connection", (socket) => {
@@ -1911,6 +1925,13 @@ io.on("connection", (socket) => {
         include: { user: true, chat: { include: { users: true } } }, // Include chat members
       });
 
+      // After saving the message, update the chat's `updatedAt` timestamp
+      const updatedChat = await prisma.chat.update({
+        where: { id: data.chatId },
+        data: { updatedAt: new Date() },
+        include: { users: true }, // Optionally, include users if you want to broadcast updated users list
+      });
+
       // Get all user IDs in the chat
       const chatUsers = newMessage.chat.users.map(user => user.id);
 
@@ -1922,7 +1943,8 @@ io.on("connection", (socket) => {
       console.log('Broadcasting message to chat users:', chatUsers);
 
       // Send success callback to the sender
-      callback({ success: true, message: 'Message sent from server successfully!' });
+      callback({ success: true, message: 'Message sent from server successfully!' }); 
+      callback({ success: true, message: newMessage, updatedChat });
     } catch (error) {
       console.error('Error handling message:', error);
       callback({ success: false, error: error });
@@ -1931,6 +1953,11 @@ io.on("connection", (socket) => {
 
   socket.on("joinChat", async ({ chatId, userId }) => {
     try {
+      if (!chatId) {
+        console.error("Chat ID is required");
+        return; // Early exit if chatId is not provided
+      }
+  
       socket.join(`chat_${chatId}`);
       console.log(`User ${userId} joined chat ${chatId}`);
   
@@ -1942,6 +1969,8 @@ io.on("connection", (socket) => {
   
       if (chat) {
         io.to(`chat_${chatId}`).emit("chatUpdated", chat.users);
+      } else {
+        console.error("Chat not found");
       }
     } catch (error) {
       console.error("Error joining chat:", error);
@@ -1989,60 +2018,24 @@ io.on("connection", (socket) => {
   
 // };
 
-app.post("/api/sign-up-email", async (req, res) => {
+app.post("/api/sign-up-email", async (req: Request, res: Response): Promise<any>  => {
   try {
     const { to } = req.body; // Get data from frontend
+    const user = await prisma.user.findUnique({ where: { email:to } });
+    if (!user) return res.status(400).json({ error: "User not found" });
+
+    const username = user.username;
+
+    const emailHtml = welcomeEmailTemplate(username);
+
     console.log('Sending email to:', to);
 
     const response = await resend.emails.send({
       from: `no-reply@${REACT_APP_EMAIL_URL}`,
       to,
       subject: "Welcome to LearnLink",
-      html: `
-      <html>
-      <head>
-        <style>
-          @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
-          
-          body {
-            font-family: 'Inter', Arial, sans-serif;
-            color: #333;
-            margin: 0;
-            padding: 0;
-            background-color: #f9f9f9;
-          }
-          .email-container {
-            text-align: center;
-            padding: 20px;
-          }
-          h1 {
-            color: #00668c;
-          }
-          p {
-            font-size: 16px;
-          }
-        </style>
-      </head>
-      <body>
-        <div class="email-container">
-          <img src="../../learnlink-ui/src/components/LearnLink.svg" alt="LearnLink Logo" width="100" />
-          <h1>Welcome to LearnLink!</h1>
-          <p>Thank you for signing up with LearnLink. We're excited to have you on board!</p>
-          <p>If you have any questions, feel free to reach out to our support team.</p>
-          <p>Best regards,<br />The LearnLink Team</p>
-        </div>
-      </body>
-    </html>
-    `
-    ,
+      html: emailHtml,
     });
-
-    // const response = resend.emails.send({
-    //   from: 'onboarding@resend.dev',
-    //   to: 'jonessara141@gmail.com',
-    //   subject: 'Hello World',
-    //   html: '<p>Congrats on sending your <strong>first email</strong>!</p>'
-    // });
 
     res.json({ to, success: true, response, message: 'Email sent successfully' });
   } catch (error) {
@@ -2081,6 +2074,8 @@ app.post("/api/forgot-password/email", async (req, res):Promise<any> => {
   const user = await prisma.user.findUnique({ where: { email } });
   if (!user) return res.status(400).json({ error: "User not found" });
 
+  const username = user.username;
+
   // Generate a secure reset token
   const resetToken = crypto.randomBytes(32).toString("hex");
   const hashedResetToken = await bcrypt.hash(resetToken, 10);
@@ -2096,13 +2091,14 @@ app.post("/api/forgot-password/email", async (req, res):Promise<any> => {
   // Construct password reset link
   const resetLink = `${FRONTEND_URL}/resetpassword/${resetToken}`;
 
+  const emailHtml = passwordResetEmailTemplate(username, resetLink);
   // Send email via Resend
   try {
     const resendResponse =await resend.emails.send({
       from: `no-reply@${REACT_APP_EMAIL_URL}`,
       to: email,
       subject: "Password Reset Request",
-      html: `<p>Click <a href="${resetLink}">here</a> to reset your password. This link expires in 1 hour.</p>`,
+      html: emailHtml,
     });
 
     res.json({ success: true, resendResponse });
@@ -2157,6 +2153,116 @@ app.post('/api/users/upload-pfp', authenticate, upload as express.RequestHandler
   }
 });
 
+app.post('/api/study-groups/upload-pfp', authenticate, upload as express.RequestHandler, resizeAndUpload as express.RequestHandler, async (req, res):Promise<any> => {
+  const chatID = req.body.chatID;
+  try {
+    const updatedStudyGroup = await prisma.studyGroup.update({
+      where: { chatID },
+      data: { profilePic: req.body.profilePicUrl }, // Save S3 URL
+    });
+
+    res.status(200).json({ message: "Profile picture updated", profilePic: updatedStudyGroup.profilePic });
+  } catch (error) {
+    console.error("Database update error:", error);
+    res.status(500).json({ error: "Failed to update profile picture" });
+  }
+});
+
+const upload_preview = multer({ storage: multer.memoryStorage() });  // Store file in memory
+
+app.post("/api/upload-preview", upload_preview.single("profilePic"), (req, res, next) => {
+  console.log("Received file:", req.file);  // Log the file info to ensure it's being uploaded
+  handleImagePreview(req, res).catch(next);
+});
+
+
+
+// NOTIFICATIONS
+app.get('/api/notifications', authenticate, async (req: Request, res: Response) => {
+  const userId = res.locals.userId;
+  try {
+    // Disable caching to always get fresh data
+    res.setHeader('Cache-Control', 'no-store'); // Prevent caching
+
+    const notifications = await prisma.notification.findMany({
+      where: { user_id: userId, read: false },
+      orderBy: { created_at: 'desc' },
+    });
+
+    if (notifications.length === 0) {
+      res.status(200).json([]);
+    } else {
+      res.json(notifications);
+    }
+  } catch (error) {
+    console.error('Error fetching notifications:', error);
+    res.status(500).json({ error: 'Failed to fetch notifications' });
+  }
+});
+
+
+app.post('/notifications/send', async (req, res):Promise<any> => {
+  try {
+    const { userId, message, type } = req.body;
+
+    if (!userId || !message || !type) {
+      return res.status(400).json({ error: 'Missing required fields' });
+    }
+
+    if (!['Match', 'Message', 'StudyGroup'].includes(type)) {
+      return res.status(400).json({ error: 'Invalid notification type' });
+    }
+
+    // Create the notification
+    const notification = await prisma.notification.create({
+      data: {
+        user_id: userId,
+        message,
+        read: false,
+        type,
+      },
+    });
+
+    // Send via WebSocket
+    io.to(userId.toString()).emit('notification', notification);
+
+    // Return the notification in the response
+    return res.status(201).json(notification);
+  } catch (error) {
+    console.error('Error sending notification:', error);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+app.delete('/api/notifications/delete/:id', async (req, res):Promise<any> => {
+  const notificationId = parseInt(req.params.id);
+
+  if (!notificationId) {
+    return res.status(400).json({ error: 'Invalid notification ID' });
+  }
+
+  try {
+    const deletedNotification = await prisma.notification.delete({
+      where: {
+        id: notificationId,
+      },
+    });
+
+    if (deletedNotification) {
+      return res.status(200).json({ message: 'Notification deleted successfully' });
+    } else {
+      return res.status(404).json({ error: 'Notification not found' });
+    }
+  } catch (error) {
+    console.error('Error deleting notification:', error);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
+
+
+// DO NOT EDIT BELOW THIS LINE
 
 export { app }; // Export the app for testing
 

@@ -2,7 +2,7 @@ import Logo from '../components/Logo';
 import CopyrightFooter from '../components/CopyrightFooter';
 import { useNavigate, useParams } from 'react-router-dom';
 import React, { useState } from 'react';
-import './forgotPassword.css';
+import './resetPasswordFromEmail.css';
 import { set } from 'react-hook-form';
 
 
@@ -71,13 +71,13 @@ const ResetPasswordFromEmail: React.FC = () => {
     };
 
     return (
-        <div>
-            <div className="Logo2">
+        <div className='resetPasswordFromEmail-Page'>
+            <div className='Logo2-rpfe'>
                 <Logo />
             </div>
-            <div className="forgotPassword">
+            <div className="forgotPasswordFromEmail">
                 <h1>Reset Password</h1>
-                <form className="container" onSubmit={handleResetPassword}>
+                <form className="forgotpassword-container" onSubmit={handleResetPassword}>
                     <label>New Password</label>
                     <input
                         type="password"
@@ -102,7 +102,9 @@ const ResetPasswordFromEmail: React.FC = () => {
                     </button>
                 </form>
             </div>
-            <CopyrightFooter />
+            <div>
+                <CopyrightFooter />
+            </div>
         </div>
 
     );

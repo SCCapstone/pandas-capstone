@@ -4,6 +4,7 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+    flex-direction: column;
     width: 350px;
     max-height: 450px;
     overflow-y: auto;
@@ -31,7 +32,7 @@
   }
   
   .UserListButton:hover {
-    background-color: #0056b3;
+    background-color: #01506d;
   }
   
   /* Panel Animation */
@@ -64,3 +65,90 @@
     color: red;
   }
   
+
+  .remove-button {
+    background: none;
+    border: none;
+    color: red;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  .remove-button:hover {
+    color: darkred;
+  }
+  
+/* User list styling */
+.user-list-panel ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.user-list-panel li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 15px;
+  margin-bottom: 10px;
+  background-color: #f7f7f7;
+  border-radius: 12px;
+  transition: background-color 0.3s ease;
+}
+
+.user-list-panel li:hover {
+  background-color: #e0f7fa;
+}
+
+/* Remove user button */
+.remove-button {
+  background-color: #ff4d4d;
+  color: #fff;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.remove-button:hover {
+  background-color: #e60000;
+}
+
+/* Leave button */
+.leave-button {
+  display: block;
+  width: 100%;
+  background-color: #ff9900;
+  color: white;
+  border: none;
+  padding: 10px;
+  margin-top: 15px;
+  border-radius: 12px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.leave-button:hover {
+  background-color: #cc7a00;
+}
+
+/* Close button */
+.close-button {
+  display: block;
+  width: 100%;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px;
+  margin-top: 10px;
+  border-radius: 12px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.close-button:hover {
+  background-color: #0056b3;
+}

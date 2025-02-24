@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import './signup.css';
 import Logo from '../components/Logo';
 import Copyright from '../components/CopyrightFooter';
+import { set } from 'react-hook-form';
 
 type User = {
     id: number;
@@ -51,14 +52,17 @@ const Signup: React.FC = () => {
 
     // Form submission
     const handleSignup = async (e: React.FormEvent) => {
+        setError(null);
         e.preventDefault();
 
         if (formData.password !== confirmPassword) {
+            console.log('Passwords do not match');
             setError('Passwords do not match');
             return;
         }
 
         if (!formData.firstName || !formData.lastName || !formData.email || !formData.username || !formData.password) {
+            console.log('All fields are required');
             setError('All fields are required');
             return;
         }
@@ -86,16 +90,21 @@ const Signup: React.FC = () => {
             
             // Handle unique warnings
             if (errorData.error === 'UsernameAlreadyExists') {
+                console.log('Username is already taken');
                 setError('Username is already taken');
-                throw new Error('Username is already taken');
+                // throw new Error('Username is already taken');
+                return;
 
             } else if (errorData.error === 'EmailAlreadyExists') {
+                console.log('Email is already registered');
                 setError('Email is already registered');
                 throw new Error('Email is already registered');
             } else if (errorData.error === 'NotEdu') {
+                console.log('Please use a .edu email');
                 setError('Please use a .edu email');
                 throw new Error('Non .edu email');
             } else {
+                console.log('Failed to create user');
                 throw new Error('Failed to create user');
             }
             }
@@ -149,7 +158,7 @@ const Signup: React.FC = () => {
 
     return (
         <div className="signupPage">
-            <div className="Logo2">
+            <div className="Logo2-signup">
                 <Logo />
             </div>
             <div className="signup">
@@ -158,7 +167,8 @@ const Signup: React.FC = () => {
                     <h2 className="t2">Enter your credentials to join LearnLink.</h2>
 
                     {/* Form to collect user data */}
-                    <form onSubmit={handleSignup} className='signup-form'>
+                    <div className="signup-form">
+                    <form onSubmit={handleSignup}>
                         <div className="nameFields">
                             <label>First Name</label>
                             <input
@@ -192,6 +202,7 @@ const Signup: React.FC = () => {
                         />
                         <label>&nbsp;
                             {error === 'Username is already taken' && (
+                        
                                 <span className="alert">* {error}</span>
                             )}
                         </label>
@@ -250,6 +261,7 @@ const Signup: React.FC = () => {
                             {loading ? 'Signing Up...' : 'Sign Up'}
                         </button>
                     </form>
+                    </div>
 
                     <div className="loginRedirect">
                         <label>Already have an account? <a href="/login">Log in</a></label>

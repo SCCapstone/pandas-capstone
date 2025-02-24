@@ -1,5 +1,6 @@
 import Logo from '../components/Logo';
 import './forgotPassword.css';
+
 import CopyrightFooter from '../components/CopyrightFooter';
 import {useNavigate} from 'react-router-dom';
 import React, {useState} from 'react';
@@ -62,27 +63,29 @@ const ForgotPassword: React.FC = () => {
         }
     };
 
-    return ( 
-        <div>
+    return (
+        <div className='forgotPassword-page'>
             <div className="Logo2">
                 <Logo />
             </div>
             <div className="forgotPassword">
-                <h1>Forgot Password</h1>
-                <form className="container1" onSubmit={handleSubmit}>
-                    <label>Email</label>
-                    <input type="email"
+                <div className="forgotPassword-container">
+                    <h1>Forgot Password</h1>
+                    <form className="container1" onSubmit={handleSubmit}>
+                        <label>Email</label>
+                        <input type="email"
                             placeholder="example@learnlink.com"
                             name="email"
                             onChange={handleChange}
                             required
-                            ></input>
-                    {error && <p className="error">{error}</p>}
-                    {success && <p className="success">{success}</p>}
-                    <ResendEmail email={email} />
+                        ></input>
+                        {error && <p className="error">{error}</p>}
+                        {success && <p className="success">{success}</p>}
+                        <ResendEmail email={email} />
 
-                    {/* <button className="send" disabled={loading} type="submit">{loading ? 'Sending...' : 'Send Reset Link'}</button> */}
-                </form>
+                        {/* <button className="send" disabled={loading} type="submit">{loading ? 'Sending...' : 'Send Reset Link'}</button> */}
+                    </form>
+                </div>
             </div>
             <div>
                 <CopyrightFooter />

@@ -50,21 +50,71 @@
     flex-direction: column;
 }
 
-.request-details p {
-    margin: 5px 0;
-    font-size: 1rem;
-    color: #444;
-}
-
 .request-details strong {
     color: #222;
 }
+
 
 .request-actions {
     display: flex;
     justify-content: space-evenly;
     margin-top: 12px;
 }
+
+.request-details {
+    background-color: #fafafa; /* Light background for better contrast */
+    border: 1px solid #ddd; /* Subtle border */
+    border-radius: 12px; /* Rounded corners */
+    padding: 16px; /* Padding around the content */
+    margin-bottom: 16px; /* Space between request items */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Soft shadow for depth */
+  }
+  
+  .requester-info {
+    display: flex;
+    align-items: center;
+    gap: 24px; /* Large gap between name and button */
+    margin-bottom: 12åpx; /* Space below the name section */
+    font-size: 1rem;
+    color: #444;
+  }
+  
+  .requester-name {
+    font-weight: bold;
+    font-size: 1rem;
+    color: #444;
+  }
+  
+  .requester-profile-button {
+    background-color: #f0f0f0; /* Light gray background */
+    border: 1px solid #ccc; /* Subtle border */
+    border-radius: 8px; /* Rounded corners */
+    cursor: pointer;
+    padding: 8px 12px; /* Comfortable click area */
+    font-size: 1rem;
+    transition: background-color 0.2s ease, transform 0.1s ease; /* Hover and click effects */
+  }
+  
+  .requester-profile-button:hover {
+    background-color: #e0e0e0; /* Darker on hover */
+  }
+  
+  .requester-profile-button:active {
+    transform: scale(0.95); /* Subtle press effect */
+  }
+  
+  .request-target-group-name {
+    margin-bottom: 16px; /* Increased space below target group info */
+    font-size: 1rem;
+    color: #444;
+  }
+  
+  .request-message {
+    margin-top: 16px; /* More space above the message */
+    font-size: 1rem;
+    color: #444;
+  }
+  
 
 .approve {
     background: #4CAF50;
@@ -96,6 +146,32 @@
     background: #c9302c;
 }
 
+.requester-info {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Larger space between the name and button */
+    margin: 0; /* Removes default paragraph margin */
+  }
+  
+  .requester-name {
+    font-weight: bold;
+  }
+  
+  .requester-profile-button {
+    background-color: #f0f0f0; /* Light gray background */
+    border: 1px solid #ccc; /* Subtle border */
+    border-radius: 8px; /* Rounded corners */
+    cursor: pointer;
+    padding: 8px 12px; /* Bigger clickable area */
+    font-size: 1rem;
+    transition: background-color 0.2s ease; /* Smooth hover effect */
+  }
+  
+  .requester-profile-button:hover {
+    background-color: #e0e0e0; /* Darker shade on hover */
+  }
+  
+
 /* Responsive tweaks */
 @media (max-width: 500px) {
 .requests-panel {
@@ -110,8 +186,6 @@
     flex-direction: column;
 }
 
-button {
-    width: 100%;
-    margin-top: 6px;
-}
+
+
 }

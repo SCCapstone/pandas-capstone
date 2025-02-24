@@ -117,7 +117,7 @@ model StudyGroup {
   chat         Chat?    @relation("StudyGroupChat") // Optional, if you want a relation with the Chat model
   ideal_match_factor  StudyTags?
 
-
+  profilePic   String?  // Optional field to store a profile picture
 }
 
 model Swipe {

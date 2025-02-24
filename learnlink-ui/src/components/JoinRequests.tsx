@@ -6,8 +6,9 @@ import axios from 'axios';
 
 // Props interface defining the expected properties for the JoinRequests component
 interface JoinRequestProps {
-  currentUserId: number | null;  // ID of the currently logged-in user
-  addNewChat: (newChat: any) => void; // Callback function to update the parent component with new chat data
+  currentUserId: number | null;
+  addNewChat: (newChat: any) => void;
+  openProfilePopup: (profile: { id: number; name: string }) => void;
 }
 
 // Interface defining the structure of a swipe request
@@ -42,10 +43,11 @@ interface StudyGroup {
 }
 
 // JoinRequests component handles fetching, displaying, approving, and rejecting join requests
-const JoinRequests: React.FC<JoinRequestProps> = ({ currentUserId, addNewChat }) => {
+const JoinRequests: React.FC<JoinRequestProps> = ({ currentUserId, addNewChat, openProfilePopup }) => {
   const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
   const [requests, setRequests] = useState<SwipeRequest[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [selectedProfile, setSelectedProfile] = useState<{ id: number; name: string } | null>(null);
 
   // Fetch requests when currentUserId changes
   useEffect(() => {
@@ -60,8 +62,18 @@ const JoinRequests: React.FC<JoinRequestProps> = ({ currentUserId, addNewChat })
     try {
       const requestResponse = await axios.get(`${REACT_APP_API_URL}/api/swipe/${currentUserId}`);
   
-      // Filter swipes to only include those with direction === "YES"
+      // Filter swipes to only include those with direction === "Yes"
       let requestData = requestResponse.data.filter((req: SwipeRequest) => req.direction === 'Yes');
+
+      // Eliminate duplicates by using a Set to track unique request keys
+      const uniqueRequestsMap = new Map();
+      requestData.forEach((req: SwipeRequest) => {
+        const uniqueKey = `${req.userId}-${req.targetGroupId || req.targetUserId}`;
+        if (!uniqueRequestsMap.has(uniqueKey)) {
+          uniqueRequestsMap.set(uniqueKey, req);
+        }
+      });
+      const uniqueRequests = Array.from(uniqueRequestsMap.values());
 
 
       // Fetch user details for each request
@@ -130,8 +142,28 @@ const JoinRequests: React.FC<JoinRequestProps> = ({ currentUserId, addNewChat })
           await axios.post(`${REACT_APP_API_URL}/api/sync-study-group-chat`, { studyGroupId });
         }
 
+        // NOTIFICATION
+
+        // Fetch the name of the current user
+        const userResponse = await axios.get(`${REACT_APP_API_URL}/api/users/${currentUserId}`);
+        const currentUser = userResponse.data;
+
+        const notificationMessage = `Your request has been accepted by ${currentUser.firstName} ${currentUser.lastName}`;
+
+        await axios.post(`${REACT_APP_API_URL}/notifications/send`, {
+          userId: requestUserId,  
+          message: notificationMessage,
+          type: "StudyGroup",
+        });
+
+
         handleDeleteRequest(requestId); // Remove request after approval
-      } else {
+      } 
+      else if (response.status === 405) {
+        setError("This study group is full. You cannot approve this request.");
+        handleDeleteRequest(requestId);
+      }
+      else {
         setError("Failed to approve request. Please try again.");
       }
     } catch (err) {
@@ -156,6 +188,18 @@ const JoinRequests: React.FC<JoinRequestProps> = ({ currentUserId, addNewChat })
     }
   };
 
+  const handleProfilePopup = (userId: number) => {
+    const user = requests.find((req) => req.user.id === userId)?.user;
+    if (user) {
+      openProfilePopup({ id: user.id, name: `${user.firstName} ${user.lastName}` });
+    }
+  };
+  
+
+  const closeProfilePopup = () => {
+    setSelectedProfile(null);
+  };
+
   return (
     <div className="requests-panel">
       {/* Display error message if any */}
@@ -177,18 +221,28 @@ const JoinRequests: React.FC<JoinRequestProps> = ({ currentUserId, addNewChat })
             .map((request) => (
               <li key={request.id} className="request-item">
                 <div className="request-details">
-                  {/* Display requester's name */}
-                  <p><strong>Requester Name: </strong>{request.user.firstName} {request.user.lastName}</p>
+                  {/* Profile button before requester's name */}
+                  <p className="requester-info">
+                  
+                    <strong className='requester-name'> Requester Name: </strong>{request.user.firstName} {request.user.lastName}
+                    <button 
+                      className="requester-profile-button"
+                      onClick={() => handleProfilePopup(request.user.id)}
+                    >
+                      👤 
+                    </button>
+                   </p>
                   
                   {/* Display target group if applicable */}
                   {request.targetGroupId && request.targetGroup && (
-                    <p><strong>Target Group: </strong> {request.targetGroup.studyGroup.name}</p>
+                    <p className='request-target-group-name'><strong>Target Group: </strong> {request.targetGroup.studyGroup.name}</p>
                   )}
                   
                   {/* Display request message */}
-                  <p><strong>Message: </strong> {request.message}</p>
+                  <p className='request-message'><strong>Message: </strong> {request.message}</p>
+                  
                 </div>
-
+  
                 {/* Approve and reject buttons */}
                 <div className="request-actions">
                   <button
@@ -215,5 +269,4 @@ const JoinRequests: React.FC<JoinRequestProps> = ({ currentUserId, addNewChat })
     </div>
   );
 };  
-
 export default JoinRequests;

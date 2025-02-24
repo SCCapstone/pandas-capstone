@@ -28,7 +28,11 @@ const EditStudyGroup = ({ chatID, onClose, updateChatName}: { chatID: number; on
   const [subject, setSubject] = useState('');
   const [ideal_match_factor, setIdealMatchFactor] = useState<{ value: string; label: string } | null>(null);
   const [enumOptions, setEnumOptions] = useState({ studyHabitTags: [] });
-  
+  const [profilePic, setProfilePic] = useState<string | null>(null);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [image, setImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState(null);
+
   const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
 
 
@@ -59,6 +63,7 @@ const EditStudyGroup = ({ chatID, onClose, updateChatName}: { chatID: number; on
         setDescription(data.description);
         setSubject(data.subject);
         setIdealMatchFactor(data.ideal_match_factor ? { value: data.ideal_match_factor, label: formatEnum(data.ideal_match_factor) } : null);
+        setProfilePic(data.profilePic);
       } catch (error) {
         console.error('Error fetching study group:', error);
         alert('Failed to load study group details.');
@@ -108,13 +113,109 @@ const EditStudyGroup = ({ chatID, onClose, updateChatName}: { chatID: number; on
     }
   };
 
+  const handleUpload = async () => {
+    console.log('Uploading image...'); // Debug log
+    if (!image) return;
+
+    const formData = new FormData();
+    formData.append('profilePic', image);
+    const token = localStorage.getItem('token');
+    if (token) {
+      const res = await fetch(`${REACT_APP_API_URL}/api/users/upload-pfp`, {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      const data = await res.json();
+      if (res.ok) setImageUrl(data.profilePic);
+    }
+  };
+
+  // Handle form submission
+    
+    // Function to handle file selection
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files ? e.target.files[0] : null;
+      if (file) {
+        setImage(file); // Store the selected file
+      }
+    };
+  
+    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+      const formData = new FormData();
+      
+      const file = e.target.files ? e.target.files[0] : null;
+      if (!file) return;  // If no file is selected, exit
+        setImage(file);  // Store the selected file for later use
+  
+      formData.append("profilePic", file);  // Append the file to FormData with the field name 'profilePic'
+      try {
+        // Send the image to the backend
+        const response = await fetch(`${REACT_APP_API_URL}/api/upload-preview`, {
+          method: "POST",
+          body: formData,  // Send the FormData
+        });
+    
+        if (response.ok) {
+          const data = await response.json();
+          if (data.preview) {
+            setImagePreview(data.preview);  // Set the preview image
+          }
+        } else {
+          console.error("Failed to upload image:", response.statusText);
+        }
+      } catch (error) {
+        console.error("Error uploading image:", error);
+      }
+    };
+  
+
   if (!studyGroup) return <div>Loading...</div>; // Show loading message while fetching the study group data
 
   return (
     <div className="edit-study-group-panel">
       <h1>Edit Study Group</h1>
       <form onSubmit={(e) => e.preventDefault()}>
+        
+          <div className="edit-study-group-profile-picture">
+            {/* If an image is selected, display it; otherwise, show the button */}
+            {imagePreview ? (
+              <img
+                className='upload-button'
+                src={imagePreview}  // Display the preview returned by the backend
+                alt="Selected Profile"
+                onClick={() => document.getElementById("image-upload")?.click()} // Allow re-selecting an image
+              />
+            ) : (
+              <div>
+                
+                <img
+                  className='upload-button'
+                  src={profilePic || 'https://learnlink-public.s3.us-east-2.amazonaws.com/AvatarPlaceholder.svg'}
+                  alt="Profile"
+                  width="100"
+                  height={100}
+                  onClick={() => document.getElementById("image-upload")?.click()}
+
+                />
+              </div>
+            )}
+
+            {/* Hidden file input */}
+            <input
+              id="image-upload"
+              type="file"
+              accept="image/*"
+              onChange={handleImageUpload}
+              style={{ display: "none" }}
+            />
+            {/* <button onClick={handleUpload}>Upload</button> */}
+
+          </div>
         <div>
+          <div>
           <label>Study Group Name:</label>
           <input
             type="text"
@@ -122,7 +223,6 @@ const EditStudyGroup = ({ chatID, onClose, updateChatName}: { chatID: number; on
             onChange={(e) => setName(e.target.value)}
           />
         </div>
-        <div>
           <label>Bio:</label>
           <input
             type="text"

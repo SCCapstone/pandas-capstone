@@ -1,0 +1,154 @@
+/* Main Panel Styling */
+.popup-profile-panel {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80%;
+    height: 80%;
+    background: #f9fafb;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    padding: 24px;
+    z-index: 1000;
+    overflow: hidden;
+  }
+  
+  /* Header Styling */
+  .popup-profile-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #e5e7eb;
+    padding-bottom: 16px;
+    margin-bottom: 24px;
+  }
+  
+  .popup-profile-header h1 {
+    font-size: 2rem;
+    color: #111827;
+    font-weight: 700;
+  }
+  
+  .popup-close-button {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #6b7280;
+    transition: color 0.3s ease;
+  }
+  
+  .popup-close-button:hover {
+    color: #111827;
+  }
+  
+  /* Content Area */
+  .popup-content {
+    display: flex;
+    flex-grow: 1;
+  }
+  
+  /* Left Side Styling */
+  .popup-left-side {
+    width: 35%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  }
+  
+  .popup-profile-pic {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 20px;
+  }
+  
+  .popup-bio {
+    text-align: center;
+    margin-top: 20px;
+  }
+  
+  .popup-bio h3 {
+    color: #00668C;
+    font-size: 1.25rem;
+    margin-bottom: 10px;
+  }
+  
+  /* Right Side Styling */
+  .popup-right-side {
+    width: 65%;
+    padding-left: 30px;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .popup-right-side h1 {
+    font-size: 1.75rem;
+    color: #1f2937;
+    margin-bottom: 8px;
+  }
+  
+  .popup-right-side h3 {
+    font-size: 1.25rem;
+    color: #00668C;
+    margin-bottom: 20px;
+  }
+  
+  /* Details Section */
+  .popup-profile-details-container {
+    display: flex;
+    gap: 24px;
+    margin-top: 16px;
+  }
+  
+  .popup-profile-details {
+    flex: 1;
+
+  }
+  
+  .popup-profile-details p {
+    margin: 10px 0;
+    color: #374151;
+    font-size: 1.5rem;
+  }
+  
+  .bold-first-word {
+    font-weight: 600;
+    color: #111827;
+  }
+  
+  
+
+  .study-habit-tags {
+    display: flex;
+    flex-wrap: wrap;
+    /* Allows tags to wrap to the next line if needed */
+    gap: 15px;
+    /* Adds spacing between the tags */
+    margin: 10px 0;
+    /* Adds space above and below the tags */
+    margin-bottom: 50px;
+}
+
+.popup-tag {
+    background-color: hsl(0, 0%, 90%);
+    padding: 5px 10px;
+    border-radius: 2px;
+    font-size: 16px;
+    color: #333;
+    border: 2px;
+    font-weight: 400;
+    display: inline-block;
+    /* Ensures tags are inline */
+    margin-right: 10px;
+    /* Extra space between tags */
+    margin-bottom: 10px;
+}
