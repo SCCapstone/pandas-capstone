@@ -144,6 +144,13 @@ const handleApproval = async (
 
     const response = await axios.post(`${REACT_APP_API_URL}${endpoint}`, payload);
 
+    if (response.status === 405) {
+      console.log ("borken");
+      setError("This study group is full. You cannot approve this request.");
+      handleDeleteRequest(requestId);
+      return;
+    } 
+
     if (response.status === 200 || response.status === 201) {
       // If chat was created successfully, update parent component
       if (targetUserId) {
@@ -180,12 +187,8 @@ const handleApproval = async (
       });
 
       handleDeleteRequest(requestId); // Remove request after approval
-    } else if (response.status === 405) {
-      setError("This study group is full. You cannot approve this request.");
-      handleDeleteRequest(requestId);
-    } else {
-      setError("Failed to approve request. Please try again.");
-    }
+    } 
+  
   } catch (err: unknown) {
     console.error("Error approving request:", err);
 
