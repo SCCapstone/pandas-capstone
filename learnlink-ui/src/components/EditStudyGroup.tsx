@@ -121,6 +121,7 @@ const EditStudyGroup = ({ chatID, onClose, updateChatName}: { chatID: number; on
 
     const formData = new FormData();
     formData.append('profilePic', image);
+    formData.append('chatID', chatID.toString());
     const token = localStorage.getItem('token');
     if (token) {
       const res = await fetch(`${REACT_APP_API_URL}/api/study-group/upload-pfp`, {
