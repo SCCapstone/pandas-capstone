@@ -1524,6 +1524,35 @@ app.get('/api/chats', authenticate, async (req, res): Promise<any> => {
   }
 });
 
+app.get('/api/chats/check', async (req, res): Promise<any> => {
+  const { userId1, userId2 } = req.query;
+
+  if (!userId1 || !userId2) {
+    return res.status(400).json({ message: 'Missing userId1 or userId2' });
+  }
+
+  try {
+    // Check if a chat exists between the two users
+    const existingChat = await prisma.chat.findFirst({
+      where: {
+        users: {
+          every: { id: { in: [Number(userId1), Number(userId2)] } }, // Ensure both users are in the chat
+        },
+      },
+    });
+
+    if (existingChat) {
+      return res.json({ exists: true, chatId: existingChat.id });
+    }
+
+    res.json({ exists: false });
+  } catch (error) {
+    console.error('Error checking for existing chat:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+
 app.get('/api/chats/:chatId', authenticate, async (req, res): Promise<any> => {
   const userId = res.locals.userId; // Use res.locals to get the userId set by the authenticate middleware
   const { chatId } = req.params;  // Get the chatId from the URL parameters
