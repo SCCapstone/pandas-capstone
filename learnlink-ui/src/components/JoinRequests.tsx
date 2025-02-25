@@ -143,19 +143,29 @@ const JoinRequests: React.FC<JoinRequestProps> = ({ currentUserId, addNewChat, o
         }
 
         // NOTIFICATION
-
+        
         // Fetch the name of the current user
         const userResponse = await axios.get(`${REACT_APP_API_URL}/api/users/${currentUserId}`);
         const currentUser = userResponse.data;
 
-        const notificationMessage = `Your request has been accepted by ${currentUser.firstName} ${currentUser.lastName}`;
+        let notificationMessage = `Your request has been approved by ${currentUser.firstName} ${currentUser.lastName}`;
 
+        if (studyGroupId) {
+
+          // Fetch the study group name
+          const groupResponse = await axios.get(`${REACT_APP_API_URL}/api/study-groups/${studyGroupId}`);
+          console.log(groupResponse)
+
+          // Update notification message for study group requests
+          notificationMessage = `Your request to join ${groupResponse.data.studyGroup.name} has been approved by ${currentUser.firstName} ${currentUser.lastName}`;
+        }
+  
+        // Send the notification
         await axios.post(`${REACT_APP_API_URL}/notifications/send`, {
-          userId: requestUserId,  
+          userId: requestUserId,
           message: notificationMessage,
           type: "StudyGroup",
         });
-
 
         handleDeleteRequest(requestId); // Remove request after approval
       } 
