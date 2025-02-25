@@ -2154,7 +2154,7 @@ app.post('/api/users/upload-pfp', authenticate, upload as express.RequestHandler
 });
 
 app.post('/api/study-group/upload-pfp', authenticate, upload as express.RequestHandler, resizeAndUpload as express.RequestHandler, async (req, res):Promise<any> => {
-  const chatID = req.body.chatID;
+  const chatID = parseInt(req.body.chatID);
   const profilePic = req.body.profilePicUrl;
   console.log("IN UPLOAD")
   console.log('Received chatID:', chatID);
