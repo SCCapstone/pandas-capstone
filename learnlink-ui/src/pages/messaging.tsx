@@ -332,69 +332,56 @@ const Messaging: React.FC = () => {
   
         setCurrentMessage('');
 
-    // TODO add -- add notifications when messages are sent
-    // TODO doesn't work for group chats - only sends to one group member
-
-    // Send Notification to Backend
+    // Notifications for messaging - Done
     console.log('Sending notification request to backend...');
 
-    // Get the sender's name (currentUserId is the sender)
-    let senderName = "Unknown Sender";  // Fallback in case no name is found
+    let senderName = "Unknown Sender";
     if (selectedChat.users && currentUserId) {
-      // Find the sender in the chat users list
       const sender = selectedChat.users.find((user) => user.id === currentUserId);
       if (sender) {
         senderName = `${sender.firstName} ${sender.lastName}`;
       }
     }
 
-    console.log('Sender name for notification:', senderName); // Log the sender's name
+    console.log('Sender name for notification:', senderName);
 
-    // Get the recipient name from the users list (exclude the sender)
-    let recipientName = "Unknown Recipient";  // Fallback in case no name is found
-    if (selectedChat.users && currentUserId) {
-      // Find the other user in the chat users list (the recipient)
-      const otherUser = selectedChat.users.find((user) => user.id !== currentUserId);
-      if (otherUser) {
-        recipientName = `${otherUser.firstName} ${otherUser.lastName}`;
+    // Get all recipients (exclude the sender)
+    const recipients = selectedChat.users.filter((user) => user.id !== currentUserId);
+
+    if (recipients.length > 0) {
+      
+      const isGroupChat = selectedChat.users.length > 2;
+      const chatName = await getChatName(selectedChat);
+
+      // Create the notification message
+      let notificationMessage = `New message from ${senderName}`;
+      if (isGroupChat) {
+        notificationMessage += ` in ${chatName}`;
       }
+
+      console.log('Notification message:', notificationMessage);
+
+      // Send notification to each recipient
+      await Promise.all(
+        recipients.map(async (recipient) => {
+          console.log(`Sending notification to ${recipient.firstName} ${recipient.lastName}`);
+
+          const response = await fetch(`${process.env.REACT_APP_API_URL}/notifications/send`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              userId: recipient.id,
+              message: notificationMessage,
+              type: "Message",
+              chatId: selectedChat.id,
+            }),
+          });
+        })
+      );
     }
-
-    console.log('Recipient name for notification:', recipientName); // Log the recipient's name
-
-    // Create the notification message with the sender's name
-    const notificationMessage = `New message from ${senderName}`;
-    console.log('Notification message:', notificationMessage); // Log the notification message
-
-    // Find the recipient (the user who is not the sender)
-    const recipientUser = selectedChat.users.find((user) => user.id !== currentUserId);
-
-    if (recipientUser) {
-      // Send the notification to the recipient (not the sender)
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/notifications/send`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          userId: recipientUser.id,  // Send notification to the recipient user (not the sender)
-          message: notificationMessage,  // Custom message for the notification
-          type: "Message",  // Notification type (Message)
-          chatId: selectedChat.id,  // The chat id to determine the recipient
-        }),
-      });
-
-      console.log('Notification sent to recipient:', response); // Log the response from sending the notification
-    }
-
-
-// end of adding 1/1 notifications
-
-
-
-
-
 
       } catch (error) {
         console.error('Error sending message:', error);

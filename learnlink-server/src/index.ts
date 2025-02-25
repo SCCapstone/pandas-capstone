@@ -776,7 +776,7 @@ app.get('/api/profiles/:userId', async (req, res): Promise<any> => {
       },
     });
 
-    studyGroupsToSwipeOn = studyGroupsToSwipeOn.filter((group) => group._count.users <= 6); // filter groups with 6+ members
+    studyGroupsToSwipeOn = studyGroupsToSwipeOn.filter((group) => group._count.users < 6); // filter groups with 6+ members
 
     // Calculate similarity score
     const calculateSimilarityUser = (user: User, forStudyGroup: boolean) => {
