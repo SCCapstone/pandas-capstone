@@ -2155,10 +2155,14 @@ app.post('/api/users/upload-pfp', authenticate, upload as express.RequestHandler
 
 app.post('/api/study-groups/upload-pfp', authenticate, upload as express.RequestHandler, resizeAndUpload as express.RequestHandler, async (req, res):Promise<any> => {
   const chatID = req.body.chatID;
+  const profilePic = req.body.profilePicUrl;
+  console.log("IN UPLOAD")
+  console.log('Received chatID:', chatID);
+  console.log('Received profilePic:', profilePic);
   try {
     const updatedStudyGroup = await prisma.studyGroup.update({
       where: { chatID },
-      data: { profilePic: req.body.profilePicUrl }, // Save S3 URL
+      data: { profilePic }, // Save S3 URL
     });
 
     res.status(200).json({ message: "Profile picture updated", profilePic: updatedStudyGroup.profilePic });

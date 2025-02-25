@@ -100,6 +100,8 @@ const EditStudyGroup = ({ chatID, onClose, updateChatName}: { chatID: number; on
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
+      handleUpload();
+
 
 
       console.log('Study group updated:', response.data);
@@ -121,7 +123,7 @@ const EditStudyGroup = ({ chatID, onClose, updateChatName}: { chatID: number; on
     formData.append('profilePic', image);
     const token = localStorage.getItem('token');
     if (token) {
-      const res = await fetch(`${REACT_APP_API_URL}/api/users/upload-pfp`, {
+      const res = await fetch(`${REACT_APP_API_URL}/api/study-group/upload-pfp`, {
         method: 'POST',
         body: formData,
         headers: {
