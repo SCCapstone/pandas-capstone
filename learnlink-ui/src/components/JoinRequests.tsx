@@ -191,7 +191,6 @@ const handleApproval = async (
       console.log("Caught 405 error in catch block");
       setError("This study group is full. You cannot approve this request.");
       handleDeleteRequest(requestId);
-      return; // Stop execution
     }
     if (axios.isAxiosError(err)) {
       if (err.response) {
