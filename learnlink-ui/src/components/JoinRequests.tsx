@@ -48,6 +48,9 @@ const JoinRequests: React.FC<JoinRequestProps> = ({ currentUserId, addNewChat, o
   const [requests, setRequests] = useState<SwipeRequest[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [selectedProfile, setSelectedProfile] = useState<{ id: number; name: string } | null>(null);
+  const [loadingRequests, setLoadingRequests] = useState<boolean>(false);
+  const [loadingApproval, setLoadingApproval] = useState<number | null>(null); // Tracks which request is being approved
+
 
   // Fetch requests when currentUserId changes
   useEffect(() => {
@@ -59,6 +62,7 @@ const JoinRequests: React.FC<JoinRequestProps> = ({ currentUserId, addNewChat, o
 
   // Function to fetch swipe requests related to the current user or their study group
   const handleRetrievingRequests = async () => {
+    setLoadingRequests(true); 
     try {
       const requestResponse = await axios.get(`${REACT_APP_API_URL}/api/swipe/${currentUserId}`);
   
@@ -101,6 +105,9 @@ const JoinRequests: React.FC<JoinRequestProps> = ({ currentUserId, addNewChat, o
       console.error('Error fetching requests:', err);
       setError('Failed to load requests.');
     }
+    finally {
+      setLoadingRequests(false); // Stop loading
+    }
   };
   
 // Function to approve a join request
@@ -110,9 +117,11 @@ const handleApproval = async (
   targetUserId?: number | null,
   requestUserId?: number
 ) => {
+  setLoadingApproval(requestId); // Set loading state for this specific request
   try {
     let endpoint = "";
     let payload: any = {};
+
 
     // Check if a chat already exists
     if (targetUserId) {
@@ -207,6 +216,9 @@ const handleApproval = async (
       setError("An unknown error occurred.");
     }
   }
+  finally {
+    setLoadingApproval(null); // Reset loading state
+  }
 };
 
 
@@ -243,9 +255,12 @@ const handleApproval = async (
       {/* Display error message if any */}
       {error && <p className="error-message">{error}</p>}
       
-      {/* Display message if there are no requests */}
-      {requests.length === 0 ? (
-        <p className="no-requests">No join requests.</p>
+      {loadingRequests ? (
+      <div className="loading-container">
+        Loading... <span className="loading-spinner"></span>
+      </div>
+    ) : requests.length === 0 ? (
+      <p className="no-requests">No join requests.</p>
       ) : (
         <ul className="requests-list">
           {requests
@@ -293,8 +308,10 @@ const handleApproval = async (
                         request.userId // Passing the requestUserId
                       )
                     }
-                  >
-                    ✔️ Approve
+                    disabled={loadingApproval === request.id}
+                >
+                  {loadingApproval === request.id ? 'Approving...' : '✔️ Approve'}
+                
                   </button>
                   <button className="reject" onClick={() => handleDenial(request.id)}>
                     ❌ Reject
