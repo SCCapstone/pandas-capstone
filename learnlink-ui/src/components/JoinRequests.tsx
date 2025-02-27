@@ -144,15 +144,11 @@ const handleApproval = async (
 
     const response = await axios.post(`${REACT_APP_API_URL}${endpoint}`, payload);
 
-    if (response.status === 405) {
-      console.log ("borken");
-      setError("This study group is full. You cannot approve this request.");
-      handleDeleteRequest(requestId);
-      return;
-    } 
+  
 
     if (response.status === 200 || response.status === 201) {
       // If chat was created successfully, update parent component
+      console.log("response 200");
       if (targetUserId) {
         addNewChat(response.data);
       }
@@ -191,7 +187,12 @@ const handleApproval = async (
   
   } catch (err: unknown) {
     console.error("Error approving request:", err);
-
+    if (axios.isAxiosError(err) && err.response?.status === 405) {
+      console.log("Caught 405 error in catch block");
+      setError("This study group is full. You cannot approve this request.");
+      handleDeleteRequest(requestId);
+      return; // Stop execution
+    }
     if (axios.isAxiosError(err)) {
       if (err.response) {
         // API responded with an error
