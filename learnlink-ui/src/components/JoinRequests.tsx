@@ -273,7 +273,7 @@ const handleApproval = async (
             })
             .map((request) => (
               <li key={request.id} className="request-item">
-                <div className="request-details">
+                <div className="request-details" onClick={() => handleProfilePopup(request.user.id)}>
                   {/* Profile button before requester's name */}
                   <p className="requester-info">
                   
@@ -293,7 +293,7 @@ const handleApproval = async (
                   
                   {/* Display request message */}
                   <p className='request-message'><strong>Message: </strong> {request.message}</p>
-                  
+                
                 </div>
   
                 {/* Approve and reject buttons */}
