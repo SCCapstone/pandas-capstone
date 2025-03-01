@@ -763,7 +763,6 @@ const Messaging: React.FC = () => {
             <>
               <div className='ChatHeader'>
                 <h2 className="ChatTitle">{chatNames[selectedChat.id]}</h2>
-                 
 
                 {/* Button Container for grouping buttons together */}
                   <div className="ButtonContainer">

@@ -27,6 +27,7 @@ interface User {
   gender: string;
   college: string;
   coursework: string[];
+  profilePic: string;
 }
 interface FilterCriteria {
   age?: { min?: number; max?: number };
@@ -306,9 +307,13 @@ const Navbar: React.FC = () => {
         {isDropdownVisible && searchResults.length > 0 && (
           <ul className="dropdown">
             {searchResults.map((user) => (
-              <p key={user.id} onClick={() => handleSelectUser(user.id)}>
-                {user.firstName} {user.lastName} (@{user.username})
-              </p>
+              <ul key={user.id} onClick={() => handleSelectUser(user.id)}>
+                <img src={user.profilePic} alt={`${user.firstName} ${user.lastName}`} className='search-profile-pic' />
+                <div className='search-bio'>
+                  <h3>{user.username}</h3>
+                  <p>{user.firstName} {user.lastName}</p>
+                </div>
+              </ul>
             ))}
           </ul>
         )}
