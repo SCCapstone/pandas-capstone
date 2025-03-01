@@ -14,7 +14,7 @@ import fs from 'fs';
 import https from 'https';
 import dotenv from 'dotenv';
 import { Resend } from 'resend';
-import {upload, resizeAndUpload, handleImagePreview} from './uploadConfig';
+import {upload, resizeAndUpload, handleImagePreview, resizeAndUploadStudyGroup} from './uploadConfig';
 import multer from "multer";
 import { welcomeEmailTemplate, passwordResetEmailTemplate } from "./emailTemplates";
 
@@ -146,6 +146,7 @@ interface StudyGroup {
   chatID: number | null;
   chat: any;
   ideal_match_factor: string | null;
+  profilePic: string | null;
 }
 
 // Signup endpoint
@@ -773,6 +774,7 @@ app.get('/api/profiles/:userId', async (req, res): Promise<any> => {
         chatID: true,
         chat: true,
         ideal_match_factor: true,
+        profilePic: true,
       },
     });
 
@@ -824,6 +826,7 @@ app.get('/api/profiles/:userId', async (req, res): Promise<any> => {
       const studyGroupsWithScore: StudyGroupWithScore[] = studyGroupsToSwipeOn
       .map(studyGroup => ({
         ...studyGroup,
+        profilePic: studyGroup.profilePic || placeholderImage,
         similarityScore: calculateSimilarityStudyGroup(studyGroup),
         type: 'studyGroup' as 'studyGroup',
       }))
@@ -2182,7 +2185,7 @@ app.post('/api/users/upload-pfp', authenticate, upload as express.RequestHandler
   }
 });
 
-app.post('/api/study-group/upload-pfp', authenticate, upload as express.RequestHandler, resizeAndUpload as express.RequestHandler, async (req, res):Promise<any> => {
+app.post('/api/study-group/upload-pfp', authenticate, upload as express.RequestHandler, resizeAndUploadStudyGroup as express.RequestHandler, async (req, res):Promise<any> => {
   const chatID = parseInt(req.body.chatID);
   const profilePic = req.body.profilePicUrl;
   console.log("IN UPLOAD")
