@@ -235,6 +235,9 @@ app.post('/api/login', async (req, res): Promise<any> => {
     // Compare the entered password with the stored hashed password
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
+    // FOR XTREME TESTING MODEEEE
+    // const isPasswordValid = password === user.password;
+
     if (!isPasswordValid) {
       return res.status(400).json({ error: 'Invalid username or password' });
     }
@@ -330,6 +333,8 @@ app.get('/api/users/profile/:userId', authenticate, async (req, res):Promise<any
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
+
+
 
     // Return the profile data
     res.json({
@@ -680,7 +685,7 @@ app.get('/api/profiles/:userId', async (req, res): Promise<any> => {
   try {
 
     const placeholderImage = "https://learnlink-public.s3.us-east-2.amazonaws.com/AvatarPlaceholder.svg";
-
+    const sgPlaceholderImage = 'https://learnlink-pfps.s3.us-east-1.amazonaws.com/profile-pictures/generic_studygroup_pfp.svg'
      // Fetch the current user's data to use for matching
      const currentUser = await prisma.user.findUnique({
       where: { id: userId },
@@ -826,7 +831,7 @@ app.get('/api/profiles/:userId', async (req, res): Promise<any> => {
       const studyGroupsWithScore: StudyGroupWithScore[] = studyGroupsToSwipeOn
       .map(studyGroup => ({
         ...studyGroup,
-        profilePic: studyGroup.profilePic || placeholderImage,
+        profilePic: studyGroup.profilePic || sgPlaceholderImage,
         similarityScore: calculateSimilarityStudyGroup(studyGroup),
         type: 'studyGroup' as 'studyGroup',
       }))
