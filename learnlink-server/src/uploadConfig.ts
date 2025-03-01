@@ -56,6 +56,7 @@ const resizeAndUpload = async (req: Request, res: Response, next: NextFunction) 
 
     // 📏 Resize image and apply circular crop
     const resizedBuffer = await sharp(imageBuffer)
+      .rotate() // Automatically rotate based on EXIF data
       .resize(400, 400, { fit: "cover" }) // Crop to 400x400
       .composite([
         {
