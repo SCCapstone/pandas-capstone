@@ -169,7 +169,11 @@ const SwipeProfiles = ({ userId }: { userId: number }) => {
               
 
               <div className="group-right">
-                <GroupLogo/>
+                {/* <GroupLogo/> */}
+                  <img
+                    src={currentProfile.profilePic || 'https://learnlink-public.s3.us-east-2.amazonaws.com/AvatarPlaceholder.svg'}
+                    className="group-pic"
+                  />
                 <div className="group-description">
                 <span className="bold-first-word">Bio: </span>
                 <br></br>{currentProfile.description}
