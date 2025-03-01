@@ -130,6 +130,11 @@ const Profile: React.FC = () => {
         },
       });
       const data = await res.json();
+      if (!res.ok) {
+        console.error("Upload error:", data.error || "Unknown error");
+        alert(`Error: ${data.error || "Failed to upload image"}`);
+        return;
+      }
       if (res.ok) setImageUrl(data.profilePic);
     }
   };

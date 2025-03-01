@@ -52,6 +52,9 @@ const credentials = NODE_ENV === 'production' && privateKey && certificate
 
 
 const app = express();
+app.use(express.json({ limit: "20mb" })); // Increase body payload size
+app.use(express.urlencoded({ limit: "20mb", extended: true })); // Increase URL-encoded payload size
+
 const prisma = new PrismaClient();
 let server: https.Server | http.Server;
 
@@ -2177,7 +2180,31 @@ app.post("/api/reset-password/email", async (req, res): Promise<any> => {
   res.json({ message: "Password reset successful" });
 });
 
-app.post('/api/users/upload-pfp', authenticate, upload as express.RequestHandler, resizeAndUpload as express.RequestHandler, async (req, res):Promise<any> => {
+app.post(
+  "/api/users/upload-pfp",
+  authenticate,
+  (req, res, next) => {
+    upload(req, res, (err) => {
+      if (err instanceof multer.MulterError) {
+        if (err.code === "LIMIT_FILE_SIZE") {
+          return res.status(400).json({ error: "Image file too large. Maximum size is 5MB." });
+        }
+      } else if (err) {
+        return res.status(400).json({ error: err.message });
+      }
+      next();
+    });
+  },
+  async (req, res, next) => {
+    try {
+      await resizeAndUpload(req, res, next);
+      next();
+    } catch (err) {
+      console.error("Image processing error:", err);
+      res.status(500).json({ error: "Failed to process image" });
+    }
+  },
+  async (req, res) => {
   const userId = res.locals.userId; // Authenticated user ID
 
   try {
@@ -2193,8 +2220,31 @@ app.post('/api/users/upload-pfp', authenticate, upload as express.RequestHandler
   }
 });
 
-app.post('/api/study-group/upload-pfp', authenticate, upload as express.RequestHandler, resizeAndUploadStudyGroup as express.RequestHandler, async (req, res):Promise<any> => {
-  const chatID = parseInt(req.body.chatID);
+app.post('/api/study-group/upload-pfp', 
+  authenticate, 
+  authenticate,
+  (req, res, next) => {
+    upload(req, res, (err) => {
+      if (err instanceof multer.MulterError) {
+        if (err.code === "LIMIT_FILE_SIZE") {
+          return res.status(400).json({ error: "Image file too large. Maximum size is 5MB." });
+        }
+      } else if (err) {
+        return res.status(400).json({ error: err.message });
+      }
+      next();
+    });
+  },
+  async (req, res, next) => {
+    try {
+      await resizeAndUploadStudyGroup(req, res, next);
+      next();
+    } catch (err) {
+      console.error("Image processing error:", err);
+      res.status(500).json({ error: "Failed to process image" });
+    }
+  },
+  async (req, res) => {  const chatID = parseInt(req.body.chatID);
   const profilePic = req.body.profilePicUrl;
   console.log("IN UPLOAD")
   console.log('Received chatID:', chatID);

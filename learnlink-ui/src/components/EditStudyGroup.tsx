@@ -133,6 +133,11 @@ const EditStudyGroup = ({ chatID, onClose, updateChatName}: { chatID: number; on
       });
       const data = await res.json();
       if (res.ok) setImageUrl(data.profilePic);
+      if (!res.ok) {
+        console.error("Upload error:", data.error || "Unknown error");
+        alert(`Error: ${data.error || "Failed to upload image"}`);
+        return;
+      }
     }
   };
 
