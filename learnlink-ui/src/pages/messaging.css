@@ -370,6 +370,13 @@
 .OtherMessage + .Heart {
   align-self: flex-start;
 }
+.CreateStudyGroupButton {
+  background-color: #FEAD2B;
+}
+
+.CreateStudyGroupButton:hover {
+  background-color: #dfa317;
+}
 
 /* Responsive Adjustments */
 @media (max-width: 768px) {

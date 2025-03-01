@@ -3,6 +3,7 @@ import '../pages/messaging.css';
 import './components.css';
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { FaXmark, FaCheck } from "react-icons/fa6";
 
 // Props interface defining the expected properties for the JoinRequests component
 interface JoinRequestProps {
@@ -29,6 +30,8 @@ interface User {
   id: number;
   firstName: string;
   lastName: string;
+  profilePic: string;
+  username: string;
 }
 
 // Interface for a group object
@@ -276,19 +279,27 @@ const handleApproval = async (
                 <div className="request-details" onClick={() => handleProfilePopup(request.user.id)}>
                   {/* Profile button before requester's name */}
                   <p className="requester-info">
-                  
-                    <strong className='requester-name'> Requester Name: </strong>{request.user.firstName} {request.user.lastName}
-                    <button 
+                  <img
+                    src={request.user.profilePic || 'https://learnlink-public.s3.us-east-2.amazonaws.com/AvatarPlaceholder.svg'}
+                    className="group-pic"
+                  />
+                  <div className="requester-name-container">
+                      <h3 className='requester-name'>{request.user.username}</h3>
+
+                      <div>{request.user.firstName} {request.user.lastName}</div>
+                    </div>
+                   
+                    {/* <button 
                       className="requester-profile-button"
                       onClick={() => handleProfilePopup(request.user.id)}
                     >
                       👤 
-                    </button>
+                    </button> */}
                    </p>
                   
                   {/* Display target group if applicable */}
                   {request.targetGroupId && request.targetGroup && (
-                    <p className='request-target-group-name'><strong>Target Group: </strong> {request.targetGroup.studyGroup.name}</p>
+                    <p className='request-target-group-name'><strong>To Join Study Group: </strong> {request.targetGroup.studyGroup.name}</p>
                   )}
                   
                   {/* Display request message */}
@@ -310,11 +321,11 @@ const handleApproval = async (
                     }
                     disabled={loadingApproval === request.id}
                 >
-                  {loadingApproval === request.id ? 'Approving...' : '✔️ Approve'}
+                  {loadingApproval === request.id ? 'Approving...' : <><FaCheck />Approve</>}
                 
                   </button>
                   <button className="reject" onClick={() => handleDenial(request.id)}>
-                    ❌ Reject
+                    <FaXmark/> Reject
                   </button>
                 </div>
               </li>
