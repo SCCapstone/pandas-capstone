@@ -1469,6 +1469,9 @@ app.get('/api/users/:id', async (req, res) : Promise<any> => {
         id: true,
         firstName: true,
         lastName: true,
+        profilePic: true,
+        username: true,
+        bio: true,
       },
     });
 
