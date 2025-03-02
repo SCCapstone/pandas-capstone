@@ -85,8 +85,8 @@ const Messaging: React.FC = () => {
     const fetchData = async () => {
       setLoadingChatList(true);
 
-    handleChatsSwitch();
-    const token = localStorage.getItem('token');
+      handleChatsSwitch();
+      const token = localStorage.getItem('token');
       console.log(token);
       const syncStudyGroupChats = async () => {
         try {
@@ -94,7 +94,7 @@ const Messaging: React.FC = () => {
           const response = await axios.get(`${REACT_APP_API_URL}/api/chats`, {
             headers: { Authorization: `Bearer ${token}` },
           });
-    
+
           // Loop through each chat and sync study group chats first
           for (const chat of response.data) {
             if (chat.studyGroupId) {  // Ensure it's a study group chat
@@ -105,42 +105,46 @@ const Messaging: React.FC = () => {
           }
         } catch (error) {
           console.error('Error syncing study group chats:', error);
-      }};
-  
+        }
+      };
+
       // Call the sync function first
       await syncStudyGroupChats();
-  
 
-      // Proceed with fetching users and chats after sync
-      axios.get(`${REACT_APP_API_URL}/api/users`)
-        .then((userResponse) => setUsers(userResponse.data))
-        .catch((error) => console.error('Error fetching users:', error));
+      const syncUserChats = async () => {
 
-      // Proceed with fetching chats after sync
-      axios.get(`${REACT_APP_API_URL}/api/chats`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-        .then((chatResponse) => {
-          const chatsWithMessages = chatResponse.data.map((chat: Chat) => ({
-            ...chat,
-            messages: chat.messages || [], // Ensure messages is always an array
-            users: chat.users || [], // Ensure users is always an array
-          }));
+        // Proceed with fetching users and chats after sync
+        axios.get(`${REACT_APP_API_URL}/api/users`)
+          .then((userResponse) => setUsers(userResponse.data))
+          .catch((error) => console.error('Error fetching users:', error));
 
-          setChats(chatsWithMessages);
-
-          // Ensure storing liked messages correctly
-          const likedMessagesMap = chatResponse.data.reduce((acc: Record<number, boolean>, chat: Chat) => {
-            chat.messages?.forEach((msg: Message) => {
-              acc[msg.id] = msg.liked ?? false; // Default to false if missing
-            });
-            return acc;
-          }, {});
-
-          setHeartedMessages(likedMessagesMap); // Store liked states
+        // Proceed with fetching chats after sync
+        axios.get(`${REACT_APP_API_URL}/api/chats`, {
+          headers: { Authorization: `Bearer ${token}` },
         })
-        .catch((error) => console.error('Error fetching chats:', error));
+          .then((chatResponse) => {
+            const chatsWithMessages = chatResponse.data.map((chat: Chat) => ({
+              ...chat,
+              messages: chat.messages || [], // Ensure messages is always an array
+              users: chat.users || [], // Ensure users is always an array
+            }));
 
+            setChats(chatsWithMessages);
+
+            // Ensure storing liked messages correctly
+            const likedMessagesMap = chatResponse.data.reduce((acc: Record<number, boolean>, chat: Chat) => {
+              chat.messages?.forEach((msg: Message) => {
+                acc[msg.id] = msg.liked ?? false; // Default to false if missing
+              });
+              return acc;
+            }, {});
+
+            setHeartedMessages(likedMessagesMap); // Store liked states
+          })
+          .catch((error) => console.error('Error fetching chats:', error));
+      };
+
+      await syncUserChats();
       // Fetch current user if token exists
       if (token) {
         try {
@@ -155,12 +159,12 @@ const Messaging: React.FC = () => {
           setLoadingChatList(false); // Stop the loading state
         }
       }
-    
+
     }
     fetchData();
-  
+
   }, [isPanelVisible]);  // Trigger when panel visibility changes
-  
+
 
   useEffect(() => {
     if (selectedChat) {
@@ -176,12 +180,12 @@ const Messaging: React.FC = () => {
         )
       );
     });
-  
+
     return () => {
       socket.off("chatUpdated");
     };
   }, [selectedChat]);
-  
+
 
   // Used for editing study groups
   useEffect(() => {
