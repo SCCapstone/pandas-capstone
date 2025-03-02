@@ -38,11 +38,12 @@ interface ChatsNaviProps {
   selectedChat: Chat | null;           
   setSelectedChat: React.Dispatch<React.SetStateAction<Chat | null>>; 
   handleDeleteChat: (id: number) => void; 
-  chatNames: { [key: number]: string };  
+  chatNames: { [key: number]: string };
+  loadingChatList: boolean;
 }
 
 // ChatsNavi component handles displaying a list of chats and allows selecting or deleting them
-const ChatsNavi: React.FC<ChatsNaviProps> = ({ chats, selectedChat, setSelectedChat, handleDeleteChat, chatNames }) => {
+const ChatsNavi: React.FC<ChatsNaviProps> = ({ chats, selectedChat, setSelectedChat, handleDeleteChat, chatNames,loadingChatList }) => {
   const [sortedChats, setSortedChats] = useState<Chat[]>([]);
 
   // Sort chats by most recent update when chats change
@@ -58,24 +59,31 @@ const ChatsNavi: React.FC<ChatsNaviProps> = ({ chats, selectedChat, setSelectedC
   return (
     <div className="messages-panel">
       {/* List of chats */}
-      <ul className="ChatList">
-        {sortedChats.map((chat) => (
-          <li
-            key={chat.id}
-            className={`ChatListItem ${selectedChat?.id === chat.id ? 'active' : ''}`} 
-            onClick={() => setSelectedChat(chat)}
-          >
-            {/* Clicking the chat name selects it */}
-            <span>
-              {chatNames[chat.id] || "Loading..."} 
-            </span>
-            {/* Button to delete the chat */}
-            <button className="DeleteButton" onClick={() => handleDeleteChat(chat.id)}>
-              <FaXmark />
-            </button>
-          </li>
-        ))}
-      </ul>
+      {loadingChatList ? (
+        <div className="loading-container">
+          Loading... <span className="loading-spinner"></span>
+        </div>
+      ) : (
+        <ul className="ChatList">
+
+          {sortedChats.map((chat) => (
+            <li
+              key={chat.id}
+              className={`ChatListItem ${selectedChat?.id === chat.id ? 'active' : ''}`}
+              onClick={() => setSelectedChat(chat)}
+            >
+              {/* Clicking the chat name selects it */}
+              <span>
+                {chatNames[chat.id] || "Loading..."}
+              </span>
+              {/* Button to delete the chat */}
+              <button className="DeleteButton" onClick={() => handleDeleteChat(chat.id)}>
+                <FaXmark />
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 };

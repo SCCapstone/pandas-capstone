@@ -79,8 +79,12 @@ const Messaging: React.FC = () => {
   const [groupId, setGroupId] = useState<number | null>(null);
 
   const [selectedProfile, setSelectedProfile] = useState<{ id: number; name: string } | null>(null);
+  const [loadingChatList, setLoadingChatList] = useState(true);
 
   useEffect(() => {
+    const fetchData = async () => {
+      setLoadingChatList(true);
+
     handleChatsSwitch();
     const token = localStorage.getItem('token');
       console.log(token);
@@ -104,7 +108,7 @@ const Messaging: React.FC = () => {
       }};
   
       // Call the sync function first
-      syncStudyGroupChats();
+      await syncStudyGroupChats();
   
 
       // Proceed with fetching users and chats after sync
@@ -139,13 +143,21 @@ const Messaging: React.FC = () => {
 
       // Fetch current user if token exists
       if (token) {
-        axios.get(`${REACT_APP_API_URL}/api/currentUser`, {
-          headers: { Authorization: `Bearer ${token}` },
-        })
-          .then((response) => setCurrentUserId(response.data.id))
-          .catch((error) => console.error('Error fetching current user:', error));
+        try {
+          const response = await axios.get(`${REACT_APP_API_URL}/api/currentUser`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          setCurrentUserId(response.data.id); // Set the current user ID
+        } catch (error) {
+          console.error('Error fetching current user:', error);
+        } finally {
+          // This block runs regardless of success or failure
+          setLoadingChatList(false); // Stop the loading state
+        }
       }
     
+    }
+    fetchData();
   
   }, [isPanelVisible]);  // Trigger when panel visibility changes
   
@@ -235,6 +247,7 @@ const Messaging: React.FC = () => {
           newChatNames[chat.id] = await getChatName(chat);
         }
       }
+      console.log('Chat names:', newChatNames);
   
       setChatNames(newChatNames);
     };
@@ -742,6 +755,7 @@ const Messaging: React.FC = () => {
               setSelectedChat={setSelectedChat} 
               handleDeleteChat={handleDeleteChat} 
               chatNames={chatNames} 
+              loadingChatList={loadingChatList}
 
             />
           )}
