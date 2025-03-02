@@ -12,10 +12,14 @@ RUN npm install
 RUN apt-get update && apt-get install -y \
   libvips \
   libheif-dev \
+  libjemalloc-dev \
   && rm -rf /var/lib/apt/lists/*
 
 # Step 5: Copy the rest of the app code into the container
 COPY . .
+
+ENV LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libjemalloc.so.1
+
 
 # Step 6: Install Prisma Client (and generate Prisma client)
 RUN npx prisma generate
