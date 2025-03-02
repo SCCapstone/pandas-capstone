@@ -89,7 +89,6 @@
   position: relative;
   margin-right: 1rem;
   flex-grow: 1;
-  min-width: 100px;
   transition: opacity 0.3s ease;
   display: flex;
   flex-direction: row;
@@ -143,6 +142,7 @@
   font-size: 1.5rem;
   margin-right: 1rem;
   color: #00668C;
+  min-width: 20px;
 }
 
 /* Full-Screen Overlay Menu - for navigation when for mobile*/
@@ -219,11 +219,6 @@
   }
 }
 
-@media (max-width: 400px) {
-  .search-bar {
-    display: none;
-  }
-}
 
 /* Side Navigation - for resource pages*/
 /* Default sidebar layout */

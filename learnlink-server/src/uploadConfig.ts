@@ -67,6 +67,14 @@ const resizeAndUpload = async (req: Request, res: Response, next: NextFunction) 
       ]) // Apply a circular mask
       .png()
       .toBuffer();
+
+      if (global.gc) {
+        console.log('Garbage collection is exposed');
+        global.gc();
+      } else {
+        console.log('Garbage collection is not exposed');
+      }
+
     // Generate unique file name
     const fileName = `profile-pictures/${Date.now()}_${req.file.originalname.replace(/\s+/g, "_")}`;
 
@@ -80,6 +88,10 @@ const resizeAndUpload = async (req: Request, res: Response, next: NextFunction) 
         ACL: "public-read",
       })
     );
+
+    if (global.gc) {
+      global.gc();
+    }
 
     // Generate image URL
     const newProfilePicUrl = `https://${process.env.S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${fileName}`;
@@ -104,6 +116,10 @@ const resizeAndUpload = async (req: Request, res: Response, next: NextFunction) 
         );
       } catch (deleteError) {
         console.error("Failed to delete old image:", deleteError);
+      }
+
+      if (global.gc) {
+        global.gc();
       }
     }
 
@@ -165,6 +181,10 @@ const handleImagePreview = async (req: Request, res: Response) => {
     .png()
     .toBuffer();
 
+    if (global.gc) {
+      global.gc();
+    }
+
     // Generate a preview URL or send the buffer to the frontend
     // You can store this in a temporary location or use S3, etc.
     // For this example, we're just sending the image as a base64 encoded string
@@ -213,6 +233,11 @@ const resizeAndUploadStudyGroup = async (req: Request, res: Response, next: Next
       ]) // Apply a circular mask
       .png()
       .toBuffer();
+
+      if (global.gc) {
+        global.gc();
+      }
+
     // Generate unique file name
     const fileName = `profile-pictures/${Date.now()}_${req.file.originalname.replace(/\s+/g, "_")}`;
 
@@ -226,6 +251,10 @@ const resizeAndUploadStudyGroup = async (req: Request, res: Response, next: Next
         ACL: "public-read",
       })
     );
+
+    if (global.gc) {
+      global.gc();
+    }
 
     // Generate image URL
     const newProfilePicUrl = `https://${process.env.S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${fileName}`;
@@ -250,6 +279,9 @@ const resizeAndUploadStudyGroup = async (req: Request, res: Response, next: Next
         );
       } catch (deleteError) {
         console.error("Failed to delete old image:", deleteError);
+      }
+      if (global.gc) {
+        global.gc();
       }
     }
 

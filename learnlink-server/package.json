@@ -4,7 +4,7 @@
   "main": "./src/index.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "npx nodemon"
+    "start": "LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libjemalloc.so.1 npx nodemon"
   },
   "author": "",
   "license": "ISC",
