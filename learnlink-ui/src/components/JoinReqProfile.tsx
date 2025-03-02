@@ -34,18 +34,18 @@ const JoinReqProfile: React.FC<JoinReqProfileProps> = ({ id, name, onClose }) =>
     fetchUser();
   }, [id]);
 
-    useEffect(() => {
-      const handleClickOutside = (event: MouseEvent) => {
-        if (panelRef.current && !panelRef.current.contains(event.target as Node)) {
-          onClose();
-        }
-      };
-  
-      document.addEventListener('mousedown', handleClickOutside);
-      return () => {
-        document.removeEventListener('mousedown', handleClickOutside);
-      };
-    }, [onClose]);
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (panelRef.current && !panelRef.current.contains(event.target as Node)) {
+        onClose();
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [onClose]);
 
   if (error) {
     return <div className="popup-profile-panel"><p>{error}</p></div>;
@@ -63,43 +63,43 @@ const JoinReqProfile: React.FC<JoinReqProfileProps> = ({ id, name, onClose }) =>
       </div>
       <div className='popup-content'>
         <div className='popup-left-side'>
-            <img src={user.profilePic} alt={`${user.first_name} ${user.last_name}`} className='popup-profile-pic' />
-            <div className='popup-bio'>
-                <h3>Bio:</h3>
-                <p>{user.bio}</p>
-            </div>
+          <img src={user.profilePic} alt={`${user.first_name} ${user.last_name}`} className='popup-profile-pic' />
+          <div className='popup-bio'>
+            <h3>Bio:</h3>
+            <p>{user.bio}</p>
+          </div>
 
         </div>
         <div className='popup-right-side'>
-            <h1>{user.first_name} {user.last_name}</h1>
-            <h3>@{user.username}</h3>
-            <div className='popup-profile-details-container'>
-                <div className='popup-profile-details'>
-                    <p><span className="bold-first-word">Age: </span>{user.age}</p>
-                    <p><span className="bold-first-word">College: </span>{user.college}</p>
-                    <p><span className="bold-first-word">Major: </span>{user.major}</p>
-                    <p><span className="bold-first-word">Gender: </span>{user.gender}</p>
-                </div>
-                <div className='popup-profile-details'>
-                    <p><span className="bold-first-word">Grade: </span>{user.grade}</p>
-                    <p><span className="bold-first-word">Relevant Coursework: </span>{user.relevant_courses}</p>
-                    <p><span className="bold-first-word">Fav Study Method: </span>{user.study_method}</p>
-                    <p><span className="bold-first-word">Study Tags: </span>
-                        {user.studyHabitTags.length > 0 ? (
-                            user.studyHabitTags.map((tag: string, index: number) => (
-                                <span key={index} className="popup-tag">
-                                    {formatEnum(tag)}
-                                </span>
-                            ))
-                        ) : (
-                            "No study tags specified."
-                        )}
-                    </p>
-                </div>
+          <h1>{user.first_name} {user.last_name}</h1>
+          <h3>@{user.username}</h3>
+          <div className='popup-profile-details-container'>
+            <div className='popup-profile-details'>
+              <p><span className="bold-first-word">Age: </span>{user.age}</p>
+              <p><span className="bold-first-word">College: </span>{user.college}</p>
+              <p><span className="bold-first-word">Major: </span>{user.major}</p>
+              <p><span className="bold-first-word">Gender: </span>{user.gender}</p>
             </div>
+            <div className='popup-profile-details'>
+              <p><span className="bold-first-word">Grade: </span>{user.grade}</p>
+              <p><span className="bold-first-word">Relevant Coursework: </span>{user.relevant_courses}</p>
+              <p><span className="bold-first-word">Fav Study Method: </span>{user.study_method}</p>
+              <p><span className="bold-first-word">Study Tags: </span>
+                {user.studyHabitTags.length > 0 ? (
+                  user.studyHabitTags.map((tag: string, index: number) => (
+                    <span key={index} className="popup-tag">
+                      {formatEnum(tag)}
+                    </span>
+                  ))
+                ) : (
+                  "No study tags specified."
+                )}
+              </p>
             </div>
+          </div>
         </div>
       </div>
+    </div>
   );
 };
 

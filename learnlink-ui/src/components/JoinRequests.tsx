@@ -3,6 +3,7 @@ import '../pages/messaging.css';
 import './components.css';
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { FaXmark, FaCheck } from "react-icons/fa6";
 
 // Props interface defining the expected properties for the JoinRequests component
 interface JoinRequestProps {
@@ -29,6 +30,8 @@ interface User {
   id: number;
   firstName: string;
   lastName: string;
+  profilePic: string;
+  username: string;
 }
 
 // Interface for a group object
@@ -48,6 +51,9 @@ const JoinRequests: React.FC<JoinRequestProps> = ({ currentUserId, addNewChat, o
   const [requests, setRequests] = useState<SwipeRequest[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [selectedProfile, setSelectedProfile] = useState<{ id: number; name: string } | null>(null);
+  const [loadingRequests, setLoadingRequests] = useState<boolean>(false);
+  const [loadingApproval, setLoadingApproval] = useState<number | null>(null); // Tracks which request is being approved
+
 
   // Fetch requests when currentUserId changes
   useEffect(() => {
@@ -59,6 +65,7 @@ const JoinRequests: React.FC<JoinRequestProps> = ({ currentUserId, addNewChat, o
 
   // Function to fetch swipe requests related to the current user or their study group
   const handleRetrievingRequests = async () => {
+    setLoadingRequests(true); 
     try {
       const requestResponse = await axios.get(`${REACT_APP_API_URL}/api/swipe/${currentUserId}`);
   
@@ -101,86 +108,122 @@ const JoinRequests: React.FC<JoinRequestProps> = ({ currentUserId, addNewChat, o
       console.error('Error fetching requests:', err);
       setError('Failed to load requests.');
     }
-  };
-  
-  // Function to approve a join request
-  const handleApproval = async (
-    requestId: number,
-    studyGroupId?: number | null,
-    targetUserId?: number | null,
-    requestUserId?: number
-  ) => {
-    try {
-      let endpoint = "";
-      let payload: any = { };
-  
-      console.log(studyGroupId);
-      if (studyGroupId) {
-        // If the request is for a study group, add the user to the group
-        endpoint = "/api/add-to-study-group";
-        payload.studyGroupId = studyGroupId;
-        payload.requestUserId = requestUserId;
-      } else if (targetUserId) {
-        // If the request is for a one-on-one chat, create a new chat
-        endpoint = "/api/chats";
-        payload.userId1 = requestUserId;
-        payload.userId2 = targetUserId;
-      } else {
-        throw new Error("Invalid request: No study group or target user.");
-      }
-      
-      const response = await axios.post(`${REACT_APP_API_URL}${endpoint}`, payload);
-  
-      if (response.status === 200 || response.status === 201) {
-        // If chat was created successfully, update parent component
-        if (targetUserId) {
-          addNewChat(response.data);
-        }
-
-          // Call the API to sync the study group chat users
-        if (studyGroupId) {
-          await axios.post(`${REACT_APP_API_URL}/api/sync-study-group-chat`, { studyGroupId });
-        }
-
-        // NOTIFICATION
-        
-        // Fetch the name of the current user
-        const userResponse = await axios.get(`${REACT_APP_API_URL}/api/users/${currentUserId}`);
-        const currentUser = userResponse.data;
-
-        let notificationMessage = `Your request has been approved by ${currentUser.firstName} ${currentUser.lastName}`;
-
-        if (studyGroupId) {
-
-          // Fetch the study group name
-          const groupResponse = await axios.get(`${REACT_APP_API_URL}/api/study-groups/${studyGroupId}`);
-          console.log(groupResponse)
-
-          // Update notification message for study group requests
-          notificationMessage = `Your request to join ${groupResponse.data.studyGroup.name} has been approved by ${currentUser.firstName} ${currentUser.lastName}`;
-        }
-  
-        // Send the notification
-        await axios.post(`${REACT_APP_API_URL}/notifications/send`, {
-          userId: requestUserId,
-          message: notificationMessage,
-          type: "StudyGroup",
-        });
-
-        handleDeleteRequest(requestId); // Remove request after approval
-      } 
-      else if (response.status === 405) {
-        setError("This study group is full. You cannot approve this request.");
-        handleDeleteRequest(requestId);
-      }
-      else {
-        setError("Failed to approve request. Please try again.");
-      }
-    } catch (err) {
-      console.error("Error approving request:", err);
-      setError("Failed to approve request. Please check your network and try again.");
+    finally {
+      setLoadingRequests(false); // Stop loading
     }
   };
+  
+// Function to approve a join request
+const handleApproval = async (
+  requestId: number,
+  studyGroupId?: number | null,
+  targetUserId?: number | null,
+  requestUserId?: number
+) => {
+  setLoadingApproval(requestId); // Set loading state for this specific request
+  try {
+    let endpoint = "";
+    let payload: any = {};
+
+
+    // Check if a chat already exists
+    if (targetUserId) {
+      const chatCheckResponse = await axios.get(`${REACT_APP_API_URL}/api/chats/check`, {
+        params: { userId1: requestUserId, userId2: targetUserId },
+      });
+
+      if (chatCheckResponse.data.exists) {
+        setError("A chat with this user already exists.");
+        handleDeleteRequest(requestId);
+        return; // Stop function execution
+      }
+    }
+
+    console.log(studyGroupId);
+    if (studyGroupId) {
+      // If the request is for a study group, add the user to the group
+      endpoint = "/api/add-to-study-group";
+      payload.studyGroupId = studyGroupId;
+      payload.requestUserId = requestUserId;
+    } else if (targetUserId) {
+      // If the request is for a one-on-one chat, create a new chat
+      endpoint = "/api/chats";
+      payload.userId1 = requestUserId;
+      payload.userId2 = targetUserId;
+    } else {
+      throw new Error("Invalid request: No study group or target user.");
+    }
+
+    const response = await axios.post(`${REACT_APP_API_URL}${endpoint}`, payload);
+
+  
+
+    if (response.status === 200 || response.status === 201) {
+      // If chat was created successfully, update parent component
+      console.log("response 200");
+      if (targetUserId) {
+        addNewChat(response.data);
+      }
+
+      // Sync the study group chat users
+      if (studyGroupId) {
+        await axios.post(`${REACT_APP_API_URL}/api/sync-study-group-chat`, { studyGroupId });
+      }
+
+      // NOTIFICATION
+
+      // Fetch the name of the current user
+      const userResponse = await axios.get(`${REACT_APP_API_URL}/api/users/${currentUserId}`);
+      const currentUser = userResponse.data;
+
+      let notificationMessage = `Your request has been approved by ${currentUser.firstName} ${currentUser.lastName}`;
+
+      if (studyGroupId) {
+        // Fetch the study group name
+        const groupResponse = await axios.get(`${REACT_APP_API_URL}/api/study-groups/${studyGroupId}`);
+        console.log(groupResponse);
+
+        // Update notification message for study group requests
+        notificationMessage = `Your request to join ${groupResponse.data.studyGroup.name} has been approved by ${currentUser.firstName} ${currentUser.lastName}`;
+      }
+
+      // Send the notification
+      await axios.post(`${REACT_APP_API_URL}/notifications/send`, {
+        userId: requestUserId,
+        message: notificationMessage,
+        type: "StudyGroup",
+      });
+
+      handleDeleteRequest(requestId); // Remove request after approval
+    } 
+  
+  } catch (err: unknown) {
+    console.error("Error approving request:", err);
+    if (axios.isAxiosError(err) && err.response?.status === 405) {
+      console.log("Caught 405 error in catch block");
+      setError("This study group is full. You cannot approve this request.");
+      handleDeleteRequest(requestId);
+    }
+    if (axios.isAxiosError(err)) {
+      if (err.response) {
+        // API responded with an error
+        setError(err.response.data.message || "An error occurred while processing the request.");
+      } else if (err.request) {
+        // No response received
+        setError("No response from server. Please check your network.");
+      }
+    } else if (err instanceof Error) {
+      // General JavaScript error
+      setError(`Unexpected error: ${err.message}`);
+    } else {
+      setError("An unknown error occurred.");
+    }
+  }
+  finally {
+    setLoadingApproval(null); // Reset loading state
+  }
+};
+
 
   // Function to reject a join request
   const handleDenial = async (requestId: number) => {
@@ -215,9 +258,12 @@ const JoinRequests: React.FC<JoinRequestProps> = ({ currentUserId, addNewChat, o
       {/* Display error message if any */}
       {error && <p className="error-message">{error}</p>}
       
-      {/* Display message if there are no requests */}
-      {requests.length === 0 ? (
-        <p className="no-requests">No join requests.</p>
+      {loadingRequests ? (
+      <div className="loading-container">
+        Loading... <span className="loading-spinner"></span>
+      </div>
+    ) : requests.length === 0 ? (
+      <p className="no-requests">No join requests.</p>
       ) : (
         <ul className="requests-list">
           {requests
@@ -226,31 +272,39 @@ const JoinRequests: React.FC<JoinRequestProps> = ({ currentUserId, addNewChat, o
               // Sorting requests by creation date (most recent first)
               const dateA = new Date(a.createdAt || 0).getTime();
               const dateB = new Date(b.createdAt || 0).getTime();
-              return dateB - dateA;
+              return dateA - dateB;
             })
             .map((request) => (
               <li key={request.id} className="request-item">
-                <div className="request-details">
+                <div className="request-details" onClick={() => handleProfilePopup(request.user.id)}>
                   {/* Profile button before requester's name */}
                   <p className="requester-info">
-                  
-                    <strong className='requester-name'> Requester Name: </strong>{request.user.firstName} {request.user.lastName}
-                    <button 
+                  <img
+                    src={request.user.profilePic || 'https://learnlink-public.s3.us-east-2.amazonaws.com/AvatarPlaceholder.svg'}
+                    className="group-pic"
+                  />
+                  <div className="requester-name-container">
+                      <h3 className='requester-name'>{request.user.username}</h3>
+
+                      <div>{request.user.firstName} {request.user.lastName}</div>
+                    </div>
+                   
+                    {/* <button 
                       className="requester-profile-button"
                       onClick={() => handleProfilePopup(request.user.id)}
                     >
                       👤 
-                    </button>
+                    </button> */}
                    </p>
                   
                   {/* Display target group if applicable */}
                   {request.targetGroupId && request.targetGroup && (
-                    <p className='request-target-group-name'><strong>Target Group: </strong> {request.targetGroup.studyGroup.name}</p>
+                    <p className='request-target-group-name'><strong>To Join Study Group: </strong> {request.targetGroup.studyGroup.name}</p>
                   )}
                   
                   {/* Display request message */}
                   <p className='request-message'><strong>Message: </strong> {request.message}</p>
-                  
+                
                 </div>
   
                 {/* Approve and reject buttons */}
@@ -265,11 +319,13 @@ const JoinRequests: React.FC<JoinRequestProps> = ({ currentUserId, addNewChat, o
                         request.userId // Passing the requestUserId
                       )
                     }
-                  >
-                    ✔️ Approve
+                    disabled={loadingApproval === request.id}
+                >
+                  {loadingApproval === request.id ? 'Approving...' : <><FaCheck />Approve</>}
+                
                   </button>
                   <button className="reject" onClick={() => handleDenial(request.id)}>
-                    ❌ Reject
+                    <FaXmark/> Reject
                   </button>
                 </div>
               </li>

@@ -2,10 +2,7 @@
 .requests-panel {
     max-width: 600px;
     margin: 20px 10px;
-    padding: 20px;
-    background: #f9f9f9;
-    border-radius: 12px;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    padding: 15px;
     overflow-y: scroll;
 }
 
@@ -35,7 +32,7 @@
 
 .requests-list {
     list-style: none;
-    padding: 0;
+    padding: 5px;
     margin: 0;
     overflow-y: scroll;
 }
@@ -56,18 +53,39 @@
 
 
 .request-actions {
+  flex-direction: row-reverse;
     display: flex;
-    justify-content: space-evenly;
+    justify-content: space-between;
     margin-top: 12px;
+    gap: 20px;
+}
+.request-actions button{
+  flex:1;
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  align-items: center;
+  
 }
 
 .request-details {
-    background-color: #fafafa; /* Light background for better contrast */
-    border: 1px solid #ddd; /* Subtle border */
+    /* background-color: #fafafa; Light background for better contrast */
+    /* border: 1px solid #ddd; Subtle border */
     border-radius: 12px; /* Rounded corners */
     padding: 16px; /* Padding around the content */
-    margin-bottom: 16px; /* Space between request items */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Soft shadow for depth */
+    margin-bottom: 5px; /* Space between request items */
+    /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); Soft shadow for depth */
+    cursor: pointer;
+  }
+  .request-details:hover {
+    background-color: #f0f0f0; /* Slightly darker on hover */
+  }
+
+  .request-details img {
+    width: 60px; /* Fixed width for consistency */
+    height: 60px; /* Fixed height for consistency */
+    border-radius: 50%; /* Circular shape */
+    margin-right: 16px; /* Space between image and text */
   }
   
   .requester-info {
@@ -78,11 +96,21 @@
     font-size: 1rem;
     color: #444;
   }
+
+  .requester-name-container {
+    display: flex;
+    flex-direction: column;
+    align-items: left;
+    margin-bottom: 12px; /* Space below the name */
+    font-size: 1rem;
+    color: #444;
+  }
   
   .requester-name {
     font-weight: bold;
-    font-size: 1rem;
+    font-size: medium;
     color: #444;
+    margin-bottom: 5px;
   }
   
   .requester-profile-button {
@@ -171,6 +199,32 @@
     background-color: #e0e0e0; /* Darker shade on hover */
   }
   
+
+  /* Loading screen styles */
+.loading-container {
+  text-align: center;
+  padding: 20px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #333;
+}
+
+.loading-spinner {
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  border-left-color: #007bff;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  animation: spin 1s linear infinite;
+  display: inline-block;
+  margin-left: 10px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
 
 /* Responsive tweaks */
 @media (max-width: 500px) {

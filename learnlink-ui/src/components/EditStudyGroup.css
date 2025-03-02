@@ -16,6 +16,9 @@
     padding: 40px;
     border-radius: 8px;
     width: 400px;
+    max-width: 60vw;
+    max-height: 70vh;
+    overflow-y: auto;
   }
   
   .edit-study-group-panel input,

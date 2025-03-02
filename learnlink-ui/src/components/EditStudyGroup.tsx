@@ -121,6 +121,7 @@ const EditStudyGroup = ({ chatID, onClose, updateChatName}: { chatID: number; on
 
     const formData = new FormData();
     formData.append('profilePic', image);
+    formData.append('chatID', chatID.toString());
     const token = localStorage.getItem('token');
     if (token) {
       const res = await fetch(`${REACT_APP_API_URL}/api/study-group/upload-pfp`, {
@@ -132,6 +133,11 @@ const EditStudyGroup = ({ chatID, onClose, updateChatName}: { chatID: number; on
       });
       const data = await res.json();
       if (res.ok) setImageUrl(data.profilePic);
+      if (!res.ok) {
+        console.error("Upload error:", data.error || "Unknown error");
+        alert(`Error: ${data.error || "Failed to upload image"}`);
+        return;
+      }
     }
   };
 

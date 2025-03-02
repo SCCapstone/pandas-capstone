@@ -14,7 +14,7 @@ import fs from 'fs';
 import https from 'https';
 import dotenv from 'dotenv';
 import { Resend } from 'resend';
-import {upload, resizeAndUpload, handleImagePreview} from './uploadConfig';
+import {upload, resizeAndUpload, handleImagePreview, resizeAndUploadStudyGroup} from './uploadConfig';
 import multer from "multer";
 import { welcomeEmailTemplate, passwordResetEmailTemplate } from "./emailTemplates";
 
@@ -52,6 +52,9 @@ const credentials = NODE_ENV === 'production' && privateKey && certificate
 
 
 const app = express();
+app.use(express.json({ limit: "20mb" })); // Increase body payload size
+app.use(express.urlencoded({ limit: "20mb", extended: true })); // Increase URL-encoded payload size
+
 const prisma = new PrismaClient();
 let server: https.Server | http.Server;
 
@@ -146,6 +149,7 @@ interface StudyGroup {
   chatID: number | null;
   chat: any;
   ideal_match_factor: string | null;
+  profilePic: string | null;
 }
 
 // Signup endpoint
@@ -233,6 +237,9 @@ app.post('/api/login', async (req, res): Promise<any> => {
 
     // Compare the entered password with the stored hashed password
     const isPasswordValid = await bcrypt.compare(password, user.password);
+
+    // FOR XTREME TESTING MODEEEE
+    // const isPasswordValid = password === user.password;
 
     if (!isPasswordValid) {
       return res.status(400).json({ error: 'Invalid username or password' });
@@ -329,6 +336,8 @@ app.get('/api/users/profile/:userId', authenticate, async (req, res):Promise<any
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
+
+
 
     // Return the profile data
     res.json({
@@ -679,7 +688,7 @@ app.get('/api/profiles/:userId', async (req, res): Promise<any> => {
   try {
 
     const placeholderImage = "https://learnlink-public.s3.us-east-2.amazonaws.com/AvatarPlaceholder.svg";
-
+    const sgPlaceholderImage = 'https://learnlink-pfps.s3.us-east-1.amazonaws.com/profile-pictures/generic_studygroup_pfp.svg'
      // Fetch the current user's data to use for matching
      const currentUser = await prisma.user.findUnique({
       where: { id: userId },
@@ -773,6 +782,7 @@ app.get('/api/profiles/:userId', async (req, res): Promise<any> => {
         chatID: true,
         chat: true,
         ideal_match_factor: true,
+        profilePic: true,
       },
     });
 
@@ -824,6 +834,7 @@ app.get('/api/profiles/:userId', async (req, res): Promise<any> => {
       const studyGroupsWithScore: StudyGroupWithScore[] = studyGroupsToSwipeOn
       .map(studyGroup => ({
         ...studyGroup,
+        profilePic: studyGroup.profilePic || sgPlaceholderImage,
         similarityScore: calculateSimilarityStudyGroup(studyGroup),
         type: 'studyGroup' as 'studyGroup',
       }))
@@ -1466,6 +1477,9 @@ app.get('/api/users/:id', async (req, res) : Promise<any> => {
         id: true,
         firstName: true,
         lastName: true,
+        profilePic: true,
+        username: true,
+        bio: true,
       },
     });
 
@@ -1523,6 +1537,35 @@ app.get('/api/chats', authenticate, async (req, res): Promise<any> => {
     res.status(500).json({ message: 'Server error' });
   }
 });
+
+app.get('/api/chats/check', async (req, res): Promise<any> => {
+  const { userId1, userId2 } = req.query;
+
+  if (!userId1 || !userId2) {
+    return res.status(400).json({ message: 'Missing userId1 or userId2' });
+  }
+
+  try {
+    // Check if a chat exists between the two users
+    const existingChat = await prisma.chat.findFirst({
+      where: {
+        users: {
+          every: { id: { in: [Number(userId1), Number(userId2)] } }, // Ensure both users are in the chat
+        },
+      },
+    });
+
+    if (existingChat) {
+      return res.json({ exists: true, chatId: existingChat.id });
+    }
+
+    res.json({ exists: false });
+  } catch (error) {
+    console.error('Error checking for existing chat:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 
 app.get('/api/chats/:chatId', authenticate, async (req, res): Promise<any> => {
   const userId = res.locals.userId; // Use res.locals to get the userId set by the authenticate middleware
@@ -2137,40 +2180,86 @@ app.post("/api/reset-password/email", async (req, res): Promise<any> => {
   res.json({ message: "Password reset successful" });
 });
 
-app.post('/api/users/upload-pfp', authenticate, upload as express.RequestHandler, resizeAndUpload as express.RequestHandler, async (req, res):Promise<any> => {
-  const userId = res.locals.userId; // Authenticated user ID
-
-  try {
-    const updatedUser = await prisma.user.update({
-      where: { id: userId },
-      data: { profilePic: req.body.profilePicUrl }, // Save S3 URL
+app.post(
+  "/api/users/upload-pfp",
+  authenticate,
+  (req, res, next) => {
+    upload(req, res, (err) => {
+      if (err instanceof multer.MulterError) {
+        if (err.code === "LIMIT_FILE_SIZE") {
+          return res.status(400).json({ error: "Image file too large. Maximum size is 5MB." });
+        }
+      } else if (err) {
+        return res.status(400).json({ error: err.message });
+      }
+      next(); // Proceed to the next middleware if no errors
     });
+  },
+  async (req, res, next): Promise<any> => {
+    try {
+      await resizeAndUpload(req, res, next); // Image processing
+    } catch (err) {
+      console.error("Image processing error:", err);
+      return res.status(500).json({ error: "Failed to process image" }); // Return here to prevent further responses
+    }
+  },
+  async (req, res): Promise<any> => {
+    const userId = res.locals.userId; // Authenticated user ID
 
-    res.status(200).json({ message: "Profile picture updated", profilePic: updatedUser.profilePic });
-  } catch (error) {
-    console.error("Database update error:", error);
-    res.status(500).json({ error: "Failed to update profile picture" });
+    try {
+      const updatedUser = await prisma.user.update({
+        where: { id: userId },
+        data: { profilePic: req.body.profilePicUrl }, // Save S3 URL
+      });
+
+      return res.status(200).json({ message: "Profile picture updated", profilePic: updatedUser.profilePic });
+    } catch (error) {
+      console.error("Database update error:", error);
+      return res.status(500).json({ error: "Failed to update profile picture" });
+    }
   }
-});
+);
 
-app.post('/api/study-groups/upload-pfp', authenticate, upload as express.RequestHandler, resizeAndUpload as express.RequestHandler, async (req, res):Promise<any> => {
-  const chatID = req.body.chatID;
-  const profilePic = req.body.profilePicUrl;
-  console.log("IN UPLOAD")
-  console.log('Received chatID:', chatID);
-  console.log('Received profilePic:', profilePic);
-  try {
-    const updatedStudyGroup = await prisma.studyGroup.update({
-      where: { chatID },
-      data: { profilePic }, // Save S3 URL
+app.post('/api/study-group/upload-pfp',
+  authenticate,
+  (req, res, next) => {
+    upload(req, res, (err) => {
+      if (err instanceof multer.MulterError) {
+        if (err.code === "LIMIT_FILE_SIZE") {
+          return res.status(400).json({ error: "Image file too large. Maximum size is 5MB." });
+        }
+      } else if (err) {
+        return res.status(400).json({ error: err.message });
+      }
+      next(); // Proceed to the next middleware if no errors
     });
+  },
+  async (req, res, next): Promise<any> => {
+    try {
+      await resizeAndUploadStudyGroup(req, res, next); // Image processing
+    } catch (err) {
+      console.error("Image processing error:", err);
+      return res.status(500).json({ error: "Failed to process image" }); // Return here to prevent further responses
+    }
+  },
+  async (req, res): Promise<any> => {
+    const chatID = parseInt(req.body.chatID);
+    const profilePic = req.body.profilePicUrl;
+    console.log("IN UPLOAD")
+    console.log('Received chatID:', chatID);
+    console.log('Received profilePic:', profilePic);
+    try {
+      const updatedStudyGroup = await prisma.studyGroup.update({
+        where: { chatID },
+        data: { profilePic }, // Save S3 URL
+      });
 
-    res.status(200).json({ message: "Profile picture updated", profilePic: updatedStudyGroup.profilePic });
-  } catch (error) {
-    console.error("Database update error:", error);
-    res.status(500).json({ error: "Failed to update profile picture" });
-  }
-});
+      res.status(200).json({ message: "Profile picture updated", profilePic: updatedStudyGroup.profilePic });
+    } catch (error) {
+      console.error("Database update error:", error);
+      res.status(500).json({ error: "Failed to update profile picture" });
+    }
+  });
 
 const upload_preview = multer({ storage: multer.memoryStorage() });  // Store file in memory
 
@@ -2205,7 +2294,7 @@ app.get('/api/notifications', authenticate, async (req: Request, res: Response) 
 });
 
 
-app.post('/notifications/send', async (req, res):Promise<any> => {
+app.post('/notifications/send', async (req, res): Promise<any> => {
   try {
     const { userId, message, type } = req.body;
 
@@ -2238,7 +2327,7 @@ app.post('/notifications/send', async (req, res):Promise<any> => {
   }
 });
 
-app.delete('/api/notifications/delete/:id', async (req, res):Promise<any> => {
+app.delete('/api/notifications/delete/:id', async (req, res): Promise<any> => {
   const notificationId = parseInt(req.params.id);
 
   if (!notificationId) {
