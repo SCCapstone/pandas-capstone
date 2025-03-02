@@ -241,16 +241,28 @@ const Messaging: React.FC = () => {
   }, [selectedChat]); // Runs when messages update
   
 
-  //used for fetching chat names upon mounting
   useEffect(() => {
     const fetchChatNames = async () => {
       const newChatNames: { [key: number]: string } = { ...chatNames };
-  
-      for (const chat of chats) {
+      
+      // Use Promise.all to fetch all chat names concurrently
+      const fetchPromises = chats.map(async (chat) => {
         if (!newChatNames[chat.id]) { // Only fetch if not already in state
-          newChatNames[chat.id] = await getChatName(chat);
+          try {
+            const chatName = await getChatName(chat);
+            if (chatName) {
+              newChatNames[chat.id] = chatName;
+            } else {
+              console.warn(`No name for chat with ID: ${chat.id}`);
+            }
+          } catch (error) {
+            console.error(`Error fetching name for chat with ID: ${chat.id}`, error);
+          }
         }
-      }
+      });
+  
+      // Wait for all chat names to be fetched
+      await Promise.all(fetchPromises);
       console.log('Chat names:', newChatNames);
   
       setChatNames(newChatNames);
@@ -258,7 +270,7 @@ const Messaging: React.FC = () => {
   
     fetchChatNames();
   }, [chats]); // Runs only when `chats` change
-
+  
   useEffect(() => {
     if (selectedChat?.messages?.length && chatWindowRef.current) {
       requestAnimationFrame(() => {
