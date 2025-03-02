@@ -88,6 +88,19 @@ const Messaging: React.FC = () => {
       handleChatsSwitch();
       const token = localStorage.getItem('token');
       console.log(token);
+      const getCurrentUser = async () => {
+        if (token) {
+          try {
+            const response = await axios.get(`${REACT_APP_API_URL}/api/currentUser`, {
+              headers: { Authorization: `Bearer ${token}` },
+            });
+            setCurrentUserId(response.data.id); // Set the current user ID
+          } catch (error) {
+            console.error('Error fetching current user:', error);
+          }
+        }
+      }
+      await getCurrentUser();
       const syncStudyGroupChats = async () => {
         try {
           // Fetch the user's study groups or chats (assumed from user context or current user API)
@@ -145,20 +158,8 @@ const Messaging: React.FC = () => {
       };
 
       await syncUserChats();
-      // Fetch current user if token exists
-      if (token) {
-        try {
-          const response = await axios.get(`${REACT_APP_API_URL}/api/currentUser`, {
-            headers: { Authorization: `Bearer ${token}` },
-          });
-          setCurrentUserId(response.data.id); // Set the current user ID
-        } catch (error) {
-          console.error('Error fetching current user:', error);
-        } finally {
-          // This block runs regardless of success or failure
-          setLoadingChatList(false); // Stop the loading state
-        }
-      }
+
+      setLoadingChatList(false);
 
     }
     fetchData();
@@ -436,6 +437,7 @@ const Messaging: React.FC = () => {
     // not a study group option
     if (currentUserId) {
       const otherUser = chat.users?.find((user) => user.id !== currentUserId);
+      console.log('Other user:', otherUser);
       if (otherUser) {
           return `${otherUser.firstName} ${otherUser.lastName}`;
       }
