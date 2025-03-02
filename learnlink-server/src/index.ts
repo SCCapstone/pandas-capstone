@@ -2192,6 +2192,7 @@ app.post(
       } else if (err) {
         return res.status(400).json({ error: err.message });
       }
+      next(); // Proceed to the next middleware if no errors
     });
   },
   async (req, res, next): Promise<any> => {
@@ -2221,7 +2222,6 @@ app.post(
 
 app.post('/api/study-group/upload-pfp',
   authenticate,
-  authenticate,
   (req, res, next) => {
     upload(req, res, (err) => {
       if (err instanceof multer.MulterError) {
@@ -2231,19 +2231,17 @@ app.post('/api/study-group/upload-pfp',
       } else if (err) {
         return res.status(400).json({ error: err.message });
       }
-      next();
     });
   },
-  async (req, res, next) => {
+  async (req, res, next): Promise<any> => {
     try {
-      await resizeAndUploadStudyGroup(req, res, next);
-      next();
+      await resizeAndUploadStudyGroup(req, res, next); // Image processing
     } catch (err) {
       console.error("Image processing error:", err);
-      res.status(500).json({ error: "Failed to process image" });
+      return res.status(500).json({ error: "Failed to process image" }); // Return here to prevent further responses
     }
   },
-  async (req, res) => {
+  async (req, res): Promise<any> => {
     const chatID = parseInt(req.body.chatID);
     const profilePic = req.body.profilePicUrl;
     console.log("IN UPLOAD")
