@@ -258,6 +258,8 @@ app.post('/api/login', async (req, res): Promise<any> => {
   } catch (error) {
     console.error('Error during login:', error);
     res.status(500).json({ error: 'Internal server error' });
+    process.exit(1); // Explicitly exit with a non-zero status
+    // will restart docker container
   }
 });
 
