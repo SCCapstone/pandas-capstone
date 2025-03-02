@@ -2231,6 +2231,7 @@ app.post('/api/study-group/upload-pfp',
       } else if (err) {
         return res.status(400).json({ error: err.message });
       }
+      next(); // Proceed to the next middleware if no errors
     });
   },
   async (req, res, next): Promise<any> => {

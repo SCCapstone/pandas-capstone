@@ -263,7 +263,7 @@ const resizeAndUploadStudyGroup = async (req: Request, res: Response, next: Next
     req.body.profilePicUrl = newProfilePicUrl;
 
 
-    return next();
+    return;
   } catch (error) {
     console.error("Image processing error:", error);
     return res.status(500).json({ error: "Image upload failed" });
