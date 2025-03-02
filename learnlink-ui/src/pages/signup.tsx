@@ -35,6 +35,9 @@ const Signup: React.FC = () => {
 
     const [confirmPassword, setConfirmPassword] = useState<string>('');
     const [error, setError] = useState<string | null>(null);
+    const [emailError, setEmailError] = useState<string | null>(null);
+    const [usernameError, setUsernameError] = useState<string | null>(null);
+    const [passwordError, setPasswordError] = useState<string | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
     const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
 
@@ -53,11 +56,15 @@ const Signup: React.FC = () => {
     // Form submission
     const handleSignup = async (e: React.FormEvent) => {
         setError(null);
+        setEmailError(null);
+        setUsernameError(null);
+        setPasswordError(null);
         e.preventDefault();
 
         if (formData.password !== confirmPassword) {
             console.log('Passwords do not match');
             setError('Passwords do not match');
+            setPasswordError('Passwords do not match');
             return;
         }
 
@@ -87,26 +94,35 @@ const Signup: React.FC = () => {
 
             if (!response.ok) {
                 const errorData = await response.json();
-            
-            // Handle unique warnings
-            if (errorData.error === 'UsernameAlreadyExists') {
-                console.log('Username is already taken');
-                setError('Username is already taken');
-                // throw new Error('Username is already taken');
+                console.log(errorData);
+
+                // Handle unique warnings
+                if (errorData.error === 'UsernameAlreadyExists') {
+                    console.log('Username is already taken');
+                    setError('Username is already taken');
+                    setUsernameError('Username is already taken');
+                    // throw new Error('Username is already taken');
+                    return;
+
+                }
+
+                if (errorData.error === 'EmailAlreadyExists') {
+                    console.log('Email is already registered');
+                    setError('Email is already registered');
+                    setEmailError('Email is already registered');
+                    return;
+                }
+
+                if (errorData.error === 'NotEdu') {
+                    console.log('Please use a .edu email');
+                    setError('Please use a .edu email');
+                    setEmailError('Please use a .edu email');
+                    return;
+                }
+                console.log('Failed to create user');
+                setError('Failed to create user');
                 return;
 
-            } else if (errorData.error === 'EmailAlreadyExists') {
-                console.log('Email is already registered');
-                setError('Email is already registered');
-                throw new Error('Email is already registered');
-            } else if (errorData.error === 'NotEdu') {
-                console.log('Please use a .edu email');
-                setError('Please use a .edu email');
-                throw new Error('Non .edu email');
-            } else {
-                console.log('Failed to create user');
-                throw new Error('Failed to create user');
-            }
             }
 
             // Clear form
@@ -150,7 +166,7 @@ const Signup: React.FC = () => {
             // Navigate to landing page after successful signup
             navigate('/LandingPage');
         } catch (error) {
-            //setError('Failed to sign up. Please try again later.');
+            setError('Failed to sign up. Please try again later.');
         } finally {
             setLoading(false);
         }
@@ -201,9 +217,9 @@ const Signup: React.FC = () => {
                             onChange={handleChange}
                         />
                         <label>&nbsp;
-                            {error === 'Username is already taken' && (
+                            {usernameError === 'Username is already taken' && (
                         
-                                <span className="alert">* {error}</span>
+                                <span className="alert">* {usernameError}</span>
                             )}
                         </label>
 
@@ -218,8 +234,8 @@ const Signup: React.FC = () => {
                             required
                         />
                         <label>&nbsp;
-                        {error === 'Email is already registered'  || error === "Please use a .edu email" && (
-                                <span className="alert">* {error}</span>
+                        {(emailError === 'Email is already registered'  || error === "Please use a .edu email") && (
+                                <span className="alert">* {emailError}</span>
                             )}
                         </label>
                         {/* <label>&nbsp;
@@ -249,14 +265,16 @@ const Signup: React.FC = () => {
                             required
                         />
                         <label>&nbsp;
-                            {error === 'Passwords do not match' && (
-                                <span className="alert">* {error}</span>
+                            {passwordError === 'Passwords do not match' && (
+                                <span className="alert">* {passwordError}</span>
                             )}
                         </label>
 
                         {/* Show error if there's any */}
+                        {/* {emailError}
+                        {usernameError}
+                        {passwordError} */}
                         {error && <p className="error">Failed to sign up.</p>}
-
                         <button className="signUpButton" type="submit" disabled={loading} data-testid="su-button">
                             {loading ? 'Signing Up...' : 'Sign Up'}
                         </button>
