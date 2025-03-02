@@ -260,3 +260,10 @@
 }
 
 }
+
+@media (max-width: 768px) {
+
+.requester-info {
+    flex-direction: row;
+}
+}
