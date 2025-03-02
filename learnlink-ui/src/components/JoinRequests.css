@@ -76,6 +76,7 @@
     margin-bottom: 5px; /* Space between request items */
     /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); Soft shadow for depth */
     cursor: pointer;
+    padding:5px 5px 5px 5px;
   }
   .request-details:hover {
     background-color: #f0f0f0; /* Slightly darker on hover */
@@ -220,6 +221,7 @@
   margin-left: 10px;
 }
 
+
 @keyframes spin {
   to {
     transform: rotate(360deg);
@@ -227,7 +229,7 @@
 }
 
 /* Responsive tweaks */
-@media (max-width: 500px) {
+@media (max-width: 1160px) {
 .requests-panel {
     padding: 15px;
 }
@@ -240,6 +242,21 @@
     flex-direction: column;
 }
 
+.requester-info {
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: left;
+    text-align: flex-start;
+}
 
+.requester-info img {
+  align-self: center;
+}
+
+.requester-name-container {
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: left;
+}
 
 }
