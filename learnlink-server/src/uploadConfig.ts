@@ -56,7 +56,6 @@ const resizeAndUpload = async (req: Request, res: Response, next: NextFunction) 
 
     // 📏 Resize image and apply circular crop
     const resizedBuffer = await sharp(imageBuffer)
-      .rotate() // Automatically rotate based on EXIF data
       .resize(400, 400, { fit: "cover" }) // Crop to 400x400
       .composite([
         {
@@ -112,16 +111,23 @@ const resizeAndUpload = async (req: Request, res: Response, next: NextFunction) 
     await prisma.user.update({
       where: { id: userId },
       data: { profilePic: newProfilePicUrl },
-    });
+    })
+      .then(() => {
+        res.json({ profilePicUrl: newProfilePicUrl });
+      })
+      .catch((error) => {
+        console.error("Database update failed:", error);
+        return res.status(500).json({ error: "Database update failed" });
+      });
 
     // Set the new profile picture URL in the request body to pass to the next middleware
     req.body.profilePicUrl = newProfilePicUrl;
 
 
-    next();
+    return next();
   } catch (error) {
     console.error("Image processing error:", error);
-    res.status(500).json({ error: "Image upload failed" });
+    return res.status(500).json({ error: "Image upload failed" }); // Ensure to return here to stop further execution
   }
 };
 
@@ -164,12 +170,12 @@ const handleImagePreview = async (req: Request, res: Response) => {
     // For this example, we're just sending the image as a base64 encoded string
     const base64Image = resizedBuffer.toString("base64");
 
-    res.json({
+    return res.json({
       preview: `data:image/jpeg;base64,${base64Image}`,  // Send as base64 for the frontend
     });
   } catch (error) {
     console.error("Image processing error:", error);
-    res.status(500).json({ error: "Image processing failed" });
+    return res.status(500).json({ error: "Image processing failed" });
   }
 };
 
@@ -257,10 +263,10 @@ const resizeAndUploadStudyGroup = async (req: Request, res: Response, next: Next
     req.body.profilePicUrl = newProfilePicUrl;
 
 
-    next();
+    return next();
   } catch (error) {
     console.error("Image processing error:", error);
-    res.status(500).json({ error: "Image upload failed" });
+    return res.status(500).json({ error: "Image upload failed" });
   }
 };
 

@@ -2192,36 +2192,35 @@ app.post(
       } else if (err) {
         return res.status(400).json({ error: err.message });
       }
-      next();
     });
   },
-  async (req, res, next) => {
+  async (req, res, next): Promise<any> => {
     try {
-      await resizeAndUpload(req, res, next);
-      next();
+      await resizeAndUpload(req, res, next); // Image processing
     } catch (err) {
       console.error("Image processing error:", err);
-      res.status(500).json({ error: "Failed to process image" });
+      return res.status(500).json({ error: "Failed to process image" }); // Return here to prevent further responses
     }
   },
-  async (req, res) => {
-  const userId = res.locals.userId; // Authenticated user ID
+  async (req, res): Promise<any> => {
+    const userId = res.locals.userId; // Authenticated user ID
 
-  try {
-    const updatedUser = await prisma.user.update({
-      where: { id: userId },
-      data: { profilePic: req.body.profilePicUrl }, // Save S3 URL
-    });
+    try {
+      const updatedUser = await prisma.user.update({
+        where: { id: userId },
+        data: { profilePic: req.body.profilePicUrl }, // Save S3 URL
+      });
 
-    res.status(200).json({ message: "Profile picture updated", profilePic: updatedUser.profilePic });
-  } catch (error) {
-    console.error("Database update error:", error);
-    res.status(500).json({ error: "Failed to update profile picture" });
+      return res.status(200).json({ message: "Profile picture updated", profilePic: updatedUser.profilePic });
+    } catch (error) {
+      console.error("Database update error:", error);
+      return res.status(500).json({ error: "Failed to update profile picture" });
+    }
   }
-});
+);
 
-app.post('/api/study-group/upload-pfp', 
-  authenticate, 
+app.post('/api/study-group/upload-pfp',
+  authenticate,
   authenticate,
   (req, res, next) => {
     upload(req, res, (err) => {
@@ -2244,23 +2243,24 @@ app.post('/api/study-group/upload-pfp',
       res.status(500).json({ error: "Failed to process image" });
     }
   },
-  async (req, res) => {  const chatID = parseInt(req.body.chatID);
-  const profilePic = req.body.profilePicUrl;
-  console.log("IN UPLOAD")
-  console.log('Received chatID:', chatID);
-  console.log('Received profilePic:', profilePic);
-  try {
-    const updatedStudyGroup = await prisma.studyGroup.update({
-      where: { chatID },
-      data: { profilePic }, // Save S3 URL
-    });
+  async (req, res) => {
+    const chatID = parseInt(req.body.chatID);
+    const profilePic = req.body.profilePicUrl;
+    console.log("IN UPLOAD")
+    console.log('Received chatID:', chatID);
+    console.log('Received profilePic:', profilePic);
+    try {
+      const updatedStudyGroup = await prisma.studyGroup.update({
+        where: { chatID },
+        data: { profilePic }, // Save S3 URL
+      });
 
-    res.status(200).json({ message: "Profile picture updated", profilePic: updatedStudyGroup.profilePic });
-  } catch (error) {
-    console.error("Database update error:", error);
-    res.status(500).json({ error: "Failed to update profile picture" });
-  }
-});
+      res.status(200).json({ message: "Profile picture updated", profilePic: updatedStudyGroup.profilePic });
+    } catch (error) {
+      console.error("Database update error:", error);
+      res.status(500).json({ error: "Failed to update profile picture" });
+    }
+  });
 
 const upload_preview = multer({ storage: multer.memoryStorage() });  // Store file in memory
 
@@ -2295,7 +2295,7 @@ app.get('/api/notifications', authenticate, async (req: Request, res: Response) 
 });
 
 
-app.post('/notifications/send', async (req, res):Promise<any> => {
+app.post('/notifications/send', async (req, res): Promise<any> => {
   try {
     const { userId, message, type } = req.body;
 
@@ -2328,7 +2328,7 @@ app.post('/notifications/send', async (req, res):Promise<any> => {
   }
 });
 
-app.delete('/api/notifications/delete/:id', async (req, res):Promise<any> => {
+app.delete('/api/notifications/delete/:id', async (req, res): Promise<any> => {
   const notificationId = parseInt(req.params.id);
 
   if (!notificationId) {
