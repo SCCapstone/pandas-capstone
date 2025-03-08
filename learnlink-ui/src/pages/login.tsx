@@ -3,6 +3,8 @@ import Logo from '../components/Logo';
 import CopyrightFooter from '../components/CopyrightFooter';
 import { useNavigate } from 'react-router-dom';
 import React, { useState } from 'react';
+import CustomAlert from '../components/CustomAlert';
+
 const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
 
 type LoginInputs = {
@@ -16,6 +18,8 @@ const Login: React.FC = () => {
     const [password, setPassword] = useState<string>('');
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
+    const [alerts, setAlerts] = useState<{ id: number; alertText: string; alertSeverity: "error" | "warning" | "info" | "success"; visible: boolean }[]>([]);
+    const alertVisible = alerts.some(alert => alert.visible);
 
     // Handle form inputs
     const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => setUsername(e.target.value);
@@ -27,6 +31,10 @@ const Login: React.FC = () => {
 
         if (!username || !password) {
             setError("Username and password are required.");
+            setAlerts((prevAlerts) => [
+                ...prevAlerts,
+                { id: Date.now(), alertText: "Username and password are required.", alertSeverity: "error", visible: true },
+              ]);
             return;
         }
 
@@ -43,7 +51,12 @@ const Login: React.FC = () => {
             });
 
             if (!response.ok) {
+                setAlerts((prevAlerts) => [
+                    ...prevAlerts,
+                    { id: Date.now(), alertText: "Invalid username or password.", alertSeverity: "error", visible: true },
+                  ]);
                 throw new Error("Invalid username or password.");
+                
             }
 
             // Get the response body, which should contain a JWT or session data
@@ -54,6 +67,10 @@ const Login: React.FC = () => {
             navigate('/swiping'); 
         } catch (error) {
             setError((error as Error).message);
+            setAlerts((prevAlerts) => [
+                ...prevAlerts,
+                { id: Date.now(), alertText: (error as Error).message, alertSeverity: "error", visible: true },
+              ]);
         } finally {
             setLoading(false);
         }
@@ -65,6 +82,18 @@ const Login: React.FC = () => {
                 <Logo />
             </div>
             <div className="login">
+                {alertVisible && (
+                    <div className='alert-container'>
+                        {alerts.map(alert => (
+                            <CustomAlert
+                                key={alert.id}
+                                text={alert.alertText || ''}
+                                severity={alert.alertSeverity || 'info' as "error" | "warning" | "info" | "success"}
+                                onClose={() => setAlerts(prevAlerts => prevAlerts.filter(a => a.id !== alert.id))}
+                            />
+                        ))}
+                    </div>
+                )}
                 <div className="login-container">
 
                     <form onSubmit={handleLogin} className="login-form">
