@@ -100,7 +100,7 @@ const PublicProfile: React.FC = () => {
                     setError(err.message);
                     setAlerts((prevAlerts) => [
                         ...prevAlerts,
-                        { id: Date.now(), alertText: err.message, alertSeverity: "error", visible: true },
+                        { id: Date.now(), alertText: err instanceof Error ? err.message : 'An unknown error occurred', alertSeverity: "error", visible: true },
                       ]);
                 } else {
                     setError('An unknown error occurred');

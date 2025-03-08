@@ -7,7 +7,7 @@ import { selectStyles, formatEnum } from '../utils/format';
 import Select from 'react-select';
 import makeAnimated from 'react-select/animated';
 import { StylesConfig, ControlProps, CSSObjectWithLabel } from 'react-select';
-import CustomAlert from '../components/CustomAlert';
+import CustomAlert from './CustomAlert';
 
 
 
