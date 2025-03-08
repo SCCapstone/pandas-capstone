@@ -11,6 +11,7 @@ import ChatsNavi from "../components/ChatsNavi";
 import JoinRequests from '../components/JoinRequests';
 import GroupUserList from '../components/GroupUserList';
 import JoinReqProfile from '../components/JoinReqProfile';
+import CustomAlert from '../components/CustomAlert';
 
 
 
@@ -80,6 +81,10 @@ const Messaging: React.FC = () => {
 
   const [selectedProfile, setSelectedProfile] = useState<{ id: number; name: string } | null>(null);
   const [loadingChatList, setLoadingChatList] = useState(true);
+
+  const [alerts, setAlerts] = useState<{ id: number; alertText: string; alertSeverity: "error" | "warning" | "info" | "success"; visible: boolean }[]>([]);
+  const alertVisible = alerts.some(alert => alert.visible);
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -454,7 +459,11 @@ const Messaging: React.FC = () => {
       //Authorization
       const token = localStorage.getItem('token');
       if (!token) {
-        alert('You need to be logged in to delete a chat.');
+        // alert('You need to be logged in to delete a chat.');
+        setAlerts((prevAlerts) => [
+          ...prevAlerts,
+          { id: Date.now(), alertText: 'You need to be logged in to delete a chat.', alertSeverity: 'error', visible: true },
+        ]);
         return;
       }
 
@@ -478,7 +487,11 @@ const Messaging: React.FC = () => {
       //Authorization
       const token = localStorage.getItem('token');
       if (!token) {
-        alert('You need to be logged in to view users.');
+        // alert('You need to be logged in to view users.');
+        setAlerts((prevAlerts) => [
+          ...prevAlerts,
+          { id: Date.now(), alertText: 'You need to be logged in to view users.', alertSeverity: 'error', visible: true },
+        ]);
         return;
       }
   
@@ -513,7 +526,12 @@ const Messaging: React.FC = () => {
       setIsUserPanelVisible(true); // Open the panel to show users
     } catch (error) {
       console.error('Error fetching users:', error);
-      alert('Failed to load users.');
+      // alert('Failed to load users.');
+      setAlerts((prevAlerts) => [
+        ...prevAlerts,
+        { id: Date.now(), alertText: 'Failed to load users', alertSeverity: 'error', visible: true },
+      ]);
+      
     }
   };
   
@@ -523,7 +541,11 @@ const Messaging: React.FC = () => {
     try {
       const token = localStorage.getItem('token');
       if (!token) {
-        alert('You need to be logged in to create a study group.');
+        // alert('You need to be logged in to create a study group.');
+        setAlerts((prevAlerts) => [
+          ...prevAlerts,
+          { id: Date.now(), alertText: 'You need to be logged in to create a study group.', alertSeverity: 'error', visible: true },
+        ]);
         return;
       }
 
@@ -540,6 +562,10 @@ const Messaging: React.FC = () => {
 
       if (!selectedChat) {
         alert('No chat selected.');
+        setAlerts((prevAlerts) => [
+          ...prevAlerts,
+          { id: Date.now(), alertText: 'No chat selected', alertSeverity: 'error', visible: true },
+        ]);
         return;
       }
 
@@ -624,10 +650,18 @@ const Messaging: React.FC = () => {
 
   // Handle double click to like a message
   const handleDoubleClick = async (messageId: number) => {
+    setAlerts((prevAlerts) => [
+      ...prevAlerts,
+      { id: Date.now(), alertText: 'You need to be logged in to create a study group.', alertSeverity: 'error', visible: true },
+    ]);
 
     const token = localStorage.getItem('token');
       if (!token) {
-        alert('Please log in again.');
+        // alert('Please log in again.');
+        setAlerts((prevAlerts) => [
+          ...prevAlerts,
+          { id: Date.now(), alertText: 'Please log in again', alertSeverity: 'error', visible: true },
+        ]);
         return;
       }
 
@@ -745,7 +779,21 @@ const Messaging: React.FC = () => {
               <Navbar />
 
       </div>
+      
       <div className="Chat">
+        {/* Display the alert if it's visible */}
+      {alertVisible && (
+        <div className='alert-container'>
+          {alerts.map(alert => (
+            <CustomAlert
+              key={alert.id}
+              text={alert.alertText || ''}
+              severity={alert.alertSeverity || 'info' as "error" | "warning" | "info" | "success"}
+              onClose={() => setAlerts(prevAlerts => prevAlerts.filter(a => a.id !== alert.id))}
+            />
+          ))}
+        </div>
+      )}
         {/* Tabs for Messages and Requests */}
 
         <div className="ChatsSidebar">
