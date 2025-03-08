@@ -1,11 +1,15 @@
 .alert-container {
-    position: sticky;
-    top: 0; /* Ensures it sticks to the top */
+    position: fixed;
     display: flex;
+    width: 450px;
+    top: 80px;;
+    right: 0;
+    max-width: 100%;
     flex-direction: column;
     z-index: 9999;
     padding: 10px 10px 0px 10px;
     gap: 10px;
+    box-sizing: border-box;  
 }
 
 .customAlert {
@@ -78,4 +82,14 @@
 
 .customAlert.error h1, .customAlert.error p, .customAlert.error .alertX {
     color: #721c24;
+}
+
+@media screen and (max-width: 768px) {
+    .alert-container {
+        width: 100%;
+        top: 60px;
+        right: 0;
+        padding: 10px;
+    }
+    
 }

@@ -83,24 +83,26 @@ const ChangePassword: React.FC = () => {
       <header>
         <Navbar />
       </header>
-            {/* Display the alert if it's visible */}
-            <div className='alert-container'>
-        {alertVisible && alerts.map(alert => (
-          <CustomAlert
-            key={alert.id}
-            text={alert.alertText || ''}
-            severity={alert.alertSeverity || 'info' as "error" | "warning" | "info" | "success"}
-            onClose={() => setAlerts(prevAlerts => prevAlerts.filter(a => a.id !== alert.id))}
-          />
-        ))}
-      </div>
+      {/* Display the alert if it's visible */}
+      {alertVisible && (
+        <div className='alert-container'>
+          {alerts.map(alert => (
+            <CustomAlert
+              key={alert.id}
+              text={alert.alertText || ''}
+              severity={alert.alertSeverity || 'info' as "error" | "warning" | "info" | "success"}
+              onClose={() => setAlerts(prevAlerts => prevAlerts.filter(a => a.id !== alert.id))}
+            />
+          ))}
+        </div>
+      )}
       <main className="content">
         <div className="change-password">
-        <h1 className="p1">Change Password</h1>
+          <h1 className="p1">Change Password</h1>
           <div className="change-password-container">
             <form onSubmit={handleSubmit}>
               <label>Old Password</label>
-              <input 
+              <input
                 type="password"
                 placeholder="********"
                 value={oldPassword}

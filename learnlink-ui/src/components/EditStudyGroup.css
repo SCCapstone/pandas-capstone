@@ -12,6 +12,7 @@
   }
   
   .edit-study-group-panel {
+    position: relative;
     background-color: white;
     padding: 40px;
     border-radius: 8px;
@@ -19,6 +20,7 @@
     max-width: 60vw;
     max-height: 70vh;
     overflow-y: auto;
+    box-sizing: border-box;
   }
   
   .edit-study-group-panel input,

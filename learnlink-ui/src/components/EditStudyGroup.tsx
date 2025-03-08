@@ -223,17 +223,18 @@ const EditStudyGroup = ({ chatID, onClose, updateChatName}: { chatID: number; on
 
   return (
     <div className="edit-study-group-panel">
-      {/* Display the alert if it's visible */}
-      <div className='alert-container'>
-        {alertVisible && alerts.map(alert => (
-          <CustomAlert
-            key={alert.id}
-            text={alert.alertText || ''}
-            severity={alert.alertSeverity || 'info' as "error" | "warning" | "info" | "success"}
-            onClose={() => setAlerts(prevAlerts => prevAlerts.filter(a => a.id !== alert.id))}
-          />
-        ))}
-      </div>
+      {alertVisible && (
+        <div className='alert-container'>
+          {alerts.map(alert => (
+            <CustomAlert
+              key={alert.id}
+              text={alert.alertText || ''}
+              severity={alert.alertSeverity || 'info' as "error" | "warning" | "info" | "success"}
+              onClose={() => setAlerts(prevAlerts => prevAlerts.filter(a => a.id !== alert.id))}
+            />
+          ))}
+        </div>
+      )}
       <h1>Edit Study Group</h1>
       <form onSubmit={(e) => e.preventDefault()}>
         
