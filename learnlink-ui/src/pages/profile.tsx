@@ -6,6 +6,8 @@ import CopyrightFooter from '../components/CopyrightFooter';
 import makeAnimated from 'react-select/animated';
 import Select from 'react-select';
 import { profile } from 'console';
+import { set } from 'react-hook-form';
+import CustomAlert from '../components/CustomAlert';
 
 
 const animatedComponents = makeAnimated();
@@ -37,6 +39,7 @@ const Profile: React.FC = () => {
   // State to store enum options
   const [enumOptions, setEnumOptions] = useState({ grade: [], gender: [], studyHabitTags: [] });
   const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [alerts, setAlerts] = useState<{ id: number; alertText: string; alertSeverity: "error" | "warning" | "info" | "success"; visible: boolean }[]>([]);
 
 
   // Fetch enum values on component mount
@@ -132,7 +135,11 @@ const Profile: React.FC = () => {
       const data = await res.json();
       if (!res.ok) {
         console.error("Upload error:", data.error || "Unknown error");
-        alert(`Error: ${data.error || "Failed to upload image"}`);
+        setAlerts((prevAlerts) => [
+          ...prevAlerts,
+          { id: Date.now(), alertText: data.error || "Failed to upload image", alertSeverity: "error", visible: true },
+        ]);
+        // alert(`Error: ${data.error || "Failed to upload image"}`);
         return;
       }
       if (res.ok) setImageUrl(data.profilePic);
@@ -179,7 +186,10 @@ const Profile: React.FC = () => {
       const token = localStorage.getItem('token'); // Assuming JWT token is stored in localStorage
 
       if (!token) {
-        alert('You must be logged in to update your profile.');
+        setAlerts((prevAlerts) => [
+          ...prevAlerts,
+          { id: Date.now(), alertText: 'You must be logged in to update your profile.', alertSeverity: 'error', visible: true },
+        ]);
         return;
       }
 
@@ -196,13 +206,18 @@ const Profile: React.FC = () => {
         throw new Error('Failed to update profile');
       }
 
-      const updatedUser = await response.json();
-      console.log(updatedUser); // Handle the updated user response if needed
+      setAlerts((prevAlerts) => [
+        ...prevAlerts,
+        { id: Date.now(), alertText: 'Profile updated successfully', alertSeverity: 'success', visible: true },
+      ]);
 
-      alert('Profile updated successfully');
     } catch (error) {
       console.error(error);
-      alert('Error updating profile');
+      // alert('Error updating profile');
+      setAlerts((prevAlerts) => [
+        ...prevAlerts,
+        { id: Date.now(), alertText: 'Error updating profile', alertSeverity: 'error', visible: true },
+      ]);
     }
   };
 
@@ -261,17 +276,32 @@ const Profile: React.FC = () => {
   };
 
 
+  const alertVisible = alerts.some(alert => alert.visible);
+
   return (
     <div className="profile-page">
       <header>
         <Navbar />
       </header>
+      {alertVisible && (
+        <div className='alert-container'>
+          {alerts.map(alert => (
+            <CustomAlert
+              key={alert.id}
+              text={alert.alertText || ''}
+              severity={alert.alertSeverity || 'info' as "error" | "warning" | "info" | "success"}
+              onClose={() => setAlerts(prevAlerts => prevAlerts.filter(a => a.id !== alert.id))}
+            />
+          ))}
+        </div>
+      )}
+
       <div className='main-container'>
         <header className="profile-header">
           <h1 className="profile-title">Update Profile</h1>
         </header>
         <main className="profile-content">
-          <form className='profile-form' onSubmit={handleSubmit}>
+          <form className='profile-form' onSubmit={handleSubmit} onReset={() => window.location.reload()}>
             <div className="profile-details">
               <div className="profile-side">
                 <label>
@@ -454,7 +484,7 @@ const Profile: React.FC = () => {
                 </label>
 
                 <div className="profile-buttons">
-                  <button type="button" className="back-button">CANCEL</button>
+                  <button type="reset" className="back-button">CANCEL</button>
                   <button type="submit" className="save-button">SAVE</button>
                 </div>
               </div>

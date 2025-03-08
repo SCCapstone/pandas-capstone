@@ -7,6 +7,7 @@ import { selectStyles, formatEnum } from '../utils/format';
 import Select from 'react-select';
 import makeAnimated from 'react-select/animated';
 import { StylesConfig, ControlProps, CSSObjectWithLabel } from 'react-select';
+import CustomAlert from '../components/CustomAlert';
 
 
 
@@ -32,6 +33,8 @@ const EditStudyGroup = ({ chatID, onClose, updateChatName}: { chatID: number; on
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [image, setImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState(null);
+  const [alerts, setAlerts] = useState<{ id: number; alertText: string; alertSeverity: "error" | "warning" | "info" | "success"; visible: boolean }[]>([]);
+  const alertVisible = alerts.some(alert => alert.visible);
 
   const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
 
@@ -42,7 +45,11 @@ const EditStudyGroup = ({ chatID, onClose, updateChatName}: { chatID: number; on
       try {
         const token = localStorage.getItem('token');
         if (!token) {
-          alert('You need to be logged in to edit the study group.');
+          // alert('You need to be logged in to edit the study group.');
+          setAlerts((prevAlerts) => [
+            ...prevAlerts,
+            { id: Date.now(), alertText: 'You need to be logged in to edit the study group.', alertSeverity: "error", visible: true },
+          ]);
           return;
         }
         const enumsResponse = await fetch(`${REACT_APP_API_URL}/api/enums`);
@@ -66,7 +73,11 @@ const EditStudyGroup = ({ chatID, onClose, updateChatName}: { chatID: number; on
         setProfilePic(data.profilePic);
       } catch (error) {
         console.error('Error fetching study group:', error);
-        alert('Failed to load study group details.');
+        // alert('Failed to load study group details.');
+        setAlerts((prevAlerts) => [
+          ...prevAlerts,
+          { id: Date.now(), alertText: "Failed to load study group details. Please try again later.", alertSeverity: "error", visible: true },
+        ]);
       }
     };
 
@@ -78,19 +89,31 @@ const EditStudyGroup = ({ chatID, onClose, updateChatName}: { chatID: number; on
     try {
       const token = localStorage.getItem('token');
       if (!token) {
-        alert('You need to be logged in to save the study group.');
+        // alert('You need to be logged in to save the study group.');
+        setAlerts((prevAlerts) => [
+          ...prevAlerts,
+          { id: Date.now(), alertText: 'You need to be logged in to save the study group.', alertSeverity: "error", visible: true },
+        ]);
         return;
       }
 
       const updatedStudyGroup = { name, description, subject, chatID, ideal_match_factor };
 
       if (name==='' || name === null) {
-        alert('Please enter a study group name.');
+        // alert('Please enter a study group name.');
+        setAlerts((prevAlerts) => [
+          ...prevAlerts,
+          { id: Date.now(), alertText: 'Study group name is required', alertSeverity: "error", visible: true },
+        ]);
         return;
       }
 
       if ( ideal_match_factor === null) {
-        alert('Please enter an ideal match factor.');
+        // alert('Please enter an ideal match factor.');
+        setAlerts((prevAlerts) => [
+          ...prevAlerts,
+          { id: Date.now(), alertText: 'Ideal match factor is required', alertSeverity: "error", visible: true },
+        ]);
         return;
       }
 
@@ -105,13 +128,25 @@ const EditStudyGroup = ({ chatID, onClose, updateChatName}: { chatID: number; on
 
 
       console.log('Study group updated:', response.data);
+      
+      
 
       updateChatName(chatID, name);
+
+      setAlerts((prevAlerts) => [
+        ...prevAlerts,
+        { id: Date.now(), alertText: 'Study group updated', alertSeverity: "success", visible: true },
+      ]);
+      
       // alert('Study group updated successfully!');
       onClose(); // Close the panel or component after saving
     } catch (error) {
       console.error('Error saving study group:', error);
-      alert('Failed to save study group.');
+      // alert('Failed to save study group.');
+      setAlerts((prevAlerts) => [
+        ...prevAlerts,
+        { id: Date.now(), alertText: "Failed to save study group", alertSeverity: "error" as "error", visible: true },
+      ]);
     }
   };
 
@@ -135,7 +170,11 @@ const EditStudyGroup = ({ chatID, onClose, updateChatName}: { chatID: number; on
       if (res.ok) setImageUrl(data.profilePic);
       if (!res.ok) {
         console.error("Upload error:", data.error || "Unknown error");
-        alert(`Error: ${data.error || "Failed to upload image"}`);
+        // alert(`Error: ${data.error || "Failed to upload image"}`);
+        setAlerts((prevAlerts) => [
+          ...prevAlerts,
+          { id: Date.now(), alertText: ` ${data.error || "Failed to upload image"}`, alertSeverity: "error", visible: true },
+        ]);
         return;
       }
     }
@@ -184,6 +223,17 @@ const EditStudyGroup = ({ chatID, onClose, updateChatName}: { chatID: number; on
 
   return (
     <div className="edit-study-group-panel">
+      {/* Display the alert if it's visible */}
+      <div className='alert-container'>
+        {alertVisible && alerts.map(alert => (
+          <CustomAlert
+            key={alert.id}
+            text={alert.alertText || ''}
+            severity={alert.alertSeverity || 'info' as "error" | "warning" | "info" | "success"}
+            onClose={() => setAlerts(prevAlerts => prevAlerts.filter(a => a.id !== alert.id))}
+          />
+        ))}
+      </div>
       <h1>Edit Study Group</h1>
       <form onSubmit={(e) => e.preventDefault()}>
         

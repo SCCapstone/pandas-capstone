@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import Navbar from '../components/Navbar';
-import CopyrightFooter from '../components/CopyrightFooter'; 
+import CopyrightFooter from '../components/CopyrightFooter';
+import CustomAlert from '../components/CustomAlert';
 import './changePassword.css';
 
 const ChangePassword: React.FC = () => {
@@ -8,6 +9,7 @@ const ChangePassword: React.FC = () => {
   const [newPassword, setNewPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [alerts, setAlerts] = useState<{ id: number; alertText: string; alertSeverity: "error" | "warning" | "info" | "success"; visible: boolean }[]>([]);
   const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
 
 
@@ -41,23 +43,57 @@ const ChangePassword: React.FC = () => {
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.error || 'An error occurred');
+
+        if (data.warning) {
+          setError(data.warning || 'An error occurred');
+          setAlerts((prevAlerts) => [
+            ...prevAlerts,
+            { id: Date.now(), alertText: data.warning || 'An error occurred', alertSeverity: "warning", visible: true },
+          ]);
+        } else {
+          setError(data.error || 'An error occurred');
+          setAlerts((prevAlerts) => [
+            ...prevAlerts,
+            { id: Date.now(), alertText: data.error || 'An error occurred', alertSeverity: "error", visible: true },
+          ]);
+        }
       } else {
         // Successfully updated password, handle success (e.g., navigate to another page or show a success message)
-        alert('Password updated successfully');
+        setAlerts((prevAlerts) => [
+          ...prevAlerts,
+          { id: Date.now(), alertText: data.error || 'Password updated successfully', alertSeverity: "success", visible: true },
+        ]);
+        // alert('Password updated successfully');
       }
     } catch (err) {
       setError('Failed to update password. Please try again later.');
+      setAlerts((prevAlerts) => [
+        ...prevAlerts,
+        { id: Date.now(), alertText: 'Failed to update password. Please try again later.', alertSeverity: 'error', visible: true },
+      ]);
     } finally {
       setLoading(false);
     }
   };
+
+  const alertVisible = alerts.some(alert => alert.visible);
 
   return (
     <div className="page-container">
       <header>
         <Navbar />
       </header>
+            {/* Display the alert if it's visible */}
+            <div className='alert-container'>
+        {alertVisible && alerts.map(alert => (
+          <CustomAlert
+            key={alert.id}
+            text={alert.alertText || ''}
+            severity={alert.alertSeverity || 'info' as "error" | "warning" | "info" | "success"}
+            onClose={() => setAlerts(prevAlerts => prevAlerts.filter(a => a.id !== alert.id))}
+          />
+        ))}
+      </div>
       <main className="content">
         <div className="change-password">
         <h1 className="p1">Change Password</h1>
@@ -79,7 +115,7 @@ const ChangePassword: React.FC = () => {
                 onChange={handleNewPasswordChange}
                 required
               />
-              {error && <p className="error">{error}</p>}
+              {/* {error && <p className="error">{error}</p>} */}
               <button className="lButton" type="submit" disabled={loading}>
                 {loading ? "Updating..." : "Change Password"}
               </button>

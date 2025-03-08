@@ -17,6 +17,7 @@ import { Resend } from 'resend';
 import {upload, resizeAndUpload, handleImagePreview, resizeAndUploadStudyGroup} from './uploadConfig';
 import multer from "multer";
 import { welcomeEmailTemplate, passwordResetEmailTemplate } from "./emailTemplates";
+import { warn } from "console";
 
 
 
@@ -487,6 +488,11 @@ app.post('/api/update-password', authenticate, async (req, res):Promise<any> => 
     const isPasswordValid = await bcrypt.compare(oldPassword, user.password);
     if (!isPasswordValid) {
       return res.status(400).json({ error: 'Old password does not match current password' });
+    }
+
+    const isPasswordSame = await bcrypt.compare(newPassword, user.password);
+    if (isPasswordSame) {
+      return res.status(401).json({ warning: 'New password matches current password' });
     }
 
     const hashedPassword = await bcrypt.hash(newPassword, 10);
