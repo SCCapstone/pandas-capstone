@@ -4,6 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import React, { useState } from 'react';
 import './resetPasswordFromEmail.css';
 import { set } from 'react-hook-form';
+import CustomAlert from '../components/CustomAlert';
 
 
 const ResetPasswordFromEmail: React.FC = () => {
@@ -15,6 +16,9 @@ const ResetPasswordFromEmail: React.FC = () => {
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
     const [disabled, setDisabled] = useState(true);
+    const [alerts, setAlerts] = useState<{ id: number; alertText: string; alertSeverity: "error" | "warning" | "info" | "success"; visible: boolean }[]>([]);
+    const alertVisible = alerts.some(alert => alert.visible);
+
     const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
 
   
@@ -31,6 +35,10 @@ const ResetPasswordFromEmail: React.FC = () => {
                 return true;
             } else {
                 setError("Passwords do not match");
+                setAlerts((prevAlerts) => [
+                    ...prevAlerts,
+                    { id: Date.now(), alertText: 'Passwords do not match', alertSeverity: "error", visible: true },
+                ]);
                 setDisabled(true);
                 return false;
             }
@@ -46,6 +54,10 @@ const ResetPasswordFromEmail: React.FC = () => {
         if (password !== confirmPassword) {
             console.log("Passwords do not match");
             setError("Passwords do not match");
+            setAlerts((prevAlerts) => [
+                ...prevAlerts,
+                { id: Date.now(), alertText: 'Passwords do not match', alertSeverity: "error", visible: true },
+            ]);
             setLoading(false);
             return;
         }
@@ -59,13 +71,27 @@ const ResetPasswordFromEmail: React.FC = () => {
         if (response.ok) {
             setLoading(false);
             console.log(data);
-            alert("Password reset successful!");
+            // alert("Password reset successful!");
+            setAlerts((prevAlerts) => [
+                ...prevAlerts,
+                { id: Date.now(), alertText: 'Password reset successful', alertSeverity: "success", visible: true },
+            ]);
+
             navigate("/login");
         } else {
             setError(data.error || "Something went wrong");
             if (data.error === "Invalid or expired token") {
-                alert("Invalid or expired token");
+                // alert("Invalid or expired token");
+                setAlerts((prevAlerts) => [
+                    ...prevAlerts,
+                    { id: Date.now(), alertText: "Invalid or expired token", alertSeverity: "error", visible: true },
+                ]);
                 navigate("/forgotpassword");
+            } else {
+                setAlerts((prevAlerts) => [
+                    ...prevAlerts,
+                    { id: Date.now(), alertText: 'Something went wrong', alertSeverity: "error", visible: true },
+                ]);
             }
         }
     };
@@ -76,6 +102,18 @@ const ResetPasswordFromEmail: React.FC = () => {
                 <Logo />
             </div>
             <div className="forgotPasswordFromEmail">
+                {alertVisible && (
+                    <div className='alert-container'>
+                        {alerts.map(alert => (
+                            <CustomAlert
+                                key={alert.id}
+                                text={alert.alertText || ''}
+                                severity={alert.alertSeverity || 'info' as "error" | "warning" | "info" | "success"}
+                                onClose={() => setAlerts(prevAlerts => prevAlerts.filter(a => a.id !== alert.id))}
+                            />
+                        ))}
+                    </div>
+                )}
                 <h1>Reset Password</h1>
                 <form className="forgotpassword-container" onSubmit={handleResetPassword}>
                     <label>New Password</label>

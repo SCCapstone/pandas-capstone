@@ -7,6 +7,7 @@ import './publicProfile.css';
 import { formatEnum } from '../utils/format';
 import InviteMessagePanel from '../components/InviteMessagePanel';
 import { getLoggedInUserId } from '../utils/auth';
+import CustomAlert from '../components/CustomAlert';
 
 
 
@@ -16,7 +17,10 @@ const PublicProfile: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
     const [showInvitePanel, setShowInvitePanel] = useState(false);
     const loggedInUserId = getLoggedInUserId();
-    
+    const [alerts, setAlerts] = useState<{ id: number; alertText: string; alertSeverity: "error" | "warning" | "info" | "success"; visible: boolean }[]>([]);
+    const alertVisible = alerts.some(alert => alert.visible);
+
+
 
     const navigate = useNavigate();
     const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
@@ -28,7 +32,11 @@ const PublicProfile: React.FC = () => {
         try {
             const token = localStorage.getItem('token');
             if (!token) {
-                alert('You need to be logged in to swipe.');
+                // alert('You need to be logged in to swipe.');
+                setAlerts((prevAlerts) => [
+                    ...prevAlerts,
+                    { id: Date.now(), alertText: 'Log in to swipe.', alertSeverity: "error", visible: true },
+                  ]);
                 return;
             }
 
@@ -52,6 +60,11 @@ const PublicProfile: React.FC = () => {
     
         } catch (error) {
           console.error('Error swiping:', error);
+          setAlerts((prevAlerts) => [
+            ...prevAlerts,
+            { id: Date.now(), alertText: 'Error swiping. Please try again later. ', alertSeverity: "error", visible: true },
+          ]);
+          
         }
       };
 
@@ -73,6 +86,10 @@ const PublicProfile: React.FC = () => {
                     },
                 });
                 if (!response.ok) {
+                    setAlerts((prevAlerts) => [
+                        ...prevAlerts,
+                        { id: Date.now(), alertText: 'Failed to fetch user', alertSeverity: "error", visible: true },
+                      ]);
                     throw new Error('Failed to fetch user');
                 }
                 const data = await response.json();
@@ -81,8 +98,16 @@ const PublicProfile: React.FC = () => {
             } catch (err) {
                 if (err instanceof Error) {
                     setError(err.message);
+                    setAlerts((prevAlerts) => [
+                        ...prevAlerts,
+                        { id: Date.now(), alertText: err.message, alertSeverity: "error", visible: true },
+                      ]);
                 } else {
                     setError('An unknown error occurred');
+                    setAlerts((prevAlerts) => [
+                        ...prevAlerts,
+                        { id: Date.now(), alertText: 'An unknown error occurred', alertSeverity: "error", visible: true },
+                      ]);
                 }
             }
         };
@@ -104,6 +129,18 @@ const PublicProfile: React.FC = () => {
                 <Navbar />
             </header>
             <div className="public-profile-container">
+                {alertVisible && (
+                    <div className='alert-container'>
+                        {alerts.map(alert => (
+                            <CustomAlert
+                                key={alert.id}
+                                text={alert.alertText || ''}
+                                severity={alert.alertSeverity || 'info' as "error" | "warning" | "info" | "success"}
+                                onClose={() => setAlerts(prevAlerts => prevAlerts.filter(a => a.id !== alert.id))}
+                            />
+                        ))}
+                    </div>
+                )}
                 <div className='whole-public-component'>
                     <div className="profile-card">
                         {user ? (
