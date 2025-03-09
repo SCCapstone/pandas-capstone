@@ -29,3 +29,52 @@
     margin: 0 10px;
     font-size: 16px;
 }
+
+.network-list {
+    /* border: 1px solid #ccc; Light gray border */
+    /* border-radius: 8px; Rounded corners */
+    /* left: 0;
+    right: 0; */
+    flex:1;
+    /* background-color: #fff; */
+    border-radius: 2px;
+    overflow-y: scroll;
+    /* box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); */
+    z-index: 1000;
+    padding-inline-start: 0;
+    justify-content: center;
+  
+  
+  }
+  
+  .network-list ul {
+    border-top: 1px solid #ccc; /* Light gray border */
+    color: black;
+    padding: 15px 20px;
+    cursor: pointer;
+    font-size: medium;
+    margin: 0;
+      display: flex; /* Enable flexbox in the item */
+      align-items: center;   /* border-bottom: #2c658f; */
+  }
+  
+  .network-list ul:hover {
+    background-color: #D4EAF7;
+  }
+  
+  .network-list .network-profile-pic {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    margin-right: 20px;
+  }
+  .network-list .network-bio p {
+    font-size: medium;
+    margin: 0;
+  }
+  .network-list .network-bio h3 {
+    font-size: medium;
+    margin: 0;
+  }
+  
+  

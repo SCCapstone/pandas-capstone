@@ -27,8 +27,13 @@ const Swiping: React.FC = () => {
       <header className="header">
         <Navbar />
       </header>
+      
       <main className="swipe-content">
-        {!userId ? (
+        {/* <div className='match-header-buttons'>
+        <button className='location'>Location (put in later)</button>
+        <button className='pendingRequests'>Pending Requests</button>
+      </div> */}
+      {!userId ? (
           <p>Loading user profile...</p>
         ) : (
           <SwipeProfiles userId={userId} />
