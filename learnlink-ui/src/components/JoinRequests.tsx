@@ -4,6 +4,8 @@ import './components.css';
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { FaXmark, FaCheck } from "react-icons/fa6";
+import { updateSwipeStatus } from '../utils/userServices';
+
 
 // Props interface defining the expected properties for the JoinRequests component
 interface JoinRequestProps {
@@ -43,6 +45,13 @@ interface Group {
 interface StudyGroup {
   id: number;
   name: string; // Name of the study group
+}
+
+// Enum for swipe status
+enum SwipeStatus {
+  Accepted = 'Accepted',
+  Denied = 'Denied',
+  Pending = 'Pending'
 }
 
 // JoinRequests component handles fetching, displaying, approving, and rejecting join requests
@@ -128,6 +137,8 @@ const handleApproval = async (
 
     // Check if a chat already exists
     if (targetUserId) {
+      updateSwipeStatus(requestId, SwipeStatus.Accepted);  // Pass the enum value
+
       const chatCheckResponse = await axios.get(`${REACT_APP_API_URL}/api/chats/check`, {
         params: { userId1: requestUserId, userId2: targetUserId },
       });
@@ -227,6 +238,7 @@ const handleApproval = async (
 
   // Function to reject a join request
   const handleDenial = async (requestId: number) => {
+    updateSwipeStatus(requestId, SwipeStatus.Denied);  // Pass the enum value
     handleDeleteRequest(requestId);
   };
 
