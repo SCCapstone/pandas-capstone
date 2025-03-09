@@ -293,6 +293,7 @@ const Navbar: React.FC = () => {
         <a href="/swiping">Match</a>
         <a href="/profile">Profile</a>
         <a href="/messaging" onClick={handleMessaging}>Messaging</a>
+        <a href="/network">Network</a>
         <a href="/resources/studyTips">Resources</a>
       </nav>
 
@@ -328,6 +329,7 @@ const Navbar: React.FC = () => {
         <a href="/swiping">Match</a>
         <a href="/profile">Profile</a>
         <a href="/messaging" onClick={handleMessaging}>Messaging</a>
+        <a href="/network">Network</a>
         <a href="/resources/studyTips">Resources</a>
       </div>
 

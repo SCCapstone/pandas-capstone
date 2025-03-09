@@ -1,0 +1,31 @@
+.NetworkPage {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: #fff;
+}
+.NetworkContainer {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    flex: 1;
+}
+
+.NetworkTabsContainer {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    background-color: #00668C;
+    height: 40px;
+    padding: 10px;
+
+}
+
+.NetworkTabsContainer .Tab {
+    padding: 10px 20px;
+    cursor: pointer;
+    margin: 0 10px;
+    font-size: 16px;
+}
