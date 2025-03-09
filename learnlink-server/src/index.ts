@@ -2393,6 +2393,31 @@ app.delete('/api/notifications/delete/:id', async (req, res): Promise<any> => {
   }
 });
 
+import { SwipeStatus } from '@prisma/client'; // Import enum
+
+app.put('/api/swipe-requests/:id', async (req, res):Promise<any> => {
+    const { id } = req.params;
+    const { status }: { status: SwipeStatus } = req.body; // Expect status to be of enum type
+    console.log('Received request to update swipe status', id);
+
+    console.log('Received status:', status);
+    if (!Object.values(SwipeStatus).includes(status)) {
+        return res.status(400).json({ error: "Invalid status value" });
+    }
+
+    try {
+        const updatedRequest = await prisma.swipe.update({
+            where: { id: Number(id) },
+            data: { status },
+        });
+
+        res.json(updatedRequest);
+    } catch (error) {
+        console.error("Error updating swipe status:", error);
+        res.status(500).json({ error: "Failed to update request status" });
+    }
+});
+
 // app.get('/api/pending-requests', authenticate, async (req, res): Promise<any> => {
 //   const userId = res.locals.userId;
 //   const pendingRequests = await prisma..findMany({

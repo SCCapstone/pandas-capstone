@@ -49,6 +49,12 @@ enum SwipeAction {
   Yes
 }
 
+enum SwipeStatus {
+  Pending
+  Accepted
+  Denied
+}
+
 enum NotificationType {
   Match
   Message
@@ -130,6 +136,7 @@ model Swipe {
   targetUser   User?    @relation("SwipesReceived", fields: [targetUserId], references: [id], onDelete: Cascade)
   targetGroup  StudyGroup? @relation("StudyGroupSwipes", fields: [targetGroupId], references: [id])
   createdAt    DateTime @default(now())
+  status       SwipeStatus @default(Pending)
 
   message      String?  // Optional field to store a message
 }
