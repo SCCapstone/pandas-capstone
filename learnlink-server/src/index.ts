@@ -587,6 +587,39 @@ app.get('/api/swipe/:currentUser', async (req, res): Promise<any> => {
   }
 });
 
+app.get('/api/swipe/sentRequests/:currentUser', async (req, res): Promise<any> => {
+  let { currentUser } = req.params;
+  console.log('Fetching requests for user:', currentUser);
+
+  const userId = parseInt(currentUser, 10);
+  
+  if (isNaN(userId)) {
+    return res.status(400).json({ error: 'Invalid user ID' });
+  }
+
+  try {
+    const sentRequests = await prisma.swipe.findMany({
+      where: {
+        userId: userId,
+      },
+      select: { 
+        id: true,
+        userId: true,
+        user: true,
+        targetUserId: true,
+        targetGroupId: true,
+        direction: true,
+        message: true,
+      },
+    });
+
+    res.status(200).json(sentRequests);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Something went wrong' });
+  }
+});
+
 //for deleting a request in the reject button in requests panel
 app.delete('/api/swipe/:requestId', async(req, res): Promise<any> =>{
   let {requestId} = req.params;
@@ -2359,6 +2392,11 @@ app.delete('/api/notifications/delete/:id', async (req, res): Promise<any> => {
     return res.status(500).json({ error: 'Internal server error' });
   }
 });
+
+// app.get('/api/pending-requests', authenticate, async (req, res): Promise<any> => {
+//   const userId = res.locals.userId;
+//   const pendingRequests = await prisma..findMany({
+// });
 
 
 

@@ -11,6 +11,7 @@
     align-items: center;
     gap: 20px;
     flex: 1;
+    overflow-y: scroll;
 }
 
 .NetworkTabsContainer {
@@ -18,8 +19,10 @@
     display: flex;
     justify-content: center;
     background-color: #00668C;
-    height: 40px;
+    height: 70px;
     padding: 10px;
+    box-sizing: border-box;
+
 
 }
 
@@ -43,6 +46,8 @@
     z-index: 1000;
     padding-inline-start: 0;
     justify-content: center;
+    width: 100%;
+    box-sizing: border-box;
   
   
   }
@@ -71,10 +76,32 @@
   .network-list .network-bio p {
     font-size: medium;
     margin: 0;
+    color: black;
+    font-weight: 300;
   }
   .network-list .network-bio h3 {
     font-size: medium;
     margin: 0;
   }
-  
-  
+
+  .TabContent {
+    flex:1;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 0 20px;
+    width: 100%;
+    /* max-width: 800px; */
+    margin: 0 auto;
+    overflow-y: scroll;
+    box-sizing: border-box;
+
+  }
+
+  .TabPanel {
+    box-sizing: border-box;
+    width: 100%;
+
+
+
+  }
