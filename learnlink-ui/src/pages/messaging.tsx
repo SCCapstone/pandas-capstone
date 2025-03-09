@@ -650,10 +650,6 @@ const Messaging: React.FC = () => {
 
   // Handle double click to like a message
   const handleDoubleClick = async (messageId: number) => {
-    setAlerts((prevAlerts) => [
-      ...prevAlerts,
-      { id: Date.now(), alertText: 'You need to be logged in to create a study group.', alertSeverity: 'error', visible: true },
-    ]);
 
     const token = localStorage.getItem('token');
       if (!token) {
