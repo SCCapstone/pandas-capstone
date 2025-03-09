@@ -57,6 +57,11 @@ const Network = () => {
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState("sentRequests");
 
+    const handleSelectUser = (userId: number) => {
+        navigate(`/user-profile/${userId}`);
+    };
+
+
     return (
         <div className="NetworkPage">
             <Navbar />
@@ -87,9 +92,9 @@ const Network = () => {
 
                 {/* Tab Content */}
                 <div className="TabContent">
-                    {activeTab === "matches" && <MatchesList />}
-                    {activeTab === "sentRequests" && <SentRequestsList />}
-                    {activeTab === "receivedRequests" && <ReceivedRequestsList />}
+                    {activeTab === "matches" && <MatchesList handleSelectUser={handleSelectUser}/>}
+                    {activeTab === "sentRequests" && <SentRequestsList handleSelectUser={handleSelectUser}/>}
+                    {activeTab === "receivedRequests" && <ReceivedRequestsList handleSelectUser={handleSelectUser}/>}
                 </div>
             </div>
             <CopyrightFooter />
@@ -98,7 +103,7 @@ const Network = () => {
 };
 
 // Matches Tab Content
-const MatchesList = () => {
+const MatchesList = ({ handleSelectUser }: { handleSelectUser: (userId: number) => void }) => { 
     const navigate = useNavigate();
     const [matchesList, setMatchesList] = useState<User[]>([]);
     const [sentRequestsList, setSentRequestsList] = useState<User[]>([]);
@@ -110,7 +115,7 @@ const MatchesList = () => {
             <p>List of matched study partners...</p>
             <ul className="network-list">
                 {matchesList.map((user) => (
-                    <ul key={user.id} onClick={() => HandleSelectUser(user.id)}>
+                    <ul key={user.id} onClick={() => handleSelectUser(user.id)}>
                         <img src={user.profilePic} alt={`${user.firstName} ${user.lastName}`} className='network-profile-pic' />
                         <div className='network-bio'>
                             <h3>{user.username}</h3>
@@ -124,7 +129,7 @@ const MatchesList = () => {
 };
 
 // Sent Requests Tab Content
-const SentRequestsList = () => {
+const SentRequestsList = ({ handleSelectUser }: { handleSelectUser: (userId: number) => void }) => { 
     const [error, setError] = useState<string | null>(null);
     const [selectedProfile, setSelectedProfile] = useState<{ id: number; name: string } | null>(null);
     const [loadingRequests, setLoadingRequests] = useState<boolean>(false);
@@ -147,8 +152,8 @@ const SentRequestsList = () => {
           const requestResponse = await axios.get(`${REACT_APP_API_URL}/api/swipe/sentRequests/${currentUserId}`);
       
           // Filter swipes to only include those with direction === "Yes"
-          let requestData = requestResponse.data.filter((req: SwipeRequest) => req.direction === 'Yes');
-          console.log("requests",requestData);
+        let requestData = requestResponse.data.filter((req: SwipeRequest) => req.direction === 'Yes' && (req.targetUserId || req.targetGroupId));
+        console.log("requests", requestData);
     
           // Eliminate duplicates by using a Set to track unique request keys
           const uniqueRequestsMap = new Map();
@@ -204,7 +209,7 @@ const SentRequestsList = () => {
             <p>List of matched study partners...</p> */}
             <ul className="network-list">
                         {sentRequestsList.map((request) => (
-                            <ul key={request.id} onClick={() => request.targetUserId && HandleSelectUser(request.targetUserId!)}>
+                            <ul key={request.id} onClick={() => request.targetUserId && handleSelectUser(request.targetUserId!)}>
                                 {request.targetUserId  &&  request.targetUser? (
                                     // Display target user details
                                     <>
@@ -231,9 +236,7 @@ const SentRequestsList = () => {
                                             <p>{request.targetGroup.studyGroup.description}</p>
                                         </div>
                                     </>
-                                ) : (
-                                    <p>Invalid request data.</p>
-                                )}
+                                ) : null}
                             </ul>
                         ))}
                     </ul>
@@ -245,7 +248,7 @@ const SentRequestsList = () => {
 
 
 // Received Requests Tab Content
-const ReceivedRequestsList = () => {
+const ReceivedRequestsList = ({ handleSelectUser }: { handleSelectUser: (userId: number) => void }) => { 
     const [error, setError] = useState<string | null>(null);
     const [selectedProfile, setSelectedProfile] = useState<{ id: number; name: string } | null>(null);
     const [loadingRequests, setLoadingRequests] = useState<boolean>(false);
@@ -327,7 +330,7 @@ const ReceivedRequestsList = () => {
             <p>List of matched study partners...</p> */}
             <ul className="network-list">
                 {receivedRequestsList.map((request) => (
-                    <ul key={request.id} onClick={() => HandleSelectUser(request.user.id)}>
+                    <ul key={request.id} onClick={() => handleSelectUser(request.user.id)}>
                         <img 
                         src={request.user.profilePic || 'https://learnlink-public.s3.us-east-2.amazonaws.com/AvatarPlaceholder.svg'} 
                         alt={`${request.user.firstName} ${request.user.lastName}`} 
@@ -345,13 +348,6 @@ const ReceivedRequestsList = () => {
         </div>
     );
 };
-
-const HandleSelectUser = (userId: number) => {
-    const navigate = useNavigate();
-    navigate(`/user-profile/${userId}`); // Navigate to the user's profile page
-    // setSearchQuery('');
-    // setSearchResults([]);
-  };
 
 
 
