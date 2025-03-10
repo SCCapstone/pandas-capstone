@@ -25,6 +25,7 @@ interface SwipeRequest {
   user: User;                 // User details of the requester
   targetGroup: Group;         // Group details (if applicable)
   direction: 'Yes' | 'No';
+  status: SwipeStatus;
 }
 
 // Interface for a user object
@@ -79,7 +80,7 @@ const JoinRequests: React.FC<JoinRequestProps> = ({ currentUserId, addNewChat, o
       const requestResponse = await axios.get(`${REACT_APP_API_URL}/api/swipe/${currentUserId}`);
   
       // Filter swipes to only include those with direction === "Yes"
-      let requestData = requestResponse.data.filter((req: SwipeRequest) => req.direction === 'Yes');
+      let requestData = requestResponse.data.filter((req: SwipeRequest) => req.direction === 'Yes' && req.status === SwipeStatus.Pending);
 
       // Eliminate duplicates by using a Set to track unique request keys
       const uniqueRequestsMap = new Map();
@@ -137,7 +138,6 @@ const handleApproval = async (
 
     // Check if a chat already exists
     if (targetUserId) {
-      updateSwipeStatus(requestId, SwipeStatus.Accepted);  // Pass the enum value
 
       const chatCheckResponse = await axios.get(`${REACT_APP_API_URL}/api/chats/check`, {
         params: { userId1: requestUserId, userId2: targetUserId },
@@ -146,6 +146,7 @@ const handleApproval = async (
       if (chatCheckResponse.data.exists) {
         setError("A chat with this user already exists.");
         handleDeleteRequest(requestId);
+        handleRequestsChange(requestId);
         return; // Stop function execution
       }
     }
@@ -205,7 +206,10 @@ const handleApproval = async (
         type: "StudyGroup",
       });
 
-      handleDeleteRequest(requestId); // Remove request after approval
+      updateSwipeStatus(requestId, SwipeStatus.Accepted); // Update status to accepted
+
+      // handleDeleteRequest(requestId); // Remove request after approval
+      handleRequestsChange(requestId);
     } 
   
   } catch (err: unknown) {
@@ -213,7 +217,10 @@ const handleApproval = async (
     if (axios.isAxiosError(err) && err.response?.status === 405) {
       console.log("Caught 405 error in catch block");
       setError("This study group is full. You cannot approve this request.");
-      handleDeleteRequest(requestId);
+      handleDenial(requestId);
+
+      // handleDeleteRequest(requestId);
+      handleRequestsChange(requestId);
     }
     if (axios.isAxiosError(err)) {
       if (err.response) {
@@ -239,7 +246,8 @@ const handleApproval = async (
   // Function to reject a join request
   const handleDenial = async (requestId: number) => {
     updateSwipeStatus(requestId, SwipeStatus.Denied);  // Pass the enum value
-    handleDeleteRequest(requestId);
+    // handleDeleteRequest(requestId);
+    handleRequestsChange(requestId);
   };
 
   // Function to delete a request from the system
@@ -251,6 +259,11 @@ const handleApproval = async (
       console.error('Error rejecting request:', err);
       setError('Failed to reject request.');
     }
+  };
+
+  const handleRequestsChange  = async (requestId: number) => { 
+    setRequests(requests.filter((request) => request.id !== requestId));
+
   };
 
   const handleProfilePopup = (userId: number) => {
