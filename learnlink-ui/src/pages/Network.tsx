@@ -34,6 +34,7 @@ interface SwipeRequest {
     targetGroup: Group;         // Group details (if applicable)
     direction: 'Yes' | 'No';
     targetUser?: User;          // User details of the target user (if applicable)
+    status: string;
   }
 
   // Interface for a group object
@@ -102,6 +103,14 @@ const Network = () => {
     );
 };
 
+const handleDeleteRequest = async (requestId: number) => {
+    try {
+      await axios.delete(`${REACT_APP_API_URL}/api/swipe/${requestId}`);
+    } catch (err) {
+      console.error('Error rejecting request:', err);
+    }
+  };
+
 // Matches Tab Content
 const MatchesList = ({ handleSelectUser }: { handleSelectUser: (userId: number) => void }) => { 
     const navigate = useNavigate();
@@ -135,6 +144,7 @@ const SentRequestsList = ({ handleSelectUser }: { handleSelectUser: (userId: num
     const [loadingRequests, setLoadingRequests] = useState<boolean>(false);
     const [loadingApproval, setLoadingApproval] = useState<number | null>(null); // Tracks which request is being approved
     const [sentRequestsList, setSentRequestsList] = useState<SwipeRequest[]>([]);
+    // const [status, setStatus] = useState<string>('');
     const currentUserId = getLoggedInUserId();
 
     useEffect(() => {
@@ -212,17 +222,26 @@ const SentRequestsList = ({ handleSelectUser }: { handleSelectUser: (userId: num
                             <ul key={request.id} onClick={() => request.targetUserId && handleSelectUser(request.targetUserId!)}>
                                 {request.targetUserId  &&  request.targetUser? (
                                     // Display target user details
-                                    <>
-                                        <img 
-                                            src={request.targetUser.profilePic || 'https://learnlink-public.s3.us-east-2.amazonaws.com/AvatarPlaceholder.svg'} 
-                                            alt={`${request.targetUser.firstName} ${request.targetUser.lastName}`} 
-                                            className='network-profile-pic' 
-                                        />
-                                        <div className='network-bio'>
-                                            <h3>{request.targetUser.username}</h3>
-                                            <p>{request.targetUser.firstName} {request.targetUser.lastName}</p>
+                                    <div className='network-list-container'>
+                                        <div className='network-list-info'>
+                                            <img
+                                                src={request.targetUser.profilePic || 'https://learnlink-public.s3.us-east-2.amazonaws.com/AvatarPlaceholder.svg'}
+                                                alt={`${request.targetUser.firstName} ${request.targetUser.lastName}`}
+                                                className='network-profile-pic'
+                                            />
+                                            <div className='network-bio'>
+                                                <h3>{request.targetUser.username}</h3>
+                                                <p>{request.targetUser.firstName} {request.targetUser.lastName}</p>
+                                            </div>
                                         </div>
-                                    </>
+                                        <div className='network-list-status'>
+                                            {request.status === 'Pending' ? (
+                                                <button className='network-withdraw-button' onClick={() => handleDeleteRequest(request.id)}>Withdraw</button>
+                                            ) : null}
+                                            <button className={`status-${request.status.toLowerCase()}`}>{request.status}</button>
+                                        </div>
+
+                                    </div>
                                 ) : request.targetGroupId  && request.targetGroup ? (
                                     // Display target group details
                                     <>
@@ -235,6 +254,8 @@ const SentRequestsList = ({ handleSelectUser }: { handleSelectUser: (userId: num
                                             <h3>Group: {request.targetGroup.studyGroup.name}</h3>
                                             <p>{request.targetGroup.studyGroup.description}</p>
                                         </div>
+                                        <button>Accept</button>
+
                                     </>
                                 ) : null}
                             </ul>

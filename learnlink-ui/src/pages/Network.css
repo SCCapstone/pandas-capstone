@@ -51,6 +51,19 @@
   
   
   }
+
+  .network-list-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 0 20px;
+    width: 100%;
+    /* max-width: 800px; */
+    margin: 0 auto;
+    overflow-y: scroll;
+    box-sizing: border-box;
+  }
   
   .network-list ul {
     border-top: 1px solid #ccc; /* Light gray border */
@@ -105,3 +118,51 @@
 
 
   }
+
+  .network-list-info {
+      display: flex;
+      flex-direction: row;
+  }
+
+  .network-list button {
+      padding: 5px 10px;
+      border-radius: 5px;
+      color: white;
+      font-size: 14px;
+      border: none;
+      width: 100px;
+  }
+
+  .network-list-status {
+      display: flex;
+      flex-direction: row;
+      gap: 10px;
+  }
+
+  button.network-withdraw-button {
+    border: #969696 solid 2px;
+    background-color: transparent;
+    color: #969696;
+    cursor: pointer;
+  }
+
+  button.network-withdraw-button:hover {
+    background-color: brown;
+    color: white;
+    border: none;
+    transform: scale(1.05);
+    transition: transform 0.3s ease;
+  }
+
+
+
+  .network-list .status-accepted {
+      background-color: #4CAF50;
+  }
+
+  .network-list .status-denied {
+      background-color: brown;
+  }
+.network-list .status-pending {
+    background-color: #afafaf;
+}

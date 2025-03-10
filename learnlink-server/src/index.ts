@@ -610,6 +610,7 @@ app.get('/api/swipe/sentRequests/:currentUser', async (req, res): Promise<any> =
         targetGroupId: true,
         direction: true,
         message: true,
+        status: true,
       },
     });
 
