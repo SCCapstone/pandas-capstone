@@ -440,14 +440,14 @@ const Messaging: React.FC = () => {
 
 
   // sends messages between users
-  const handleSendSystemMessage = async () => {
+  const handleSendSystemMessage = async (mss: String) => {
     // Authorization
     const token = localStorage.getItem('token');
-    if (updateMessage.trim() && selectedChat) {
+    if (mss.trim() && selectedChat) {
       try {
         const messageData: Message = {
           id: Date.now(), // Use a unique ID generator
-          content: updateMessage.trim(),
+          content: mss.trim(),
           createdAt: new Date().toISOString(),
           userId: currentUserId || 0, // Add a fallback for currentUserId
           chatId: selectedChat.id,
@@ -460,7 +460,7 @@ const Messaging: React.FC = () => {
           'message',
           {
             chatId: selectedChat.id,
-            content: updateMessage,
+            content: mss,
             userId: currentUserId,
             token,
           },
@@ -855,9 +855,10 @@ const Messaging: React.FC = () => {
         }
         setUpdateMessage(mess);
 
-        handleSendSystemMessage();
+        
 
-        //console.log("update message " ,  mess);
+        console.log("update message " ,  mess);
+        handleSendSystemMessage(mess);
       } else {
         console.error('Failed to delete the user.');
       }
