@@ -79,6 +79,8 @@ const Messaging: React.FC = () => {
   const [usernames, setUsernames] = useState<{ [key: number]: string }>({});
   const [groupId, setGroupId] = useState<number | null>(null);
 
+  const [updateMessage, setUpdateMessage] = useState<string>('');
+
   const [selectedProfile, setSelectedProfile] = useState<{ id: number; name: string } | null>(null);
   const [loadingChatList, setLoadingChatList] = useState(true);
 
@@ -214,9 +216,10 @@ const Messaging: React.FC = () => {
   }, [selectedChat]);  
 
   //Used for retrieving the user names of a chat and the users within
+// Used for retrieving the usernames of users in a chat
   useEffect(() => {
-    if (selectedChat?.messages) {
-      selectedChat.messages.forEach((message) => handleGetUsername(message.userId));
+    if (selectedChat?.users) {
+      selectedChat.users.forEach((userId) => handleGetUsername(userId.id));
     }
   }, [selectedChat]);
 
@@ -727,6 +730,8 @@ const Messaging: React.FC = () => {
     }
   }
 
+
+
   //deletes a user from a study group
   const removeUser = async (userId: number, groupId: number | null) => {
     if (!groupId) {
@@ -744,6 +749,19 @@ const Messaging: React.FC = () => {
         if (selectedChat?.id === userId) {
           setSelectedChat(null);
         }
+
+        // add left/removed from chat message here
+        const username = usernames[userId] || "Unknown";
+        let mess = "";
+        // console.log(username);
+        if (userId === currentUserId) {
+          mess = `${username} left the group.`;
+          
+        } else {
+          mess = `${username} was removed from the group.`;
+        }
+        setUpdateMessage(mess);
+        //console.log("update message " ,  mess);
       } else {
         console.error('Failed to delete the user.');
       }
