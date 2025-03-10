@@ -63,6 +63,7 @@
     margin: 0 auto;
     overflow-y: scroll;
     box-sizing: border-box;
+    align-items: center;
   }
   
   .network-list ul {
@@ -131,6 +132,9 @@
       font-size: 14px;
       border: none;
       width: 100px;
+      height: 55px;
+      max-height: 55px;
+
   }
 
   .network-list-status {
@@ -144,6 +148,7 @@
     background-color: transparent;
     color: #969696;
     cursor: pointer;
+    max-height: 55px;
   }
 
   button.network-withdraw-button:hover {

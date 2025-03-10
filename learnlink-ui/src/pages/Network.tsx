@@ -242,21 +242,29 @@ const SentRequestsList = ({ handleSelectUser }: { handleSelectUser: (userId: num
                                         </div>
 
                                     </div>
-                                ) : request.targetGroupId  && request.targetGroup ? (
+                                ) : request.targetGroupId && request.targetGroup ? (
                                     // Display target group details
-                                    <>
-                                    <img 
-                                            src={request.targetGroup.studyGroup.profilePic || 'https://learnlink-pfps.s3.us-east-1.amazonaws.com/profile-pictures/generic_studygroup_pfp.svg'} 
-                                            alt={`${request.targetGroup.studyGroup.name}`} 
-                                            className='network-profile-pic' 
+                                    <div className='network-list-container'>
+                                    <div className='network-list-info'>
+                                        <img
+                                            src={request.targetGroup.studyGroup.profilePic || 'https://learnlink-pfps.s3.us-east-1.amazonaws.com/profile-pictures/generic_studygroup_pfp.svg'}
+                                            alt={`${request.targetGroup.studyGroup.name}`}
+                                            className='network-profile-pic'
                                         />
                                         <div className='network-bio'>
                                             <h3>Group: {request.targetGroup.studyGroup.name}</h3>
                                             <p>{request.targetGroup.studyGroup.description}</p>
                                         </div>
-                                        <button>Accept</button>
+                                        </div>
+                                        <div className='network-list-status'>
+                                            {request.status === 'Pending' ? (
+                                                <button className='network-withdraw-button' onClick={() => handleDeleteRequest(request.id)}>Withdraw</button>
+                                            ) : null}
+                                            <button className={`status-${request.status.toLowerCase()}`}>{request.status}</button>
+                                        </div>
+                                        </div>
 
-                                    </>
+                                    
                                 ) : null}
                             </ul>
                         ))}
