@@ -257,13 +257,7 @@ const Messaging: React.FC = () => {
     };
   }, [selectedChat]); // Runs when messages update
   
-  useEffect(() => {
-    if (updateMessage) {
-      console.log("Update message:", updateMessage);
-      // You can also trigger an alert or update the UI accordingly
-    }
-  }, [updateMessage]);
-  
+
 
   useEffect(() => {
     const fetchChatNames = async () => {
@@ -437,6 +431,76 @@ const Messaging: React.FC = () => {
       );
     }
 
+      } catch (error) {
+        console.error('Error sending message:', error);
+      }
+    }
+  };
+    
+
+
+  // sends messages between users
+  const handleSendSystemMessage = async () => {
+    // Authorization
+    const token = localStorage.getItem('token');
+    if (updateMessage.trim() && selectedChat) {
+      try {
+        const messageData: Message = {
+          id: Date.now(), // Use a unique ID generator
+          content: updateMessage.trim(),
+          createdAt: new Date().toISOString(),
+          userId: currentUserId || 0, // Add a fallback for currentUserId
+          chatId: selectedChat.id,
+          liked: false,
+          system: true,
+        };
+  
+        // sends the message via a websocket to the other user
+        socket.emit(
+          'message',
+          {
+            chatId: selectedChat.id,
+            content: updateMessage,
+            userId: currentUserId,
+            token,
+          },
+          (response: { success: boolean; message?: string; error?: string }) => {
+            if (response.success) {
+              console.log('Message sent successfully:', response.message);
+            } else {
+              console.log('Message send failed:', response.error);
+            }
+          }
+        );
+        setCurrentMessage('');
+        
+        
+        // Update the selectedChat to include the new message
+        setSelectedChat((prevSelectedChat) =>
+          prevSelectedChat
+            ? { ...prevSelectedChat, messages: [...(prevSelectedChat.messages || []), messageData] }
+            : null
+        );
+
+        setChats((prevChats) => {
+          const updatedChats = prevChats.map((chat) =>
+            chat.id === selectedChat.id
+              ? {
+                  ...chat,
+                  messages: [...(chat.messages || []), messageData],
+                  updatedAt: new Date().toISOString(), // Convert Date to string here
+                }
+              : chat
+          );
+          // Sort chats by updatedAt (most recent first)
+          return updatedChats.sort(
+            (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+          );
+        });
+        
+        setUpdateMessage('');
+
+   
       } catch (error) {
         console.error('Error sending message:', error);
       }
@@ -791,13 +855,8 @@ const Messaging: React.FC = () => {
         }
         setUpdateMessage(mess);
 
+        handleSendSystemMessage();
 
-         // Send the system message to the chat
-        await axios.post(`${REACT_APP_API_URL}/api/study-groups/${groupId}/messages`, {
-          content: mess,
-          userId: null,  // Assuming null or a special system user ID represents system messages
-          isSystemMessage: true, // Include a flag for frontend styling
-        });
         //console.log("update message " ,  mess);
       } else {
         console.error('Failed to delete the user.');
@@ -977,10 +1036,7 @@ const Messaging: React.FC = () => {
                           ) : null}
                           {/* Display messages */}
                           <div
-                            className={`MessageBubble ${
-                              message.system ? 'SystemMessage' :
-                              message.userId === currentUserId ? 'MyMessage' : 'OtherMessage'
-                            }`}
+                            className={`MessageBubble ${message.system ? 'SystemMessage' : (message.userId === currentUserId ? 'MyMessage' : 'OtherMessage')}`}
                             onDoubleClick={() => handleDoubleClick(message.id)}
                           >
                             {typeof message === 'string'
