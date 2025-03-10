@@ -262,6 +262,9 @@ const Navbar: React.FC = () => {
   const handleMessaging = () => {
     navigate('/messaging');
   };
+  const handleGroups = () => {
+    navigate('groups');
+  };
   const handleAccountDetails = () => {
     navigate('/accountDetails');
   }
@@ -292,8 +295,9 @@ const Navbar: React.FC = () => {
       <nav className="nav-links">
         <a href="/swiping">Match</a>
         <a href="/profile">Profile</a>
-        <a href="/messaging" onClick={handleMessaging}>Messaging</a>
         <a href="/network">Network</a>
+        <a href="/messaging" onClick={handleMessaging}>Messaging</a>
+        <a href="/groups" onClick={handleGroups}>Groups</a>
         <a href="/resources/studyTips">Resources</a>
       </nav>
 
