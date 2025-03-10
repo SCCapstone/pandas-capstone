@@ -76,7 +76,8 @@ const Messaging: React.FC = () => {
   // for user panel
   const [isUserPanelVisible, setIsUserPanelVisible] = useState(false);
   // for displaying names above messages sent
-  const [usernames, setUsernames] = useState<{ [key: number]: string }>({});
+  const [msgUsernames, setMsgUsernames] = useState<{ [key: number]: string }>({});
+  const [chatUsernames, setChatUsernames] = useState<{ [key: number]: string }>({});
   const [groupId, setGroupId] = useState<number | null>(null);
 
   const [updateMessage, setUpdateMessage] = useState<string>('');
@@ -219,10 +220,16 @@ const Messaging: React.FC = () => {
 // Used for retrieving the usernames of users in a chat
   useEffect(() => {
     if (selectedChat?.users) {
-      selectedChat.users.forEach((userId) => handleGetUsername(userId.id));
+      selectedChat.users.forEach((userId) => handleGetChatUsername(userId.id));
     }
   }, [selectedChat]);
 
+  //Used for retrieving the user names of a chat and the users within
+  useEffect(() => {
+    if (selectedChat?.messages) {
+      selectedChat.messages.forEach((message) => handleGetMessageUsername(message.userId));
+    }
+  }, [selectedChat]);
   
   // Web socket functionality for sending and receiving messages
   useEffect(() => {
@@ -688,15 +695,28 @@ const Messaging: React.FC = () => {
   };
 
   // Used for retriving names for putting names above sent messages
-  const handleGetUsername = async (userId: number) => {
+  const handleGetMessageUsername = async (userId: number) => {
     try {
       const response = await axios.get(`${REACT_APP_API_URL}/api/users/${userId}`);
       const username = response.data.firstName + " " + response.data.lastName;
-      setUsernames((prev) => ({ ...prev, [userId]: username }));
+      setMsgUsernames((prev) => ({ ...prev, [userId]: username }));
       //console.log(username);
     } catch (error) {
       console.error("Error fetching username:", error);
-      setUsernames((prev) => ({ ...prev, [userId]: "Unknown" }));
+      setMsgUsernames((prev) => ({ ...prev, [userId]: "Unknown" }));
+    }
+  };
+
+  // Used for retriving names for putting names above sent messages
+  const handleGetChatUsername = async (userId: number) => {
+    try {
+      const response = await axios.get(`${REACT_APP_API_URL}/api/users/${userId}`);
+      const username = response.data.firstName + " " + response.data.lastName;
+      setChatUsernames((prev) => ({ ...prev, [userId]: username }));
+      //console.log(username);
+    } catch (error) {
+      console.error("Error fetching username:", error);
+      setChatUsernames((prev) => ({ ...prev, [userId]: "Unknown" }));
     }
   };
 
@@ -751,7 +771,7 @@ const Messaging: React.FC = () => {
         }
 
         // add left/removed from chat message here
-        const username = usernames[userId] || "Unknown";
+        const username = chatUsernames[userId] || "Unknown";
         let mess = "";
         // console.log(username);
         if (userId === currentUserId) {
@@ -935,7 +955,7 @@ const Messaging: React.FC = () => {
                           {/* Display usernames */}
                           {index === 0 || selectedChat.messages[index - 1].userId !== message.userId ? (
                             <div className={`username ${message.userId === currentUserId ? 'MyUsername' : ''}`}>
-                              {usernames[message.userId] || "Loading..."}
+                              {msgUsernames[message.userId] || "Loading..."}
                             </div>
                           ) : null}
                           {/* Display messages */}
