@@ -177,6 +177,7 @@ model Message {
   user         User        @relation(fields: [userId], references: [id]) // One-to-many relation to User
   chat         Chat        @relation(fields: [chatId], references: [id], onDelete: Cascade) // One-to-many relation to Chat
   liked        Boolean     @default(false)
+  system       Boolean     @default(false)
 }
 
 model Notification {

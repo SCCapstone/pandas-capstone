@@ -21,7 +21,8 @@ interface Message {
   createdAt: string;  
   userId: number;     
   chatId: number;     
-  liked: boolean;     
+  liked: boolean;  
+  system: boolean;   
 }
 
 // Represents a user participating in a chat

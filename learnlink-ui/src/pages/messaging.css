@@ -378,6 +378,18 @@
   background-color: #dfa317;
 }
 
+
+.SystemMessage {
+  background-color: #f8d7da; /* Light red/pink background */
+  color: #721c24; /* Dark red text */
+  font-style: italic;
+  text-align: center;
+  padding: 8px;
+  margin: 5px 0;
+  border-radius: 5px;
+  border: 1px solid #f5c6cb;
+}
+
 /* Responsive Adjustments */
 @media (max-width: 768px) {
   .Messaging {

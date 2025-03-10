@@ -31,6 +31,7 @@ interface Message{
   userId: number;
   chatId: number;
   liked: boolean;
+  system: boolean;
   
 }
 interface User {
@@ -81,7 +82,7 @@ const Messaging: React.FC = () => {
   const [groupId, setGroupId] = useState<number | null>(null);
 
   const [updateMessage, setUpdateMessage] = useState<string>('');
-
+  const [visibleMessage, setVisibleMessage] = useState("");
   const [selectedProfile, setSelectedProfile] = useState<{ id: number; name: string } | null>(null);
   const [loadingChatList, setLoadingChatList] = useState(true);
 
@@ -256,6 +257,13 @@ const Messaging: React.FC = () => {
     };
   }, [selectedChat]); // Runs when messages update
   
+  useEffect(() => {
+    if (updateMessage) {
+      console.log("Update message:", updateMessage);
+      // You can also trigger an alert or update the UI accordingly
+    }
+  }, [updateMessage]);
+  
 
   useEffect(() => {
     const fetchChatNames = async () => {
@@ -328,6 +336,7 @@ const Messaging: React.FC = () => {
           userId: currentUserId || 0, // Add a fallback for currentUserId
           chatId: selectedChat.id,
           liked: false,
+          system: false,
         };
   
         // sends the message via a websocket to the other user
@@ -781,6 +790,14 @@ const Messaging: React.FC = () => {
           mess = `${username} was removed from the group.`;
         }
         setUpdateMessage(mess);
+
+
+         // Send the system message to the chat
+        await axios.post(`${REACT_APP_API_URL}/api/study-groups/${groupId}/messages`, {
+          content: mess,
+          userId: null,  // Assuming null or a special system user ID represents system messages
+          isSystemMessage: true, // Include a flag for frontend styling
+        });
         //console.log("update message " ,  mess);
       } else {
         console.error('Failed to delete the user.');
@@ -961,6 +978,7 @@ const Messaging: React.FC = () => {
                           {/* Display messages */}
                           <div
                             className={`MessageBubble ${
+                              message.system ? 'SystemMessage' :
                               message.userId === currentUserId ? 'MyMessage' : 'OtherMessage'
                             }`}
                             onDoubleClick={() => handleDoubleClick(message.id)}
