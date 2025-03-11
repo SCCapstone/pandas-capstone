@@ -1030,7 +1030,7 @@ const Messaging: React.FC = () => {
                       selectedChat.messages.map((message, index) => (
                         <div key={index} className="MessageContainer">
                           {/* Display usernames */}
-                          {index === 0 || selectedChat.messages[index - 1].userId !== message.userId ? (
+                          {!message.system && index === 0 || selectedChat.messages[index - 1].userId !== message.userId ? (
                             <div className={`username ${message.userId === currentUserId ? 'MyUsername' : ''}`}>
                               {msgUsernames[message.userId] || "Loading..."}
                             </div>
