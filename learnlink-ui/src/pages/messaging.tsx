@@ -12,6 +12,7 @@ import JoinRequests from '../components/JoinRequests';
 import GroupUserList from '../components/GroupUserList';
 import JoinReqProfile from '../components/JoinReqProfile';
 import CustomAlert from '../components/CustomAlert';
+import { unescape } from 'querystring';
 
 
 
@@ -28,7 +29,7 @@ interface Message{
   id: number;
   content: string;
   createdAt: string;
-  userId: number;
+  userId: number | undefined;
   chatId: number;
   liked: boolean;
   system: boolean;
@@ -234,7 +235,7 @@ useEffect(() => {
   useEffect(() => {
     if (selectedChat?.messages) {
       selectedChat.messages.forEach((message) => {
-        if (message.userId !== SYSTEM_USER_ID) { // Check if the userId is not -1 (system message)
+        if (message.userId !== undefined) { // Check if the userId is not -1 (system message)
           handleGetMessageUsername(message.userId);
         }
       });
@@ -458,7 +459,7 @@ useEffect(() => {
           id: Date.now(), // Use a unique ID generator
           content: mss.trim(),
           createdAt: new Date().toISOString(),
-          userId: SYSTEM_USER_ID,
+          userId: undefined,
           chatId: selectedChat.id,
           liked: false,
           system: true,
@@ -470,7 +471,8 @@ useEffect(() => {
           {
             chatId: selectedChat.id,
             content: mss,
-            userId: SYSTEM_USER_ID,
+            userId: undefined,
+            system: true,
             token,
           },
           (response: { success: boolean; message?: string; error?: string }) => {
@@ -776,31 +778,38 @@ useEffect(() => {
     
   };
 
-  // Used for retriving names for putting names above sent messages
-  const handleGetMessageUsername = async (userId: number) => {
-    try {
-      const response = await axios.get(`${REACT_APP_API_URL}/api/users/${userId}`);
-      const username = response.data.firstName + " " + response.data.lastName;
-      setMsgUsernames((prev) => ({ ...prev, [userId]: username }));
-      //console.log(username);
-    } catch (error) {
-      console.error("Error fetching username:", error);
-      setMsgUsernames((prev) => ({ ...prev, [userId]: "Unknown" }));
-    }
-  };
+ // Used for retrieving names for putting names above sent messages
+const handleGetMessageUsername = async (userId: number) => {
+  // Check if the userId is the SYSTEM_USER_ID and skip if true
+  if (userId === SYSTEM_USER_ID) return;
 
-  // Used for retriving names for putting names above sent messages
-  const handleGetChatUsername = async (userId: number) => {
-    try {
-      const response = await axios.get(`${REACT_APP_API_URL}/api/users/${userId}`);
-      const username = response.data.firstName + " " + response.data.lastName;
-      setChatUsernames((prev) => ({ ...prev, [userId]: username }));
-      //console.log(username);
-    } catch (error) {
-      console.error("Error fetching username:", error);
-      setChatUsernames((prev) => ({ ...prev, [userId]: "Unknown" }));
-    }
-  };
+  try {
+    const response = await axios.get(`${REACT_APP_API_URL}/api/users/${userId}`);
+    const username = response.data.firstName + " " + response.data.lastName;
+    setMsgUsernames((prev) => ({ ...prev, [userId]: username }));
+    //console.log(username);
+  } catch (error) {
+    console.error("Error fetching username:", error);
+    setMsgUsernames((prev) => ({ ...prev, [userId]: "Unknown" }));
+  }
+};
+
+// Used for retrieving names for putting names above sent messages
+const handleGetChatUsername = async (userId: number) => {
+  // Check if the userId is the SYSTEM_USER_ID and skip if true
+  if (userId === SYSTEM_USER_ID) return;
+
+  try {
+    const response = await axios.get(`${REACT_APP_API_URL}/api/users/${userId}`);
+    const username = response.data.firstName + " " + response.data.lastName;
+    setChatUsernames((prev) => ({ ...prev, [userId]: username }));
+    //console.log(username);
+  } catch (error) {
+    console.error("Error fetching username:", error);
+    setChatUsernames((prev) => ({ ...prev, [userId]: "Unknown" }));
+  }
+};
+
 
 
   // passed into joinrequests component, ensures the name is updated when a request is approved
@@ -1041,7 +1050,7 @@ useEffect(() => {
                           {/* Display usernames */}
                           {!message.system && (index === 0 || selectedChat.messages[index - 1].userId !== message.userId) && (
                             <div className={`username ${message.userId === currentUserId ? 'MyUsername' : ''}`}>
-                              {msgUsernames[message.userId] || "Loading..."}
+                              {message.userId !== undefined && msgUsernames[message.userId] ? msgUsernames[message.userId] : "Loading..."}
                             </div>
                           )}
 

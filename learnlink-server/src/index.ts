@@ -38,6 +38,7 @@ const JWT_SECRET = env.JWT_SECRET || 'your_default_jwt_secret';
 const resend = new Resend(process.env.RESEND);
 const REACT_APP_EMAIL_URL = process.env.REACT_APP_EMAIL_URL || 'learnlink.site';
 const MAX_USERS_IN_A_GROUP = 6;
+const SYSTEM_USER_ID = -1;
 
 // Read certificates conditionally based on the environment
 const privateKey = NODE_ENV === 'production'
@@ -1989,50 +1990,72 @@ app.get('/socket-io', (req, res) => {
 
 
 // Real-time WebSocket chat functionality
+// Real-time WebSocket chat functionality
+// Real-time WebSocket chat functionality
 io.on("connection", (socket) => {
   console.log("User connected");
 
   socket.on('message', async (data, callback) => {
     try {
       // Validate the incoming data
-      if (!data.content || !data.chatId || !data.userId) {
-        throw new Error('Missing required fields: content, chatId, or userId');
+      if (!data.content || !data.chatId || (data.system && data.userId !== undefined)) {
+        throw new Error('Missing required fields: content, chatId, or invalid userId for system message');
       }
 
-      // Create a new message in the database using Prisma
-      const newMessage = await prisma.message.create({
-        data: {
-          content: data.content,
-          createdAt: new Date(),
-          user: { connect: { id: data.userId } },
-          chat: { connect: { id: data.chatId } },
-        },
-        include: { user: true, chat: { include: { users: true } } }, // Include chat members
-      });
+      let newMessage;
+      console.log(data.system);
+
+      if (data.system) {
+        // If it's a system message, no user should be connected
+        newMessage = await prisma.message.create({
+          data: {
+            content: data.content,
+            createdAt: new Date(),
+            chatId: data.chatId,
+            system: true,
+            // No userId for system messages
+          },
+          include: { chat: { include: { users: true } } }, // Include chat and users if needed
+        });
+      } else {
+        // Regular user message
+        newMessage = await prisma.message.create({
+          data: {
+            content: data.content,
+            createdAt: new Date(),
+            user: { connect: { id: data.userId } },  // Ensure userId is connected for user messages
+            chat: { connect: { id: data.chatId } },
+          },
+          include: { user: true, chat: { include: { users: true } } },
+        });
+      }
 
       // After saving the message, update the chat's `updatedAt` timestamp
       const updatedChat = await prisma.chat.update({
         where: { id: data.chatId },
         data: { updatedAt: new Date() },
-        include: { users: true }, // Optionally, include users if you want to broadcast updated users list
+        include: { users: true },
       });
 
       // Get all user IDs in the chat
       const chatUsers = newMessage.chat.users.map(user => user.id);
 
-      // Broadcast message only to users in this chat
-      chatUsers.forEach(userId => {
-        io.to(`user_${userId}`).emit('newMessage', newMessage);
-      });
+      // Broadcast message to users in this chat, skip broadcasting for system messages
+      if (!data.system) {
+        chatUsers.forEach(userId => {
+          io.to(`user_${userId}`).emit('newMessage', newMessage);
+        });
+      }
 
       console.log('Broadcasting message to chat users:', chatUsers);
 
       // Send success callback to the sender
-      callback({ success: true, message: 'Message sent from server successfully!' }); 
+      callback({ success: true, message: 'Message sent from server successfully!' });
       callback({ success: true, message: newMessage, updatedChat });
+
     } catch (error) {
       console.error('Error handling message:', error);
-      callback({ success: false, error: error });
+      callback({ success: false, error });
     }
   });
 
@@ -2042,16 +2065,16 @@ io.on("connection", (socket) => {
         console.error("Chat ID is required");
         return; // Early exit if chatId is not provided
       }
-  
+
       socket.join(`chat_${chatId}`);
       console.log(`User ${userId} joined chat ${chatId}`);
-  
+
       // Fetch updated chat users
       const chat = await prisma.chat.findUnique({
         where: { id: chatId },
         include: { users: true },
       });
-  
+
       if (chat) {
         io.to(`chat_${chatId}`).emit("chatUpdated", chat.users);
       } else {
@@ -2061,12 +2084,13 @@ io.on("connection", (socket) => {
       console.error("Error joining chat:", error);
     }
   });
-  
 
   socket.on('disconnect', () => {
     console.log('A user disconnected:', socket.id);
   });
 });
+
+
 
 
 

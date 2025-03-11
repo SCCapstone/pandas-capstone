@@ -19,7 +19,7 @@ interface Message {
   id: number;
   content: string;    
   createdAt: string;  
-  userId: number;     
+  userId: number | undefined;     
   chatId: number;     
   liked: boolean;  
   system: boolean;   
