@@ -43,7 +43,7 @@ interface User {
 
 
 const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
-
+const SYSTEM_USER_ID = -1; // Define a reserved system user ID
 
 const socket = io(REACT_APP_API_URL, {
   transports: ["websocket"], // Ensure WebSocket is explicitly used
@@ -217,18 +217,27 @@ const Messaging: React.FC = () => {
     }
   }, [selectedChat]);  
 
-  //Used for retrieving the user names of a chat and the users within
+
 // Used for retrieving the usernames of users in a chat
-  useEffect(() => {
-    if (selectedChat?.users) {
-      selectedChat.users.forEach((userId) => handleGetChatUsername(userId.id));
-    }
-  }, [selectedChat]);
+useEffect(() => {
+  if (selectedChat?.users) {
+    selectedChat.users.forEach((userId) => {
+      if (userId.id !== SYSTEM_USER_ID) { // Check if the userId is not -1 (system message)
+        handleGetChatUsername(userId.id); // Only call handleGetChatUsername for non-system users
+      }
+    });
+  }
+}, [selectedChat]);
+
 
   //Used for retrieving the user names of a chat and the users within
   useEffect(() => {
     if (selectedChat?.messages) {
-      selectedChat.messages.forEach((message) => handleGetMessageUsername(message.userId));
+      selectedChat.messages.forEach((message) => {
+        if (message.userId !== SYSTEM_USER_ID) { // Check if the userId is not -1 (system message)
+          handleGetMessageUsername(message.userId);
+        }
+      });
     }
   }, [selectedChat]);
   
@@ -449,7 +458,7 @@ const Messaging: React.FC = () => {
           id: Date.now(), // Use a unique ID generator
           content: mss.trim(),
           createdAt: new Date().toISOString(),
-          userId: currentUserId || 0, // Add a fallback for currentUserId
+          userId: SYSTEM_USER_ID,
           chatId: selectedChat.id,
           liked: false,
           system: true,
@@ -461,7 +470,7 @@ const Messaging: React.FC = () => {
           {
             chatId: selectedChat.id,
             content: mss,
-            userId: currentUserId,
+            userId: SYSTEM_USER_ID,
             token,
           },
           (response: { success: boolean; message?: string; error?: string }) => {
@@ -1030,11 +1039,12 @@ const Messaging: React.FC = () => {
                       selectedChat.messages.map((message, index) => (
                         <div key={index} className="MessageContainer">
                           {/* Display usernames */}
-                          {!message.system && index === 0 || selectedChat.messages[index - 1].userId !== message.userId ? (
+                          {!message.system && (index === 0 || selectedChat.messages[index - 1].userId !== message.userId) && (
                             <div className={`username ${message.userId === currentUserId ? 'MyUsername' : ''}`}>
                               {msgUsernames[message.userId] || "Loading..."}
                             </div>
-                          ) : null}
+                          )}
+
                           {/* Display messages */}
                           <div
                             className={`MessageBubble ${message.system ? 'SystemMessage' : (message.userId === currentUserId ? 'MyMessage' : 'OtherMessage')}`}
