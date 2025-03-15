@@ -3,6 +3,7 @@ import Logo from '../components/Logo';
 import CopyrightFooter from '../components/CopyrightFooter';
 import { useNavigate } from 'react-router-dom';
 import React, { useState } from 'react';
+import { set } from 'react-hook-form';
 import CustomAlert from '../components/CustomAlert';
 
 const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
@@ -104,6 +105,7 @@ const Login: React.FC = () => {
                             id="username"
                             type="text"
                             placeholder="JohnDoe123"
+                            data-testid="testusername"
                             value={username}
                             onChange={handleUsernameChange}
                             required
@@ -113,6 +115,7 @@ const Login: React.FC = () => {
                             id="password"
                             type="password"
                             placeholder="Enter your password"
+                            data-testid="testpassword"
                             value={password}
                             onChange={handlePasswordChange}
                             required
@@ -133,7 +136,7 @@ const Login: React.FC = () => {
 
                         <button
                             type="button" // Prevent form submission
-                            onClick={() => navigate('/signup')} >
+                            onClick={() => navigate('/signup')} data-testid="testbutton" >
                             Sign Up
                         </button> 
                     </form>
