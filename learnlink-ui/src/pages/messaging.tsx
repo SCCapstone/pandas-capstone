@@ -95,7 +95,7 @@ const Messaging: React.FC = () => {
     const fetchData = async () => {
       setLoadingChatList(true);
 
-      handleChatsSwitch();
+      //handleChatsSwitch();
       const token = localStorage.getItem('token');
       console.log(token);
       const getCurrentUser = async () => {
@@ -174,7 +174,7 @@ const Messaging: React.FC = () => {
     }
     fetchData();
 
-  }, [isPanelVisible]);  // Trigger when panel visibility changes
+  }, [isPanelVisible, activeTab]);  // Trigger when panel visibility changes
 
 
   useEffect(() => {
@@ -222,25 +222,27 @@ const Messaging: React.FC = () => {
 // Used for retrieving the usernames of users in a chat
 useEffect(() => {
   if (selectedChat?.users) {
-    selectedChat.users.forEach((userId) => {
-      if (userId.id !== SYSTEM_USER_ID) { // Check if the userId is not -1 (system message)
-        handleGetChatUsername(userId.id); // Only call handleGetChatUsername for non-system users
+    selectedChat.users.forEach((user) => {
+      if (user.id !== undefined) { 
+        handleGetChatUsername(user.id); // Only call handleGetChatUsername for non-system users
       }
+        
+      
     });
   }
-}, [selectedChat]);
+}, [selectedChat, activeTab]);
 
 
   //Used for retrieving the user names of a chat and the users within
   useEffect(() => {
     if (selectedChat?.messages) {
       selectedChat.messages.forEach((message) => {
-        if (message.userId !== undefined) { // Check if the userId is not -1 (system message)
+        if (message.system !== true && message.userId !== undefined) { // Check if the userId is not -1 (system message)
           handleGetMessageUsername(message.userId);
         }
       });
     }
-  }, [selectedChat]);
+  }, [selectedChat, activeTab]);
   
   // Web socket functionality for sending and receiving messages
   useEffect(() => {
@@ -781,7 +783,7 @@ useEffect(() => {
  // Used for retrieving names for putting names above sent messages
 const handleGetMessageUsername = async (userId: number) => {
   // Check if the userId is the SYSTEM_USER_ID and skip if true
-  if (userId === SYSTEM_USER_ID) return;
+  if (userId === undefined) return;
 
   try {
     const response = await axios.get(`${REACT_APP_API_URL}/api/users/${userId}`);
@@ -790,14 +792,14 @@ const handleGetMessageUsername = async (userId: number) => {
     //console.log(username);
   } catch (error) {
     console.error("Error fetching username:", error);
-    setMsgUsernames((prev) => ({ ...prev, [userId]: "Unknown" }));
   }
 };
 
 // Used for retrieving names for putting names above sent messages
 const handleGetChatUsername = async (userId: number) => {
   // Check if the userId is the SYSTEM_USER_ID and skip if true
-  if (userId === SYSTEM_USER_ID) return;
+  if (userId === undefined) return;
+  console.log("fetching username for user" , userId);
 
   try {
     const response = await axios.get(`${REACT_APP_API_URL}/api/users/${userId}`);
@@ -806,7 +808,6 @@ const handleGetChatUsername = async (userId: number) => {
     //console.log(username);
   } catch (error) {
     console.error("Error fetching username:", error);
-    setChatUsernames((prev) => ({ ...prev, [userId]: "Unknown" }));
   }
 };
 
