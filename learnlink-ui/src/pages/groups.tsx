@@ -213,55 +213,26 @@ import { unescape } from 'querystring';
             {/* Group Stuff */}
                 {selectedGroup && (
                 <>
-                <div className="ButtonContainer">
-                    {hasStudyGroup && (
-                    <button
-                        className="UserListButton"
-                        onClick={() => {
-                        setIsUserPanelVisible(true);
-                        }}
-                    >
-                        Members
-                    </button>
-                    )}
-                    {hasStudyGroup ? (
-                    <button
-                        className="EditStudyGroupButton"
-                        onClick={() => setIsPanelVisible(true)}
-                    >
-                        Edit Study Group
-                    </button>
-                    ) : (
-                    <button
-                        className="CreateStudyGroupButton"
-                        onClick={() => setIsPanelVisible(true)}
-                    >
-                        Create Study Group
-                    </button>
-                    )}
-                </div>
-                {isUserPanelVisible && selectedGroupUsers && (
+                
+                {selectedGroupUsers && (
                     <div className="users-panel">
                       <GroupUserList
                         groupId={currentGroupId}
                         currentId={currentUserId}
                         users={selectedGroupUsers ?? []}
                         chatId={selectedGroup.chatID}
-                        onClose={() => setIsUserPanelVisible(false)}
                         onRemoveUser={removeUser}
                         updateUsers={updateUsers}
                       />
                     </div>
                 )}
-                {isPanelVisible && (
                     <div className="study-group-panel">
                     <EditStudyGroup
-                        chatID={selectedGroup.id}
-                        onClose={() => setIsPanelVisible(false)}
+                        chatID={selectedGroup.chatID}
                         updateChatName={updateChatName}
                     />
                     </div>
-                )}
+               
                 </>
             )}
             </div>

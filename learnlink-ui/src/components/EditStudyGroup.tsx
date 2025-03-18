@@ -22,7 +22,7 @@ interface StudyGroup {
   ideal_match_factor: string;
 }
 
-const EditStudyGroup = ({ chatID, onClose, updateChatName}: { chatID: number; onClose: () => void ; updateChatName: (chatId: number, newName: string) => void}) => {
+const EditStudyGroup = ({ chatID, updateChatName}: { chatID: number; updateChatName: (chatId: number, newName: string) => void}) => {
   const [studyGroup, setStudyGroup] = useState<StudyGroup | null>(null);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
@@ -139,7 +139,6 @@ const EditStudyGroup = ({ chatID, onClose, updateChatName}: { chatID: number; on
       ]);
       
       // alert('Study group updated successfully!');
-      onClose(); // Close the panel or component after saving
     } catch (error) {
       console.error('Error saving study group:', error);
       // alert('Failed to save study group.');
@@ -320,7 +319,6 @@ const EditStudyGroup = ({ chatID, onClose, updateChatName}: { chatID: number; on
           />
           </div>
         <button type="button" onClick={handleSave}>Save</button>
-        <button type="button" onClick={onClose}>Cancel</button>
       </form>
     </div>
   );

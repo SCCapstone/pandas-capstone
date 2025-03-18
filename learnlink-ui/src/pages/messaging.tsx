@@ -1104,7 +1104,6 @@ const handleGetChatUsername = async (userId: number) => {
                         currentId={currentUserId}
                         users={selectedChatUsers ?? []}
                         chatId={selectedChat.id}
-                        onClose={() => setIsUserPanelVisible(false)}
                         onRemoveUser={removeUser}
                         updateUsers={updateUsers}
                       />
@@ -1116,7 +1115,6 @@ const handleGetChatUsername = async (userId: number) => {
                     <div className="study-group-panel">
                       <EditStudyGroup
                         chatID={selectedChat.id}
-                        onClose={() => setIsPanelVisible(false)}
                         updateChatName={updateChatName}
                       />
                     </div>

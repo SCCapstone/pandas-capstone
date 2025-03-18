@@ -23,7 +23,6 @@ const GroupUserList = (
   currentId,
   users,
   chatId,
-  onClose,
   onRemoveUser,
   updateUsers,
 }: {
@@ -31,7 +30,6 @@ const GroupUserList = (
   currentId: number | null;
   users: User[] | null;
   chatId: number | null;
-  onClose: () => void;
   onRemoveUser: (userId: number, groupId: number | null) => void; // Update type here
   updateUsers: (userId: number) => void;
 }) => {
@@ -39,18 +37,7 @@ const GroupUserList = (
   const panelRef = useRef<HTMLDivElement>(null);
 
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (panelRef.current && !panelRef.current.contains(event.target as Node)) {
-        onClose();
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [onClose]);
+  
 
 
   const handleRemoveUser = (userId: number) => {
@@ -62,9 +49,6 @@ const GroupUserList = (
     updateUsers(userId);
   };
 
-  const closeComponent = () => {
-    onClose(); // Calls the parent's function to unmount
-  };
 
   return (
     <div ref={panelRef} className="user-list-panel">
@@ -88,7 +72,6 @@ const GroupUserList = (
           onClick={() => {
             if (currentId !== null) {
               handleRemoveUser(currentId);
-              closeComponent();
             } else {
               console.error('Current user ID is not available');
             }
@@ -98,7 +81,6 @@ const GroupUserList = (
           Leave Study Group
         </button>
       </ul>
-      <button onClick={onClose} className="close-button">Close</button>
     </div>
   );
 };
