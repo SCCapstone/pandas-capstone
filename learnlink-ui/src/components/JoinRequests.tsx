@@ -158,6 +158,7 @@ const handleApproval = async (
       payload.studyGroupId = studyGroupId;
       payload.requestUserId = requestUserId;
     } else if (targetUserId) {
+      console.log("approved user", targetUserId)
       // If the request is for a one-on-one chat, create a new chat
       endpoint = "/api/chats";
       payload.userId1 = requestUserId;

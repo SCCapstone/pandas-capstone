@@ -34,8 +34,15 @@ interface SwipeRequest {
     targetGroup: Group;         // Group details (if applicable)
     direction: 'Yes' | 'No';
     targetUser?: User;          // User details of the target user (if applicable)
-    status: string;
+    status: SwipeStatus;
   }
+
+  // Enum for swipe status
+enum SwipeStatus {
+  Accepted = 'Accepted',
+  Denied = 'Denied',
+  Pending = 'Pending'
+}
 
   // Interface for a group object
 interface Group {
@@ -103,13 +110,7 @@ const Network = () => {
     );
 };
 
-const handleDeleteRequest = async (requestId: number) => {
-    try {
-      await axios.delete(`${REACT_APP_API_URL}/api/swipe/${requestId}`);
-    } catch (err) {
-      console.error('Error rejecting request:', err);
-    }
-  };
+
 
 // Matches Tab Content
 const MatchesList = ({ handleSelectUser }: { handleSelectUser: (userId: number) => void }) => { 
@@ -153,6 +154,17 @@ const SentRequestsList = ({ handleSelectUser }: { handleSelectUser: (userId: num
           handleRetrievingRequests();
         }
       }, [currentUserId]); // Dependency ensures effect runs when currentUserId updates
+
+      const handleDeleteRequest = async (requestId: number) => {
+        try {
+          await axios.delete(`${REACT_APP_API_URL}/api/swipe/${requestId}`);
+          setSentRequestsList(prevRequests => 
+            prevRequests.filter(request => request.id !== requestId)
+        );
+        } catch (err) {
+          console.error('Error rejecting request:', err);
+        }
+      };
     
       // Function to fetch swipe requests related to the current user or their study group
       const handleRetrievingRequests = async () => {
@@ -236,7 +248,7 @@ const SentRequestsList = ({ handleSelectUser }: { handleSelectUser: (userId: num
                                         </div>
                                         <div className='network-list-status'>
                                             {request.status === 'Pending' ? (
-                                                <button className='network-withdraw-button' onClick={() => handleDeleteRequest(request.id)}>Withdraw</button>
+                                                <button className='network-withdraw-button' onClick={(event: React.MouseEvent<HTMLButtonElement>) => {event.stopPropagation();handleDeleteRequest(request.id);}}>Withdraw</button>
                                             ) : null}
                                             <button className={`status-${request.status.toLowerCase()}`}>{request.status}</button>
                                         </div>
@@ -294,54 +306,52 @@ const ReceivedRequestsList = ({ handleSelectUser }: { handleSelectUser: (userId:
     
       // Function to fetch swipe requests related to the current user or their study group
       const handleRetrievingRequests = async () => {
-
-        setLoadingRequests(true); 
+        setLoadingRequests(true);
         try {
-          const requestResponse = await axios.get(`${REACT_APP_API_URL}/api/swipe/${currentUserId}`);
-      
-          // Filter swipes to only include those with direction === "Yes"
-          let requestData = requestResponse.data.filter((req: SwipeRequest) => req.direction === 'Yes');
+            const requestResponse = await axios.get(`${REACT_APP_API_URL}/api/swipe/${currentUserId}`);
     
-          // Eliminate duplicates by using a Set to track unique request keys
-          const uniqueRequestsMap = new Map();
-          requestData.forEach((req: SwipeRequest) => {
-            const uniqueKey = `${req.userId}-${req.targetGroupId || req.targetUserId}`;
-            if (!uniqueRequestsMap.has(uniqueKey)) {
-              uniqueRequestsMap.set(uniqueKey, req);
-            }
-          });
-          const uniqueRequests = Array.from(uniqueRequestsMap.values());
+            // Filter to only "Yes" swipes
+            let requestData = requestResponse.data.filter((req: SwipeRequest) => req.direction === 'Yes'&& req.status === SwipeStatus.Pending);
     
+            // Eliminate duplicates before proceeding to fetch details
+            const uniqueRequestsMap = new Map();
+            requestData.forEach((req: SwipeRequest) => {
+                const uniqueKey = `${req.userId}-${req.targetGroupId || req.targetUserId}`;
+                if (!uniqueRequestsMap.has(uniqueKey)) {
+                    uniqueRequestsMap.set(uniqueKey, req);
+                }
+            });
     
-          // Fetch user details for each request
-          const userRequests = await Promise.all(
-            requestData.map(async (req: SwipeRequest) => {
-              const userResponse = await axios.get(`${REACT_APP_API_URL}/api/users/${req.userId}`);
-              return { ...req, user: userResponse.data }; // Attach user data to request
-            })
-          );
-      
-          // Fetch study group details for requests that have a targetGroupId
-          const updatedRequests = await Promise.all(
-            userRequests.map(async (req: SwipeRequest) => {
-              if (req.targetGroupId) {
-                const groupResponse = await axios.get(`${REACT_APP_API_URL}/api/study-groups/${req.targetGroupId}`);
-                return { ...req, targetGroup: groupResponse.data }; // Attach group data to request
-              }
-              return req; // Return request unchanged if no target group
-            })
-          );
-      
-          setRecievedRequestsList(updatedRequests);
-          console.log(receivedRequestsList);
+            const uniqueRequests = Array.from(uniqueRequestsMap.values());
+    
+            // Fetch user details for each unique request
+            const userRequests = await Promise.all(
+                uniqueRequests.map(async (req: SwipeRequest) => {
+                    const userResponse = await axios.get(`${REACT_APP_API_URL}/api/users/${req.userId}`);
+                    return { ...req, user: userResponse.data };
+                })
+            );
+    
+            // Fetch study group details if needed
+            const updatedRequests = await Promise.all(
+                userRequests.map(async (req: SwipeRequest) => {
+                    if (req.targetGroupId) {
+                        const groupResponse = await axios.get(`${REACT_APP_API_URL}/api/study-groups/${req.targetGroupId}`);
+                        return { ...req, targetGroup: groupResponse.data };
+                    }
+                    return req;
+                })
+            );
+    
+            setRecievedRequestsList(updatedRequests);
+            console.log("Updated Requests List:", updatedRequests);
         } catch (err) {
-          console.error('Error fetching requests:', err);
-          setError('Failed to load requests.');
+            console.error('Error fetching requests:', err);
+            setError('Failed to load requests.');
+        } finally {
+            setLoadingRequests(false);
         }
-        finally {
-          setLoadingRequests(false); // Stop loading
-        }
-      };
+    };
     return (
         <div className="TabPanel">
                   {/* Display error message if any */}

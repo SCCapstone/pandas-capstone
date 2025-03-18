@@ -161,7 +161,7 @@
   transition: opacity 0.5s ease, visibility 0.5s ease;
   opacity: 0;
   visibility: hidden;
-  z-index: 1100;
+  z-index: 100000;
 }
 
 .fullscreen-menu.show {
@@ -213,9 +213,11 @@
   }
   .nav-links.show {
     display: flex;
+
   }
   .hamburger {
     display: block;
+
   }
 }
 

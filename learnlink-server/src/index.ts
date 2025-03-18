@@ -1657,6 +1657,8 @@ app.get('/api/chats/check', async (req, res): Promise<any> => {
       },
     });
 
+    console.log(existingChat)
+
     if (existingChat) {
       return res.json({ exists: true, chatId: existingChat.id });
     }
