@@ -2,7 +2,7 @@
     display: flex;
     flex-direction: column;
     background-color: #fff;
-    overflow-y: scroll;
+    overflow-y: hidden;
     height: 100vh;
   }
   
@@ -14,20 +14,18 @@
   
   .Group {
     display: flex;
-    flex:1;
+    flex: 1;
     overflow-y: hidden;
   }
-
-
 
   .GroupHeader {
     display: flex;
     justify-content: space-between;
-    padding-right: 20px;
+    padding: 15px;
     border-bottom: 1px solid #ddd;
     background-color: #f9f9f9;
+    font-weight: bold;
   }
-
 
   .GroupInfo {
     display: flex;
@@ -36,16 +34,81 @@
     width: 100%;
     margin: 0 auto;
     padding: 10px;
-    overflow-y: scroll;
+    overflow-y: auto;
     box-sizing: border-box;
     border-radius: 8px;
+    background-color: #fff;
   }
 
   .GroupsSidebar {
-    overflow-y: scroll;
+    display: flex;
+    flex-direction: column;
     width: 30%;
     max-width: 30%;
     border-right: 1px solid #ccc;
     background-color: #f9f9f9;
     height: 100%;
+    overflow-y: auto;
+    padding: 10px;
+  }
+
+  .GroupList {
+    flex-grow: 1;
+    overflow-y: auto;
+    max-height: 100%;
+    padding: 0;
+    list-style-type: none;
+  }
+
+  .GroupListItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    margin: 5px 0;
+    background-color: #e6e6e6;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+
+  .GroupListItem:hover {
+    background-color: #d4d4d4;
+  }
+
+  .GroupListItem.active {
+    background-color: #ccc;
+    font-weight: bold;
+  }
+
+  .groups-panel {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    overflow: hidden;
+    padding: 10px;
+  }
+
+  .loading-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    font-size: 16px;
+    color: #555;
+  }
+
+  .loading-spinner {
+    margin-left: 10px;
+    width: 16px;
+    height: 16px;
+    border: 2px solid #ccc;
+    border-top: 2px solid #555;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
   }
