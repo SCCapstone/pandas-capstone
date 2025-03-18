@@ -1005,6 +1005,58 @@ app.post('/api/study-groups', authenticate, async (req, res): Promise<any> => {
   }
 });
 
+app.get('/api/study-groups', authenticate, async (req, res) : Promise<any> => {
+  const userId = res.locals.userId;
+
+  if (!userId) {
+    return res.status(401).json({ message: 'User not authenticated' });
+  }
+
+  try {
+    // Fetch the study groups the user is a member of
+    const userGroups = await prisma.studyGroup.findMany({
+      where: {
+        users: {
+          some: { id: userId }, // Check if user is in the group
+        },
+      },
+      include: {
+        creator: true, // Include creator details
+        users: true,   // Include all users in the group
+        chat: {        // Include chat details
+          select: { id: true },
+        }
+      },
+    });
+
+    if (!userGroups || userGroups.length === 0) {
+      return res.status(404).json({ message: 'No study groups found' });
+    }
+
+    // Transform the response to match Group interface
+    const response = userGroups.map(group => ({
+      id: group.id,
+      name: group.name,
+      subject: group.subject,
+      description: group.description,
+      created_by: group.created_by,
+      created_at: group.created_at,
+      users: group.users,
+      chatID: group.chat?.id || null,
+      ideal_factor: group.ideal_match_factor || null,
+      profile_pic: group.profilePic || null,
+    }));
+
+
+    res.json(response);
+  } catch (error) {
+    console.error('Error retrieving groups for user:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+
+
 app.get('/api/study-groups/:id', async (req, res): Promise<any> => {
   const studyGroupId = parseInt(req.params.id);  // Extract study group ID from the request parameters
 
@@ -1511,6 +1563,8 @@ app.get('/api/users', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
+
 //used for getting request list in messaging page
 app.get('/api/users/:id', async (req, res) : Promise<any> => {
   try {

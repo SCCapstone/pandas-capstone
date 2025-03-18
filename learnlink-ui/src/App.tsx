@@ -22,6 +22,7 @@ import {MatchRoute} from './utils/matchRoute';
 import ResetPasswordFromEmail from './pages/resetPasswordFromEmail';
 import AdvancedSearch from './pages/advancedSearch';
 import Network from './pages/Network';
+import Groups from './pages/groups'
 
 function App() {
   return (
@@ -42,6 +43,7 @@ function App() {
             <Route path="/landingpage" element={<LandingPage />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="/messaging" element = {<Messaging/> }/>
+            <Route path="/groups" element = {<Groups/>}/>
             <Route path="/profile" element = {<Profile/> }/>
             <Route path="/resources" element = {<Resources/> }/>
             <Route path="/resources/studyTips" element = {<StudyTips/> }/>

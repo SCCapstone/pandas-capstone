@@ -44,7 +44,6 @@ interface User {
 
 
 const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
-const SYSTEM_USER_ID = -1; // Define a reserved system user ID
 
 const socket = io(REACT_APP_API_URL, {
   transports: ["websocket"], // Ensure WebSocket is explicitly used
@@ -174,7 +173,92 @@ const Messaging: React.FC = () => {
     }
     fetchData();
 
-  }, [isPanelVisible]);  // Trigger when panel visibility changes
+  }, [isPanelVisible]);  // reloads when selected or tab changes, allows for updates to users
+
+
+
+  useEffect(() => {
+    const fetchData = async () => {
+
+      const token = localStorage.getItem('token');
+      console.log(token);
+      const getCurrentUser = async () => {
+        if (token) {
+          try {
+            const response = await axios.get(`${REACT_APP_API_URL}/api/currentUser`, {
+              headers: { Authorization: `Bearer ${token}` },
+            });
+            setCurrentUserId(response.data.id); // Set the current user ID
+          } catch (error) {
+            console.error('Error fetching current user:', error);
+          }
+        }
+      }
+      await getCurrentUser();
+      const syncStudyGroupChats = async () => {
+        try {
+          // Fetch the user's study groups or chats (assumed from user context or current user API)
+          const response = await axios.get(`${REACT_APP_API_URL}/api/chats`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+
+          // Loop through each chat and sync study group chats first
+          for (const chat of response.data) {
+            if (chat.studyGroupId) {  // Ensure it's a study group chat
+              await axios.post(`${REACT_APP_API_URL}/api/sync-study-group-chat`, {
+                studyGroupId: chat.studyGroupId,
+              });
+            }
+          }
+        } catch (error) {
+          console.error('Error syncing study group chats:', error);
+        }
+      };
+
+      // Call the sync function first
+      await syncStudyGroupChats();
+
+      const syncUserChats = async () => {
+
+        // Proceed with fetching users and chats after sync
+        axios.get(`${REACT_APP_API_URL}/api/users`)
+          .then((userResponse) => setUsers(userResponse.data))
+          .catch((error) => console.error('Error fetching users:', error));
+
+        // Proceed with fetching chats after sync
+        axios.get(`${REACT_APP_API_URL}/api/chats`, {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+          .then((chatResponse) => {
+            const chatsWithMessages = chatResponse.data.map((chat: Chat) => ({
+              ...chat,
+              messages: chat.messages || [], // Ensure messages is always an array
+              users: chat.users || [], // Ensure users is always an array
+            }));
+
+            setChats(chatsWithMessages);
+
+            // Ensure storing liked messages correctly
+            const likedMessagesMap = chatResponse.data.reduce((acc: Record<number, boolean>, chat: Chat) => {
+              chat.messages?.forEach((msg: Message) => {
+                acc[msg.id] = msg.liked ?? false; // Default to false if missing
+              });
+              return acc;
+            }, {});
+
+            setHeartedMessages(likedMessagesMap); // Store liked states
+          })
+          .catch((error) => console.error('Error fetching chats:', error));
+      };
+
+      await syncUserChats();
+
+      setLoadingChatList(false);
+
+    }
+    fetchData();
+
+  }, [activeTab, selectedChat]);  // reloads when selected or tab changes, allows for updates to users
 
 
   useEffect(() => {
@@ -222,25 +306,27 @@ const Messaging: React.FC = () => {
 // Used for retrieving the usernames of users in a chat
 useEffect(() => {
   if (selectedChat?.users) {
-    selectedChat.users.forEach((userId) => {
-      if (userId.id !== SYSTEM_USER_ID) { // Check if the userId is not -1 (system message)
-        handleGetChatUsername(userId.id); // Only call handleGetChatUsername for non-system users
+    selectedChat.users.forEach((user) => {
+      if (user.id !== undefined) { 
+        handleGetChatUsername(user.id); // Only call handleGetChatUsername for non-system users
       }
+        
+      
     });
   }
-}, [selectedChat]);
+}, [selectedChat, activeTab]);
 
 
   //Used for retrieving the user names of a chat and the users within
   useEffect(() => {
     if (selectedChat?.messages) {
       selectedChat.messages.forEach((message) => {
-        if (message.userId !== undefined) { // Check if the userId is not -1 (system message)
+        if (message.system !== true && message.userId !== undefined) { // Check if the userId is not -1 (system message)
           handleGetMessageUsername(message.userId);
         }
       });
     }
-  }, [selectedChat]);
+  }, [selectedChat, activeTab]);
   
   // Web socket functionality for sending and receiving messages
   useEffect(() => {
@@ -781,7 +867,7 @@ useEffect(() => {
  // Used for retrieving names for putting names above sent messages
 const handleGetMessageUsername = async (userId: number) => {
   // Check if the userId is the SYSTEM_USER_ID and skip if true
-  if (userId === SYSTEM_USER_ID) return;
+  if (userId === undefined) return;
 
   try {
     const response = await axios.get(`${REACT_APP_API_URL}/api/users/${userId}`);
@@ -790,14 +876,14 @@ const handleGetMessageUsername = async (userId: number) => {
     //console.log(username);
   } catch (error) {
     console.error("Error fetching username:", error);
-    setMsgUsernames((prev) => ({ ...prev, [userId]: "Unknown" }));
   }
 };
 
 // Used for retrieving names for putting names above sent messages
 const handleGetChatUsername = async (userId: number) => {
   // Check if the userId is the SYSTEM_USER_ID and skip if true
-  if (userId === SYSTEM_USER_ID) return;
+  if (userId === undefined) return;
+  console.log("fetching username for user" , userId);
 
   try {
     const response = await axios.get(`${REACT_APP_API_URL}/api/users/${userId}`);
@@ -806,7 +892,6 @@ const handleGetChatUsername = async (userId: number) => {
     //console.log(username);
   } catch (error) {
     console.error("Error fetching username:", error);
-    setChatUsernames((prev) => ({ ...prev, [userId]: "Unknown" }));
   }
 };
 
@@ -1022,7 +1107,6 @@ const handleGetChatUsername = async (userId: number) => {
                         onClose={() => setIsUserPanelVisible(false)}
                         onRemoveUser={removeUser}
                         updateUsers={updateUsers}
-                        updateChats = {updateChats}
                       />
                     </div>
                   )}
