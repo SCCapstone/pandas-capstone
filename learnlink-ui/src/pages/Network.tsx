@@ -303,7 +303,7 @@ const ReceivedRequestsList = ({ handleSelectUser }: { handleSelectUser: (userId:
           handleRetrievingRequests();
         }
       }, [currentUserId]); // Dependency ensures effect runs when currentUserId updates
-    
+
       // Function to fetch swipe requests related to the current user or their study group
       const handleRetrievingRequests = async () => {
         setLoadingRequests(true);
@@ -361,31 +361,42 @@ const ReceivedRequestsList = ({ handleSelectUser }: { handleSelectUser: (userId:
       <div className="loading-container">
         Loading... <span className="loading-spinner"></span>
       </div>
-    ) : receivedRequestsList.length === 0 ? (
-      <p className="no-requests">No join requests.</p>
+      ) : receivedRequestsList.length === 0 ? (
+        <p className="no-requests">No join requests.</p>
       ) : (
-            <div className="network-list-container">
-            {/* <h3>Your Matches</h3>
+        <div className="network-list-container">
+          {/* <h3>Your Matches</h3>
             <p>List of matched study partners...</p> */}
-            <ul className="network-list">
-                {receivedRequestsList.map((request) => (
-                    <ul key={request.id} onClick={() => handleSelectUser(request.user.id)}>
-                        <img 
-                        src={request.user.profilePic || 'https://learnlink-public.s3.us-east-2.amazonaws.com/AvatarPlaceholder.svg'} 
-                        alt={`${request.user.firstName} ${request.user.lastName}`} 
-                        className='network-profile-pic' 
-                        />
-                        <div className='network-bio'>
-                            <h3>{request.user.username}</h3>
-                            <p>{request.user.firstName} {request.user.lastName}</p>
-                        </div>
-                    </ul>
-                ))}
-            </ul>
-            </div>
-      )}
+          <ul className="network-list">
+          <div className='network-list-info'></div>
+
+            {receivedRequestsList.map((request) => (
+              <ul key={request.id} onClick={() => handleSelectUser(request.user.id)}>
+                <div className='network-list-container'>
+                  <div className='network-list-info'>
+                    <img
+                      src={request.user.profilePic || 'https://learnlink-public.s3.us-east-2.amazonaws.com/AvatarPlaceholder.svg'}
+                      alt={`${request.user.firstName} ${request.user.lastName}`}
+                      className='network-profile-pic'
+                    />
+                    <div className='network-bio'>
+                      <h3>{request.user.username}</h3>
+                      <p>{request.user.firstName} {request.user.lastName}</p>
+                    </div>
+                  </div>
+                  <div className='network-list-status'>
+                    <button className='network-accept-button' onClick={(event: React.MouseEvent<HTMLButtonElement>) => { event.stopPropagation(); }}>Accept</button>
+                    <button className='network-deny-button' onClick={(event: React.MouseEvent<HTMLButtonElement>) => { event.stopPropagation(); }}>Deny</button>
+                  </div>
+                </div>
+              </ul>
+            ))}
+          </ul>
+
         </div>
-    );
+      )}
+    </div>
+  );
 };
 
 
