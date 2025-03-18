@@ -44,13 +44,20 @@ import { unescape } from 'querystring';
 
     const [groups, setGroups] = useState<Group[]>([]);
     const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
+    const [currentGroupId, setCurrentGroupId] =  useState<number | null>(null);
     const [users, setUsers] = useState<User[]>([]); // Store users
     const [currentUserId, setCurrentUserId] = useState<number | null>(null);
     const [loadingGroups, setLoadingGroups] = useState<boolean>(true);
+     const [groupNames, setGroupNames] = useState<{ [key: number]: string }>({});
 
     const [alerts, setAlerts] = useState<{ id: number; alertText: string; alertSeverity: "error" | "warning" | "info" | "success"; visible: boolean }[]>([]);
     const alertVisible = alerts.some(alert => alert.visible);
   
+
+    const [isUserPanelVisible, setIsUserPanelVisible] = useState(false);
+    const [isPanelVisible, setIsPanelVisible] = useState(false);
+    const [selectedGroupUsers, setSelectedGroupUsers] = useState<User[] | null>(null);
+    const hasStudyGroup = Boolean(selectedGroup);
 
 
     useEffect(() => {
@@ -77,6 +84,7 @@ import { unescape } from 'querystring';
                         headers: { Authorization: `Bearer ${token}` },
                       });
                     setGroups(response.data);
+            
                 } catch (error) {
                     console.error('Error fetching study groups:', error);
                 }
@@ -90,6 +98,69 @@ import { unescape } from 'querystring';
         fetchGroups();
       }, []);
 
+
+
+
+    const updateUsers = (userId: number) => {
+    setSelectedGroupUsers(prevUsers => (prevUsers || []).filter(user => user.id !== userId));
+    };
+
+
+
+
+    const updateChatName = (chatId: number, newName: string) => {
+    setGroupNames((prevGroupNames) => ({
+        ...prevGroupNames,
+        [chatId]: newName,
+    }));
+    };
+
+
+
+    
+    //deletes a user from a study group
+    const removeUser = async (userId: number, groupId: number | null) => {
+        if (!groupId) {
+        console.error('Group ID is missing.');
+        return;
+        }
+        try {
+        const response = await axios.delete(`${REACT_APP_API_URL}/api/study-groups/${groupId}/users/${userId}`);
+        
+        if (response.status === 200) {
+            // Log the updated users state to ensure it reflects the change
+            //setSelectedChatUsers(prevUsers => (prevUsers || []).filter(user => user.id !== userId));
+
+            setSelectedGroupUsers((prevUsers) => (prevUsers|| []).filter(user => user.id !== userId));
+            if (selectedGroup?.id === userId) {
+            setSelectedGroup(null);
+            }
+            /*
+            // add left/removed from chat message here
+            const username = chatUsernames[userId] || "Unknown";
+            let mess = "";
+            // console.log(username);
+            if (userId === currentUserId) {
+            mess = `${username} left the group.`;
+            
+            } else {
+            mess = `${username} was removed from the group.`;
+            }
+            setUpdateMessage(mess);
+
+            
+
+            console.log("update message " ,  mess);
+            handleSendSystemMessage(mess);
+            */
+        } else {
+            console.error('Failed to delete the user.');
+        }
+        } catch (error) {
+        console.error('Error deleting user:', error);
+        }
+    };
+  
     return (
         <div className="Groups">
           <div>
@@ -125,8 +196,12 @@ import { unescape } from 'querystring';
                             <li
                             key={group.id}
                             className={`GroupListItem ${selectedGroup?.id === group.id ? 'active' : ''}`}
-                            onClick={() => setSelectedGroup(group)}
-                            >
+                            onClick={() => {
+                                setSelectedGroup(group);
+                                setCurrentGroupId(group.id);
+                                setSelectedGroupUsers(group.users);
+                              }}
+                              >
                             <span>{group.name}</span>
                             </li>
                         ))}
@@ -136,14 +211,59 @@ import { unescape } from 'querystring';
             </div>
             <div className="GroupInfo">
             {/* Group Stuff */}
-              
-                  
-                  
-                  
-            
-       
-
-             
+                {selectedGroup && (
+                <>
+                <div className="ButtonContainer">
+                    {hasStudyGroup && (
+                    <button
+                        className="UserListButton"
+                        onClick={() => {
+                        setIsUserPanelVisible(true);
+                        }}
+                    >
+                        Members
+                    </button>
+                    )}
+                    {hasStudyGroup ? (
+                    <button
+                        className="EditStudyGroupButton"
+                        onClick={() => setIsPanelVisible(true)}
+                    >
+                        Edit Study Group
+                    </button>
+                    ) : (
+                    <button
+                        className="CreateStudyGroupButton"
+                        onClick={() => setIsPanelVisible(true)}
+                    >
+                        Create Study Group
+                    </button>
+                    )}
+                </div>
+                {isUserPanelVisible && selectedGroupUsers && (
+                    <div className="users-panel">
+                      <GroupUserList
+                        groupId={currentGroupId}
+                        currentId={currentUserId}
+                        users={selectedGroupUsers ?? []}
+                        chatId={selectedGroup.chatID}
+                        onClose={() => setIsUserPanelVisible(false)}
+                        onRemoveUser={removeUser}
+                        updateUsers={updateUsers}
+                      />
+                    </div>
+                )}
+                {isPanelVisible && (
+                    <div className="study-group-panel">
+                    <EditStudyGroup
+                        chatID={selectedGroup.id}
+                        onClose={() => setIsPanelVisible(false)}
+                        updateChatName={updateChatName}
+                    />
+                    </div>
+                )}
+                </>
+            )}
             </div>
             </div>
             

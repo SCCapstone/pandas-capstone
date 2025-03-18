@@ -1107,7 +1107,6 @@ const handleGetChatUsername = async (userId: number) => {
                         onClose={() => setIsUserPanelVisible(false)}
                         onRemoveUser={removeUser}
                         updateUsers={updateUsers}
-                        updateChats = {updateChats}
                       />
                     </div>
                   )}
