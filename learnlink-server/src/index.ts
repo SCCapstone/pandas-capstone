@@ -531,17 +531,22 @@ app.post('/api/swipe', async (req, res) => {
         message
       },
     });
+    console.log("is study group???", isStudyGroup)
 
     // If the swipe was 'Yes', check if it's a match
-    if (direction === 'Yes') {
-      if (isStudyGroup) {
-        // Check for a mutual swipe with the study group
-        await createMatchForStudyGroup(userId, targetId);
-      } else {
-        // Check for a mutual swipe with another user
-        await createMatchForUsers(userId, targetId);
-      }
-    }
+    // if (direction === 'Yes') {
+    //   if (isStudyGroup) {
+    //     console.log("targetid:, ", targetId)
+        
+    //     // Check for a mutual swipe with the study group
+    //     await createMatchForStudyGroup(userId, targetId);
+    //   } else {
+    //     // Check for a mutual swipe with another user
+    //     await createMatchForUsers(userId, targetId);
+    //   }
+    // }
+
+    // moving this part to join req logic for now
 
     res.status(200).json({ message: 'Swipe recorded successfully' });
   } catch (error) {
@@ -2474,27 +2479,57 @@ app.delete('/api/notifications/delete/:id', async (req, res): Promise<any> => {
 
 import { SwipeStatus } from '@prisma/client'; // Import enum
 
-app.put('/api/swipe-requests/:id', async (req, res):Promise<any> => {
-    const { id } = req.params;
-    const { status }: { status: SwipeStatus } = req.body; // Expect status to be of enum type
-    console.log('Received request to update swipe status', id);
+app.put('/api/swipe-requests/:id', async (req, res): Promise<any> => {
+  const { id } = req.params;
+  const { status }: { status: SwipeStatus } = req.body; // Expect status to be of enum type
+  console.log('Received request to update swipe status', id);
+  console.log('Received status:', status);
 
-    console.log('Received status:', status);
-    if (!Object.values(SwipeStatus).includes(status)) {
-        return res.status(400).json({ error: "Invalid status value" });
-    }
+  if (!Object.values(SwipeStatus).includes(status)) {
+      return res.status(400).json({ error: "Invalid status value" });
+  }
 
-    try {
-        const updatedRequest = await prisma.swipe.update({
-            where: { id: Number(id) },
-            data: { status },
-        });
+  try {
+      // Find the swipe request
+      const swipe = await prisma.swipe.findUnique({
+          where: { id: Number(id) },
+      });
 
-        res.json(updatedRequest);
-    } catch (error) {
-        console.error("Error updating swipe status:", error);
-        res.status(500).json({ error: "Failed to update request status" });
-    }
+      if (!swipe) {
+          return res.status(404).json({ error: "Swipe request not found" });
+      }
+
+      // Update swipe request status
+      const updatedRequest = await prisma.swipe.update({
+          where: { id: Number(id) },
+          data: { status },
+      });
+
+      // If the request is accepted, create a match
+      if (status === "Accepted" && swipe.targetUserId) {
+          await prisma.match.create({
+              data: {
+                  user1Id: swipe.userId,       // Requesting user
+                  user2Id: swipe.targetUserId, // Target user who accepted
+              },
+          });
+      }
+
+      if(status==="Accepted" && swipe.targetGroupId) {
+        await prisma.match.create({
+          data: {
+            user1Id: swipe.userId,
+            studyGroupId: swipe.targetGroupId,
+            isStudyGroupMatch: true,
+          },
+        })
+      }
+
+      res.json(updatedRequest);
+  } catch (error) {
+      console.error("Error updating swipe status:", error);
+      res.status(500).json({ error: "Failed to update request status" });
+  }
 });
 
 // app.get('/api/pending-requests', authenticate, async (req, res): Promise<any> => {
