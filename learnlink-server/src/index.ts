@@ -534,17 +534,19 @@ app.post('/api/swipe', async (req, res) => {
     console.log("is study group???", isStudyGroup)
 
     // If the swipe was 'Yes', check if it's a match
-    if (direction === 'Yes') {
-      if (isStudyGroup) {
-        console.log("targetid:, ", targetId)
+    // if (direction === 'Yes') {
+    //   if (isStudyGroup) {
+    //     console.log("targetid:, ", targetId)
         
-        // Check for a mutual swipe with the study group
-        await createMatchForStudyGroup(userId, targetId);
-      } else {
-        // Check for a mutual swipe with another user
-        await createMatchForUsers(userId, targetId);
-      }
-    }
+    //     // Check for a mutual swipe with the study group
+    //     await createMatchForStudyGroup(userId, targetId);
+    //   } else {
+    //     // Check for a mutual swipe with another user
+    //     await createMatchForUsers(userId, targetId);
+    //   }
+    // }
+
+    // moving this part to join req logic for now
 
     res.status(200).json({ message: 'Swipe recorded successfully' });
   } catch (error) {
