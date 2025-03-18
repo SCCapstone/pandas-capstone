@@ -1,0 +1,51 @@
+.Groups {
+    display: flex;
+    flex-direction: column;
+    background-color: #fff;
+    overflow-y: scroll;
+    height: 100vh;
+  }
+  
+  .content {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  
+  .Group {
+    display: flex;
+    flex:1;
+    overflow-y: hidden;
+  }
+
+
+
+  .GroupHeader {
+    display: flex;
+    justify-content: space-between;
+    padding-right: 20px;
+    border-bottom: 1px solid #ddd;
+    background-color: #f9f9f9;
+  }
+
+
+  .GroupInfo {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    width: 100%;
+    margin: 0 auto;
+    padding: 10px;
+    overflow-y: scroll;
+    box-sizing: border-box;
+    border-radius: 8px;
+  }
+
+  .GroupsSidebar {
+    overflow-y: scroll;
+    width: 30%;
+    max-width: 30%;
+    border-right: 1px solid #ccc;
+    background-color: #f9f9f9;
+    height: 100%;
+  }

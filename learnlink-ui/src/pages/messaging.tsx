@@ -44,7 +44,6 @@ interface User {
 
 
 const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
-const SYSTEM_USER_ID = -1; // Define a reserved system user ID
 
 const socket = io(REACT_APP_API_URL, {
   transports: ["websocket"], // Ensure WebSocket is explicitly used
@@ -95,7 +94,7 @@ const Messaging: React.FC = () => {
     const fetchData = async () => {
       setLoadingChatList(true);
 
-      //handleChatsSwitch();
+      handleChatsSwitch();
       const token = localStorage.getItem('token');
       console.log(token);
       const getCurrentUser = async () => {
@@ -174,7 +173,92 @@ const Messaging: React.FC = () => {
     }
     fetchData();
 
-  }, [isPanelVisible, activeTab]);  // Trigger when panel visibility changes
+  }, [isPanelVisible]);  // reloads when selected or tab changes, allows for updates to users
+
+
+
+  useEffect(() => {
+    const fetchData = async () => {
+
+      const token = localStorage.getItem('token');
+      console.log(token);
+      const getCurrentUser = async () => {
+        if (token) {
+          try {
+            const response = await axios.get(`${REACT_APP_API_URL}/api/currentUser`, {
+              headers: { Authorization: `Bearer ${token}` },
+            });
+            setCurrentUserId(response.data.id); // Set the current user ID
+          } catch (error) {
+            console.error('Error fetching current user:', error);
+          }
+        }
+      }
+      await getCurrentUser();
+      const syncStudyGroupChats = async () => {
+        try {
+          // Fetch the user's study groups or chats (assumed from user context or current user API)
+          const response = await axios.get(`${REACT_APP_API_URL}/api/chats`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+
+          // Loop through each chat and sync study group chats first
+          for (const chat of response.data) {
+            if (chat.studyGroupId) {  // Ensure it's a study group chat
+              await axios.post(`${REACT_APP_API_URL}/api/sync-study-group-chat`, {
+                studyGroupId: chat.studyGroupId,
+              });
+            }
+          }
+        } catch (error) {
+          console.error('Error syncing study group chats:', error);
+        }
+      };
+
+      // Call the sync function first
+      await syncStudyGroupChats();
+
+      const syncUserChats = async () => {
+
+        // Proceed with fetching users and chats after sync
+        axios.get(`${REACT_APP_API_URL}/api/users`)
+          .then((userResponse) => setUsers(userResponse.data))
+          .catch((error) => console.error('Error fetching users:', error));
+
+        // Proceed with fetching chats after sync
+        axios.get(`${REACT_APP_API_URL}/api/chats`, {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+          .then((chatResponse) => {
+            const chatsWithMessages = chatResponse.data.map((chat: Chat) => ({
+              ...chat,
+              messages: chat.messages || [], // Ensure messages is always an array
+              users: chat.users || [], // Ensure users is always an array
+            }));
+
+            setChats(chatsWithMessages);
+
+            // Ensure storing liked messages correctly
+            const likedMessagesMap = chatResponse.data.reduce((acc: Record<number, boolean>, chat: Chat) => {
+              chat.messages?.forEach((msg: Message) => {
+                acc[msg.id] = msg.liked ?? false; // Default to false if missing
+              });
+              return acc;
+            }, {});
+
+            setHeartedMessages(likedMessagesMap); // Store liked states
+          })
+          .catch((error) => console.error('Error fetching chats:', error));
+      };
+
+      await syncUserChats();
+
+      setLoadingChatList(false);
+
+    }
+    fetchData();
+
+  }, [activeTab, selectedChat]);  // reloads when selected or tab changes, allows for updates to users
 
 
   useEffect(() => {
