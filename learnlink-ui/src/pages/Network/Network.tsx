@@ -1,12 +1,12 @@
 
 import './Network.css';
-import Navbar from '../components/Navbar';
-import CopyrightFooter from '../components/CopyrightFooter';
+import Navbar from '../../components/Navbar';
+import CopyrightFooter from '../../components/CopyrightFooter';
 import { useNavigate } from 'react-router-dom';
-import CustomAlert from '../components/CustomAlert';
+import CustomAlert from '../../components/CustomAlert';
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { getLoggedInUserId } from '../utils/auth';
+import { getLoggedInUserId } from '../../utils/auth';
 
 
 

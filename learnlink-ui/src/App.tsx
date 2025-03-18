@@ -21,7 +21,7 @@ import {PrivateRoutes} from './utils/privateRoutes';
 import {MatchRoute} from './utils/matchRoute';
 import ResetPasswordFromEmail from './pages/resetPasswordFromEmail';
 import AdvancedSearch from './pages/advancedSearch';
-import Network from './pages/Network';
+import Network from './pages/Network/Network';
 import Groups from './pages/groups'
 
 function App() {
