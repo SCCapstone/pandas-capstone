@@ -120,3 +120,5 @@ const ReceivedRequestsList: React.FC<ReceivedRequestsListProps>  = ({ handleSele
     </div>
   );
 };
+
+export default ReceivedRequestsList
