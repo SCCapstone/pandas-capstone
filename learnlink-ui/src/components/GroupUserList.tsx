@@ -52,7 +52,6 @@ const GroupUserList = (
 
   return (
     <div ref={panelRef} className="user-list-panel">
-      <h3>Group Members</h3>
       <ul>
         {users && users.length > 0 ? (
           users.map((user) => (
@@ -86,3 +85,4 @@ const GroupUserList = (
 };
 
 export default GroupUserList;
+

@@ -1,4 +1,4 @@
-import './EditStudyGroup.css';
+import './StudyGroupInfo.css';
 import '../pages/messaging.css';
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
@@ -45,7 +45,7 @@ interface User {
 }
 
 
-const EditStudyGroup =(
+const StudyGroupInfo =(
     {
     chatID, 
     updateChatName,
@@ -270,7 +270,7 @@ const EditStudyGroup =(
   if (!studyGroup) return <div>Loading...</div>; // Show loading message while fetching the study group data
 
   return (
-    <div className="edit-study-group-panel">
+    <div className="main-study-group-panel">
       {alertVisible && (
         <div className='alert-container'>
           {alerts.map(alert => (
@@ -283,10 +283,10 @@ const EditStudyGroup =(
           ))}
         </div>
       )}
-      <h1>Edit Study Group</h1>
-      <form onSubmit={(e) => e.preventDefault()}>
+      <h1>Study Group</h1>
+
         
-          <div className="edit-study-group-profile-picture">
+          <div className="study-group-profile-picture">
             {/* If an image is selected, display it; otherwise, show the button */}
             {imagePreview ? (
               <img
@@ -367,6 +367,7 @@ const EditStudyGroup =(
             styles={selectStyles}
           />
           </div>
+          
           <div>
           <label>Members:</label>
               <div className="members">
@@ -381,10 +382,8 @@ const EditStudyGroup =(
               </div>
         </div> 
 
-        <button className='save-button' onClick={handleSave}>Save</button>
-      </form>
     </div>
   );
 };
 
-export default EditStudyGroup;
+export default StudyGroupInfo;
