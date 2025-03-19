@@ -5,7 +5,7 @@ import { SwipeRequest, SwipeStatus } from './types';
 import { getLoggedInUserId } from '../../utils/auth';
 import openProfilePopup from '../messaging'
 import { updateSwipeStatus } from '../../utils/userServices';
-import { FaCheck } from 'react-icons/fa6';
+import { FaCheck, FaXmark } from 'react-icons/fa6';
 
 interface ReceivedRequestsListProps {
     handleSelectUser: (userId: number) => void;
@@ -283,12 +283,17 @@ const handleApproval = async (
                                             disabled={loadingApproval === request.id}
 
                                         >
-                                            {loadingApproval === request.id ? 'Approving...' : <><FaCheck /> ${request.id}
-                                            targetGroupId: {request.targetGroupId} 
-                                            targetUserId: {request.targetUserId}
-                                            user.id: {request.user.id }Approve</>}
+                                            {loadingApproval === request.id ? 'Approving...' : <><FaCheck /> Accept</>}
                                         </button>
-                                        <button className='network-deny-button' onClick={(event: React.MouseEvent<HTMLButtonElement>) => { event.stopPropagation(); }}>Deny</button>
+                                        <button className='network-deny-button'
+                                            onClick={(event: React.MouseEvent<HTMLButtonElement>) => {
+                                                event.stopPropagation();
+                                                handleDenial(request.id)
+                                            }}
+                                        >
+                                            <FaXmark />
+                                            Reject
+                                        </button>
                                     </div>
                                 </div>
                             </ul>

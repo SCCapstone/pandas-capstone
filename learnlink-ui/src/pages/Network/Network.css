@@ -174,18 +174,38 @@
 
 .network-list .network-accept-button {
   background-color: #4CAF50;
-
+  width: 110px;
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  justify-content: center;
+  align-items: center;
 
 }
 
 .network-list .network-deny-button {
-  background-color: brown;
+  background-color: #c13d38;
+  width: 110px;
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  justify-content: center;
+  align-items: center;
+
 }
 
 .network-list .network-deny-button:hover,
 .network-list .network-accept-button:hover {
-  transform: scale(1.05);
-  transition: transform 0.3s ease;
+  /* transform: scale(1.05); */
+  transition: transform 0.1s ease;
   cursor: pointer;
 
+}
+
+.network-list .network-accept-button:hover {
+  background-color: #45a049;
+}
+
+.network-list .network-deny-button:hover {
+  background-color: #992f2b;
 }
