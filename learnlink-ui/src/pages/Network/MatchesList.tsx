@@ -105,6 +105,7 @@ const currentUserId = getLoggedInUserId();
                       </div>
                       <div className='network-list-status'>
                               <button className='network-withdraw-button' onClick={(event: React.MouseEvent<HTMLButtonElement>) => { event.stopPropagation();  }}>Remove</button>
+                              <button className='network-message-button' onClick={(event: React.MouseEvent<HTMLButtonElement>) => { event.stopPropagation();  }}>Message</button>
                       </div>
 
                   </div>

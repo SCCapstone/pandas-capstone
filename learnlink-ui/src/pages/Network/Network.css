@@ -216,3 +216,15 @@
   padding: 10px;
   margin-top: 10px;
 }
+
+.network-list .network-message-button {
+  background-color: #00668C;
+}
+
+.network-list .network-message-button:hover {
+  transform: scale(1.05);
+  transition: transform 0.1s ease;
+  cursor: pointer;
+  background-color: #004b67;
+
+}
