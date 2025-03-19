@@ -265,6 +265,13 @@ const handleApproval = async (
                                         <div className='network-bio'>
                                             <h3>{request.user.username}</h3>
                                             <p>{request.user.firstName} {request.user.lastName}</p>
+                                            {request.message ? (
+                                            <div className='network-message'>
+                                                {/* <h3>Message:</h3> */}
+                                                <p>{request.message}</p>
+                                            </div>
+                                            ) : null
+                                            }
                                         </div>
                                     </div>
                                     <div className='network-list-status'>
