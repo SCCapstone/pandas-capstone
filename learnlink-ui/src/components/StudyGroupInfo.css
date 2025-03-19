@@ -15,7 +15,7 @@
   
   
   
-  .study-group-panel {
+  .main-study-group-panel {
     background-color: white;
     padding: 40px;
     border-radius: 10px;
@@ -44,7 +44,7 @@
     height: 40px;
   }
   
-  .edit-study-group-panel button {
+  .main-study-group-panel button {
     color: white;
     border: none;
     padding: 10px 20px;
@@ -54,14 +54,14 @@
   }
   
   
-  .edit-study-group-profile-picture {
+  .study-group-profile-picture {
     display: flex;
     justify-content: center;
     align-items: center;
     margin-bottom: 20px;
   }
   
-  .edit-study-group-profile-picture img {
+  .study-group-profile-picture img {
     width: 200px;
     height: 200px;
     border-radius: 50%;

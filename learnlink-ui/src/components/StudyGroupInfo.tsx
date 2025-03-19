@@ -270,7 +270,7 @@ const StudyGroupInfo =(
   if (!studyGroup) return <div>Loading...</div>; // Show loading message while fetching the study group data
 
   return (
-    <div className="study-group-panel">
+    <div className="main-study-group-panel">
       {alertVisible && (
         <div className='alert-container'>
           {alerts.map(alert => (
@@ -284,7 +284,7 @@ const StudyGroupInfo =(
         </div>
       )}
       <h1>Study Group</h1>
-      <form onSubmit={(e) => e.preventDefault()}>
+
         
           <div className="study-group-profile-picture">
             {/* If an image is selected, display it; otherwise, show the button */}
@@ -367,6 +367,7 @@ const StudyGroupInfo =(
             styles={selectStyles}
           />
           </div>
+          
           <div>
           <label>Members:</label>
               <div className="members">
@@ -381,8 +382,6 @@ const StudyGroupInfo =(
               </div>
         </div> 
 
-        <button className='save-button' onClick={handleSave}>Save</button>
-      </form>
     </div>
   );
 };

@@ -7,7 +7,7 @@ import './LandingPage.css';
 import axios from 'axios';
 import { useSearchParams } from 'react-router-dom';
 import EditStudyGroup from '../components/EditStudyGroup';
-import StudyGroupInfo from '../components/EditStudyGroup';
+import StudyGroupInfo from '../components/StudyGroupInfo';
 import ChatsNavi from "../components/ChatsNavi";
 import JoinRequests from '../components/JoinRequests';
 import GroupUserList from '../components/GroupUserList';
