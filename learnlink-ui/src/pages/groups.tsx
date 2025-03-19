@@ -7,6 +7,7 @@ import './LandingPage.css';
 import axios from 'axios';
 import { useSearchParams } from 'react-router-dom';
 import EditStudyGroup from '../components/EditStudyGroup';
+import StudyGroupInfo from '../components/EditStudyGroup';
 import ChatsNavi from "../components/ChatsNavi";
 import JoinRequests from '../components/JoinRequests';
 import GroupUserList from '../components/GroupUserList';
@@ -48,7 +49,7 @@ import { unescape } from 'querystring';
     const [users, setUsers] = useState<User[]>([]); // Store users
     const [currentUserId, setCurrentUserId] = useState<number | null>(null);
     const [loadingGroups, setLoadingGroups] = useState<boolean>(true);
-     const [groupNames, setGroupNames] = useState<{ [key: number]: string }>({});
+    const [groupNames, setGroupNames] = useState<{ [key: number]: string }>({});
 
     const [alerts, setAlerts] = useState<{ id: number; alertText: string; alertSeverity: "error" | "warning" | "info" | "success"; visible: boolean }[]>([]);
     const alertVisible = alerts.some(alert => alert.visible);
@@ -215,23 +216,18 @@ import { unescape } from 'querystring';
                 <>
                 
                 {selectedGroupUsers && (
-                    <div className="users-panel">
-                      <GroupUserList
-                        groupId={currentGroupId}
-                        currentId={currentUserId}
-                        users={selectedGroupUsers ?? []}
-                        chatId={selectedGroup.chatID}
-                        onRemoveUser={removeUser}
-                        updateUsers={updateUsers}
-                      />
-                    </div>
-                )}
                     <div className="study-group-panel">
-                    <EditStudyGroup
+                    <StudyGroupInfo
                         chatID={selectedGroup.chatID}
                         updateChatName={updateChatName}
+                        groupId={currentGroupId}
+                        currentId={currentUserId}
+                        users={selectedGroupUsers.filter(user => user.id !== currentUserId) ?? []}
+                        onRemoveUser={removeUser}
+                        updateUsers={updateUsers}
                     />
                     </div>
+                )}
                
                 </>
             )}
