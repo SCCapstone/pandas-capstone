@@ -721,7 +721,11 @@ app.get('/api/profiles', authenticate, async (req: Request, res: Response) => {
       },
     });
 
-    res.status(200).json(matches);
+    res.status(200).json({
+      userId, // Pass currentUserId in the response
+      matches
+    }
+    );
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Something went wrong' });

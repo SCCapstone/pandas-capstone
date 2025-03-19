@@ -43,3 +43,13 @@ export interface User {
     status: SwipeStatus;
   }
   
+  export interface Match {
+    id: number;
+    user1Id:number;
+    user2Id:number;
+    studyGroupId?:number;
+    user1: User;
+    user2: User;
+    studyGroup?: StudyGroup;
+    isStudyGroupMatch: boolean;
+  }

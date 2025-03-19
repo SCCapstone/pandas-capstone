@@ -104,7 +104,7 @@ const SentRequestsList:React.FC<SentRequestsListProps> = ({ handleSelectUser }: 
             <ul className="network-list">
                         {sentRequestsList.map((request) => (
                             <ul key={request.id} onClick={() => request.targetUserId && handleSelectUser(request.targetUserId!)}>
-                                {request.targetUserId  &&  request.targetUser? (
+                                {request.targetUserId && request.targetUser ? (
                                     // Display target user details
                                     <div className='network-list-container'>
                                         <div className='network-list-info'>
@@ -120,7 +120,7 @@ const SentRequestsList:React.FC<SentRequestsListProps> = ({ handleSelectUser }: 
                                         </div>
                                         <div className='network-list-status'>
                                             {request.status === 'Pending' ? (
-                                                <button className='network-withdraw-button' onClick={(event: React.MouseEvent<HTMLButtonElement>) => {event.stopPropagation();handleDeleteRequest(request.id);}}>Withdraw</button>
+                                                <button className='network-withdraw-button' onClick={(event: React.MouseEvent<HTMLButtonElement>) => { event.stopPropagation(); handleDeleteRequest(request.id); }}>Withdraw</button>
                                             ) : null}
                                             <button className={`status-${request.status.toLowerCase()}`}>{request.status}</button>
                                         </div>
@@ -129,16 +129,16 @@ const SentRequestsList:React.FC<SentRequestsListProps> = ({ handleSelectUser }: 
                                 ) : request.targetGroupId && request.targetGroup ? (
                                     // Display target group details
                                     <div className='network-list-container'>
-                                    <div className='network-list-info'>
-                                        <img
-                                            src={request.targetGroup.studyGroup.profilePic || 'https://learnlink-pfps.s3.us-east-1.amazonaws.com/profile-pictures/generic_studygroup_pfp.svg'}
-                                            alt={`${request.targetGroup.studyGroup.name}`}
-                                            className='network-profile-pic'
-                                        />
-                                        <div className='network-bio'>
-                                            <h3>Group: {request.targetGroup.studyGroup.name}</h3>
-                                            <p>{request.targetGroup.studyGroup.description}</p>
-                                        </div>
+                                        <div className='network-list-info'>
+                                            <img
+                                                src={request.targetGroup.studyGroup.profilePic || 'https://learnlink-pfps.s3.us-east-1.amazonaws.com/profile-pictures/generic_studygroup_pfp.svg'}
+                                                alt={`${request.targetGroup.studyGroup.name}`}
+                                                className='network-profile-pic'
+                                            />
+                                            <div className='network-bio'>
+                                                <h3>Group: {request.targetGroup.studyGroup.name}</h3>
+                                                <p>{request.targetGroup.studyGroup.description}</p>
+                                            </div>
                                         </div>
                                         <div className='network-list-status'>
                                             {request.status === 'Pending' ? (
@@ -146,15 +146,15 @@ const SentRequestsList:React.FC<SentRequestsListProps> = ({ handleSelectUser }: 
                                             ) : null}
                                             <button className={`status-${request.status.toLowerCase()}`}>{request.status}</button>
                                         </div>
-                                        </div>
+                                    </div>
 
-                                    
+
                                 ) : null}
                             </ul>
                         ))}
                     </ul>
-            </div>
-      )}
+                </div>
+            )}
         </div>
     );
 };
