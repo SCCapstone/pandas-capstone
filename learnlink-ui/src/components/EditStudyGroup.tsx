@@ -372,20 +372,7 @@ const EditStudyGroup =(
             styles={selectStyles}
           />
           </div>
-          <div>
-          <label>Members:</label>
-              <div className="members">
-                <GroupUserContainer
-                  groupId={currentGroupId}
-                  currentId={currentId}
-                  users={users}
-                  chatId={chatID}
-                  onRemoveUser={onRemoveUser}
-                  updateUsers={updateUsers}
-                  isPopup={false}
-                />
-              </div>
-        </div> 
+          
 
         <button className='save-group-button' onClick={handleSave}>Save</button>
         <button className='cancel-edit-button' onClick={onClose}>Cancel</button>
