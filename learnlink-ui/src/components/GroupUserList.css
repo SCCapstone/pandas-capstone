@@ -1,12 +1,11 @@
 /* Users Panel - Non-popup */
-.users-panel {
+.Inline-members .users-panel {
   position: relative; /* Change to 'relative' to remove the fixed position */
   width: 350px;
   max-height: 450px;
   overflow-y: auto;
   background: white;
   border-radius: 10px;
-  padding: 40px;
   margin: 20px auto; /* Center the panel horizontally */
   display: flex;
   flex-direction: column;
@@ -29,11 +28,9 @@
   }
 }
 
-.users-panel {
-  animation: fadeInScale 0.3s ease-in-out;
-}
 
-/* Close Button for User Panel */
+
+
 .users-panel button {
   background: none;
   border: none;
@@ -41,30 +38,25 @@
   color: #555;
   cursor: pointer;
   align-self: flex-end;
+  
 }
 
 .users-panel button:hover {
   color: red;
 }
 
-.remove-button {
-  background: none;
-  border: none;
-  color: red;
-  font-weight: bold;
-  cursor: pointer;
+
+
+.user-list-panel{
+  width: 100%;
 }
 
-.remove-button:hover {
-  color: darkred;
-}
-
-/* User list styling */
 .user-list-panel ul {
+  justify-content: space-between;
   list-style-type: none;
   padding: 0;
   margin: 0;
-  padding-bottom: 20px;
+  
 }
 
 .user-list-panel li {
@@ -84,12 +76,12 @@
 }
 
 /* Remove user button */
-.remove-button {
+.user-list-panel .remove-button {
   background-color: #ff4d4d46;
   color: #fff;
   border: none;
   padding: 6px 10px;
-  border-radius: 50%;
+  border-radius: 4px;
   cursor: pointer;
   font-weight: bold;
   transition: background-color 0.3s ease;
@@ -100,23 +92,39 @@
 }
 
 /* Leave button */
-.leave-button {
+.leave-group-button {
   display: block;
   width: 100%;
   background-color: #ce5e39;
   color: white;
   border: none;
-  padding: 10px;
+
   margin-top: 15px;
   border-radius: 12px;
   font-size: 1rem;
   cursor: pointer;
   transition: background-color 0.3s ease;
-  padding-bottom: 20%;
 }
 
-.leave-button:hover {
+.leave-group-button:hover {
   background-color: #e60000;
+}
+
+.close-button{
+  display: block;
+  width: 100%;
+  background-color: #2894ca;
+  color: white;
+  border: none;
+  margin-top: 15px;
+  border-radius: 12px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.close-button:hover {
+  background-color: rgb(7, 95, 145);
 }
 
 

@@ -9,7 +9,8 @@ import makeAnimated from 'react-select/animated';
 import GroupUserList from '../components/GroupUserList';
 import { StylesConfig, ControlProps, CSSObjectWithLabel } from 'react-select';
 import CustomAlert from './CustomAlert';
-
+import GroupUserContainer from './GroupUserContainer';
+import EditStudyGroup from './EditStudyGroup';
 
 
 
@@ -79,6 +80,7 @@ const StudyGroupInfo =(
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
   const [currentGroupId, setCurrentGroupId] =  useState<number | null>(null);
   const [selectedGroupUsers, setSelectedGroupUsers] = useState<User[] | null>(null);
+  const [isEdit, setIsEdit] = useState<Boolean>(false);
 
   const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
 
@@ -127,149 +129,32 @@ const StudyGroupInfo =(
     };
 
     fetchStudyGroup();
-  }, [chatID]);
+  }, [chatID, isEdit]);
 
-  // Handle form submission to save the changes
-  const handleSave = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        // alert('You need to be logged in to save the study group.');
-        setAlerts((prevAlerts) => [
-          ...prevAlerts,
-          { id: Date.now(), alertText: 'You need to be logged in to save the study group.', alertSeverity: "error", visible: true },
-        ]);
-        return;
-      }
-
-      const updatedStudyGroup = { name, description, subject, chatID, ideal_match_factor };
-
-      if (name==='' || name === null) {
-        // alert('Please enter a study group name.');
-        setAlerts((prevAlerts) => [
-          ...prevAlerts,
-          { id: Date.now(), alertText: 'Study group name is required', alertSeverity: "error", visible: true },
-        ]);
-        return;
-      }
-
-      if ( ideal_match_factor === null) {
-        // alert('Please enter an ideal match factor.');
-        setAlerts((prevAlerts) => [
-          ...prevAlerts,
-          { id: Date.now(), alertText: 'Ideal match factor is required', alertSeverity: "error", visible: true },
-        ]);
-        return;
-      }
-
-      const response = await axios.put(
-        `${REACT_APP_API_URL}/api/study-groups/chat/${chatID}`,
-        updatedStudyGroup,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-
-      handleUpload();
-
-
-
-      console.log('Study group updated:', response.data);
-      
-      
-
-      updateChatName(chatID, name);
-
-      setAlerts((prevAlerts) => [
-        ...prevAlerts,
-        { id: Date.now(), alertText: 'Study group updated', alertSeverity: "success", visible: true },
-      ]);
-      
-      // alert('Study group updated successfully!');
-    } catch (error) {
-      console.error('Error saving study group:', error);
-      // alert('Failed to save study group.');
-      setAlerts((prevAlerts) => [
-        ...prevAlerts,
-        { id: Date.now(), alertText: "Failed to save study group", alertSeverity: "error" as "error", visible: true },
-      ]);
-    }
+ 
+  
+  const handleEdit = () => {
+    setIsEdit(true);
   };
-
-  const handleUpload = async () => {
-    console.log('Uploading image...'); // Debug log
-    if (!image) return;
-
-    const formData = new FormData();
-    formData.append('profilePic', image);
-    formData.append('chatID', chatID.toString());
-    const token = localStorage.getItem('token');
-    if (token) {
-      const res = await fetch(`${REACT_APP_API_URL}/api/study-group/upload-pfp`, {
-        method: 'POST',
-        body: formData,
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-      const data = await res.json();
-      if (res.ok) setImageUrl(data.profilePic);
-      if (!res.ok) {
-        console.error("Upload error:", data.error || "Unknown error");
-        // alert(`Error: ${data.error || "Failed to upload image"}`);
-        setAlerts((prevAlerts) => [
-          ...prevAlerts,
-          { id: Date.now(), alertText: ` ${data.error || "Failed to upload image"}`, alertSeverity: "error", visible: true },
-        ]);
-        return;
-      }
-    }
-  };
-
-  // Handle form submission
-    
-    // Function to handle file selection
-    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      const file = e.target.files ? e.target.files[0] : null;
-      if (file) {
-        setImage(file); // Store the selected file
-      }
-    };
-  
-    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-      const formData = new FormData();
-      
-      const file = e.target.files ? e.target.files[0] : null;
-      if (!file) return;  // If no file is selected, exit
-        setImage(file);  // Store the selected file for later use
-  
-      formData.append("profilePic", file);  // Append the file to FormData with the field name 'profilePic'
-      try {
-        // Send the image to the backend
-        const response = await fetch(`${REACT_APP_API_URL}/api/upload-preview`, {
-          method: "POST",
-          body: formData,  // Send the FormData
-        });
-    
-        if (response.ok) {
-          const data = await response.json();
-          if (data.preview) {
-            setImagePreview(data.preview);  // Set the preview image
-          }
-        } else {
-          console.error("Failed to upload image:", response.statusText);
-        }
-      } catch (error) {
-        console.error("Error uploading image:", error);
-      }
-    };
   
 
-    
-
-
+  
 
   if (!studyGroup) return <div>Loading...</div>; // Show loading message while fetching the study group data
 
-  return (
+  return (isEdit ? (
+    <EditStudyGroup
+      chatID={chatID}
+      onClose={() => setIsEdit(false)}
+      updateChatName={updateChatName}
+      groupId={groupId}
+      currentId={currentId}
+      users={users}
+      onRemoveUser={onRemoveUser}
+      updateUsers={updateUsers}
+    />
+  ) : (
+
     <div className="main-study-group-panel">
       {alertVisible && (
         <div className='alert-container'>
@@ -283,107 +168,71 @@ const StudyGroupInfo =(
           ))}
         </div>
       )}
-      <h1>Study Group</h1>
+
+      <div className='Button-Header'> 
+        
+        <button className='Availability-Button'> Availability </button>
+        <button className='Edit-Button' onClick={handleEdit}> Edit </button>
+
+      </div>
+
+      <h1> {name} </h1>
 
         
-          <div className="study-group-profile-picture">
-            {/* If an image is selected, display it; otherwise, show the button */}
-            {imagePreview ? (
-              <img
-                className='upload-button'
-                src={imagePreview}  // Display the preview returned by the backend
-                alt="Selected Profile"
-                onClick={() => document.getElementById("image-upload")?.click()} // Allow re-selecting an image
-              />
-            ) : (
-              <div>
-                
-                <img
-                  className='upload-button'
-                  src={profilePic || 'https://learnlink-public.s3.us-east-2.amazonaws.com/AvatarPlaceholder.svg'}
-                  alt="Profile"
-                  width="100"
-                  height={100}
-                  onClick={() => document.getElementById("image-upload")?.click()}
-
-                />
-              </div>
-            )}
-
-            {/* Hidden file input */}
-            <input
-              id="image-upload"
-              type="file"
-              accept="image/*"
-              onChange={handleImageUpload}
-              style={{ display: "none" }}
+        <div className="study-group-profile-picture">
+            <img
+                className='profile-pic'
+                src={profilePic || 'https://learnlink-public.s3.us-east-2.amazonaws.com/AvatarPlaceholder.svg'}
+                alt="Profile"
+                width="100"
+                height={100}
             />
-            {/* <button onClick={handleUpload}>Upload</button> */}
-
-          </div>
-        <div>
-          <div>
-          <label>Study Group Name:</label>
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
         </div>
-          <label>Bio:</label>
-          <input
-            type="text"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-          />
+        {/* 
+        <div className='group-title'>
+           <span className="bold-first-word"> Study Group Name: </span> 
+             {name}
         </div>
-        <div>
-          <label>Relevant Course:</label>
-          <input
-            type="text"
-            value={subject}
-            onChange={(e) => setSubject(e.target.value)}
-          />
-        </div>
-        <div>
-          <label>Ideal Match Factor:</label>
-          <Select
-            name="ideal_match_factor"
-            options={enumOptions.studyHabitTags.map((tag) => ({
-              value: tag,
-              label: formatEnum(tag), // Formats the tag into a readable label
-            }))}
-            value={ideal_match_factor?.label ? { value: ideal_match_factor.value, label: ideal_match_factor.label } : null}
-            onChange={(newValue) => {
-              // Type assertion for SingleValue
-              const selectedOption = newValue as { value: string; label: string } | null;
-              setIdealMatchFactor(selectedOption);
-            }}
-            closeMenuOnSelect={true} // Close menu on select since it's single-select
-            components={animatedComponents}
-            className="basic-single-select"
-            classNamePrefix="select"
-            isMulti={false}
-            styles={selectStyles}
-          />
-          </div>
+          */}
           
+        <div className="group-description">
+            <span className="bold-first-word">Bio: </span>
+           {description}
+        </div>
+
+
+        <div className='group-subject'>
+            <span className="bold-first-word">Course: </span>
+            {subject}
+        </div>
+
+        <div className='group-ideal'>
+        <span className="bold-first-word">Ideal Match Factor: </span>
+          <span className="ideal-match-factor-display">
+            {ideal_match_factor?.label ? ideal_match_factor.label : "N/A"}
+          </span>
+        </div>
+
+
           <div>
-          <label>Members:</label>
-              <div className="members">
-                <GroupUserList
+          <label className='members-label'>Members:</label>
+              <div className="member-list">
+                <GroupUserContainer
                   groupId={currentGroupId}
                   currentId={currentId}
                   users={users}
                   chatId={chatID}
                   onRemoveUser={onRemoveUser}
                   updateUsers={updateUsers}
+                  isPopup={false}
                 />
               </div>
         </div> 
 
     </div>
+  )
   );
 };
 
 export default StudyGroupInfo;
+

@@ -1,4 +1,4 @@
-import './EditStudyGroup.css';
+import './CreateStudyGroup.css';
 import '../pages/messaging.css';
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
@@ -46,25 +46,15 @@ interface User {
 }
 
 
-const EditStudyGroup =(
+const CreateStudyGroup =(
     {
     chatID, 
     onClose,
     updateChatName,
-    groupId,
-    currentId,
-    users,
-    onRemoveUser,
-    updateUsers,
   }: {
     chatID: number;
     onClose: () => void ;
     updateChatName: (chatId: number, newName: string) => void;
-    groupId: number | null;
-    currentId: number | null;
-    users: User[] | null;
-    onRemoveUser: (userId: number, groupId: number | null) => void; // Update type here
-    updateUsers: (userId: number) => void;
   }) => {
   const [studyGroup, setStudyGroup] = useState<StudyGroup | null>(null);
   const [name, setName] = useState('');
@@ -96,7 +86,7 @@ const EditStudyGroup =(
           // alert('You need to be logged in to edit the study group.');
           setAlerts((prevAlerts) => [
             ...prevAlerts,
-            { id: Date.now(), alertText: 'You need to be logged in to edit the study group.', alertSeverity: "error", visible: true },
+            { id: Date.now(), alertText: 'You need to be logged in to create the study group.', alertSeverity: "error", visible: true },
           ]);
           return;
         }
@@ -275,7 +265,7 @@ const EditStudyGroup =(
 
   return ( 
     
-    <div className="edit-study-group-panel">
+    <div className="create-study-group-panel">
       {alertVisible && (
         <div className='alert-container'>
           {alerts.map(alert => (
@@ -288,10 +278,10 @@ const EditStudyGroup =(
           ))}
         </div>
       )}
-      <h1>Edit Study Group</h1>
+      <h1>Create Study Group</h1>
       <form onSubmit={(e) => e.preventDefault()}>
         
-          <div className="edit-study-group-profile-picture">
+          <div className="create-study-group-profile-picture">
             {/* If an image is selected, display it; otherwise, show the button */}
             {imagePreview ? (
               <img
@@ -374,11 +364,11 @@ const EditStudyGroup =(
           </div>
           
 
-        <button className='save-group-button' onClick={handleSave}>Save</button>
-        <button className='cancel-edit-button' onClick={onClose}>Cancel</button>
+        <button className='save-create-button' onClick={handleSave}>Save</button>
+        <button className='cancel-create-button' onClick={onClose}>Cancel</button>
       </form>
     </div>
   );
 };
 
-export default EditStudyGroup;
+export default CreateStudyGroup;

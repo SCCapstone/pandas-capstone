@@ -1,0 +1,29 @@
+
+/* Styling for inline version (normal, non-popup) */
+.Inline-members {
+  position: relative;
+  width: 100%; /* Take up full available width */
+  padding: 0; /* Remove padding */
+  background: none; /* No background */
+  box-shadow: none; /* Remove any shadow */
+  border-radius: 0; /* No border radius */
+}
+
+/* Styling for popup version */
+.Popup-members {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 70%;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+}
+
+

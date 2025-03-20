@@ -13,7 +13,9 @@ import GroupUserList from '../components/GroupUserList';
 import JoinReqProfile from '../components/JoinReqProfile';
 import CustomAlert from '../components/CustomAlert';
 import { unescape } from 'querystring';
-
+import GroupUserContainer from '../components/GroupUserContainer';
+import { useNavigate } from "react-router-dom";
+import CreateStudyGroup from '../components/CreateStudyGroup';
 
 
 interface Chat {
@@ -85,6 +87,9 @@ const Messaging: React.FC = () => {
   const [visibleMessage, setVisibleMessage] = useState("");
   const [selectedProfile, setSelectedProfile] = useState<{ id: number; name: string } | null>(null);
   const [loadingChatList, setLoadingChatList] = useState(true);
+  const navigate = useNavigate();
+
+
 
   const [alerts, setAlerts] = useState<{ id: number; alertText: string; alertSeverity: "error" | "warning" | "info" | "success"; visible: boolean }[]>([]);
   const alertVisible = alerts.some(alert => alert.visible);
@@ -1073,12 +1078,13 @@ const handleGetChatUsername = async (userId: number) => {
                       </button>
                     )}
 
-                    {/* Edit/Create Study Group Button */}
+                    {/* Edit/Create Study Group Button //TODO navigate not just to groups but to the specific group and open edit. */}
+                    
                     {hasStudyGroup ? (
                       <button
                         className="EditStudyGroupButton"
                         onClick={() => {
-                          setIsPanelVisible(true);
+                          navigate("/groups");
                         }}
                       >
                         Edit Study Group
@@ -1095,7 +1101,32 @@ const handleGetChatUsername = async (userId: number) => {
                       </button>
                     )}
                   </div>
+                  {/* User List Panel */}
+                  {isUserPanelVisible && selectedChatUsers && (
+                    <div className="Popup-members-users-panel">
+                      <GroupUserContainer
+                        groupId={groupId}
+                        currentId={currentUserId}
+                        users={selectedChatUsers ?? []}
+                        chatId={selectedChat.id}
+                        onRemoveUser={removeUser}
+                        updateUsers={updateUsers}
+                        onClose={() => setIsUserPanelVisible(false)}
+                        isPopup={true}
+                      />
+                    </div>
+                  )}
 
+                  {/* Study Group Panel */}
+                  {isPanelVisible && (
+                    <div className="c-study-group-panel">
+                      <CreateStudyGroup
+                        chatID={selectedChat.id}
+                        onClose={() => setIsPanelVisible(false)}
+                        updateChatName={updateChatName}
+                      />
+                    </div>
+                  )}
                   
                                   </div>
              

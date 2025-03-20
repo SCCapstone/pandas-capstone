@@ -68,7 +68,7 @@
 }
 
 
-.save-button {
+.save-group-button {
   display: block;
   width: 100%;
   background-color: #00668C;
@@ -83,10 +83,28 @@
   padding-bottom: 20%;
 }
 
-.save-button:hover {
+.save-group-button:hover {
   background-color: #128e35;
 }
 
+.cancel-edit-button {
+  display: block;
+  width: 100%;
+  background-color: #57adcd;
+  color: white;
+  border: none;
+  padding: 10px;
+  margin-top: 15px;
+  border-radius: 12px;
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  padding-bottom: 20%;
+}
+
+.cancel-edit-button:hover {
+  background-color: #186c79;
+}
 /* Fade-in animation */
 @keyframes fadeInScale {
   from {
