@@ -206,7 +206,7 @@ const StudyGroupInfo =(
 
           <div>
           <label>Members:</label>
-              <div className="members">
+              <div className="member-list">
                 <GroupUserContainer
                   groupId={currentGroupId}
                   currentId={currentId}

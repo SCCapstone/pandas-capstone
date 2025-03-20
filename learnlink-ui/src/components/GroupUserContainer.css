@@ -9,14 +9,13 @@
 
 /* Styling for inline version (normal, non-popup) */
 .members {
-  position: relative;
-  padding: 20px;
-  max-width: 600px;
-  margin: 0 auto; /* Center horizontally */
-  background: #f9f9f9;
-  border-radius: 10px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
+    position: relative;
+    width: 100%; /* Take up full available width */
+    padding: 0; /* Remove padding */
+    background: none; /* No background */
+    box-shadow: none; /* Remove any shadow */
+    border-radius: 0; /* No border radius */
+  }
 
 /* Styling for popup version */
 .Popup-members {
