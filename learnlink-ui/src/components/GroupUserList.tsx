@@ -100,7 +100,8 @@ const GroupUserList = (
           Leave Study Group
         </button>
       </ul>
-      {isPopup && <button onClick={onClose} className="close-button">Close</button>}
+      <ul> {isPopup && <button onClick={onClose} className="close-button">Close</button>} </ul>
+      
     </div>
   );
 };

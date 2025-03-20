@@ -1100,7 +1100,7 @@ const handleGetChatUsername = async (userId: number) => {
                   </div>
                   {/* User List Panel */}
                   {isUserPanelVisible && selectedChatUsers && (
-                    <div className="users-panel">
+                    <div className="Popup-members-users-panel">
                       <GroupUserContainer
                         groupId={groupId}
                         currentId={currentUserId}

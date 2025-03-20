@@ -1,14 +1,6 @@
-/* General styling for user list */
-.members,
-.Popup-members {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-}
 
 /* Styling for inline version (normal, non-popup) */
-.members {
+.Inline-members {
   position: relative;
   width: 100%; /* Take up full available width */
   padding: 0; /* Remove padding */
@@ -19,12 +11,14 @@
 
 /* Styling for popup version */
 .Popup-members {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 70%;
   position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 50%;
-  max-width: 500px;
   background: white;
   padding: 20px;
   border-radius: 10px;
