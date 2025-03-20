@@ -14,7 +14,7 @@ import JoinReqProfile from '../components/JoinReqProfile';
 import CustomAlert from '../components/CustomAlert';
 import { unescape } from 'querystring';
 import GroupUserContainer from '../components/GroupUserContainer';
-
+import { useNavigate } from "react-router-dom";
 
 
 interface Chat {
@@ -86,6 +86,7 @@ const Messaging: React.FC = () => {
   const [visibleMessage, setVisibleMessage] = useState("");
   const [selectedProfile, setSelectedProfile] = useState<{ id: number; name: string } | null>(null);
   const [loadingChatList, setLoadingChatList] = useState(true);
+  const navigate = useNavigate();
 
 
 
@@ -1077,11 +1078,12 @@ const handleGetChatUsername = async (userId: number) => {
                     )}
 
                     {/* Edit/Create Study Group Button */}
+                    //TODO navigate not just to groups but to the specific group and open edit.
                     {hasStudyGroup ? (
                       <button
                         className="EditStudyGroupButton"
                         onClick={() => {
-                          setIsPanelVisible(true);
+                          navigate("/groups");
                         }}
                       >
                         Edit Study Group
