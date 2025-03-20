@@ -1,0 +1,58 @@
+/* General styling for user list */
+.members,
+.Popup-members {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+/* Styling for inline version (normal, non-popup) */
+.members {
+  position: relative;
+  padding: 20px;
+  max-width: 600px;
+  margin: 0 auto; /* Center horizontally */
+  background: #f9f9f9;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Styling for popup version */
+.Popup-members {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 50%;
+  max-width: 500px;
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+}
+
+/* Additional styling for GroupUserList panel inside the container */
+.user-list-panel {
+  width: 100%;
+  padding: 10px;
+  background: white;
+  border-radius: 5px;
+}
+
+/* Styling for close button inside the popup */
+.close-button {
+  display: block;
+  margin: 10px auto;
+  padding: 8px 15px;
+  background: #d9534f;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.close-button:hover {
+  background: #c9302c;
+}

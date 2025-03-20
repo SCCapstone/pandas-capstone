@@ -9,6 +9,7 @@ import makeAnimated from 'react-select/animated';
 import GroupUserList from '../components/GroupUserList';
 import { StylesConfig, ControlProps, CSSObjectWithLabel } from 'react-select';
 import CustomAlert from './CustomAlert';
+import GroupUserContainer from './GroupUserContainer';
 
 
 
@@ -206,13 +207,14 @@ const StudyGroupInfo =(
           <div>
           <label>Members:</label>
               <div className="members">
-                <GroupUserList
+                <GroupUserContainer
                   groupId={currentGroupId}
                   currentId={currentId}
                   users={users}
                   chatId={chatID}
                   onRemoveUser={onRemoveUser}
                   updateUsers={updateUsers}
+                  isPopup={false}
                 />
               </div>
         </div> 

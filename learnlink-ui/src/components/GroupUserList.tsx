@@ -23,21 +23,39 @@ const GroupUserList = (
   currentId,
   users,
   chatId,
+  onClose,
   onRemoveUser,
   updateUsers,
+  isPopup,
 }: {
   groupId: number | null;
   currentId: number | null;
   users: User[] | null;
   chatId: number | null;
+  onClose?: () => void;
   onRemoveUser: (userId: number, groupId: number | null) => void; // Update type here
   updateUsers: (userId: number) => void;
+  isPopup: boolean; 
 }) => {
   
   const panelRef = useRef<HTMLDivElement>(null);
 
 
-  
+  useEffect(() => {
+
+    if (!isPopup) return; 
+
+    const handleClickOutside = (event: MouseEvent) => {
+      if (panelRef.current && !panelRef.current.contains(event.target as Node)) {
+        onClose?.();
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isPopup, onClose]);
 
 
   const handleRemoveUser = (userId: number) => {
@@ -71,6 +89,7 @@ const GroupUserList = (
           onClick={() => {
             if (currentId !== null) {
               handleRemoveUser(currentId);
+              onClose?.();
             } else {
               console.error('Current user ID is not available');
             }
@@ -80,6 +99,7 @@ const GroupUserList = (
           Leave Study Group
         </button>
       </ul>
+      {isPopup && <button onClick={onClose} className="close-button">Close</button>}
     </div>
   );
 };

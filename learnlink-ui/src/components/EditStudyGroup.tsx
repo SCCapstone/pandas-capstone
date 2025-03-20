@@ -9,6 +9,7 @@ import makeAnimated from 'react-select/animated';
 import GroupUserList from '../components/GroupUserList';
 import { StylesConfig, ControlProps, CSSObjectWithLabel } from 'react-select';
 import CustomAlert from './CustomAlert';
+import GroupUserContainer from './GroupUserContainer';
 
 
 
@@ -48,6 +49,7 @@ interface User {
 const EditStudyGroup =(
     {
     chatID, 
+    onClose,
     updateChatName,
     groupId,
     currentId,
@@ -56,6 +58,7 @@ const EditStudyGroup =(
     updateUsers,
   }: {
     chatID: number;
+    onClose: () => void ;
     updateChatName: (chatId: number, newName: string) => void;
     groupId: number | null;
     currentId: number | null;
@@ -184,6 +187,7 @@ const EditStudyGroup =(
       ]);
       
       // alert('Study group updated successfully!');
+      onClose();
     } catch (error) {
       console.error('Error saving study group:', error);
       // alert('Failed to save study group.');
@@ -370,18 +374,20 @@ const EditStudyGroup =(
           <div>
           <label>Members:</label>
               <div className="members">
-                <GroupUserList
+                <GroupUserContainer
                   groupId={currentGroupId}
                   currentId={currentId}
                   users={users}
                   chatId={chatID}
                   onRemoveUser={onRemoveUser}
                   updateUsers={updateUsers}
+                  isPopup={false}
                 />
               </div>
         </div> 
 
         <button className='save-group-button' onClick={handleSave}>Save</button>
+        <button type="button" onClick={onClose}>Cancel</button>
       </form>
     </div>
   );

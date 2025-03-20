@@ -13,6 +13,7 @@ import GroupUserList from '../components/GroupUserList';
 import JoinReqProfile from '../components/JoinReqProfile';
 import CustomAlert from '../components/CustomAlert';
 import { unescape } from 'querystring';
+import GroupUserContainer from '../components/GroupUserContainer';
 
 
 
@@ -85,6 +86,8 @@ const Messaging: React.FC = () => {
   const [visibleMessage, setVisibleMessage] = useState("");
   const [selectedProfile, setSelectedProfile] = useState<{ id: number; name: string } | null>(null);
   const [loadingChatList, setLoadingChatList] = useState(true);
+
+
 
   const [alerts, setAlerts] = useState<{ id: number; alertText: string; alertSeverity: "error" | "warning" | "info" | "success"; visible: boolean }[]>([]);
   const alertVisible = alerts.some(alert => alert.visible);
@@ -1095,7 +1098,37 @@ const handleGetChatUsername = async (userId: number) => {
                       </button>
                     )}
                   </div>
+                  {/* User List Panel */}
+                  {isUserPanelVisible && selectedChatUsers && (
+                    <div className="users-panel">
+                      <GroupUserContainer
+                        groupId={groupId}
+                        currentId={currentUserId}
+                        users={selectedChatUsers ?? []}
+                        chatId={selectedChat.id}
+                        onRemoveUser={removeUser}
+                        updateUsers={updateUsers}
+                        onClose={() => setIsUserPanelVisible(false)}
+                        isPopup={true}
+                      />
+                    </div>
+                  )}
 
+                  {/* Study Group Panel */}
+                  {isPanelVisible && (
+                    <div className="study-group-panel">
+                      <EditStudyGroup
+                        chatID={selectedChat.id}
+                        onClose={() => setIsPanelVisible(false)}
+                        updateChatName={updateChatName}
+                        groupId={groupId}
+                        currentId={currentUserId}
+                        users={selectedChatUsers ?? []}
+                        onRemoveUser={removeUser}
+                        updateUsers={updateUsers}
+                      />
+                    </div>
+                  )}
                   
                                   </div>
              
