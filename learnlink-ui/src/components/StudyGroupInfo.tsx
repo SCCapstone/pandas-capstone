@@ -181,31 +181,16 @@ const StudyGroupInfo =(
             {subject}
         </div>
 
-        <div>
-          <label>Ideal Match Factor:</label>
-          <Select
-            name="ideal_match_factor"
-            options={enumOptions.studyHabitTags.map((tag) => ({
-              value: tag,
-              label: formatEnum(tag), // Formats the tag into a readable label
-            }))}
-            value={ideal_match_factor?.label ? { value: ideal_match_factor.value, label: ideal_match_factor.label } : null}
-            onChange={(newValue) => {
-              // Type assertion for SingleValue
-              const selectedOption = newValue as { value: string; label: string } | null;
-              setIdealMatchFactor(selectedOption);
-            }}
-            closeMenuOnSelect={true} // Close menu on select since it's single-select
-            components={animatedComponents}
-            className="basic-single-select"
-            classNamePrefix="select"
-            isMulti={false}
-            styles={selectStyles}
-          />
-          </div>
+        <div className='group-ideal'>
+        <span className="bold-first-word">Ideal Match Factor: </span>
+          <span className="ideal-match-factor-display">
+            {ideal_match_factor?.label ? ideal_match_factor.label : "N/A"}
+          </span>
+        </div>
+
 
           <div>
-          <label>Members:</label>
+          <label className='members-label'>Members:</label>
               <div className="member-list">
                 <GroupUserContainer
                   groupId={currentGroupId}

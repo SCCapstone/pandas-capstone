@@ -37,6 +37,20 @@
   margin: 2px 0;
 }
 
+.group-ideal{
+  font-size: 1.25rem;
+  color: #000;
+  margin: 2px 0;
+}
+
+.members-label{ 
+  font-size: 1.25rem;
+  color: #000;
+  margin: 10px 0;
+  font-weight: bold;
+  
+}
+
 
 .main-study-group-panel {
   background-color: white;
