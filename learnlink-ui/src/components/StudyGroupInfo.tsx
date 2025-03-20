@@ -170,9 +170,7 @@ const StudyGroupInfo =(
       )}
 
       <div className='Button-Header'> 
-        <button className='Send-Button'> Send Meeting Request </button>
-        <button className='Requests-Button'>Pending Meeting Requests</button>
-        <button className='Calendar-Button'> Calendar </button>
+        
         <button className='Availability-Button'> Availability </button>
         <button className='Edit-Button' onClick={handleEdit}> Edit </button>
 

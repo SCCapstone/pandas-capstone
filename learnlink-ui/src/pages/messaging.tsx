@@ -15,6 +15,7 @@ import CustomAlert from '../components/CustomAlert';
 import { unescape } from 'querystring';
 import GroupUserContainer from '../components/GroupUserContainer';
 import { useNavigate } from "react-router-dom";
+import CreateStudyGroup from '../components/CreateStudyGroup';
 
 
 interface Chat {
@@ -1118,16 +1119,11 @@ const handleGetChatUsername = async (userId: number) => {
 
                   {/* Study Group Panel */}
                   {isPanelVisible && (
-                    <div className="study-group-panel">
-                      <EditStudyGroup
+                    <div className="c-study-group-panel">
+                      <CreateStudyGroup
                         chatID={selectedChat.id}
                         onClose={() => setIsPanelVisible(false)}
                         updateChatName={updateChatName}
-                        groupId={groupId}
-                        currentId={currentUserId}
-                        users={selectedChatUsers ?? []}
-                        onRemoveUser={removeUser}
-                        updateUsers={updateUsers}
                       />
                     </div>
                   )}

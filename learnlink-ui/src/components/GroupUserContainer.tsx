@@ -41,17 +41,6 @@ const GroupUserContainer = ({
     isPopup: boolean; 
     }) => {
 
-        const dialogRef = useRef<HTMLDialogElement>(null);
-
-        const openDialog = () => {
-        dialogRef.current?.showModal();
-        };
-
-        const closeDialog = () => {
-        dialogRef.current?.close();
-        
-        };
-
   return (
     <div>
 
