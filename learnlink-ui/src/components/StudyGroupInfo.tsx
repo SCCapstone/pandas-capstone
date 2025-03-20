@@ -10,7 +10,7 @@ import GroupUserList from '../components/GroupUserList';
 import { StylesConfig, ControlProps, CSSObjectWithLabel } from 'react-select';
 import CustomAlert from './CustomAlert';
 import GroupUserContainer from './GroupUserContainer';
-
+import EditStudyGroup from './EditStudyGroup';
 
 
 
@@ -80,6 +80,7 @@ const StudyGroupInfo =(
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
   const [currentGroupId, setCurrentGroupId] =  useState<number | null>(null);
   const [selectedGroupUsers, setSelectedGroupUsers] = useState<User[] | null>(null);
+  const [isEdit, setIsEdit] = useState<Boolean>(false);
 
   const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
 
@@ -128,16 +129,32 @@ const StudyGroupInfo =(
     };
 
     fetchStudyGroup();
-  }, [chatID]);
+  }, [chatID, isEdit]);
 
+ 
   
-
+  const handleEdit = () => {
+    setIsEdit(true);
+  };
+  
 
   
 
   if (!studyGroup) return <div>Loading...</div>; // Show loading message while fetching the study group data
 
-  return (
+  return (isEdit ? (
+    <EditStudyGroup
+      chatID={chatID}
+      onClose={() => setIsEdit(false)}
+      updateChatName={updateChatName}
+      groupId={groupId}
+      currentId={currentId}
+      users={users}
+      onRemoveUser={onRemoveUser}
+      updateUsers={updateUsers}
+    />
+  ) : (
+
     <div className="main-study-group-panel">
       {alertVisible && (
         <div className='alert-container'>
@@ -157,6 +174,7 @@ const StudyGroupInfo =(
         <button className='Requests-Button'>Pending Meeting Requests</button>
         <button className='Calendar-Button'> Calendar </button>
         <button className='Availability-Button'> Availability </button>
+        <button className='Edit-Button' onClick={handleEdit}> Edit </button>
 
       </div>
 
@@ -214,6 +232,7 @@ const StudyGroupInfo =(
         </div> 
 
     </div>
+  )
   );
 };
 

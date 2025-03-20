@@ -20,7 +20,9 @@
   border-radius: 10px;
 }
 
-.Meeting-Button,
+.Send-Button,
+.Requests-Button,
+.Edit-Button,
 .Calendar-Button,
 .Availability-Button {
   padding: 10px 20px;
@@ -30,6 +32,11 @@
   border-radius: 5px;
   cursor: pointer;
   transition: all 0.3s ease-in-out;
+}
+
+.Edit-Button {
+  background-color: #ff0019; /* Blue */
+  color: white;
 }
 
 .Send-Button {
@@ -50,6 +57,10 @@
 .Availability-Button {
   background-color: #28a745; /* Green */
   color: white;
+}
+
+.Edit-Button:hover {
+  background-color: #b30000;
 }
 
 .Send-Button:hover {

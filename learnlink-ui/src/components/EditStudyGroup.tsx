@@ -273,7 +273,8 @@ const EditStudyGroup =(
 
   if (!studyGroup) return <div>Loading...</div>; // Show loading message while fetching the study group data
 
-  return (
+  return ( 
+    
     <div className="edit-study-group-panel">
       {alertVisible && (
         <div className='alert-container'>
@@ -387,7 +388,7 @@ const EditStudyGroup =(
         </div> 
 
         <button className='save-group-button' onClick={handleSave}>Save</button>
-        <button type="button" onClick={onClose}>Cancel</button>
+        <button className='cancel-edit-button' onClick={onClose}>Cancel</button>
       </form>
     </div>
   );
