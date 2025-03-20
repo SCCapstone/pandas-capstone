@@ -12,6 +12,63 @@
   animation: fadeInScale 0.3s ease-in-out;
 }
 
+.Button-Header {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 10px;
+}
+
+.Meeting-Button,
+.Calendar-Button,
+.Availability-Button {
+  padding: 10px 20px;
+  font-size: 16px;
+  font-weight: bold;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+}
+
+.Send-Button {
+  background-color: #bb00ff; /* Blue */
+  color: white;
+}
+
+.Requests-Button {
+  background-color: #ff006f; /* Blue */
+  color: white;
+}
+
+.Calendar-Button {
+  background-color: #007bff; /* Blue */
+  color: white;
+}
+
+.Availability-Button {
+  background-color: #28a745; /* Green */
+  color: white;
+}
+
+.Send-Button:hover {
+  background-color: #5c00b3;
+}
+
+.Requests-Button:hover {
+  background-color: #b30054;
+}
+
+.Calendar-Button:hover {
+  background-color: #0056b3;
+}
+
+.Availability-Button:hover {
+  background-color: #218838;
+}
+
+
 
 .bold-first-word {
   font-weight: bold;

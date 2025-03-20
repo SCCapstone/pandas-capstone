@@ -151,7 +151,16 @@ const StudyGroupInfo =(
           ))}
         </div>
       )}
-      <h1>Study Group</h1>
+
+      <div className='Button-Header'> 
+        <button className='Send-Button'> Send Meeting Request </button>
+        <button className='Requests-Button'>Pending Meeting Requests</button>
+        <button className='Calendar-Button'> Calendar </button>
+        <button className='Availability-Button'> Availability </button>
+
+      </div>
+
+      <h1> {name} </h1>
 
         
         <div className="study-group-profile-picture">
@@ -163,12 +172,12 @@ const StudyGroupInfo =(
                 height={100}
             />
         </div>
-        
+        {/* 
         <div className='group-title'>
            <span className="bold-first-word"> Study Group Name: </span> 
              {name}
         </div>
-
+          */}
           
         <div className="group-description">
             <span className="bold-first-word">Bio: </span>
