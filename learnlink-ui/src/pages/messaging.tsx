@@ -1077,8 +1077,8 @@ const handleGetChatUsername = async (userId: number) => {
                       </button>
                     )}
 
-                    {/* Edit/Create Study Group Button */}
-                    //TODO navigate not just to groups but to the specific group and open edit.
+                    {/* Edit/Create Study Group Button //TODO navigate not just to groups but to the specific group and open edit. */}
+                    
                     {hasStudyGroup ? (
                       <button
                         className="EditStudyGroupButton"
