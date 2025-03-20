@@ -68,7 +68,7 @@
 }
 
 
-.save-button {
+.save-group-button {
   display: block;
   width: 100%;
   background-color: #00668C;
@@ -83,7 +83,7 @@
   padding-bottom: 20%;
 }
 
-.save-button:hover {
+.save-group-button:hover {
   background-color: #128e35;
 }
 

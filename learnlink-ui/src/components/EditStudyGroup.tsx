@@ -381,7 +381,7 @@ const EditStudyGroup =(
               </div>
         </div> 
 
-        <button className='save-button' onClick={handleSave}>Save</button>
+        <button className='save-group-button' onClick={handleSave}>Save</button>
       </form>
     </div>
   );
