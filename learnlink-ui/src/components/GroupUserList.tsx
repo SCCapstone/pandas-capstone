@@ -1,5 +1,6 @@
 import './GroupUserList.css';
 import '../pages/messaging.css';
+import './GroupUserContainer.css'
 import React, { useEffect, useState , useRef} from 'react';
 import axios from 'axios';
 import { on } from 'events';
@@ -94,7 +95,7 @@ const GroupUserList = (
               console.error('Current user ID is not available');
             }
           }}
-          className="leave-button"
+          className="leave-group-button"
         >
           Leave Study Group
         </button>

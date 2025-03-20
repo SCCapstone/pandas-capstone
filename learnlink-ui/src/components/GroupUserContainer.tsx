@@ -70,7 +70,7 @@ const GroupUserContainer = ({
         />
      </div>
       ) : (
-        <div className="members">
+        <div className="Inline-members">
           <GroupUserList
             groupId={groupId}
             currentId={currentId}

@@ -9,13 +9,13 @@
 
 /* Styling for inline version (normal, non-popup) */
 .members {
-    position: relative;
-    width: 100%; /* Take up full available width */
-    padding: 0; /* Remove padding */
-    background: none; /* No background */
-    box-shadow: none; /* Remove any shadow */
-    border-radius: 0; /* No border radius */
-  }
+  position: relative;
+  width: 100%; /* Take up full available width */
+  padding: 0; /* Remove padding */
+  background: none; /* No background */
+  box-shadow: none; /* Remove any shadow */
+  border-radius: 0; /* No border radius */
+}
 
 /* Styling for popup version */
 .Popup-members {
@@ -32,26 +32,4 @@
   z-index: 1000;
 }
 
-/* Additional styling for GroupUserList panel inside the container */
-.user-list-panel {
-  width: 100%;
-  padding: 10px;
-  background: white;
-  border-radius: 5px;
-}
 
-/* Styling for close button inside the popup */
-.close-button {
-  display: block;
-  margin: 10px auto;
-  padding: 8px 15px;
-  background: #d9534f;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.close-button:hover {
-  background: #c9302c;
-}

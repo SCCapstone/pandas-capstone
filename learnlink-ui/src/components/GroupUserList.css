@@ -1,17 +1,35 @@
 /* Users Panel - Non-popup */
-.users-panel {
+.Inline-members .users-panel {
   position: relative; /* Change to 'relative' to remove the fixed position */
   width: 350px;
   max-height: 450px;
   overflow-y: auto;
   background: white;
   border-radius: 10px;
-  padding: 40px;
   margin: 20px auto; /* Center the panel horizontally */
   display: flex;
   flex-direction: column;
   align-items: center;
   box-sizing: border-box;
+}
+
+.Popup-members .users-panel{
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  flex-direction: column;
+  width: 350px;
+  max-height: 450px;
+  overflow-y: auto;
+  background: white;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
 }
 
 
@@ -29,12 +47,12 @@
   }
 }
 
-.users-panel {
+.Inline-members .users-panel {
   animation: fadeInScale 0.3s ease-in-out;
 }
 
-/* Close Button for User Panel */
-.users-panel button {
+
+.Inline-members .users-panel button {
   background: none;
   border: none;
   font-size: 16px;
@@ -43,11 +61,11 @@
   align-self: flex-end;
 }
 
-.users-panel button:hover {
+.Inline-members .users-panel button:hover {
   color: red;
 }
 
-.remove-button {
+.Inline-members .remove-button {
   background: none;
   border: none;
   color: red;
@@ -55,19 +73,18 @@
   cursor: pointer;
 }
 
-.remove-button:hover {
+.Inline-members .remove-button:hover {
   color: darkred;
 }
 
 /* User list styling */
-.user-list-panel ul {
+.Inline-members .user-list-panel ul {
   list-style-type: none;
   padding: 0;
   margin: 0;
-  padding-bottom: 20px;
 }
 
-.user-list-panel li {
+.Inline-members .user-list-panel li {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -79,12 +96,12 @@
 
 }
 
-.user-list-panel li:hover {
+.Inline-members .user-list-panel li:hover {
   background-color: #e0f7fa;
 }
 
 /* Remove user button */
-.remove-button {
+.Inline-members .remove-button {
   background-color: #ff4d4d46;
   color: #fff;
   border: none;
@@ -95,27 +112,26 @@
   transition: background-color 0.3s ease;
 }
 
-.remove-button:hover {
+.Inline-members .remove-button:hover {
   background-color: #e60000;
 }
 
 /* Leave button */
-.leave-button {
+.Inline-members .leave-group-button {
   display: block;
   width: 100%;
   background-color: #ce5e39;
   color: white;
   border: none;
-  padding: 10px;
+
   margin-top: 15px;
   border-radius: 12px;
   font-size: 1rem;
   cursor: pointer;
   transition: background-color 0.3s ease;
-  padding-bottom: 20%;
 }
 
-.leave-button:hover {
+.Inline-members .leave-group-button:hover {
   background-color: #e60000;
 }
 
