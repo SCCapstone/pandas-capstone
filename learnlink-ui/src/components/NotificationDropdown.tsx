@@ -100,9 +100,8 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ setNotifCou
   return (
     <div>
       <ul className="notif-dropdown">
-        {loading && <p>Loading notifications...</p>}
         {error && <p>{error}</p>}
-        {notifs.length === 0 && !loading && <p id="none">No new notifications</p>}
+        {notifs.length === 0 && !loading && <div id="none">No new notifications</div>}
         {notifs.map((notif) => (
           <li key={notif.id} onClick={() => handleSelectNotif(notif)} className={notif.read ? 'read' : 'unread'}>
             <span className="notif-icon">{getNotificationIcon(notif.type)}</span>

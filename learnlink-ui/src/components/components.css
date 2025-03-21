@@ -489,14 +489,14 @@
   position: absolute;
   top: -5px;
   right: 7px;
-  background-color: red;
-  color: white;
+  background-color: #ffcf43;
+  color:#00668C;
   font-size: 9px;
   font-weight: bold;
-  padding: 3px 3px;  /* Adjusted padding to make it more circular */
+  padding: 3px 3px;
   border-radius: 50%;
-  width: 10px;   /* Set a fixed width */
-  height: 10px;  /* Set a fixed height */
+  width: 10px;
+  height: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
