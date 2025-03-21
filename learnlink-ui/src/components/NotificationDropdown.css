@@ -1,15 +1,9 @@
 /* Dropdown */
 .notif-dropdown {
     position: absolute;
-    /* top: 50%;
-    left: 0;
-    right: 0; */
-    top: 55px; /* Adjust based on your icon's position */
-    right:30px; /* Aligns it to the right */
-    width: 180px; /* Set a proper width */
-
-    /*transform: translateX(-100%); /* Moves it completely to the left */
-    /*right:0;*/
+    top: 55px;
+    right: 30px;
+    width: 220px;
     max-height: 300px;
     border-radius: 8px;
     background-color: #fff;
@@ -28,46 +22,48 @@
     align-items: center;
     padding: 10px;
     cursor: pointer;
-  }
-
-.notif-dropdown p {
-    color: #00668C;
-    font-size: 18px;
-    font-family: Arial, Helvetica, sans-serif;
-    cursor: pointer;
-    padding:2px;
-    font-size: 14px;
-    margin: 0;
-    border: 0px solid #eee;
-    text-align: left;
-    transition: background-color 0.2s ease-in-out;
+    border-bottom: 1px solid #eee;
+    min-height: 50px;
+    gap: 12px;
 }
 
-.notif-dropdown p:last-child {
+.notif-dropdown li:hover{
+    background-color:#D4EAF7;
+}
+
+.notif-dropdown li:last-child {
     border-bottom: none;
 }
 
-.notif-dropdown li:hover {
-    background-color: #D4EAF7;
-}
-
-#none{
-    background-color: white;
+.notif-dropdown p {
+    color: #00668C;
+    font-size: 12px;
+    font-family: Arial, Helvetica, sans-serif;
+    cursor: pointer;
+    margin: 0;
+    text-align: left;
+    flex: 1;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: normal;
+    line-height: 1.4;
+    display: flex;
+    align-items: center;
 }
 
 .notif-icon {
-    margin-right: 10px;
-    width:25px;
-  }
-  
-  .match {
-    color: green;
-  }
-  
-  .message {
-    color: blue;
-  }
-  
-  .study-group {
-    color: purple;
-  }
+    width: 25px;
+    height: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+#none {
+    color: #00668C;
+    font-size: 14px;
+    text-align: center;
+    padding: 5px;
+}

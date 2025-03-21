@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import './NotificationDropdown.css';
-import { FaUserCheck, FaComments, FaUsers } from 'react-icons/fa'; // Import icons
 
 // Define notification types
 enum NotificationType {
@@ -15,7 +14,7 @@ interface Notification {
   message: string;
   read: boolean;
   created_at: string;
-  type: NotificationType; // Already included in your data
+  type: NotificationType;
 }
 
 interface NotificationDropdownProps {
@@ -78,14 +77,24 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ setNotifCou
     }
   };
 
-  // Map NotificationType to icons
+  // Map NotificationType to emoji icons
   const getNotificationIcon = (type: NotificationType) => {
-    const icons = {
-      [NotificationType.Match]: <FaUserCheck className="notif-icon match" />,
-      [NotificationType.Message]: <FaComments className="notif-icon message" />,
-      [NotificationType.StudyGroup]: <FaUsers className="notif-icon study-group" />,
-    };
-    return icons[type] || null;
+    let icon;
+    switch (type) {
+      case NotificationType.Match:
+        icon = "🔗";
+        break;
+      case NotificationType.Message:
+        icon = "✉️";
+        break;
+      case NotificationType.StudyGroup:
+        icon = "📚";
+        break;
+      default:
+        icon = "🔔";
+        break;
+    }
+    return icon;
   };
 
   return (
@@ -96,7 +105,7 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ setNotifCou
         {notifs.length === 0 && !loading && <p id="none">No new notifications</p>}
         {notifs.map((notif) => (
           <li key={notif.id} onClick={() => handleSelectNotif(notif)} className={notif.read ? 'read' : 'unread'}>
-            {getNotificationIcon(notif.type)}
+            <span className="notif-icon">{getNotificationIcon(notif.type)}</span>
             <p>{notif.message}</p>
           </li>
         ))}
