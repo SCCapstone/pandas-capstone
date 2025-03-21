@@ -1,5 +1,5 @@
+import React, { useState, useEffect } from 'react';
 import './NotificationDropdown.css';
-import { useState, useEffect } from 'react';
 
 interface Notification {
   id: number;
@@ -8,7 +8,11 @@ interface Notification {
   created_at: string;
 }
 
-const NotificationDropdown: React.FC = () => {
+interface NotificationDropdownProps {
+  setNotifCount: React.Dispatch<React.SetStateAction<number>>; // Define the setNotifCount prop type
+}
+
+const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ setNotifCount }) => {
   const [notifs, setNotifs] = useState<Notification[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -53,7 +57,6 @@ const NotificationDropdown: React.FC = () => {
   }, []); // Runs once when component mounts
 
   // Handle notification click (delete notification)
-  // TODO - when you click I want it to also take you to the chat
   const handleSelectNotif = async (notif: Notification) => {
     try {
       console.log('Deleting notification with ID:', notif.id);
@@ -81,14 +84,12 @@ const NotificationDropdown: React.FC = () => {
 
       // Update state to reflect the deletion in UI
       setNotifs((prevNotifs) => prevNotifs.filter((n) => n.id !== notif.id));
+      setNotifCount((prevCount) => prevCount - 1); // Update notification count in Navbar
 
     } catch (error) {
       console.error('Error deleting notification:', error);
     }
   };
-
-  
-
 
   return (
     <div>
