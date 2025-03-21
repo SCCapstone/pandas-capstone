@@ -14,7 +14,7 @@
 
 .Button-Header {
   display: flex;
-  justify-content: center;
+  justify-content: right;
   gap: 10px;
   padding: 10px;
   border-radius: 10px;
@@ -35,24 +35,10 @@
 }
 
 .Edit-Button {
-  background-color: #ff0019; /* Blue */
+  background-color: #00b3ff; /* Blue */
   color: white;
 }
 
-.Send-Button {
-  background-color: #bb00ff; /* Blue */
-  color: white;
-}
-
-.Requests-Button {
-  background-color: #ff006f; /* Blue */
-  color: white;
-}
-
-.Calendar-Button {
-  background-color: #007bff; /* Blue */
-  color: white;
-}
 
 .Availability-Button {
   background-color: #28a745; /* Green */
@@ -60,20 +46,9 @@
 }
 
 .Edit-Button:hover {
-  background-color: #b30000;
+  background-color: #0018b3;
 }
 
-.Send-Button:hover {
-  background-color: #5c00b3;
-}
-
-.Requests-Button:hover {
-  background-color: #b30054;
-}
-
-.Calendar-Button:hover {
-  background-color: #0056b3;
-}
 
 .Availability-Button:hover {
   background-color: #218838;
