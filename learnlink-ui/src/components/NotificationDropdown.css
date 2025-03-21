@@ -19,18 +19,27 @@
     border: 1px solid #00668C;
     padding-inline-start: 0;
     transition: background-color 0.3s ease-in-out;
+    list-style: none;
+    padding: 0;
 }
+
+.notif-dropdown li {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    cursor: pointer;
+  }
 
 .notif-dropdown p {
     color: #00668C;
-    font-size: 24px;
+    font-size: 18px;
     font-family: Arial, Helvetica, sans-serif;
-    padding: 12px 16px;
     cursor: pointer;
+    padding:2px;
     font-size: 14px;
     margin: 0;
     border: 0px solid #eee;
-    text-align: center;
+    text-align: left;
     transition: background-color 0.2s ease-in-out;
 }
 
@@ -38,7 +47,7 @@
     border-bottom: none;
 }
 
-.notif-dropdown p:hover {
+.notif-dropdown li:hover {
     background-color: #D4EAF7;
 }
 
@@ -46,3 +55,19 @@
     background-color: white;
 }
 
+.notif-icon {
+    margin-right: 10px;
+    width:25px;
+  }
+  
+  .match {
+    color: green;
+  }
+  
+  .message {
+    color: blue;
+  }
+  
+  .study-group {
+    color: purple;
+  }

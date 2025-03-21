@@ -1,15 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import './NotificationDropdown.css';
+import { FaUserCheck, FaComments, FaUsers } from 'react-icons/fa'; // Import icons
 
+// Define notification types
+enum NotificationType {
+  Match = "Match",
+  Message = "Message",
+  StudyGroup = "StudyGroup"
+}
+
+// Notification interface
 interface Notification {
   id: number;
   message: string;
   read: boolean;
   created_at: string;
+  type: NotificationType; // Already included in your data
 }
 
 interface NotificationDropdownProps {
-  setNotifCount: React.Dispatch<React.SetStateAction<number>>; // Define the setNotifCount prop type
+  setNotifCount: React.Dispatch<React.SetStateAction<number>>;
 }
 
 const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ setNotifCount }) => {
@@ -20,33 +30,23 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ setNotifCou
 
   useEffect(() => {
     const fetchNotifications = async () => {
-      console.log('Fetching notifications...');
       try {
         const token = localStorage.getItem('token');
         if (!token) {
-          console.error('No authentication token found.');
           setError('Unauthorized: No token found');
           setLoading(false);
           return;
         }
 
         const response = await fetch(`${REACT_APP_API_URL}/api/notifications`, {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-          },
+          headers: { 'Authorization': `Bearer ${token}` },
         });
 
-        if (!response.ok) {
-          const errorText = await response.text();
-          console.error('Error response from server:', errorText);
-          throw new Error(`Error: ${response.status}`);
-        }
+        if (!response.ok) throw new Error(`Error: ${response.status}`);
 
         const data = await response.json();
-        console.log('Fetched notifications:', data); // Debugging log
         setNotifs(data);
       } catch (err) {
-        console.error('Error loading notifications:', err);
         setError('Error loading notifications');
       } finally {
         setLoading(false);
@@ -54,18 +54,12 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ setNotifCou
     };
 
     fetchNotifications();
-  }, []); // Runs once when component mounts
+  }, []);
 
-  // Handle notification click (delete notification)
   const handleSelectNotif = async (notif: Notification) => {
     try {
-      console.log('Deleting notification with ID:', notif.id);
-
       const token = localStorage.getItem('token');
-      if (!token) {
-        console.error('No authentication token found.');
-        return;
-      }
+      if (!token) return;
 
       const response = await fetch(`${REACT_APP_API_URL}/api/notifications/delete/${notif.id}`, {
         method: 'DELETE',
@@ -75,20 +69,23 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ setNotifCou
         },
       });
 
-      if (!response.ok) {
-        console.error('Failed to delete notification:', await response.text());
-        return;
-      }
+      if (!response.ok) return;
 
-      console.log('Notification deleted successfully:', notif.id);
-
-      // Update state to reflect the deletion in UI
       setNotifs((prevNotifs) => prevNotifs.filter((n) => n.id !== notif.id));
-      setNotifCount((prevCount) => prevCount - 1); // Update notification count in Navbar
-
+      setNotifCount((prevCount) => prevCount - 1);
     } catch (error) {
       console.error('Error deleting notification:', error);
     }
+  };
+
+  // Map NotificationType to icons
+  const getNotificationIcon = (type: NotificationType) => {
+    const icons = {
+      [NotificationType.Match]: <FaUserCheck className="notif-icon match" />,
+      [NotificationType.Message]: <FaComments className="notif-icon message" />,
+      [NotificationType.StudyGroup]: <FaUsers className="notif-icon study-group" />,
+    };
+    return icons[type] || null;
   };
 
   return (
@@ -99,6 +96,7 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ setNotifCou
         {notifs.length === 0 && !loading && <p id="none">No new notifications</p>}
         {notifs.map((notif) => (
           <li key={notif.id} onClick={() => handleSelectNotif(notif)} className={notif.read ? 'read' : 'unread'}>
+            {getNotificationIcon(notif.type)}
             <p>{notif.message}</p>
           </li>
         ))}
