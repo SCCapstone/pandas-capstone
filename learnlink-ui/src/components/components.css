@@ -161,7 +161,7 @@
   transition: opacity 0.5s ease, visibility 0.5s ease;
   opacity: 0;
   visibility: hidden;
-  z-index: 100000;
+  z-index: 1000;
 }
 
 .fullscreen-menu.show {
