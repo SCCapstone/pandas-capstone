@@ -1629,6 +1629,7 @@ app.get('/api/chats', authenticate, async (req, res): Promise<any> => {
             createdAt: 'asc', // Sort messages by creation time (optional)
           },
         },
+        
       },
     });
 

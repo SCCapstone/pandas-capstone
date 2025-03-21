@@ -58,13 +58,41 @@ import { unescape } from 'querystring';
     const [isUserPanelVisible, setIsUserPanelVisible] = useState(false);
     const [isPanelVisible, setIsPanelVisible] = useState(false);
     const [selectedGroupUsers, setSelectedGroupUsers] = useState<User[] | null>(null);
+    const [isEditMode, setIsEditMode] = useState<boolean>(false);
     const hasStudyGroup = Boolean(selectedGroup);
+    const searchParams = new URLSearchParams(window.location.search);
+    const selectedGroupId = searchParams.get("groupId");
+    const tab = searchParams.get("tab");
 
 
     useEffect(() => {
         const fetchGroups = async () => {
         const token = localStorage.getItem('token');
+
+        console.log("groups selected group id: ",selectedGroupId);
         
+        const getCurrentGroup = async () => {
+          if (!selectedGroupId){
+            return;
+          }
+          if (selectedGroupId) {
+            try {
+              const response = await axios.get(`${REACT_APP_API_URL}/api/study-groups/${selectedGroupId}`);
+              console.log(response.data);
+              setSelectedGroup(response.data.studyGroup); // Set the current user ID
+              setCurrentGroupId(response.data.studyGroup.id);
+              setSelectedGroupUsers(response.data.studyGroup.users);
+              const isEdit = tab === "true";
+              setIsEditMode(isEdit);
+              
+            } catch (error) {
+              console.error('Error fetching selected group:', error);
+            }
+          }
+        }
+
+        await getCurrentGroup();
+      
         const getCurrentUser = async () => {
             if (token) {
               try {
@@ -78,6 +106,7 @@ import { unescape } from 'querystring';
             }
           }
         await getCurrentUser();
+        console.log("currentUserId: ", currentUserId);
         const getGroups = async () => {
             if (token) {
                 try {
@@ -95,16 +124,25 @@ import { unescape } from 'querystring';
             }
         }
         await getGroups();
+        console.log("current groups complete");
         };
         fetchGroups();
+        console.log("fetch groups complete");
       }, []);
 
+    
+
+
+      useEffect(() => {
+        console.log("Updated selected group users:", selectedGroupUsers);
+      }, [selectedGroupUsers]);
 
 
 
     const updateUsers = (userId: number) => {
     setSelectedGroupUsers(prevUsers => (prevUsers || []).filter(user => user.id !== userId));
     };
+
 
 
 
@@ -225,6 +263,7 @@ import { unescape } from 'querystring';
                         users={selectedGroupUsers.filter(user => user.id !== currentUserId) ?? []}
                         onRemoveUser={removeUser}
                         updateUsers={updateUsers}
+                        isItEdit ={isEditMode}
                     />
                     </div>
                 )}
