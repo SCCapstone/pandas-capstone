@@ -81,10 +81,14 @@ const NotificationDropdown: React.FC = () => {
 
       // Update state to reflect the deletion in UI
       setNotifs((prevNotifs) => prevNotifs.filter((n) => n.id !== notif.id));
+
     } catch (error) {
       console.error('Error deleting notification:', error);
     }
   };
+
+  
+
 
   return (
     <div>
