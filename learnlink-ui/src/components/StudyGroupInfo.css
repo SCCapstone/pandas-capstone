@@ -20,10 +20,9 @@
   border-radius: 10px;
 }
 
-.Send-Button,
-.Requests-Button,
+
 .Edit-Button,
-.Calendar-Button,
+.Chat-Button,
 .Availability-Button {
   padding: 10px 20px;
   font-size: 16px;
@@ -39,6 +38,10 @@
   color: white;
 }
 
+.Chat-Button {
+  background-color: #e73990; /* Blue */
+  color: white;
+}
 
 .Availability-Button {
   background-color: #28a745; /* Green */
@@ -47,6 +50,10 @@
 
 .Edit-Button:hover {
   background-color: #0018b3;
+}
+
+.Chat-Button:hover {
+  background-color: #b30071;
 }
 
 

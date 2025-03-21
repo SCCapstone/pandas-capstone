@@ -821,7 +821,7 @@ useEffect(() => {
       const data = await response.json();
       console.log('Study group check result:', data);
       setCurrentGroupId(data.studyGroupID);
-      
+
   
       // Check if studyGroupID is returned (i.e., chat is linked to a study group)
       if (response.ok && data.studyGroupID) {
@@ -1081,7 +1081,7 @@ const handleGetChatUsername = async (userId: number) => {
                       </button>
                     )}
 
-                    {/* Edit/Create Study Group Button //TODO navigate not just to groups but to the specific group and open edit. */}
+                    {/* Edit/Create Study Group Button */}
                     
                     {hasStudyGroup ? (
                       <button

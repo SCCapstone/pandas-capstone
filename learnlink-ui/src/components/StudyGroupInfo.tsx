@@ -172,7 +172,7 @@ const StudyGroupInfo =(
       )}
 
       <div className='Button-Header'> 
-        
+        <button className='Chat-Button'>Chat</button>
         <button className='Availability-Button'> Availability </button>
         <button className='Edit-Button' onClick={handleEdit}> Edit </button>
 
