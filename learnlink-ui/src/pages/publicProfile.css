@@ -15,6 +15,7 @@
     gap: 1rem;
     width: 100%;
     padding: 1rem;
+    overflow-y: scroll;
 }
 
 .whole-public-component {
@@ -134,6 +135,17 @@
     height: 50px;
     margin-bottom: 20px;
 }
+
+.public-action-buttons .match-button-status-pending {
+    background-color: #afafaf;
+    cursor:default;
+}
+.public-action-buttons .match-button-status-accepted {
+    background-color: #4CAF50;
+    cursor:default;
+
+}
+
 
 .public-info {
     display: flex;

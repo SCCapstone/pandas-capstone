@@ -627,13 +627,17 @@ app.get('/api/swipe/sentRequests/:currentUser', async (req, res): Promise<any> =
   }
 });
 
-app.get('/api/swipe/pendingRequestCheck/:targetUser', async (req, res): Promise<any> => {
+
+// Fetches request staus between a user and another user
+app.get('/api/swipe/user/pendingRequestCheck/:targetUser', authenticate, async (req, res): Promise<any> => {
   const { targetUser } = req.params;
   const currentUser = res.locals.userId
-  console.log('Fetching requests for user:', currentUser);
 
   const currentUserId = parseInt(currentUser, 10);
   const targetUserId  = parseInt(targetUser, 10);
+
+  console.log('Fetching requests between user: ', currentUserId, ' and', targetUserId);
+
 
   if (isNaN(currentUserId) || isNaN(targetUserId)) {
     return res.status(400).json({ error: 'Invalid user ID' });
@@ -656,12 +660,40 @@ app.get('/api/swipe/pendingRequestCheck/:targetUser', async (req, res): Promise<
         direction: true,
         message: true,
         status: true,
+        updatedAt: true
       },
     });
 
-    
+    const mostRecentRequest = sentRequests.sort((a, b) => {
+      // Compare updatedAt values (latest date first)
+      return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+    })[0];
 
-    res.status(200).json(sentRequests);
+    console.log(mostRecentRequest); // This will be the most recent sentRequest
+
+    if(!mostRecentRequest) {
+      return res.status(200).json(null);
+    }
+
+    if (mostRecentRequest.status == "Accepted") {
+      // Check if match exists
+      if (mostRecentRequest.targetUserId) {
+        const matchData = await prisma.match.findMany({
+          where: {
+            OR: [
+              { user1Id: mostRecentRequest.userId, user2Id: mostRecentRequest.targetUserId },
+              { user1Id: mostRecentRequest.targetUserId, user2Id: mostRecentRequest.userId },
+            ]
+          }
+        });
+        if (matchData) { return res.status(200).json(mostRecentRequest.status); }
+
+      }
+
+      return res.status(200).json(null);
+    }
+
+    return res.status(200).json(mostRecentRequest.status);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Something went wrong' });
