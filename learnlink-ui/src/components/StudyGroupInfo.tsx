@@ -11,7 +11,7 @@ import { StylesConfig, ControlProps, CSSObjectWithLabel } from 'react-select';
 import CustomAlert from './CustomAlert';
 import GroupUserContainer from './GroupUserContainer';
 import EditStudyGroup from './EditStudyGroup';
-
+import { useNavigate } from "react-router-dom";
 
 
 const animatedComponents = makeAnimated();
@@ -83,6 +83,8 @@ const StudyGroupInfo =(
   const [currentGroupId, setCurrentGroupId] =  useState<number | null>(null);
   const [selectedGroupUsers, setSelectedGroupUsers] = useState<User[] | null>(null);
   const [isEdit, setIsEdit] = useState<Boolean>(isItEdit);
+  const navigate = useNavigate();
+  
 
   const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
 
@@ -172,7 +174,11 @@ const StudyGroupInfo =(
       )}
 
       <div className='Button-Header'> 
-        <button className='Chat-Button'>Chat</button>
+        <button className='Chat-Button'
+            onClick={() => {
+              navigate(`/messaging?selectedChat=${chatID}&groupId=${groupId}`);
+            }}
+        >Chat</button>
         <button className='Availability-Button'> Availability </button>
         <button className='Edit-Button' onClick={handleEdit}> Edit </button>
 
