@@ -99,6 +99,11 @@ const MatchesList: React.FC<MatchesListProps> = ({ handleSelectUser }) => {
 
     };
 
+    const handleMessage  = async (userId: number) => {
+
+
+    };
+
     if (loading) return <div className="loading-container">Loading... <span className="loading-spinner"></span> </div>;
 
     if(matchesList.length === 0) return <p className="no-requests">No connections yet.</p>
@@ -147,7 +152,7 @@ const MatchesList: React.FC<MatchesListProps> = ({ handleSelectUser }) => {
                       </div>
                       <div className='network-list-status'>
                               <button className='network-withdraw-button' onClick={(event: React.MouseEvent<HTMLButtonElement>) => { event.stopPropagation(); setSelectedFriend(friend.id); setDisplayRemoveWarning(true)}}>Remove</button>
-                              <button className='network-message-button' onClick={(event: React.MouseEvent<HTMLButtonElement>) => { event.stopPropagation();  setSelectedFriend(friend.id)}}>Message</button>
+                              <button className='network-message-button' onClick={(event: React.MouseEvent<HTMLButtonElement>) => { event.stopPropagation();  setSelectedFriend(friend.id); handleMessage(friend.id);}}>Message</button>
                       </div>
 
                       {displayRemoveWarning && selectedFriend === friend.id && (
