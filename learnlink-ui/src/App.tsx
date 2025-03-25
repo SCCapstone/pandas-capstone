@@ -46,13 +46,15 @@ function App() {
             <Route path="/messaging" element = {<Messaging/> }/>
             <Route path="/groups" element = {<Groups/>}/>
             <Route path="/profile" element = {<Profile/> }/>
-            <Route path="/resources" element = {<Resources/> }/>
-            <Route path="/resources/studyTips" element = {<StudyTips/> }/>
-            <Route path="/resources/externalResources" element = {<ExternalResources/> }/>
-            <Route path="/resources/gradeCalculator" element = {<GradeCalculator/> }/>
-            <Route path="/resources/weeklySchedule" element = {<Scheduler/> }/>
-            <Route path="/resetpassword" element={<ResetPassword />} />
-            <Route element={<MatchRoute/>}>
+            <Route path="/resources" element={<Resources />} />
+            <Route path="/resources/studyTips" element={<StudyTips />} />
+            <Route path="/resources/externalResources" element={<ExternalResources />} />
+            <Route path="/resources/gradeCalculator" element={<GradeCalculator />} />
+            <Route
+              path="/studyGroup/:studyGroupId/schedule"
+              element={<Scheduler />}
+            />            <Route path="/resetpassword" element={<ResetPassword />} />
+            <Route element={<MatchRoute />}>
               <Route path="/swiping" element={<Swiping />} />
             </Route>
             <Route path="/network" element={<Network />} />

@@ -2782,6 +2782,63 @@ app.put('/api/swipe-requests/:id', async (req, res): Promise<any> => {
 //   const pendingRequests = await prisma..findMany({
 // });
 
+app.get("/api/studyGroup/:studyGroupId/availability", authenticate,  async (req, res) => {
+  const { studyGroupId } = req.params;
+
+  try {
+    const availability = await prisma.availability.findMany({
+      where: {
+        studyGroupId: Number(studyGroupId),
+      },
+      include: {
+        user: true, // Optionally, include user details if needed
+      },
+    });
+
+    res.json(availability);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Failed to fetch availability" });
+  }
+});
+const days = ["Sun", "Mon", "Tues", "Wed", "Thur", "Fri", "Sat"] as const;
+
+type Day = typeof days[number];
+
+// In your Express route
+app.post("/api/studyGroup/:studyGroupId/availability", async (req, res) => {
+  const { studyGroupId } = req.params;
+  const { userId, availability } = req.body;
+
+  try {
+    // Delete any existing availability for the user in this study group
+    await prisma.availability.deleteMany({
+      where: {
+        userId: Number(userId),
+        studyGroupId: Number(studyGroupId),
+      },
+    });
+
+    // Save the new availability
+    await prisma.availability.createMany({
+      data: Object.keys(availability).flatMap((day) =>
+        availability[day as Day].map((timeSlot: string) => ({
+          userId: Number(userId),
+          studyGroupId: Number(studyGroupId),
+          day: day as Day,
+          availability: timeSlot,
+        }))
+      ),
+    });
+
+    res.status(200).json({ message: "Availability saved successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Failed to save availability" });
+  }
+});
+
+
 
 
 

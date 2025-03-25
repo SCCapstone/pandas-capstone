@@ -1,76 +1,103 @@
-.schedule-container {
-  /* display: grid; */
-  grid-template-columns: repeat(7, 1fr);
-  gap: 10px;
-  max-width: 100%;
-  margin: 0 auto;
-  padding: 20px;
+:root {
+    --primary-100: #D4EAF7;
+    --primary-200: #B6CCD8;
+    --primary-300: #71C4EF;
+    --text-100: #3B3C3D;
+    --text-200: #1D1C1C;
+    --bg-100: #FFFEFB;
+    --bg-200: #F5F4F1;
+    --bg-300: #CCCBC8;
+    --accent-100: #FEAD2B;
+    --accent-200: #00668C;
 }
 
-.time-slot-header {
-  display: grid;
-  grid-template-columns: 1fr repeat(7, 1fr);
-  gap: 10px;
-  font-weight: bold;
-  text-align: center;
+body {
+    background-color: var(--bg-100);
+    font-family: "Inter", sans-serif;
+    color: var(--text-100);
 }
 
-.day-header {
-  padding: 10px;
-  background-color: #f0f0f0;
-  border: 1px solid #ddd;
+.schedule-table {
+    width: 100%;
+    border-collapse: collapse;
+    border: hidden;
+    margin: 20px auto;
+    background: var(--bg-200);
+    /* box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); */
+    /* border-radius: 8px; */
+    overflow: hidden;
+    table-layout: fixed;
 }
 
-.empty-cell {
-  padding: 10px;
+.schedule-table thead {
+    background: var(--primary-200);
+    color: var(--text-200);
+    text-transform: uppercase;
+    font-weight: bold;
+
 }
 
-.time-slot-row {
-  display: grid;
-  grid-template-columns: 1fr repeat(7, 1fr);
-  gap: 10px;
-  text-align: center;
+.schedule-table th,
+.schedule-table td {
+    padding: 12px;
+    text-align: center;
+    border: 1px solid #3b3c3d6e;
+}
+.schedule-table th.empty-cell {
+    background: white !important;
+    border: none;
 }
 
-.time-slot {
-  padding: 10px;
-  background-color: #f9f9f9;
-  border: 1px solid #ddd;
+.schedule-table tbody tr:nth-child(odd) {
+    background: var(--bg-100);
+}
+
+.schedule-table tbody tr:nth-child(even) {
+    background: var(--bg-200);
+}
+
+.schedule-table .time-slot {
+    background: var(--primary-100);
+    font-weight: bold;
+    color: var(--text-200);
 }
 
 .cell {
-  padding: 15px;
-  text-align: center;
-  cursor: pointer;
-  background-color: #ffffff;
-  border: 1px solid #ddd;
+    cursor: pointer;
+    transition: background 0.2s ease-in-out;
+}
+
+.cell:hover {
+    background: var(--primary-300);
 }
 
 .cell.selected {
-    background-color: #4CAF50; /* Green background for selected slots */
-    color: white;
-  }
-  
+    background: #00678c93;
+    color: var(--bg-100);
+    font-weight: bold;
+    /* border-radius: 6px; */
+}
 
+.cell.selected:hover {
+    background: var(--accent-100);
+}
+
+/* Responsive Design */
 @media (max-width: 768px) {
-  .schedule-container {
-    grid-template-columns: repeat(6, 1fr);
-  }
+    .schedule-table th,
+    .schedule-table td {
+        padding: 8px;
+        font-size: 14px;
+    }
+}
 
-  .time-slot-header,
-  .time-slot-row {
-    grid-template-columns: 1fr repeat(7, 1fr);
-  }
+@media (max-width: 480px) {
+    .schedule-table {
+        font-size: 12px;
+    }
 
-  .time-slot, .cell {
-    font-size: 12px;
-  }
-
-  .time-slot-header {
-    font-size: 14px;
-  }
-
-  .schedule-container {
-    grid-template-columns: repeat(7, 1fr);
-  }
+    .schedule-table th,
+    .schedule-table td {
+        padding: 6px;
+    }
 }

@@ -11,7 +11,7 @@ import { StylesConfig, ControlProps, CSSObjectWithLabel } from 'react-select';
 import CustomAlert from './CustomAlert';
 import GroupUserContainer from './GroupUserContainer';
 import EditStudyGroup from './EditStudyGroup';
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 
 const animatedComponents = makeAnimated();
@@ -179,7 +179,9 @@ const StudyGroupInfo =(
               navigate(`/messaging?selectedChat=${chatID}&groupId=${groupId}`);
             }}
         >Chat</button>
+        <Link to={`/studyGroup/${groupId}/schedule`}>
         <button className='Availability-Button'> Availability </button>
+      </Link>
         <button className='Edit-Button' onClick={handleEdit}> Edit </button>
 
       </div>

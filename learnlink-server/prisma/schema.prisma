@@ -102,6 +102,8 @@ model User {
   // Password reset fields
   resetToken          String?        @unique // Nullable, unique reset token
   resetTokenExpiry    DateTime?      // Expiration timestamp for the reset token
+
+  availability Availability[]
 }
 
 model StudyGroup {
@@ -124,6 +126,8 @@ model StudyGroup {
   ideal_match_factor  StudyTags?
 
   profilePic   String?  // Optional field to store a profile picture
+
+  Availability Availability[]
 }
 
 model Swipe {
@@ -190,4 +194,15 @@ model Notification {
   created_at DateTime @default(now())
 
   user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
+
+model Availability {
+  id           Int        @id @default(autoincrement())
+  userId       Int
+  studyGroupId Int
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  studyGroup   StudyGroup @relation(fields: [studyGroupId], references: [id], onDelete: Cascade)
+  availability Json       // Stores selected time slots in JSON format
+
+  @@unique([userId, studyGroupId]) // Ensures one availability entry per user per study group
 }
