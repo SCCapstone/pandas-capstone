@@ -23,6 +23,7 @@ import ResetPasswordFromEmail from './pages/resetPasswordFromEmail';
 import AdvancedSearch from './pages/advancedSearch';
 import Network from './pages/Network/Network';
 import Groups from './pages/groups'
+import Scheduler from './pages/resources/Scheduler'
 
 function App() {
   return (
@@ -49,6 +50,7 @@ function App() {
             <Route path="/resources/studyTips" element = {<StudyTips/> }/>
             <Route path="/resources/externalResources" element = {<ExternalResources/> }/>
             <Route path="/resources/gradeCalculator" element = {<GradeCalculator/> }/>
+            <Route path="/resources/weeklySchedule" element = {<Scheduler/> }/>
             <Route path="/resetpassword" element={<ResetPassword />} />
             <Route element={<MatchRoute/>}>
               <Route path="/swiping" element={<Swiping />} />
