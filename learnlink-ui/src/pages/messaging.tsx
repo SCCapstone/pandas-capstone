@@ -87,6 +87,7 @@ const Messaging: React.FC = () => {
   const [visibleMessage, setVisibleMessage] = useState("");
   const [selectedProfile, setSelectedProfile] = useState<{ id: number; name: string } | null>(null);
   const [loadingChatList, setLoadingChatList] = useState(true);
+  const [currentGroupId, setCurrentGroupId] = useState<number | null>(null);
   const navigate = useNavigate();
 
 
@@ -819,6 +820,8 @@ useEffect(() => {
       const response = await fetch(`${REACT_APP_API_URL}/api/study-groups/chat/${selectedChat.id}`); // Fetching chat details by chat ID
       const data = await response.json();
       console.log('Study group check result:', data);
+      setCurrentGroupId(data.studyGroupID);
+
   
       // Check if studyGroupID is returned (i.e., chat is linked to a study group)
       if (response.ok && data.studyGroupID) {
@@ -1078,13 +1081,13 @@ const handleGetChatUsername = async (userId: number) => {
                       </button>
                     )}
 
-                    {/* Edit/Create Study Group Button //TODO navigate not just to groups but to the specific group and open edit. */}
+                    {/* Edit/Create Study Group Button */}
                     
                     {hasStudyGroup ? (
                       <button
                         className="EditStudyGroupButton"
                         onClick={() => {
-                          navigate("/groups");
+                          navigate(`/groups?groupId=${currentGroupId}&tab=true`);
                         }}
                       >
                         Edit Study Group

@@ -55,6 +55,7 @@ const StudyGroupInfo =(
     users,
     onRemoveUser,
     updateUsers,
+    isItEdit,
   }: {
     chatID: number;
     updateChatName: (chatId: number, newName: string) => void;
@@ -63,6 +64,7 @@ const StudyGroupInfo =(
     users: User[] | null;
     onRemoveUser: (userId: number, groupId: number | null) => void; // Update type here
     updateUsers: (userId: number) => void;
+    isItEdit: boolean;
   }) => {
   const [studyGroup, setStudyGroup] = useState<StudyGroup | null>(null);
   const [name, setName] = useState('');
@@ -80,7 +82,7 @@ const StudyGroupInfo =(
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
   const [currentGroupId, setCurrentGroupId] =  useState<number | null>(null);
   const [selectedGroupUsers, setSelectedGroupUsers] = useState<User[] | null>(null);
-  const [isEdit, setIsEdit] = useState<Boolean>(false);
+  const [isEdit, setIsEdit] = useState<Boolean>(isItEdit);
 
   const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
 
@@ -170,7 +172,7 @@ const StudyGroupInfo =(
       )}
 
       <div className='Button-Header'> 
-        
+        <button className='Chat-Button'>Chat</button>
         <button className='Availability-Button'> Availability </button>
         <button className='Edit-Button' onClick={handleEdit}> Edit </button>
 

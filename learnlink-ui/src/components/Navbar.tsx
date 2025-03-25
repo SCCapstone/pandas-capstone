@@ -37,6 +37,7 @@ interface FilterCriteria {
 }
 
 const Navbar: React.FC = () => {
+  const [notifCount, setNotifCount] = useState<number>(0); // Track the notification count
   const navigate = useNavigate();
   const location = useLocation().pathname;
 
@@ -286,6 +287,31 @@ const Navbar: React.FC = () => {
     setFilterCriteria({});
   };
 
+  useEffect(() => {
+    const fetchNotificationCount = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) return;
+
+        const response = await fetch(`${REACT_APP_API_URL}/api/notifications`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (!response.ok) {
+          console.error('Failed to fetch notifications');
+          return;
+        }
+
+        const data = await response.json();
+        setNotifCount(data.length); // Update notification count in Navbar
+      } catch (err) {
+        console.error('Error fetching notification count:', err);
+      }
+    };
+
+    fetchNotificationCount();
+  }, []);
+
   return (
     <header className="navbar">
       <div className="nav-logo"><Logo /></div>
@@ -339,11 +365,16 @@ const Navbar: React.FC = () => {
       </div>
 
       <div className="nav-icons">
-        <FaBell className="icon" onClick={handleNotifs}/>
-        {isNotificationDropdownVisible && <NotificationDropdown />}
-        <FaCog className="icon" onClick={handleSettings} />
-        <FaUserCircle className="icon profile-icon" onClick={handleAccountDetails} />
+      <div className="notification-wrapper" onClick={handleNotifs}>
+        <FaBell className="icon" />
+        {notifCount > 0 && <span className="notification-badge">{notifCount}</span>}
       </div>
+      {isNotificationDropdownVisible && (
+        <NotificationDropdown setNotifCount={setNotifCount} /> // Pass setNotifCount as a prop
+      )}
+      <FaCog className="icon" onClick={handleSettings} />
+      <FaUserCircle className="icon profile-icon" onClick={handleAccountDetails} />
+    </div>
     </header>
   );
 };
