@@ -1,0 +1,229 @@
+.NetworkPage {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: #fff;
+}
+.NetworkContainer {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    flex: 1;
+    overflow-y: scroll;
+}
+
+.NetworkTabsContainer {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    background-color: #00668C;
+    height: 70px;
+    padding: 10px;
+    box-sizing: border-box;
+
+
+}
+
+.NetworkTabsContainer .Tab {
+    padding: 10px 20px;
+    cursor: pointer;
+    margin: 0 10px;
+    font-size: 16px;
+}
+
+.network-list {
+    /* border: 1px solid #ccc; Light gray border */
+    /* border-radius: 8px; Rounded corners */
+    /* left: 0;
+    right: 0; */
+    flex:1;
+    /* background-color: #fff; */
+    border-radius: 2px;
+    overflow-y: scroll;
+    /* box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); */
+    padding-inline-start: 0;
+    justify-content: center;
+    width: 100%;
+    box-sizing: border-box;
+  
+  
+  }
+
+  .network-list-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 0 20px;
+    width: 100%;
+    /* max-width: 800px; */
+    margin: 0 auto;
+    overflow-y: scroll;
+    box-sizing: border-box;
+    align-items: center;
+  }
+  
+  .network-list ul {
+    border-top: 1px solid #ccc; /* Light gray border */
+    color: black;
+    padding: 15px 20px;
+    cursor: pointer;
+    font-size: medium;
+    margin: 0;
+      display: flex; /* Enable flexbox in the item */
+      align-items: center;   /* border-bottom: #2c658f; */
+  }
+  
+  .network-list ul:hover {
+    background-color: #D4EAF7;
+  }
+  
+  .network-list .network-profile-pic {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    margin-right: 20px;
+  }
+  .network-list .network-bio p {
+    font-size: medium;
+    margin: 0;
+    color: black;
+    font-weight: 300;
+  }
+  .network-list .network-bio h3 {
+    font-size: medium;
+    margin: 0;
+  }
+
+  .TabContent {
+    flex:1;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 0 20px;
+    width: 100%;
+    /* max-width: 800px; */
+    margin: 0 auto;
+    overflow-y: scroll;
+    box-sizing: border-box;
+
+  }
+
+  .TabPanel {
+    box-sizing: border-box;
+    width: 100%;
+
+
+
+  }
+
+  .network-list-info {
+      display: flex;
+      flex-direction: row;
+  }
+
+  .network-list button {
+      padding: 5px 10px;
+      border-radius: 5px;
+      color: white;
+      font-size: 14px;
+      border: none;
+      width: 100px;
+      height: 55px;
+      max-height: 55px;
+
+  }
+
+  .network-list-status {
+      display: flex;
+      flex-direction: row;
+      gap: 10px;
+  }
+
+  button.network-withdraw-button {
+    border: #969696 solid 2px;
+    background-color: transparent;
+    color: #969696;
+    cursor: pointer;
+    max-height: 55px;
+  }
+
+  button.network-withdraw-button:hover {
+    background-color: brown;
+    color: white;
+    border: none;
+    transform: scale(1.05);
+    transition: transform 0.3s ease;
+  }
+
+
+
+  .network-list .status-accepted {
+      background-color: #4CAF50;
+  }
+
+  .network-list .status-denied {
+      background-color: brown;
+  }
+.network-list .status-pending {
+    background-color: #afafaf;
+}
+
+.network-list .network-accept-button {
+  background-color: #4CAF50;
+  width: 110px;
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  justify-content: center;
+  align-items: center;
+
+}
+
+.network-list .network-deny-button {
+  background-color: #c13d38;
+  width: 110px;
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  justify-content: center;
+  align-items: center;
+
+}
+
+.network-list .network-deny-button:hover,
+.network-list .network-accept-button:hover {
+  transform: scale(1.05);
+  transition: transform 0.1s ease;
+  cursor: pointer;
+
+}
+
+.network-list .network-accept-button:hover {
+  background-color: #45a049;
+}
+
+.network-list .network-deny-button:hover {
+  background-color: #992f2b;
+}
+
+.network-message {
+  background-color: #f0f0f0;
+  border-radius: 5px;
+  padding: 10px;
+  margin-top: 10px;
+}
+
+.network-list .network-message-button {
+  background-color: #00668C;
+}
+
+.network-list .network-message-button:hover {
+  transform: scale(1.05);
+  transition: transform 0.1s ease;
+  cursor: pointer;
+  background-color: #004b67;
+
+}

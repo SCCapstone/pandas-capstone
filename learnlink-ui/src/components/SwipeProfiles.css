@@ -105,7 +105,7 @@
     gap: 1rem;
   }
 
-  .swipe-action-buttons button, .swipe-buttons-container button {
+  .swipe-action-buttons button, .swipe-buttons-container button, .match-header-buttons button {
     width:auto;
     align-self:flex-end;
     padding-left: 40px;
@@ -293,6 +293,15 @@
   margin-right: 10px; /* Extra space between tags */
   margin-top: 10px;
   margin-bottom: 10px;
+}
+
+.match-header-buttons {
+  margin-top: 20px;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
 }
 
 /* mobile */

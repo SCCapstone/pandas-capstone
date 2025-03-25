@@ -17,6 +17,7 @@ import { Resend } from 'resend';
 import {upload, resizeAndUpload, handleImagePreview, resizeAndUploadStudyGroup} from './uploadConfig';
 import multer from "multer";
 import { welcomeEmailTemplate, passwordResetEmailTemplate } from "./emailTemplates";
+import { warn } from "console";
 
 
 
@@ -37,6 +38,7 @@ const JWT_SECRET = env.JWT_SECRET || 'your_default_jwt_secret';
 const resend = new Resend(process.env.RESEND);
 const REACT_APP_EMAIL_URL = process.env.REACT_APP_EMAIL_URL || 'learnlink.site';
 const MAX_USERS_IN_A_GROUP = 6;
+const SYSTEM_USER_ID = -1;
 
 // Read certificates conditionally based on the environment
 const privateKey = NODE_ENV === 'production'
@@ -489,6 +491,11 @@ app.post('/api/update-password', authenticate, async (req, res):Promise<any> => 
       return res.status(400).json({ error: 'Old password does not match current password' });
     }
 
+    const isPasswordSame = await bcrypt.compare(newPassword, user.password);
+    if (isPasswordSame) {
+      return res.status(401).json({ warning: 'New password matches current password' });
+    }
+
     const hashedPassword = await bcrypt.hash(newPassword, 10);
 
 
@@ -524,17 +531,22 @@ app.post('/api/swipe', async (req, res) => {
         message
       },
     });
+    console.log("is study group???", isStudyGroup)
 
     // If the swipe was 'Yes', check if it's a match
-    if (direction === 'Yes') {
-      if (isStudyGroup) {
-        // Check for a mutual swipe with the study group
-        await createMatchForStudyGroup(userId, targetId);
-      } else {
-        // Check for a mutual swipe with another user
-        await createMatchForUsers(userId, targetId);
-      }
-    }
+    // if (direction === 'Yes') {
+    //   if (isStudyGroup) {
+    //     console.log("targetid:, ", targetId)
+        
+    //     // Check for a mutual swipe with the study group
+    //     await createMatchForStudyGroup(userId, targetId);
+    //   } else {
+    //     // Check for a mutual swipe with another user
+    //     await createMatchForUsers(userId, targetId);
+    //   }
+    // }
+
+    // moving this part to join req logic for now
 
     res.status(200).json({ message: 'Swipe recorded successfully' });
   } catch (error) {
@@ -575,6 +587,113 @@ app.get('/api/swipe/:currentUser', async (req, res): Promise<any> => {
     });
 
     res.status(200).json(swipes);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Something went wrong' });
+  }
+});
+
+app.get('/api/swipe/sentRequests/:currentUser', async (req, res): Promise<any> => {
+  let { currentUser } = req.params;
+  console.log('Fetching requests for user:', currentUser);
+
+  const userId = parseInt(currentUser, 10);
+  
+  if (isNaN(userId)) {
+    return res.status(400).json({ error: 'Invalid user ID' });
+  }
+
+  try {
+    const sentRequests = await prisma.swipe.findMany({
+      where: {
+        userId: userId,
+      },
+      select: { 
+        id: true,
+        userId: true,
+        user: true,
+        targetUserId: true,
+        targetGroupId: true,
+        direction: true,
+        message: true,
+        status: true,
+      },
+    });
+
+    res.status(200).json(sentRequests);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Something went wrong' });
+  }
+});
+
+
+// Fetches request staus between a user and another user
+app.get('/api/swipe/user/pendingRequestCheck/:targetUser', authenticate, async (req, res): Promise<any> => {
+  const { targetUser } = req.params;
+  const currentUser = res.locals.userId
+
+  const currentUserId = parseInt(currentUser, 10);
+  const targetUserId  = parseInt(targetUser, 10);
+
+  console.log('Fetching requests between user: ', currentUserId, ' and', targetUserId);
+
+
+  if (isNaN(currentUserId) || isNaN(targetUserId)) {
+    return res.status(400).json({ error: 'Invalid user ID' });
+  }
+
+  try {
+    const sentRequests = await prisma.swipe.findMany({
+      where: {
+        AND: {
+          userId: currentUserId,
+          targetUserId: targetUserId
+        }
+      },
+      select: { 
+        id: true,
+        userId: true,
+        user: true,
+        targetUserId: true,
+        targetGroupId: true,
+        direction: true,
+        message: true,
+        status: true,
+        updatedAt: true
+      },
+    });
+
+    const mostRecentRequest = sentRequests.sort((a, b) => {
+      // Compare updatedAt values (latest date first)
+      return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+    })[0];
+
+    console.log(mostRecentRequest); // This will be the most recent sentRequest
+
+    if(!mostRecentRequest) {
+      return res.status(200).json(null);
+    }
+
+    if (mostRecentRequest.status == "Accepted") {
+      // Check if match exists
+      if (mostRecentRequest.targetUserId) {
+        const matchData = await prisma.match.findMany({
+          where: {
+            OR: [
+              { user1Id: mostRecentRequest.userId, user2Id: mostRecentRequest.targetUserId },
+              { user1Id: mostRecentRequest.targetUserId, user2Id: mostRecentRequest.userId },
+            ]
+          }
+        });
+        if (matchData) { return res.status(200).json(mostRecentRequest.status); }
+
+      }
+
+      return res.status(200).json(null);
+    }
+
+    return res.status(200).json(mostRecentRequest.status);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Something went wrong' });
@@ -655,6 +774,140 @@ const createMatchForStudyGroup = async (userId: number, targetGroupId: number) =
   }
 };
 
+app.delete('/api/match/:id', authenticate, async (req: Request, res: Response): Promise<any> => {
+  try {
+    const currUserId = res.locals.userId;
+    const matchUserId = parseInt(req.params.id, 10);
+
+    console.log('Deleting match between current user ID', currUserId, 'and matched user ID', matchUserId);
+
+    if (isNaN(matchUserId) || !currUserId) {
+      return res.status(400).json({ error: 'Invalid user ID' });
+    }
+
+    // Check if match exists
+    const match = await prisma.match.findMany({
+      where: {
+        OR: [
+          { user1Id: currUserId, user2Id: matchUserId },
+          { user1Id: matchUserId, user2Id: currUserId }
+        ]
+      }
+    });
+
+    console.log("Matches found:", match);
+
+    if (match.length === 0) {
+      return res.status(404).json({ error: 'Match not found' });
+    } // Step 1: Find shared study groups
+    const sharedStudyGroups = await prisma.studyGroup.findMany({
+      where: {
+        users: {
+          some: { id: currUserId }
+        },
+        AND: {
+          users: { some: { id: matchUserId } }
+        }
+      },
+      include: { users: true }
+    });
+
+    // Step 2: Determine which groups should be deleted
+    const studyGroupsToDelete = sharedStudyGroups.filter(group => group.users.length === 2);
+    const studyGroupIdsToDelete = studyGroupsToDelete.map(group => group.id);
+
+    if (studyGroupIdsToDelete.length > 0) {
+      console.log(`Deleting ${studyGroupIdsToDelete.length} study group(s)...`);
+
+      // Delete associated chats for these study groups
+      await prisma.chat.deleteMany({
+        where: {
+          studyGroupId: { in: studyGroupIdsToDelete }
+        }
+      });
+
+      // Delete the study groups
+      await prisma.studyGroup.deleteMany({
+        where: {
+          id: { in: studyGroupIdsToDelete }
+        }
+      });
+    }
+
+    // Step 3: Find direct one-on-one chats (not study group chats)
+    const oneOnOneChats = await prisma.chat.findMany({
+      where: {
+        studyGroupId: null, // Not linked to any study group
+        users: {
+          every: { id: { in: [currUserId, matchUserId] } } // Only these two users
+        }
+      }
+    });
+
+    if (oneOnOneChats.length > 0) {
+      console.log("Deleting direct one-on-one chats...");
+
+      await prisma.message.deleteMany({
+        where: {
+          chatId: { in: oneOnOneChats.map(chat => chat.id) }
+        }
+      });
+
+      await prisma.chat.deleteMany({
+        where: {
+          id: { in: oneOnOneChats.map(chat => chat.id) }
+        }
+      });
+    }
+
+    // Step 5: Delete any previous swipes between the users
+    await prisma.swipe.deleteMany({
+      where: {
+        OR: [
+          { userId: currUserId, targetUserId: matchUserId },
+          { userId: matchUserId, targetUserId: currUserId }
+        ]
+      }
+    });
+
+    // Step 6: Create a new swipe with status 'Rejected' to prevent re-matching
+    await prisma.swipe.create({
+      data: {
+        userId: currUserId,
+        targetUserId: matchUserId,
+        direction: 'No',  // Assuming LEFT means reject
+        status: 'Denied'
+      }
+    });
+
+    // await prisma.swipe.create({
+    //   data: {
+    //     userId: matchUserId,
+    //     targetUserId: currUserId,
+    //     direction: 'No',  // Both users should reject each other
+    //     status: 'Denied'
+    //   }
+    // });
+
+    // Step 4: Delete the match
+    await prisma.match.deleteMany({
+      where: {
+        OR: [
+          { user1Id: currUserId, user2Id: matchUserId },
+          { user1Id: matchUserId, user2Id: currUserId }
+        ]
+      }
+    });
+
+    console.log("Successfully deleted match and associated chat/study group data if applicable.");
+    return res.status(200).json({ message: 'Match and associated chats/study groups deleted successfully' });
+
+  } catch (error) {
+    console.error("Error deleting match or chat:", error);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 // Endpoint to retrieve matches for a user
 app.get('/api/profiles', authenticate, async (req: Request, res: Response) => {
   const userId = res.locals.userId; // Retrieved from the token  const userId = parseInt(req.params.userId);
@@ -675,7 +928,11 @@ app.get('/api/profiles', authenticate, async (req: Request, res: Response) => {
       },
     });
 
-    res.status(200).json(matches);
+    res.status(200).json({
+      userId, // Pass currentUserId in the response
+      matches
+    }
+    );
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Something went wrong' });
@@ -691,8 +948,8 @@ app.get('/api/profiles/:userId', async (req, res): Promise<any> => {
 
     const placeholderImage = "https://learnlink-public.s3.us-east-2.amazonaws.com/AvatarPlaceholder.svg";
     const sgPlaceholderImage = 'https://learnlink-pfps.s3.us-east-1.amazonaws.com/profile-pictures/generic_studygroup_pfp.svg'
-     // Fetch the current user's data to use for matching
-     const currentUser = await prisma.user.findUnique({
+    // Fetch the current user's data to use for matching
+    const currentUser = await prisma.user.findUnique({
       where: { id: userId },
       select: {
         ideal_match_factor: true,
@@ -848,7 +1105,8 @@ app.get('/api/profiles/:userId', async (req, res): Promise<any> => {
         ...usersWithScore,
       ].sort((a, b) => b.similarityScore - a.similarityScore); // Sort by similarity score
   
-      //console.log('Combined profiles:', combinedProfiles);
+      
+      // console.log('Combined profiles:', combinedProfiles);
     res.status(200).json({
       profiles: combinedProfiles, // Sorted profiles with similarityScore and type
     });
@@ -960,6 +1218,58 @@ app.post('/api/study-groups', authenticate, async (req, res): Promise<any> => {
     return res.status(500).json({ error: 'Internal server error' });
   }
 });
+
+app.get('/api/study-groups', authenticate, async (req, res) : Promise<any> => {
+  const userId = res.locals.userId;
+
+  if (!userId) {
+    return res.status(401).json({ message: 'User not authenticated' });
+  }
+
+  try {
+    // Fetch the study groups the user is a member of
+    const userGroups = await prisma.studyGroup.findMany({
+      where: {
+        users: {
+          some: { id: userId }, // Check if user is in the group
+        },
+      },
+      include: {
+        creator: true, // Include creator details
+        users: true,   // Include all users in the group
+        chat: {        // Include chat details
+          select: { id: true },
+        }
+      },
+    });
+
+    if (!userGroups || userGroups.length === 0) {
+      return res.status(404).json({ message: 'No study groups found' });
+    }
+
+    // Transform the response to match Group interface
+    const response = userGroups.map(group => ({
+      id: group.id,
+      name: group.name,
+      subject: group.subject,
+      description: group.description,
+      created_by: group.created_by,
+      created_at: group.created_at,
+      users: group.users,
+      chatID: group.chat?.id || null,
+      ideal_factor: group.ideal_match_factor || null,
+      profile_pic: group.profilePic || null,
+    }));
+
+
+    res.json(response);
+  } catch (error) {
+    console.error('Error retrieving groups for user:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+
 
 app.get('/api/study-groups/:id', async (req, res): Promise<any> => {
   const studyGroupId = parseInt(req.params.id);  // Extract study group ID from the request parameters
@@ -1467,6 +1777,8 @@ app.get('/api/users', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
+
 //used for getting request list in messaging page
 app.get('/api/users/:id', async (req, res) : Promise<any> => {
   try {
@@ -1525,6 +1837,7 @@ app.get('/api/chats', authenticate, async (req, res): Promise<any> => {
             createdAt: 'asc', // Sort messages by creation time (optional)
           },
         },
+        
       },
     });
 
@@ -1549,7 +1862,7 @@ app.get('/api/chats/check', async (req, res): Promise<any> => {
 
   try {
     // Check if a chat exists between the two users
-    const existingChat = await prisma.chat.findFirst({
+    const existingChats = await prisma.chat.findMany({
       where: {
         users: {
           every: { id: { in: [Number(userId1), Number(userId2)] } }, // Ensure both users are in the chat
@@ -1557,8 +1870,23 @@ app.get('/api/chats/check', async (req, res): Promise<any> => {
       },
     });
 
-    if (existingChat) {
-      return res.json({ exists: true, chatId: existingChat.id });
+    console.log(existingChats)
+
+    if (existingChats.length > 0) {
+      const nonStudyGroupChats = existingChats.filter(chat => chat.studyGroupId === null);
+
+      // If there's at least one non-study-group chat, prevent new chat creation
+      console.log("non study group chats: ", nonStudyGroupChats);
+      if (nonStudyGroupChats.length>0) {
+        return res.json({ exists: true, chatId: nonStudyGroupChats[0].id });
+      }
+
+      if (existingChats.length === 1 && existingChats[0].studyGroupId !== null){
+        return res.json({exists: false })
+      }
+     
+        return res.json({ exists: true, chatId: existingChats[0].id });
+      
     }
 
     res.json({ exists: false });
@@ -1772,6 +2100,7 @@ app.post('/api/chats', async (req, res) : Promise<any> => {
   }
 
   try {
+    /*
     // Check if a chat between these users already exists
     const existingChat = await prisma.chat.findFirst({
       where: {
@@ -1785,7 +2114,7 @@ app.post('/api/chats', async (req, res) : Promise<any> => {
 
     if (existingChat) {
       return res.status(200).json(existingChat); // Return existing chat if found
-    }
+    }*/
     
     // Retrieve recipient's name
     const recipient = await prisma.user.findUnique({
@@ -1949,50 +2278,72 @@ app.get('/socket-io', (req, res) => {
 
 
 // Real-time WebSocket chat functionality
+// Real-time WebSocket chat functionality
+// Real-time WebSocket chat functionality
 io.on("connection", (socket) => {
   console.log("User connected");
 
   socket.on('message', async (data, callback) => {
     try {
       // Validate the incoming data
-      if (!data.content || !data.chatId || !data.userId) {
-        throw new Error('Missing required fields: content, chatId, or userId');
+      if (!data.content || !data.chatId || (data.system && data.userId !== undefined)) {
+        throw new Error('Missing required fields: content, chatId, or invalid userId for system message');
       }
 
-      // Create a new message in the database using Prisma
-      const newMessage = await prisma.message.create({
-        data: {
-          content: data.content,
-          createdAt: new Date(),
-          user: { connect: { id: data.userId } },
-          chat: { connect: { id: data.chatId } },
-        },
-        include: { user: true, chat: { include: { users: true } } }, // Include chat members
-      });
+      let newMessage;
+      console.log(data.system);
+
+      if (data.system) {
+        // If it's a system message, no user should be connected
+        newMessage = await prisma.message.create({
+          data: {
+            content: data.content,
+            createdAt: new Date(),
+            chatId: data.chatId,
+            system: true,
+            // No userId for system messages
+          },
+          include: { chat: { include: { users: true } } }, // Include chat and users if needed
+        });
+      } else {
+        // Regular user message
+        newMessage = await prisma.message.create({
+          data: {
+            content: data.content,
+            createdAt: new Date(),
+            user: { connect: { id: data.userId } },  // Ensure userId is connected for user messages
+            chat: { connect: { id: data.chatId } },
+          },
+          include: { user: true, chat: { include: { users: true } } },
+        });
+      }
 
       // After saving the message, update the chat's `updatedAt` timestamp
       const updatedChat = await prisma.chat.update({
         where: { id: data.chatId },
         data: { updatedAt: new Date() },
-        include: { users: true }, // Optionally, include users if you want to broadcast updated users list
+        include: { users: true },
       });
 
       // Get all user IDs in the chat
       const chatUsers = newMessage.chat.users.map(user => user.id);
 
-      // Broadcast message only to users in this chat
-      chatUsers.forEach(userId => {
-        io.to(`user_${userId}`).emit('newMessage', newMessage);
-      });
+      // Broadcast message to users in this chat, skip broadcasting for system messages
+      if (!data.system) {
+        chatUsers.forEach(userId => {
+          io.to(`user_${userId}`).emit('newMessage', newMessage);
+        });
+      }
 
       console.log('Broadcasting message to chat users:', chatUsers);
 
       // Send success callback to the sender
-      callback({ success: true, message: 'Message sent from server successfully!' }); 
+      callback({ success: true, message: 'Message sent from server successfully!' });
       callback({ success: true, message: newMessage, updatedChat });
+
     } catch (error) {
       console.error('Error handling message:', error);
-      callback({ success: false, error: error });
+      callback({ success: false, error });
     }
   });
 
@@ -2002,16 +2353,16 @@ io.on("connection", (socket) => {
         console.error("Chat ID is required");
         return; // Early exit if chatId is not provided
       }
-  
+
       socket.join(`chat_${chatId}`);
       console.log(`User ${userId} joined chat ${chatId}`);
-  
+
       // Fetch updated chat users
       const chat = await prisma.chat.findUnique({
         where: { id: chatId },
         include: { users: true },
       });
-  
+
       if (chat) {
         io.to(`chat_${chatId}`).emit("chatUpdated", chat.users);
       } else {
@@ -2021,12 +2372,13 @@ io.on("connection", (socket) => {
       console.error("Error joining chat:", error);
     }
   });
-  
 
   socket.on('disconnect', () => {
     console.log('A user disconnected:', socket.id);
   });
 });
+
+
 
 
 
@@ -2353,6 +2705,96 @@ app.delete('/api/notifications/delete/:id', async (req, res): Promise<any> => {
     return res.status(500).json({ error: 'Internal server error' });
   }
 });
+
+import { SwipeStatus } from '@prisma/client'; // Import enum
+
+app.put('/api/swipe-requests/:id', async (req, res): Promise<any> => {
+  const { id } = req.params;
+  const { status }: { status: SwipeStatus } = req.body; // Expect status to be of enum type
+  console.log('Received request to update swipe status', id);
+  console.log('Received status:', status);
+
+  if (!Object.values(SwipeStatus).includes(status)) {
+      return res.status(400).json({ error: "Invalid status value" });
+  }
+
+  try {
+      // Find the swipe request
+      const swipe = await prisma.swipe.findUnique({
+          where: { id: Number(id) },
+      });
+
+      if (!swipe) {
+          return res.status(404).json({ error: "Swipe request not found" });
+      }
+
+      if (swipe.targetUserId) {
+          // Delete any other requests between the two users
+          await prisma.swipe.deleteMany({
+            where: {
+                userId: swipe.userId,
+                targetUserId: swipe.targetUserId,
+                NOT: { id: Number(id) } // Exclude the current request
+            }
+        });
+  
+        await prisma.swipe.deleteMany({
+            where: {
+                userId: swipe.targetUserId,
+                targetUserId: swipe.userId,
+                NOT: { id: Number(id) } // Exclude the current request
+            }
+        });
+      }
+
+      if (swipe.targetGroupId) {
+           // Delete any other requests between the user and studygroup
+           await prisma.swipe.deleteMany({
+            where: {
+                userId: swipe.userId,
+                targetGroupId: swipe.targetGroupId,
+                NOT: { id: Number(id) } // Exclude the current request
+            }
+        });
+      }
+
+      // Update swipe request status
+      const updatedRequest = await prisma.swipe.update({
+          where: { id: Number(id) },
+          data: { status },
+      });
+
+      // If the request is accepted, create a match
+      if (status === "Accepted" && swipe.targetUserId) {
+          await prisma.match.create({
+              data: {
+                  user1Id: swipe.userId,       // Requesting user
+                  user2Id: swipe.targetUserId, // Target user who accepted
+              },
+          });
+      }
+
+      if(status==="Accepted" && swipe.targetGroupId) {
+        await prisma.match.create({
+          data: {
+            user1Id: swipe.userId,
+            studyGroupId: swipe.targetGroupId,
+            isStudyGroupMatch: true,
+          },
+        })
+      }
+
+      res.json(updatedRequest);
+  } catch (error) {
+      console.error("Error updating swipe status:", error);
+      res.status(500).json({ error: "Failed to update request status" });
+  }
+});
+
+// app.get('/api/pending-requests', authenticate, async (req, res): Promise<any> => {
+//   const userId = res.locals.userId;
+//   const pendingRequests = await prisma..findMany({
+// });
 
 
 

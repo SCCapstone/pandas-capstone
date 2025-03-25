@@ -1,5 +1,7 @@
 import { Navigate, Outlet } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
+import FullScreenAlert from '../components/FullScreenAlert';
+
 
 const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
 
@@ -76,8 +78,17 @@ export const MatchRoute = () => {
     console.log('Match ready:', matchReady);
     if (matchReady) {
         alertShown.current = true; // Set flag to prevent multiple alerts
-       // alert('Please update your ideal match factor to start matching!');
-        return <Navigate to="/landingpage"/>;
+        // alert('Please update your ideal match factor to start matching!');
+        // return (
+        //     <FullScreenAlert
+        //         message="Please update your ideal match factor to start matching!"
+        //         HeaderText="Incomplete Profile"
+        //         buttonText="Okay"
+        //         OnCancel={() => window.location.href = '/profile'}
+        //     />
+        // );
+
+        return <Navigate to="/landingpage" />;
     }
 
     return <Outlet />;

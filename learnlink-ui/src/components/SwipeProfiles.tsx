@@ -14,6 +14,7 @@ const SwipeProfiles = ({ userId }: { userId: number }) => {
   const [currentProfileIndex, setCurrentProfileIndex] = useState(0);
   const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
   const [showInvitePanel, setShowInvitePanel] = useState(false);
+  const [loadingProfiles, setLoadingProfiles] = useState(true)
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -38,6 +39,7 @@ const SwipeProfiles = ({ userId }: { userId: number }) => {
       
       
         setProfiles(data.profiles);
+        setLoadingProfiles(false)
       } catch (error) {
         console.error('Error fetching profiles:', error);
       }
@@ -61,6 +63,10 @@ const SwipeProfiles = ({ userId }: { userId: number }) => {
     if (currentProfileIndex > 0) {
       setCurrentProfileIndex(currentProfileIndex - 1); // Move to the previous profile
     }
+  };
+
+  const handlePendingRequests = () => {
+    navigate(`/network?tab=sentRequests`);
   };
 
   const handleSwipe = async (direction: 'Yes' | 'No', targetId: number, isStudyGroup: boolean, message:string | undefined) => {
@@ -90,9 +96,9 @@ const SwipeProfiles = ({ userId }: { userId: number }) => {
   };
   console.log(profiles.length)
 
-  if (profiles.length === 0) {
-    return <div className='swipe-info'><p>Loading profiles...</p></div>;
-  }
+  // if (profiles.length === 0) {
+  //   return <div className='swipe-info'><p>Loading profiles...</p></div>;
+  // }
 
   const currentProfile = profiles[currentProfileIndex];
   console.log(currentProfile)
@@ -156,8 +162,17 @@ const SwipeProfiles = ({ userId }: { userId: number }) => {
   }
 
   };
+
+  if (loadingProfiles) return <div className="loading-container">Loading... <span className="loading-spinner"></span> </div>;
+
+  if(profiles.length === 0) return <p className="no-requests">No more profiles to swipe on.</p>
+
   return (
     <div className="whole-swipe-component">
+      <div className='match-header-buttons'>
+        <button className='location'>Location (put in later)</button>
+        <button className='pendingRequests' onClick={handlePendingRequests}>Pending Requests</button>
+      </div>
       {currentProfile ? (
         <div className="profile-card">
           {currentProfile.chatID ? (

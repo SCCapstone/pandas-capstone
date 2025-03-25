@@ -1,0 +1,79 @@
+/* fullscreenPopup.css */
+
+.fullscreen-popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Dark background */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+}
+
+.fullscreen-popup {
+    background-color: #ffffff; /* White window */
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    max-width: 500px;
+    width: 80%;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    z-index: 10001;
+
+}
+
+.fullscreen-header {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    margin-bottom: 0;
+    gap: 15px;
+}
+
+.fullscreen-header h1{
+    margin: 0;
+    font-size: 2rem;
+}
+
+.fullscreen-popup p {
+    margin: 0;
+    font-size: 1.25rem;
+    color: #272727;
+}
+
+.fullscreen-header .warningIcon {
+    color: #f44336; /* Red warning icon */
+    font-size: 2rem;
+}
+
+.fullscreen-popup-buttons {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.fullscreen-popup-buttons button {
+    flex: 1;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1.25rem;
+}
+
+.fullscreen-popup-buttons button.okay {
+    background-color: #00668C; /* Blue fullscreen button */
+    color: #ffffff;
+}
+
+.fullscreen-popup-buttons button:hover {
+    filter: brightness(0.8); /* Slightly darken the button on hover */
+    transform: scale(1.05);
+    transition: transform 0.1s ease-in-out;
+}

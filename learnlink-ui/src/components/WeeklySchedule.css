@@ -1,0 +1,76 @@
+.schedule-container {
+  /* display: grid; */
+  grid-template-columns: repeat(7, 1fr);
+  gap: 10px;
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.time-slot-header {
+  display: grid;
+  grid-template-columns: 1fr repeat(7, 1fr);
+  gap: 10px;
+  font-weight: bold;
+  text-align: center;
+}
+
+.day-header {
+  padding: 10px;
+  background-color: #f0f0f0;
+  border: 1px solid #ddd;
+}
+
+.empty-cell {
+  padding: 10px;
+}
+
+.time-slot-row {
+  display: grid;
+  grid-template-columns: 1fr repeat(7, 1fr);
+  gap: 10px;
+  text-align: center;
+}
+
+.time-slot {
+  padding: 10px;
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+}
+
+.cell {
+  padding: 15px;
+  text-align: center;
+  cursor: pointer;
+  background-color: #ffffff;
+  border: 1px solid #ddd;
+}
+
+.cell.selected {
+    background-color: #4CAF50; /* Green background for selected slots */
+    color: white;
+  }
+  
+
+@media (max-width: 768px) {
+  .schedule-container {
+    grid-template-columns: repeat(6, 1fr);
+  }
+
+  .time-slot-header,
+  .time-slot-row {
+    grid-template-columns: 1fr repeat(7, 1fr);
+  }
+
+  .time-slot, .cell {
+    font-size: 12px;
+  }
+
+  .time-slot-header {
+    font-size: 14px;
+  }
+
+  .schedule-container {
+    grid-template-columns: repeat(7, 1fr);
+  }
+}

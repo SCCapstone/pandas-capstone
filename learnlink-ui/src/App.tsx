@@ -21,6 +21,9 @@ import {PrivateRoutes} from './utils/privateRoutes';
 import {MatchRoute} from './utils/matchRoute';
 import ResetPasswordFromEmail from './pages/resetPasswordFromEmail';
 import AdvancedSearch from './pages/advancedSearch';
+import Network from './pages/Network/Network';
+import Groups from './pages/groups'
+import Scheduler from './pages/resources/Scheduler'
 
 function App() {
   return (
@@ -41,15 +44,18 @@ function App() {
             <Route path="/landingpage" element={<LandingPage />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="/messaging" element = {<Messaging/> }/>
+            <Route path="/groups" element = {<Groups/>}/>
             <Route path="/profile" element = {<Profile/> }/>
             <Route path="/resources" element = {<Resources/> }/>
             <Route path="/resources/studyTips" element = {<StudyTips/> }/>
             <Route path="/resources/externalResources" element = {<ExternalResources/> }/>
             <Route path="/resources/gradeCalculator" element = {<GradeCalculator/> }/>
+            <Route path="/resources/weeklySchedule" element = {<Scheduler/> }/>
             <Route path="/resetpassword" element={<ResetPassword />} />
             <Route element={<MatchRoute/>}>
               <Route path="/swiping" element={<Swiping />} />
             </Route>
+            <Route path="/network" element={<Network />} />
             <Route path="/updateEmail" element={<UpdateEmail />} />
             <Route path="/changepassword" element={<ChangePassword />} />
             <Route path="/accountDetails" element={<AccountDetails />} />

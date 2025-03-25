@@ -4,6 +4,8 @@ import './components.css';
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { FaXmark, FaCheck } from "react-icons/fa6";
+import { updateSwipeStatus } from '../utils/userServices';
+
 
 // Props interface defining the expected properties for the JoinRequests component
 interface JoinRequestProps {
@@ -23,6 +25,7 @@ interface SwipeRequest {
   user: User;                 // User details of the requester
   targetGroup: Group;         // Group details (if applicable)
   direction: 'Yes' | 'No';
+  status: SwipeStatus;
 }
 
 // Interface for a user object
@@ -43,6 +46,13 @@ interface Group {
 interface StudyGroup {
   id: number;
   name: string; // Name of the study group
+}
+
+// Enum for swipe status
+enum SwipeStatus {
+  Accepted = 'Accepted',
+  Denied = 'Denied',
+  Pending = 'Pending'
 }
 
 // JoinRequests component handles fetching, displaying, approving, and rejecting join requests
@@ -70,7 +80,7 @@ const JoinRequests: React.FC<JoinRequestProps> = ({ currentUserId, addNewChat, o
       const requestResponse = await axios.get(`${REACT_APP_API_URL}/api/swipe/${currentUserId}`);
   
       // Filter swipes to only include those with direction === "Yes"
-      let requestData = requestResponse.data.filter((req: SwipeRequest) => req.direction === 'Yes');
+      let requestData = requestResponse.data.filter((req: SwipeRequest) => req.direction === 'Yes' && req.status === SwipeStatus.Pending);
 
       // Eliminate duplicates by using a Set to track unique request keys
       const uniqueRequestsMap = new Map();
@@ -128,6 +138,7 @@ const handleApproval = async (
 
     // Check if a chat already exists
     if (targetUserId) {
+
       const chatCheckResponse = await axios.get(`${REACT_APP_API_URL}/api/chats/check`, {
         params: { userId1: requestUserId, userId2: targetUserId },
       });
@@ -135,6 +146,7 @@ const handleApproval = async (
       if (chatCheckResponse.data.exists) {
         setError("A chat with this user already exists.");
         handleDeleteRequest(requestId);
+        handleRequestsChange(requestId);
         return; // Stop function execution
       }
     }
@@ -146,6 +158,7 @@ const handleApproval = async (
       payload.studyGroupId = studyGroupId;
       payload.requestUserId = requestUserId;
     } else if (targetUserId) {
+      console.log("approved user", targetUserId)
       // If the request is for a one-on-one chat, create a new chat
       endpoint = "/api/chats";
       payload.userId1 = requestUserId;
@@ -194,7 +207,10 @@ const handleApproval = async (
         type: "StudyGroup",
       });
 
-      handleDeleteRequest(requestId); // Remove request after approval
+      updateSwipeStatus(requestId, SwipeStatus.Accepted); // Update status to accepted
+
+      // handleDeleteRequest(requestId); // Remove request after approval
+      handleRequestsChange(requestId);
     } 
   
   } catch (err: unknown) {
@@ -202,7 +218,10 @@ const handleApproval = async (
     if (axios.isAxiosError(err) && err.response?.status === 405) {
       console.log("Caught 405 error in catch block");
       setError("This study group is full. You cannot approve this request.");
-      handleDeleteRequest(requestId);
+      handleDenial(requestId);
+
+      // handleDeleteRequest(requestId);
+      handleRequestsChange(requestId);
     }
     if (axios.isAxiosError(err)) {
       if (err.response) {
@@ -227,7 +246,9 @@ const handleApproval = async (
 
   // Function to reject a join request
   const handleDenial = async (requestId: number) => {
-    handleDeleteRequest(requestId);
+    updateSwipeStatus(requestId, SwipeStatus.Denied);  // Pass the enum value
+    // handleDeleteRequest(requestId);
+    handleRequestsChange(requestId);
   };
 
   // Function to delete a request from the system
@@ -239,6 +260,11 @@ const handleApproval = async (
       console.error('Error rejecting request:', err);
       setError('Failed to reject request.');
     }
+  };
+
+  const handleRequestsChange  = async (requestId: number) => { 
+    setRequests(requests.filter((request) => request.id !== requestId));
+
   };
 
   const handleProfilePopup = (userId: number) => {

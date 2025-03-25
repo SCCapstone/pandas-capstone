@@ -161,7 +161,7 @@
   transition: opacity 0.5s ease, visibility 0.5s ease;
   opacity: 0;
   visibility: hidden;
-  z-index: 1100;
+  z-index: 100000;
 }
 
 .fullscreen-menu.show {
@@ -213,9 +213,11 @@
   }
   .nav-links.show {
     display: flex;
+
   }
   .hamburger {
     display: block;
+
   }
 }
 
@@ -473,4 +475,30 @@
 @media screen and (max-height: 450px) {
   .filter-menu { padding-top: 15px; }
   .filter-menu a { font-size: 18px; }
+}
+
+
+
+/*Notification Counter*/
+.notification-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.notification-badge {
+  position: absolute;
+  top: -5px;
+  right: 7px;
+  background-color: #ffcf43;
+  color:#00668C;
+  font-size: 9px;
+  font-weight: bold;
+  padding: 3px 3px;
+  border-radius: 50%;
+  width: 10px;
+  height: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
 }

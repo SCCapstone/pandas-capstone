@@ -326,6 +326,25 @@
   height: 100%;
 }
 
+
+.Popup-members-users-panel{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 50%;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  max-width: 500px;
+  background: transparent;
+
+  
+
+}
+
+
+
 /* Individual message */
 .message {
   max-width: 80%;
@@ -376,6 +395,19 @@
 
 .CreateStudyGroupButton:hover {
   background-color: #dfa317;
+}
+
+
+.SystemMessage {
+  background-color: #f8d7da; /* Light red/pink background */
+  color: #721c24; /* Dark red text */
+  font-style: italic;
+  text-align: center;
+  align-self: center;
+  padding: 8px;
+  margin: 5px 0;
+  border-radius: 5px;
+  border: 1px solid #f5c6cb;
 }
 
 /* Responsive Adjustments */
@@ -478,7 +510,6 @@
     max-width: 100%;
     margin: 5px 0;
     padding: 10px;
-    background-color: #e0e0e0;
     border-radius: 10px;
   }
 

@@ -1,68 +1,119 @@
 .study-group-panel {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-  }
-  
-  .edit-study-group-panel {
-    background-color: white;
-    padding: 40px;
-    border-radius: 8px;
-    width: 400px;
-    max-width: 60vw;
-    max-height: 70vh;
-    overflow-y: auto;
-  }
-  
-  .edit-study-group-panel input,
-  .edit-study-group-panel textarea
- {
-    margin-bottom: 20px;
-    display:block;
-    font-size: small;
-    max-width: 400px;
-    box-sizing: border-box;
-    /* border: .7px solid #3B3C3D; */
-  }
-  
-.edit-study-group-panel input {
-  height: 40px;
-  margin-bottom: 15px;
-  padding: 5px;
-  border: .7px solid #3B3C3D;
-  border-radius: 5px;
+  position: relative; /* Change to 'relative' to remove the fixed position */
   width: 100%;
+  max-width: 60vw; /* You can adjust the width as needed */
+  max-height: 70vh;
+  margin: 20px auto; /* Center the panel horizontally */
+  padding: 20px;
+  background-color: white;
+  border-radius: 8px;
+  box-sizing: border-box;
+  overflow-y: auto;
+  animation: fadeInScale 0.3s ease-in-out;
 }
 
-  
-  .edit-study-group-panel button {
-    margin-right: 10px;
-    background-color: #00668C;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-  }
 
-  .edit-study-group-profile-picture {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    
-  }
 
-  .edit-study-group-profile-picture img {
-    width: 125px;
-    height: 125px;
-    border-radius: 50%;
-    margin-bottom: 20px;
-  }
 
-  
+.edit-study-group-panel {
+  background-color: white;
+  padding: 40px;
+  border-radius: 10px;
+  width: 100%;
+  max-width: 100%;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+
+.edit-study-group-panel input,
+.edit-study-group-panel textarea {
+  margin-bottom: 15px;
+  display: block;
+  font-size: 16px;
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #3B3C3D;
+  border-radius: 5px;
+  padding: 5px;
+}
+
+.edit-study-group-panel input {
+  height: 40px;
+}
+
+.edit-study-group-panel button {
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+
+.edit-study-group-profile-picture {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.edit-study-group-profile-picture img {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+}
+
+
+.save-group-button {
+  display: block;
+  width: 100%;
+  background-color: #00668C;
+  color: white;
+  border: none;
+  padding: 10px;
+  margin-top: 15px;
+  border-radius: 12px;
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  padding-bottom: 20%;
+}
+
+.save-group-button:hover {
+  background-color: #128e35;
+}
+
+.cancel-edit-button {
+  display: block;
+  width: 100%;
+  background-color: #57adcd;
+  color: white;
+  border: none;
+  padding: 10px;
+  margin-top: 15px;
+  border-radius: 12px;
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  padding-bottom: 20%;
+}
+
+.cancel-edit-button:hover {
+  background-color: #186c79;
+}
+/* Fade-in animation */
+@keyframes fadeInScale {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+

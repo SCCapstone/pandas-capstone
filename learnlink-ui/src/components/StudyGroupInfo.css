@@ -1,0 +1,171 @@
+.study-group-panel {
+  position: relative; /* Change to 'relative' to remove the fixed position */
+  width: 100%;
+  max-width: 60vw; /* You can adjust the width as needed */
+  max-height: 70vh;
+  margin: 20px auto; /* Center the panel horizontally */
+  padding: 20px;
+  background-color: white;
+  border-radius: 8px;
+  box-sizing: border-box;
+  overflow-y: auto;
+  animation: fadeInScale 0.3s ease-in-out;
+}
+
+.Button-Header {
+  display: flex;
+  justify-content: right;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 10px;
+}
+
+
+.Edit-Button,
+.Chat-Button,
+.Availability-Button {
+  padding: 10px 20px;
+  font-size: 16px;
+  font-weight: bold;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+}
+
+.Edit-Button {
+  background-color: #00b3ff; /* Blue */
+  color: white;
+}
+
+.Chat-Button {
+  background-color: #e73990; /* Blue */
+  color: white;
+}
+
+.Availability-Button {
+  background-color: #28a745; /* Green */
+  color: white;
+}
+
+.Edit-Button:hover {
+  background-color: #0018b3;
+}
+
+.Chat-Button:hover {
+  background-color: #b30071;
+}
+
+
+.Availability-Button:hover {
+  background-color: #218838;
+}
+
+
+
+.bold-first-word {
+  font-weight: bold;
+}
+
+
+.group-title {
+  font-size: 1.25rem;
+  color: #000;
+  margin: 2px 0;
+
+}
+
+.group-subject {
+  font-size: 1.25rem;
+  color: #000;
+  margin: 2px 0;
+}
+
+.group-description {
+  font-size: 1.25rem;
+  color: #000;
+  margin: 2px 0;
+}
+
+.group-ideal{
+  font-size: 1.25rem;
+  color: #000;
+  margin: 2px 0;
+}
+
+.members-label{ 
+  font-size: 1.25rem;
+  color: #000;
+  margin: 10px 0;
+  font-weight: bold;
+  
+}
+
+
+.main-study-group-panel {
+  background-color: white;
+  padding: 40px;
+  border-radius: 10px;
+  width: 100%;
+  max-width: 100%;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+
+.study-group-panel input,
+.study-group-panel textarea {
+  margin-bottom: 15px;
+  display: block;
+  font-size: 16px;
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #3B3C3D;
+  border-radius: 5px;
+  padding: 5px;
+}
+
+.study-group-panel input {
+  height: 40px;
+}
+
+.main-study-group-panel button {
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+
+.study-group-profile-picture {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.study-group-profile-picture img {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+}
+
+
+
+/* Fade-in animation */
+@keyframes fadeInScale {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+

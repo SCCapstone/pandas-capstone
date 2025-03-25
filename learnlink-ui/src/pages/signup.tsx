@@ -4,6 +4,8 @@ import './signup.css';
 import Logo from '../components/Logo';
 import Copyright from '../components/CopyrightFooter';
 import { set } from 'react-hook-form';
+import CustomAlert from '../components/CustomAlert';
+
 
 type User = {
     id: number;
@@ -39,7 +41,9 @@ const Signup: React.FC = () => {
     const [usernameError, setUsernameError] = useState<string | null>(null);
     const [passwordError, setPasswordError] = useState<string | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
+    const [alerts, setAlerts] = useState<{ id: number; alertText: string; alertSeverity: "error" | "warning" | "info" | "success"; visible: boolean }[]>([]);
     const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
+    const alertVisible = alerts.some(alert => alert.visible);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -55,6 +59,7 @@ const Signup: React.FC = () => {
 
     // Form submission
     const handleSignup = async (e: React.FormEvent) => {
+        setAlerts([]);
         setError(null);
         setEmailError(null);
         setUsernameError(null);
@@ -65,12 +70,20 @@ const Signup: React.FC = () => {
             console.log('Passwords do not match');
             setError('Passwords do not match');
             setPasswordError('Passwords do not match');
+            setAlerts((prevAlerts) => [
+                ...prevAlerts,
+                { id: Date.now(), alertText:'Passwords do not match', alertSeverity: 'error', visible: true },
+              ]);
             return;
         }
 
         if (!formData.firstName || !formData.lastName || !formData.email || !formData.username || !formData.password) {
             console.log('All fields are required');
             setError('All fields are required');
+            setAlerts((prevAlerts) => [
+                ...prevAlerts,
+                { id: Date.now(), alertText:'All fields are required', alertSeverity: 'error', visible: true },
+              ]);
             return;
         }
 
@@ -101,6 +114,10 @@ const Signup: React.FC = () => {
                     console.log('Username is already taken');
                     setError('Username is already taken');
                     setUsernameError('Username is already taken');
+                    setAlerts((prevAlerts) => [
+                        ...prevAlerts,
+                        { id: Date.now(), alertText: 'Username is already taken', alertSeverity: 'error', visible: true },
+                      ]);
                     // throw new Error('Username is already taken');
                     return;
 
@@ -110,6 +127,10 @@ const Signup: React.FC = () => {
                     console.log('Email is already registered');
                     setError('Email is already registered');
                     setEmailError('Email is already registered');
+                    setAlerts((prevAlerts) => [
+                        ...prevAlerts,
+                        { id: Date.now(), alertText: 'Email is already registered', alertSeverity: 'error', visible: true },
+                      ]);
                     return;
                 }
 
@@ -117,6 +138,10 @@ const Signup: React.FC = () => {
                     console.log('Please use a .edu email');
                     setError('Please use a .edu email');
                     setEmailError('Please use a .edu email');
+                    setAlerts((prevAlerts) => [
+                        ...prevAlerts,
+                        { id: Date.now(), alertText: 'Must use a .edu email ', alertSeverity: 'error', visible: true },
+                      ]);
                     return;
                 }
                 console.log('Failed to create user');
@@ -160,13 +185,26 @@ const Signup: React.FC = () => {
 
             if (!emailResponse.ok) {
                 const errorData = await emailResponse.json();
+                setAlerts((prevAlerts) => [
+                    ...prevAlerts,
+                    { id: Date.now(), alertText: errorData.error || 'Failed to send sign up email.', alertSeverity: 'error', visible: true },
+                  ]);
                 throw new Error(errorData.error || 'Failed to send email');
             }
+
+            setAlerts((prevAlerts) => [
+                ...prevAlerts,
+                { id: Date.now(), alertText: 'Sign up successful!', alertSeverity: 'success', visible: true },
+              ]);
             
             // Navigate to landing page after successful signup
             navigate('/LandingPage');
         } catch (error) {
             setError('Failed to sign up. Please try again later.');
+            setAlerts((prevAlerts) => [
+                ...prevAlerts,
+                { id: Date.now(), alertText:'Failed to sign up. Please try again later.', alertSeverity: 'error', visible: true },
+              ]);
         } finally {
             setLoading(false);
         }
@@ -177,6 +215,20 @@ const Signup: React.FC = () => {
             <div className="Logo2-signup">
                 <Logo />
             </div>
+            {/* Display the alert if it's visible */}
+            {alertVisible && (
+                <div className='alert-container'>
+                {alerts.map(alert => (
+                    <CustomAlert
+                        key={alert.id}
+                        text={alert.alertText || ''}
+                        severity={alert.alertSeverity || 'info' as "error" | "warning" | "info" | "success"}
+                        onClose={() => setAlerts(prevAlerts => prevAlerts.filter(a => a.id !== alert.id))}
+                    />
+                ))}
+            </div>
+            )}
+            
             <div className="signup">
                 <div className="signup-container">
                     <h1 className="l1">Sign Up</h1>

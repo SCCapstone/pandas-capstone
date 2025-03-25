@@ -19,9 +19,10 @@ interface Message {
   id: number;
   content: string;    
   createdAt: string;  
-  userId: number;     
+  userId: number | undefined;     
   chatId: number;     
-  liked: boolean;     
+  liked: boolean;  
+  system: boolean;   
 }
 
 // Represents a user participating in a chat

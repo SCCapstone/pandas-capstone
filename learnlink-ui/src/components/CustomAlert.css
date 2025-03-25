@@ -1,0 +1,95 @@
+.alert-container {
+    position: fixed;
+    display: flex;
+    width: 450px;
+    top: 80px;;
+    right: 0;
+    max-width: 100%;
+    flex-direction: column;
+    z-index: 9999;
+    padding: 10px 10px 0px 10px;
+    gap: 10px;
+    box-sizing: border-box;  
+}
+
+.customAlert {
+    box-sizing: border-box;  
+    margin-bottom: 0 !important;
+    border-radius: 3 !important;
+    border: 2px solid !important;
+}
+.customAlert .MuiAlert-message{
+    flex:1;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    text-align: left;
+    padding: 10px;
+    
+}
+
+
+.alertX, .alertX button{
+    background-color: transparent !important;
+    border: none !important;
+    font-size: 1.5rem !important;
+    cursor: pointer !important;
+    margin: 0 0 0 0 !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
+}
+
+.alertX svg:hover {
+    filter: brightness(1.5); /* Adjust this for desired lightness */
+}
+
+.customAlert h1 {
+    font-size: 1.25rem;
+    margin: 0;
+}
+
+.customAlert p {
+    font-size: 1rem;
+    margin: 0;
+}
+
+
+/* Severity levels */
+.customAlert.success {
+    background-color: #d4edda;
+    color: #155724;
+
+}
+.customAlert.success h1, .customAlert.success p, .customAlert.success .alertX {
+    color: #155724;
+}
+
+.customAlert.warning {
+    background-color: #fff3cd;
+    color: #856404;
+    border-color: #ed9702 !important;
+}
+
+.customAlert.warning h1, .customAlert.warning p, .customAlert.warning .alertX {
+    color: #856404;
+}
+
+.customAlert.error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border-color: #d32f2f !important;
+}
+
+.customAlert.error h1, .customAlert.error p, .customAlert.error .alertX {
+    color: #721c24;
+}
+
+@media screen and (max-width: 768px) {
+    .alert-container {
+        width: 100%;
+        top: 60px;
+        right: 0;
+        padding: 10px;
+    }
+    
+}
