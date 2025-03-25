@@ -176,7 +176,7 @@ const StudyGroupInfo =(
       <div className='Button-Header'> 
         <button className='Chat-Button'
             onClick={() => {
-              navigate(`/messaging?selectedChatId=${chatID}&groupId=${groupId}`);
+              navigate(`/messaging?selectedChatId=${chatID}`);
             }}
         >Chat</button>
         <button className='Availability-Button'> Availability </button>

@@ -92,7 +92,7 @@ const Messaging: React.FC = () => {
   const navigate = useNavigate();
 
   const selectedChatId = searchParams.get("selectedChatId");
-  const selectedGroupId = searchParams.get("groupId");
+  
 
 
   const [alerts, setAlerts] = useState<{ id: number; alertText: string; alertSeverity: "error" | "warning" | "info" | "success"; visible: boolean }[]>([]);
@@ -188,7 +188,6 @@ const Messaging: React.FC = () => {
   useEffect(() => {
     const fetchChats = async () => {
       console.log("selected chat id: ", selectedChatId);
-      console.log("selected group id: ", selectedGroupId);
       const token = localStorage.getItem('token');
 
     
