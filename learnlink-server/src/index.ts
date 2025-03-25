@@ -1032,7 +1032,8 @@ app.get('/api/profiles/:userId', async (req, res): Promise<any> => {
         ...usersWithScore,
       ].sort((a, b) => b.similarityScore - a.similarityScore); // Sort by similarity score
   
-      //console.log('Combined profiles:', combinedProfiles);
+      
+      // console.log('Combined profiles:', combinedProfiles);
     res.status(200).json({
       profiles: combinedProfiles, // Sorted profiles with similarityScore and type
     });
