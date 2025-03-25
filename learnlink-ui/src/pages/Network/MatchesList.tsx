@@ -4,6 +4,8 @@ import { Match, User } from './types';
 import axios from 'axios';
 import CustomAlert from '../../components/CustomAlert';
 import { getLoggedInUserId } from '../../utils/auth';
+import ConfirmPopup from '../../components/ConfirmPopup'
+import { set } from 'react-hook-form';
 
 
 interface MatchesListProps {
@@ -15,8 +17,12 @@ const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:200
 const MatchesList: React.FC<MatchesListProps> = ({ handleSelectUser }) => {
   const [matchesList, setMatchesList] = useState<Match[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-const currentUserId = getLoggedInUserId();
+  const [alerts, setAlerts] = useState<{ id: number; alertText: string; alertSeverity: "error" | "warning" | "info" | "success"; visible: boolean }[]>([]);
+  const alertVisible = alerts.some(alert => alert.visible);
+  const [displayRemoveWarning, setDisplayRemoveWarning] = useState<boolean>(false);
+  const [selectedFriend, setSelectedFriend] = useState<number | null>(null); // Track friend being removed
+
+  const currentUserId = getLoggedInUserId();
 
   useEffect(() => {
 
@@ -53,7 +59,10 @@ const currentUserId = getLoggedInUserId();
             setMatchesList(uniqueMatches);
 
         } catch (err) {
-        setError('Failed to fetch matches');
+            setAlerts((prevAlerts) => [
+                ...prevAlerts,
+                { id: Date.now(), alertText:`Failed to fetch matches. Please try again later.`, alertSeverity: 'error', visible: true },
+              ]);
       } finally {
         setLoading(false);
       }
@@ -62,19 +71,51 @@ const currentUserId = getLoggedInUserId();
     fetchMatches();
   }, []);
 
+  const removeMatch = async (userId: number) => {
+    try {
+        const token = localStorage.getItem('token');  // Example, change as per your implementation
+
+        const response = await axios.delete(`${REACT_APP_API_URL}/api/match/${userId}`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+
+            if (response.status === 200) {
+                setMatchesList(prevMatchesList => prevMatchesList.filter(m => m.user1Id !== userId && m.user2Id !== userId));
+                console.log('Match removed successfully');
+                setAlerts((prevAlerts) => [
+                    ...prevAlerts,
+                    { id: Date.now(), alertText: `Match removed successfully`, alertSeverity: 'success', visible: true },
+                ]);
+            }
+        } catch (err) {
+            console.error('Error removing match:', err);
+            setAlerts((prevAlerts) => [
+                ...prevAlerts,
+                { id: Date.now(), alertText: `Error removing match: ${err}`, alertSeverity: 'error', visible: true },
+            ]);
+        }
+
+    };
+
   if (loading) return <div>Loading matches...</div>;
 
   
   return (
     <div className="TabPanel">
-        { error ? (
-            <CustomAlert
-            text={"Unable to retrieve matches. Please try again later."}
-            severity={"error"}
-            onClose={() => setError(null)}
-        />
-        ) : null
-    }
+     {alertVisible && (
+                <div className='alert-container'>
+                {alerts.map(alert => (
+                    <CustomAlert
+                        key={alert.id}
+                        text={alert.alertText || ''}
+                        severity={alert.alertSeverity || 'info' as "error" | "warning" | "info" | "success"}
+                        onClose={() => setAlerts(prevAlerts => prevAlerts.filter(a => a.id !== alert.id))}
+                    />
+                ))}
+            </div>
+            )}
       {/* <h3>Your Matches</h3>
       <p>List of matched study partners...</p> */}
       <ul className="network-list">
@@ -104,9 +145,25 @@ const currentUserId = getLoggedInUserId();
                           </div>
                       </div>
                       <div className='network-list-status'>
-                              <button className='network-withdraw-button' onClick={(event: React.MouseEvent<HTMLButtonElement>) => { event.stopPropagation();  }}>Remove</button>
-                              <button className='network-message-button' onClick={(event: React.MouseEvent<HTMLButtonElement>) => { event.stopPropagation();  }}>Message</button>
+                              <button className='network-withdraw-button' onClick={(event: React.MouseEvent<HTMLButtonElement>) => { event.stopPropagation(); setSelectedFriend(friend.id); setDisplayRemoveWarning(true)}}>Remove</button>
+                              <button className='network-message-button' onClick={(event: React.MouseEvent<HTMLButtonElement>) => { event.stopPropagation();  setSelectedFriend(friend.id)}}>Message</button>
                       </div>
+
+                      {displayRemoveWarning && selectedFriend === friend.id && (
+                          <ConfirmPopup
+                              message="Are you sure you want to remove this connection? All 1-on-1 chats with this user be deleted."
+                              onConfirm={() => {
+                                  setDisplayRemoveWarning(false);
+                                  removeMatch(friend.id);
+                                  setSelectedFriend(null);
+                              }}
+                              
+                              onCancel={() => { 
+                                setDisplayRemoveWarning(false);
+                                setSelectedFriend(null);
+                            }}
+                          />
+                      )}
 
                   </div>
               </ul>

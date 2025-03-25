@@ -701,6 +701,140 @@ const createMatchForStudyGroup = async (userId: number, targetGroupId: number) =
   }
 };
 
+app.delete('/api/match/:id', authenticate, async (req: Request, res: Response): Promise<any> => {
+  try {
+    const currUserId = res.locals.userId;
+    const matchUserId = parseInt(req.params.id, 10);
+
+    console.log('Deleting match between current user ID', currUserId, 'and matched user ID', matchUserId);
+
+    if (isNaN(matchUserId) || !currUserId) {
+      return res.status(400).json({ error: 'Invalid user ID' });
+    }
+
+    // Check if match exists
+    const match = await prisma.match.findMany({
+      where: {
+        OR: [
+          { user1Id: currUserId, user2Id: matchUserId },
+          { user1Id: matchUserId, user2Id: currUserId }
+        ]
+      }
+    });
+
+    console.log("Matches found:", match);
+
+    if (match.length === 0) {
+      return res.status(404).json({ error: 'Match not found' });
+    } // Step 1: Find shared study groups
+    const sharedStudyGroups = await prisma.studyGroup.findMany({
+      where: {
+        users: {
+          some: { id: currUserId }
+        },
+        AND: {
+          users: { some: { id: matchUserId } }
+        }
+      },
+      include: { users: true }
+    });
+
+    // Step 2: Determine which groups should be deleted
+    const studyGroupsToDelete = sharedStudyGroups.filter(group => group.users.length === 2);
+    const studyGroupIdsToDelete = studyGroupsToDelete.map(group => group.id);
+
+    if (studyGroupIdsToDelete.length > 0) {
+      console.log(`Deleting ${studyGroupIdsToDelete.length} study group(s)...`);
+
+      // Delete associated chats for these study groups
+      await prisma.chat.deleteMany({
+        where: {
+          studyGroupId: { in: studyGroupIdsToDelete }
+        }
+      });
+
+      // Delete the study groups
+      await prisma.studyGroup.deleteMany({
+        where: {
+          id: { in: studyGroupIdsToDelete }
+        }
+      });
+    }
+
+    // Step 3: Find direct one-on-one chats (not study group chats)
+    const oneOnOneChats = await prisma.chat.findMany({
+      where: {
+        studyGroupId: null, // Not linked to any study group
+        users: {
+          every: { id: { in: [currUserId, matchUserId] } } // Only these two users
+        }
+      }
+    });
+
+    if (oneOnOneChats.length > 0) {
+      console.log("Deleting direct one-on-one chats...");
+
+      await prisma.message.deleteMany({
+        where: {
+          chatId: { in: oneOnOneChats.map(chat => chat.id) }
+        }
+      });
+
+      await prisma.chat.deleteMany({
+        where: {
+          id: { in: oneOnOneChats.map(chat => chat.id) }
+        }
+      });
+    }
+
+    // Step 5: Delete any previous swipes between the users
+    await prisma.swipe.deleteMany({
+      where: {
+        OR: [
+          { userId: currUserId, targetUserId: matchUserId },
+          { userId: matchUserId, targetUserId: currUserId }
+        ]
+      }
+    });
+
+    // Step 6: Create a new swipe with status 'Rejected' to prevent re-matching
+    await prisma.swipe.create({
+      data: {
+        userId: currUserId,
+        targetUserId: matchUserId,
+        direction: 'No',  // Assuming LEFT means reject
+        status: 'Denied'
+      }
+    });
+
+    // await prisma.swipe.create({
+    //   data: {
+    //     userId: matchUserId,
+    //     targetUserId: currUserId,
+    //     direction: 'No',  // Both users should reject each other
+    //     status: 'Denied'
+    //   }
+    // });
+
+    // Step 4: Delete the match
+    await prisma.match.deleteMany({
+      where: {
+        OR: [
+          { user1Id: currUserId, user2Id: matchUserId },
+          { user1Id: matchUserId, user2Id: currUserId }
+        ]
+      }
+    });
+
+    console.log("Successfully deleted match and associated chat/study group data if applicable.");
+    return res.status(200).json({ message: 'Match and associated chats/study groups deleted successfully' });
+
+  } catch (error) {
+    console.error("Error deleting match or chat:", error);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 // Endpoint to retrieve matches for a user
 app.get('/api/profiles', authenticate, async (req: Request, res: Response) => {
   const userId = res.locals.userId; // Retrieved from the token  const userId = parseInt(req.params.userId);
@@ -741,8 +875,8 @@ app.get('/api/profiles/:userId', async (req, res): Promise<any> => {
 
     const placeholderImage = "https://learnlink-public.s3.us-east-2.amazonaws.com/AvatarPlaceholder.svg";
     const sgPlaceholderImage = 'https://learnlink-pfps.s3.us-east-1.amazonaws.com/profile-pictures/generic_studygroup_pfp.svg'
-     // Fetch the current user's data to use for matching
-     const currentUser = await prisma.user.findUnique({
+    // Fetch the current user's data to use for matching
+    const currentUser = await prisma.user.findUnique({
       where: { id: userId },
       select: {
         ideal_match_factor: true,
