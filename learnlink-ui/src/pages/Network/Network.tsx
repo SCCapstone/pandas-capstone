@@ -2,16 +2,11 @@
 import './Network.css';
 import Navbar from '../../components/Navbar';
 import CopyrightFooter from '../../components/CopyrightFooter';
-import { useNavigate } from 'react-router-dom';
-import CustomAlert from '../../components/CustomAlert';
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import { getLoggedInUserId } from '../../utils/auth';
+import { useNavigate, useLocation } from "react-router-dom";
 import MatchesList from './MatchesList';
 import SentRequestsList from './SentRequestsList';
 import ReceivedRequestsList from './ReceivedRequestsList';
-
-
+import React, { useState, useEffect } from "react";
 
 interface User {
     id: number;
@@ -38,79 +33,89 @@ interface SwipeRequest {
     direction: 'Yes' | 'No';
     targetUser?: User;          // User details of the target user (if applicable)
     status: SwipeStatus;
-  }
+}
 
-  // Enum for swipe status
+// Enum for swipe status
 enum SwipeStatus {
   Accepted = 'Accepted',
   Denied = 'Denied',
   Pending = 'Pending'
 }
 
-  // Interface for a group object
+// Interface for a group object
 interface Group {
-    studyGroup: StudyGroup; // Contains details of the study group
-  }
-  
-  // Interface defining a study group
-  interface StudyGroup {
-    id: number;
-    name: string; // Name of the study group
-    description: string; // Description of the study group
-    profilePic?: string; // URL of the group's profile picture
-  }
-  
+  studyGroup: StudyGroup; // Contains details of the study group
+}
+
+// Interface defining a study group
+interface StudyGroup {
+  id: number;
+  name: string; // Name of the study group
+  description: string; // Description of the study group
+  profilePic?: string; // URL of the group's profile picture
+}
+
 
 const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
 
 
 const Network = () => {
-    const navigate = useNavigate();
-    const [activeTab, setActiveTab] = useState("sentRequests");
+  const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState("matches");
+  const currentLocation = useLocation();
 
-    const handleSelectUser = (userId: number) => {
-        navigate(`/user-profile/${userId}`);
-    };
+  // Set the active tab based on the query parameter
+  useEffect(() => {
+    const queryParams = new URLSearchParams(currentLocation.search);
+    const tab = queryParams.get("tab");
+    if (tab && ["matches", "sentRequests", "receivedRequests"].includes(tab)) {
+      setActiveTab(tab);
+    }
+  }, [currentLocation.search]);
+
+  const handleSelectUser = (userId: number) => {
+    navigate(`/user-profile/${userId}`);
+  };
 
 
-    return (
-        <div className="NetworkPage">
-            <Navbar />
-            <div className="NetworkContainer">
-                {/* Tabs Navigation */}
-                <div className="NetworkTabsContainer">
-                    <button
-                        className={`Tab ${activeTab === "matches" ? "active" : ""}`}
-                        onClick={() => setActiveTab("matches")}
-                    >
-                        Matches
-                    </button>
+  return (
+    <div className="NetworkPage">
+      <Navbar />
+      <div className="NetworkContainer">
+        {/* Tabs Navigation */}
+        <div className="NetworkTabsContainer">
+          <button
+            className={`Tab ${activeTab === "matches" ? "active" : ""}`}
+            onClick={() => setActiveTab("matches")}
+          >
+            Connections
+          </button>
 
-                    <button
-                        className={`Tab ${activeTab === "sentRequests" ? "active" : ""}`}
-                        onClick={() => setActiveTab("sentRequests")}
-                    >
-                        Sent Requests
-                    </button>
+          <button
+            className={`Tab ${activeTab === "sentRequests" ? "active" : ""}`}
+            onClick={() => setActiveTab("sentRequests")}
+          >
+            Requests Sent
+          </button>
 
-                    <button
-                        className={`Tab ${activeTab === "receivedRequests" ? "active" : ""}`}
-                        onClick={() => setActiveTab("receivedRequests")}
-                    >
-                        Received Requests
-                    </button>
-                </div>
-
-                {/* Tab Content */}
-                <div className="TabContent">
-                    {activeTab === "matches" && <MatchesList handleSelectUser={handleSelectUser}/>}
-                    {activeTab === "sentRequests" && <SentRequestsList handleSelectUser={handleSelectUser}/>}
-                    {activeTab === "receivedRequests" && <ReceivedRequestsList handleSelectUser={handleSelectUser}/>}
-                </div>
-            </div>
-            <CopyrightFooter />
+          <button
+            className={`Tab ${activeTab === "receivedRequests" ? "active" : ""}`}
+            onClick={() => setActiveTab("receivedRequests")}
+          >
+            Requests Recieved
+          </button>
         </div>
-    );
+
+        {/* Tab Content */}
+        <div className="TabContent">
+          {activeTab === "matches" && <MatchesList handleSelectUser={handleSelectUser} />}
+          {activeTab === "sentRequests" && <SentRequestsList handleSelectUser={handleSelectUser} />}
+          {activeTab === "receivedRequests" && <ReceivedRequestsList handleSelectUser={handleSelectUser} />}
+        </div>
+      </div>
+      <CopyrightFooter />
+    </div>
+  );
 };
 
 export default Network;

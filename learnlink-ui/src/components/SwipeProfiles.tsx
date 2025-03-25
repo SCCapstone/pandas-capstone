@@ -64,7 +64,7 @@ const SwipeProfiles = ({ userId }: { userId: number }) => {
   };
 
   const handlePendingRequests = () => {
-    navigate(`/network`);
+    navigate(`/network?tab=sentRequests`);
   };
 
   const handleSwipe = async (direction: 'Yes' | 'No', targetId: number, isStudyGroup: boolean, message:string | undefined) => {
