@@ -2819,10 +2819,9 @@ const days = ["Sun", "Mon", "Tues", "Wed", "Thur", "Fri", "Sat"] as const;
 
 type Day = typeof days[number];
 
-// In your Express route
 app.post("/api/studyGroup/:studyGroupId/availability", async (req, res) => {
   const { studyGroupId } = req.params;
-  const { userId, availability } = req.body;
+  const { userId, availability } = req.body; // `availability` should be a JSON object
 
   try {
     // Delete any existing availability for the user in this study group
@@ -2833,16 +2832,13 @@ app.post("/api/studyGroup/:studyGroupId/availability", async (req, res) => {
       },
     });
 
-    // Save the new availability
-    await prisma.availability.createMany({
-      data: Object.keys(availability).flatMap((day) =>
-        availability[day as Day].map((timeSlot: string) => ({
-          userId: Number(userId),
-          studyGroupId: Number(studyGroupId),
-          day: day as Day,
-          availability: timeSlot,
-        }))
-      ),
+    // Save the new availability as a JSON object
+    await prisma.availability.create({
+      data: {
+        userId: Number(userId),
+        studyGroupId: Number(studyGroupId),
+        availability: availability, // Store the entire availability JSON object
+      },
     });
 
     res.status(200).json({ message: "Availability saved successfully" });
