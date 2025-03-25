@@ -96,7 +96,7 @@ const SentRequestsList:React.FC<SentRequestsListProps> = ({ handleSelectUser }: 
         Loading... <span className="loading-spinner"></span>
       </div>
     ) : sentRequestsList.length === 0 ? (
-      <p className="no-requests">No join requests.</p>
+      <p className="no-requests">No requests sent.</p>
       ) : (
             <div className="network-list-container">
             {/* <h3>Your Matches</h3>

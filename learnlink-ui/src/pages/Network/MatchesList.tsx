@@ -99,9 +99,10 @@ const MatchesList: React.FC<MatchesListProps> = ({ handleSelectUser }) => {
 
     };
 
-  if (loading) return <div>Loading matches...</div>;
+    if (loading) return <div className="loading-container">Loading... <span className="loading-spinner"></span> </div>;
 
-  
+    if(matchesList.length === 0) return <p className="no-requests">No connections yet.</p>
+
   return (
     <div className="TabPanel">
      {alertVisible && (

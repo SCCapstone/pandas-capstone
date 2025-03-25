@@ -245,7 +245,7 @@ const handleApproval = async (
                     Loading... <span className="loading-spinner"></span>
                 </div>
             ) : receivedRequestsList.length === 0 ? (
-                <p className="no-requests">No join requests.</p>
+                <p className="no-requests">No recieved requests.</p>
             ) : (
                 <div className="network-list-container">
                     {/* <h3>Your Matches</h3>
