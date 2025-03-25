@@ -14,6 +14,7 @@ import GroupUserList from '../components/GroupUserList';
 import JoinReqProfile from '../components/JoinReqProfile';
 import CustomAlert from '../components/CustomAlert';
 import { unescape } from 'querystring';
+import { useNavigate } from "react-router-dom";
 
 
 
@@ -63,6 +64,7 @@ import { unescape } from 'querystring';
     const searchParams = new URLSearchParams(window.location.search);
     const selectedGroupId = searchParams.get("groupId");
     const tab = searchParams.get("tab");
+    const navigate = useNavigate();
 
 
     useEffect(() => {
@@ -125,6 +127,9 @@ import { unescape } from 'querystring';
         }
         await getGroups();
         console.log("current groups complete");
+
+        // Clear search params
+        navigate(window.location.pathname, { replace: true });
         };
         fetchGroups();
         console.log("fetch groups complete");

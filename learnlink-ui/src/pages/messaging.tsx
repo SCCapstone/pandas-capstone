@@ -66,7 +66,7 @@ const Messaging: React.FC = () => {
   const [hasStudyGroup, setHasStudyGroup] = useState(false);
   const [isPanelVisible, setIsPanelVisible] = useState(false);  // To control panel visibility
   const [selectedUser, setSelectedUser] = useState<User | null>(null); // Track selected user
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const selectedUserId = searchParams.get('user'); // Get the matched user ID
   const [heartedMessages, setHeartedMessages] = useState<{ [key: number]: boolean }>({});
   const [studyGroupNames, setStudyGroupNames] = useState<{ [key: number]: string }>({});
@@ -213,6 +213,8 @@ const Messaging: React.FC = () => {
       }
       await getCurrentChat();
       console.log("current chats complete");
+      // Clear search params
+      navigate(window.location.pathname, { replace: true });
       };
       fetchChats();
       console.log("fetch chats complete");
