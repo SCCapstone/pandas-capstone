@@ -1862,7 +1862,7 @@ app.get('/api/chats/check', async (req, res): Promise<any> => {
 
   try {
     // Check if a chat exists between the two users
-    const existingChat = await prisma.chat.findFirst({
+    const existingChats = await prisma.chat.findMany({
       where: {
         users: {
           every: { id: { in: [Number(userId1), Number(userId2)] } }, // Ensure both users are in the chat
@@ -1870,10 +1870,23 @@ app.get('/api/chats/check', async (req, res): Promise<any> => {
       },
     });
 
-    console.log(existingChat)
+    console.log(existingChats)
 
-    if (existingChat) {
-      return res.json({ exists: true, chatId: existingChat.id });
+    if (existingChats.length > 0) {
+      const nonStudyGroupChats = existingChats.filter(chat => chat.studyGroupId === null);
+
+      // If there's at least one non-study-group chat, prevent new chat creation
+      console.log("non study group chats: ", nonStudyGroupChats);
+      if (nonStudyGroupChats.length>0) {
+        return res.json({ exists: true, chatId: nonStudyGroupChats[0].id });
+      }
+      
+      if (existingChats.length === 1 && existingChats[0].studyGroupId !== null){
+        return res.json({exists: false })
+      }
+     
+        return res.json({ exists: true, chatId: existingChats[0].id });
+      
     }
 
     res.json({ exists: false });

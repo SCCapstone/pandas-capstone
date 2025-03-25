@@ -21,6 +21,7 @@ const MatchesList: React.FC<MatchesListProps> = ({ handleSelectUser }) => {
   const alertVisible = alerts.some(alert => alert.visible);
   const [displayRemoveWarning, setDisplayRemoveWarning] = useState<boolean>(false);
   const [selectedFriend, setSelectedFriend] = useState<number | null>(null); // Track friend being removed
+  const [error, setError] = useState<string | null>(null);
 
   const currentUserId = getLoggedInUserId();
 
@@ -99,9 +100,69 @@ const MatchesList: React.FC<MatchesListProps> = ({ handleSelectUser }) => {
 
     };
 
-    const handleMessage  = async (userId: number) => {
-
-
+    const handleMessage  = async (userId: number, currentId: number | null) => {
+        //creates a new chat as long as a non-study group chat between the two users doesnt exist
+        try {
+            let endpoint = "";
+            let payload: any = {};
+        
+        
+            // Check if a chat already exists
+            if (userId) {
+        
+              const chatCheckResponse = await axios.get(`${REACT_APP_API_URL}/api/chats/check`, {
+                params: { userId1: userId, userId2: currentId },
+              });
+        
+              if (chatCheckResponse.data.exists) {
+                console.log("A chat with this user already exists.");
+                setError("A chat with this user already exists.");
+                return; // Stop function execution
+              }
+              console.log("chat w user", userId)
+              // If the request is for a one-on-one chat, create a new chat
+              endpoint = "/api/chats";
+              payload.userId1 = userId;
+              payload.userId2 = currentId;
+            } else {
+              throw new Error("Invalid request: No user.");
+            }
+           
+            
+        
+            const response = await axios.post(`${REACT_APP_API_URL}${endpoint}`, payload);
+        
+        
+        if (response.status === 200 || response.status === 201) {
+              // If chat was created successfully, update parent component
+              console.log("response 200");
+    
+        
+    
+            } 
+          
+          } catch (err: unknown) {
+            console.error("Error approving request:", err);
+            if (axios.isAxiosError(err) && err.response?.status === 405) {
+              console.log("Caught 405 error in catch block");
+              
+            }
+            if (axios.isAxiosError(err)) {
+              if (err.response) {
+                // API responded with an error
+                setError(err.response.data.message || "An error occurred while processing the request.");
+              } else if (err.request) {
+                // No response received
+                setError("No response from server. Please check your network.");
+              }
+            } else if (err instanceof Error) {
+              // General JavaScript error
+              setError(`Unexpected error: ${err.message}`);
+            } else {
+              setError("An unknown error occurred.");
+            }
+          }
+      
     };
 
     if (loading) return <div className="loading-container">Loading... <span className="loading-spinner"></span> </div>;
@@ -152,7 +213,7 @@ const MatchesList: React.FC<MatchesListProps> = ({ handleSelectUser }) => {
                       </div>
                       <div className='network-list-status'>
                               <button className='network-withdraw-button' onClick={(event: React.MouseEvent<HTMLButtonElement>) => { event.stopPropagation(); setSelectedFriend(friend.id); setDisplayRemoveWarning(true)}}>Remove</button>
-                              <button className='network-message-button' onClick={(event: React.MouseEvent<HTMLButtonElement>) => { event.stopPropagation();  setSelectedFriend(friend.id); handleMessage(friend.id);}}>Message</button>
+                              <button className='network-message-button' onClick={(event: React.MouseEvent<HTMLButtonElement>) => { event.stopPropagation();  setSelectedFriend(friend.id); handleMessage(friend.id,currentUserId );}}>Message</button>
                       </div>
 
                       {displayRemoveWarning && selectedFriend === friend.id && (
