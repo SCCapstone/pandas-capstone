@@ -1880,7 +1880,7 @@ app.get('/api/chats/check', async (req, res): Promise<any> => {
       if (nonStudyGroupChats.length>0) {
         return res.json({ exists: true, chatId: nonStudyGroupChats[0].id });
       }
-      
+
       if (existingChats.length === 1 && existingChats[0].studyGroupId !== null){
         return res.json({exists: false })
       }
@@ -2100,6 +2100,7 @@ app.post('/api/chats', async (req, res) : Promise<any> => {
   }
 
   try {
+    /*
     // Check if a chat between these users already exists
     const existingChat = await prisma.chat.findFirst({
       where: {
@@ -2113,7 +2114,7 @@ app.post('/api/chats', async (req, res) : Promise<any> => {
 
     if (existingChat) {
       return res.status(200).json(existingChat); // Return existing chat if found
-    }
+    }*/
     
     // Retrieve recipient's name
     const recipient = await prisma.user.findUnique({
