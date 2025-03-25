@@ -627,6 +627,47 @@ app.get('/api/swipe/sentRequests/:currentUser', async (req, res): Promise<any> =
   }
 });
 
+app.get('/api/swipe/pendingRequestCheck/:targetUser', async (req, res): Promise<any> => {
+  const { targetUser } = req.params;
+  const currentUser = res.locals.userId
+  console.log('Fetching requests for user:', currentUser);
+
+  const currentUserId = parseInt(currentUser, 10);
+  const targetUserId  = parseInt(targetUser, 10);
+
+  if (isNaN(currentUserId) || isNaN(targetUserId)) {
+    return res.status(400).json({ error: 'Invalid user ID' });
+  }
+
+  try {
+    const sentRequests = await prisma.swipe.findMany({
+      where: {
+        AND: {
+          userId: currentUserId,
+          targetUserId: targetUserId
+        }
+      },
+      select: { 
+        id: true,
+        userId: true,
+        user: true,
+        targetUserId: true,
+        targetGroupId: true,
+        direction: true,
+        message: true,
+        status: true,
+      },
+    });
+
+    
+
+    res.status(200).json(sentRequests);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Something went wrong' });
+  }
+});
+
 //for deleting a request in the reject button in requests panel
 app.delete('/api/swipe/:requestId', async(req, res): Promise<any> =>{
   let {requestId} = req.params;
@@ -2639,6 +2680,36 @@ app.put('/api/swipe-requests/:id', async (req, res): Promise<any> => {
 
       if (!swipe) {
           return res.status(404).json({ error: "Swipe request not found" });
+      }
+
+      if (swipe.targetUserId) {
+          // Delete any other requests between the two users
+          await prisma.swipe.deleteMany({
+            where: {
+                userId: swipe.userId,
+                targetUserId: swipe.targetUserId,
+                NOT: { id: Number(id) } // Exclude the current request
+            }
+        });
+  
+        await prisma.swipe.deleteMany({
+            where: {
+                userId: swipe.targetUserId,
+                targetUserId: swipe.userId,
+                NOT: { id: Number(id) } // Exclude the current request
+            }
+        });
+      }
+
+      if (swipe.targetGroupId) {
+           // Delete any other requests between the user and studygroup
+           await prisma.swipe.deleteMany({
+            where: {
+                userId: swipe.userId,
+                targetGroupId: swipe.targetGroupId,
+                NOT: { id: Number(id) } // Exclude the current request
+            }
+        });
       }
 
       // Update swipe request status
