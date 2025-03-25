@@ -66,7 +66,7 @@ import { unescape } from 'querystring';
 
 
     useEffect(() => {
-        const fetchGroups = async () => {
+      const fetchGroups = async () => {
         const token = localStorage.getItem('token');
 
         console.log("groups selected group id: ",selectedGroupId);

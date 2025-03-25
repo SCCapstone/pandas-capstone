@@ -82,6 +82,7 @@ const Messaging: React.FC = () => {
   const [msgUsernames, setMsgUsernames] = useState<{ [key: number]: string }>({});
   const [chatUsernames, setChatUsernames] = useState<{ [key: number]: string }>({});
   const [groupId, setGroupId] = useState<number | null>(null);
+  
 
   const [updateMessage, setUpdateMessage] = useState<string>('');
   const [visibleMessage, setVisibleMessage] = useState("");
@@ -90,6 +91,8 @@ const Messaging: React.FC = () => {
   const [currentGroupId, setCurrentGroupId] = useState<number | null>(null);
   const navigate = useNavigate();
 
+  const selectedChatId = searchParams.get("selectedChatId");
+  const selectedGroupId = searchParams.get("groupId");
 
 
   const [alerts, setAlerts] = useState<{ id: number; alertText: string; alertSeverity: "error" | "warning" | "info" | "success"; visible: boolean }[]>([]);
@@ -182,6 +185,39 @@ const Messaging: React.FC = () => {
   }, [isPanelVisible]);  // reloads when selected or tab changes, allows for updates to users
 
 
+  useEffect(() => {
+    const fetchChats = async () => {
+      console.log("selected chat id: ", selectedChatId);
+      console.log("selected group id: ", selectedGroupId);
+      const token = localStorage.getItem('token');
+
+    
+      
+      const getCurrentChat = async () => {
+        if (!selectedChatId){
+          return;
+        }
+        if (selectedChatId) {
+          try {
+            const response = await axios.get(`${REACT_APP_API_URL}/api/chats/${selectedChatId}`, {
+              headers: { Authorization: `Bearer ${token}` },
+            });
+            console.log(response.data);
+            setSelectedChat(response.data)
+            
+            
+          } catch (error) {
+            console.error('Error fetching selected chat:', error);
+          }
+        }
+      }
+      await getCurrentChat();
+      console.log("current chats complete");
+      };
+      fetchChats();
+      console.log("fetch chats complete");
+  }, []);
+  
 
   useEffect(() => {
     const fetchData = async () => {
