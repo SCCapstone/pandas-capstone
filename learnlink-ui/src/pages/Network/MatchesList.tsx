@@ -142,7 +142,7 @@ const MatchesList: React.FC<MatchesListProps> = ({ handleSelectUser }) => {
               console.log("response 200");
               
               navigate(`/messaging?selectedChatId=${response.data.id}`);
-              //todo navigate to the newly created chat
+              
             } 
           
           } catch (err: unknown) {
