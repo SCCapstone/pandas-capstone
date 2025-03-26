@@ -48,18 +48,43 @@
   margin: 0;
 }
 
-.ChatListItem {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px solid #ddd;
-  cursor: pointer;
-}
 
 .ChatListItem:hover,
 .ChatListItem.active {
   background-color: #f0f0f0;
 }
+
+.ChatListItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 30px;
+  border-bottom: 1px solid #ddd;
+  cursor: pointer;
+  position: relative; /* Make sure to add this to position the dot */
+}
+
+.chat-name {
+  position: relative; /* Positioning context for the dot */
+  color: black; /* Default color */
+}
+
+.chat-name.unread {
+  color: blue; /* Color for unread messages */
+}
+
+.chat-name.highlighted::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: blue;
+  position: absolute;
+  left: -12px;  /* Adjust this to your layout */
+  top: 50%;
+  transform: translateY(-50%); /* Center vertically */
+}
+
 
 .ChatSection {
   flex: 1;

@@ -103,7 +103,9 @@ model User {
   resetToken          String?        @unique // Nullable, unique reset token
   resetTokenExpiry    DateTime?      // Expiration timestamp for the reset token
 
-  availability Availability[]
+  availability        Availability[]
+  unReadMessages      Boolean?      @default(true)
+  lastOpened          LastOpened[] 
 }
 
 model StudyGroup {
@@ -175,8 +177,20 @@ model Chat {
   messages      Message[] // One-to-many relationship to Message
   studyGroupId  Int?      @unique // Add this line to define the studyGroupId field
   studyGroup    StudyGroup? @relation("StudyGroupChat", fields: [studyGroupId], references: [id]) // Optional relation to StudyGroup
+  lastOpened     LastOpened[] // <-- Relation to track when each user last opened the chat
 }
 
+model LastOpened {
+  id        Int      @id @default(autoincrement())
+  chatId    Int
+  userId    Int
+  timestamp DateTime @default(now())
+
+  chat      Chat  @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  user      User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([chatId, userId]) // Ensures each user has only one timestamp per chat
+}
 
 model Message {
   id           Int         @id @default(autoincrement())
@@ -188,7 +202,6 @@ model Message {
   chat         Chat        @relation(fields: [chatId], references: [id], onDelete: Cascade) // One-to-many relation to Chat
   liked        Boolean     @default(false)
   system       Boolean     @default(false)
-  seen         Boolean     @default(false)
 }
 
 model Notification {

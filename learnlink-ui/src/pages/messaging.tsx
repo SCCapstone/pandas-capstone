@@ -22,6 +22,7 @@ interface Chat {
   users: User[]; 
   createdAt: string;
   updatedAt: string;
+  lastOpened: { [userId: number]: string };
 }
 
 interface Message{
@@ -32,7 +33,6 @@ interface Message{
   chatId: number;
   liked: boolean;
   system: boolean;
-  seen: boolean;
   
 }
 interface User {
@@ -40,6 +40,7 @@ interface User {
   username: string;
   firstName: string;
   lastName: string;
+  unReadMessages?: boolean; 
 }
 
 
@@ -81,6 +82,8 @@ const Messaging: React.FC = () => {
   const [chatUsernames, setChatUsernames] = useState<{ [key: number]: string }>({});
   const [groupId, setGroupId] = useState<number | null>(null);
   
+  const [unseenMessages, setUnseenMessages] = useState<{ [chatId: number]: boolean }>({});
+
 
   const [updateMessage, setUpdateMessage] = useState<string>('');
   const [visibleMessage, setVisibleMessage] = useState("");
@@ -159,6 +162,7 @@ const Messaging: React.FC = () => {
             }));
 
             setChats(chatsWithMessages);
+
 
             // Ensure storing liked messages correctly
             const likedMessagesMap = chatResponse.data.reduce((acc: Record<number, boolean>, chat: Chat) => {
@@ -309,18 +313,21 @@ const Messaging: React.FC = () => {
   }, [selectedChat, currentUserId]);
 
   useEffect(() => {
+    console.log ("rerendering chats");
     socket.on("chatUpdated", (updatedUsers) => {
-      setChats((prevChats) =>
-        prevChats.map((chat) =>
-          chat.id === selectedChat?.id ? { ...chat, users: updatedUsers } : chat
-        )
-      );
+        setChats((prevChats) =>
+            prevChats.map((chat) =>
+                chat.id === selectedChat?.id
+                    ? { ...chat, users: updatedUsers, messages: [...chat.messages] } // Preserve messages
+                    : chat
+            )
+        );
     });
 
     return () => {
-      socket.off("chatUpdated");
+        socket.off("chatUpdated");
     };
-  }, [selectedChat]);
+}, [selectedChat]);
 
 
   // Used for editing study groups
@@ -386,6 +393,8 @@ useEffect(() => {
             : chat
         );
       });
+      console.log("changing chats!!");
+
     });
     
     return () => {
@@ -462,7 +471,6 @@ useEffect(() => {
           chatId: selectedChat.id,
           liked: false,
           system: false,
-          seen: false,
         };
   
         // sends the message via a websocket to the other user
@@ -585,7 +593,6 @@ useEffect(() => {
           chatId: selectedChat.id,
           liked: false,
           system: true,
-          seen: false,
         };
   
         // sends the message via a websocket to the other user
@@ -640,8 +647,10 @@ useEffect(() => {
       }
     }
   };
-    
   
+  
+
+
 
   // Used to access the study group name or chat name for displaying properly on the UI
   const getChatName = async (chat: Chat) => {
@@ -1054,15 +1063,15 @@ const handleGetChatUsername = async (userId: number) => {
           </div>
 
           {/* Conditionally show the messages panel */}
-          {showMessagesPanel && (
+          {showMessagesPanel && currentUserId && (
             <ChatsNavi 
               chats={chats}
               selectedChat={selectedChat} 
               setSelectedChat={setSelectedChat} 
+              currentUserId = {currentUserId}
               handleDeleteChat={handleDeleteChat} 
               chatNames={chatNames} 
               loadingChatList={loadingChatList}
-
             />
           )}
 
