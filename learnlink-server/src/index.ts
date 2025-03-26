@@ -1337,18 +1337,7 @@ app.post('/api/study-groups', authenticate, async (req, res): Promise<any> => {
       return res.status(400).json({ error: 'Name is required' });
     }
 
-    const existingStudyGroup = await prisma.studyGroup.findFirst({
-      where: {
-        users: {
-          every: { id: { in: users } }, // Check if all users in the provided list are in the study group
-        },
-      },
-    });
-
-    if (existingStudyGroup) {
-      return res.json({ message: 'Study group already exists for these users.', studyGroupId: existingStudyGroup.id });
-    }
-
+    
     console.log('Creating study group with:', { name, subject, description, users });
 
 
@@ -1516,6 +1505,8 @@ app.put('/api/study-groups/chat/:chatID', async (req, res) : Promise<any> =>  {
     res.status(500).json({ error: 'Failed to update the study group' });
   }
 });
+
+
 
 app.get("/api/study-groups/:studyGroupId/chat", async (req, res): Promise<any> => {
   const { studyGroupId } = req.params;

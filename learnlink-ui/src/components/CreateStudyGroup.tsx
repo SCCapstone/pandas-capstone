@@ -100,6 +100,7 @@ const CreateStudyGroup =(
           `${REACT_APP_API_URL}/api/study-groups/chat/${chatID}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
+        console.log("Chat id::::: ", chatID);
 
         // Set the form fields with the existing study group values
         const data = response.data;
