@@ -309,7 +309,6 @@
 }
 
 .Tab.active {
-  border-bottom: 3px solid #fff;
   color: #fff;
 }
 

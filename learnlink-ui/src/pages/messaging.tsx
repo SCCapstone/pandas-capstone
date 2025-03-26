@@ -6,11 +6,7 @@ import CopyrightFooter from '../components/CopyrightFooter';
 import './LandingPage.css';
 import axios from 'axios';
 import { useSearchParams } from 'react-router-dom';
-import EditStudyGroup from '../components/EditStudyGroup';
 import ChatsNavi from "../components/ChatsNavi";
-import JoinRequests from '../components/JoinRequests';
-import GroupUserList from '../components/GroupUserList';
-import JoinReqProfile from '../components/JoinReqProfile';
 import CustomAlert from '../components/CustomAlert';
 import { unescape } from 'querystring';
 import GroupUserContainer from '../components/GroupUserContainer';
@@ -940,17 +936,6 @@ const handleGetChatUsername = async (userId: number) => {
   }
 };
 
-
-
-  // passed into joinrequests component, ensures the name is updated when a request is approved
-  const addNewChat = (newChat: any) => {
-    setChats((prevChats) => [...prevChats, newChat]); // Add new chat
-    setChatNames((prevNames) => ({
-      ...prevNames,
-      [newChat.id]: newChat.name, // Ensure new chat name is added
-    }));
-  };
-
   // passed into editstudygroup component, ensures the name is updated when updated
   const updateChatName = (chatId: number, newName: string) => {
     setChatNames((prevChatNames) => ({
@@ -1059,17 +1044,11 @@ const handleGetChatUsername = async (userId: number) => {
           <div className="TabsContainer">
             <button 
               className={`Tab ${activeTab === 'messages' ? 'active' : ''}`} 
-              onClick={handleChatsSwitch}
             >
               Chats
             </button>
 
-            <button 
-              className={`Tab ${activeTab === 'requests' ? 'active' : ''}`}
-              onClick={handleRequestsSwitch}
-            >
-              Requests
-            </button>
+           
           </div>
 
           {/* Conditionally show the messages panel */}
@@ -1083,14 +1062,6 @@ const handleGetChatUsername = async (userId: number) => {
               loadingChatList={loadingChatList}
 
             />
-          )}
-          {/* Conditionally show the requests panel */}
-          {showRequestsPanel && (
-            <JoinRequests 
-            currentUserId={currentUserId} 
-            addNewChat={addNewChat} // Passing addNewChat as a prop
-            openProfilePopup={openProfilePopup}
-          />
           )}
 
       
@@ -1235,13 +1206,6 @@ const handleGetChatUsername = async (userId: number) => {
          {/* Render the popup at the Messaging level */}
          
       </div>
-      {selectedProfile && (
-            <JoinReqProfile
-              id={selectedProfile.id}
-              name={selectedProfile.name}
-              onClose={closeProfilePopup}
-            />
-          )}
       <div>
         <CopyrightFooter />
       </div>
