@@ -98,10 +98,93 @@ const Messaging: React.FC = () => {
 
   const [alerts, setAlerts] = useState<{ id: number; alertText: string; alertSeverity: "error" | "warning" | "info" | "success"; visible: boolean }[]>([]);
   const alertVisible = alerts.some(alert => alert.visible);
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoadingChatList(true);
+
+      handleChatsSwitch();
+      const token = localStorage.getItem('token');
+      console.log(token);
+      const getCurrentUser = async () => {
+        if (token) {
+          try {
+            const response = await axios.get(`${REACT_APP_API_URL}/api/currentUser`, {
+              headers: { Authorization: `Bearer ${token}` },
+            });
+            setCurrentUserId(response.data.id); // Set the current user ID
+          } catch (error) {
+            console.error('Error fetching current user:', error);
+          }
+        }
+      }
+      await getCurrentUser();
+      const syncStudyGroupChats = async () => {
+        try {
+          // Fetch the user's study groups or chats (assumed from user context or current user API)
+          const response = await axios.get(`${REACT_APP_API_URL}/api/chats`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+
+          // Loop through each chat and sync study group chats first
+          for (const chat of response.data) {
+            if (chat.studyGroupId) {  // Ensure it's a study group chat
+              await axios.post(`${REACT_APP_API_URL}/api/sync-study-group-chat`, {
+                studyGroupId: chat.studyGroupId,
+              });
+            }
+          }
+        } catch (error) {
+          console.error('Error syncing study group chats:', error);
+        }
+      };
+
+      // Call the sync function first
+      await syncStudyGroupChats();
+
+      const syncUserChats = async () => {
+
+        // Proceed with fetching users and chats after sync
+        axios.get(`${REACT_APP_API_URL}/api/users`)
+          .then((userResponse) => setUsers(userResponse.data))
+          .catch((error) => console.error('Error fetching users:', error));
+
+        // Proceed with fetching chats after sync
+        axios.get(`${REACT_APP_API_URL}/api/chats`, {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+          .then((chatResponse) => {
+            const chatsWithMessages = chatResponse.data.map((chat: Chat) => ({
+              ...chat,
+              messages: chat.messages || [], // Ensure messages is always an array
+              users: chat.users || [], // Ensure users is always an array
+            }));
+
+            setChats(chatsWithMessages);
 
 
-  
-/*
+            // Ensure storing liked messages correctly
+            const likedMessagesMap = chatResponse.data.reduce((acc: Record<number, boolean>, chat: Chat) => {
+              chat.messages?.forEach((msg: Message) => {
+                acc[msg.id] = msg.liked ?? false; // Default to false if missing
+              });
+              return acc;
+            }, {});
+
+            setHeartedMessages(likedMessagesMap); // Store liked states
+          })
+          .catch((error) => console.error('Error fetching chats:', error));
+      };
+
+      await syncUserChats();
+
+      setLoadingChatList(false);
+
+    }
+    fetchData();
+
+  }, [isPanelVisible]);  // reloads when selected or tab changes, allows for updates to users
+
+
   useEffect(() => {
     const fetchChats = async () => {
       console.log("selected chat id: ", selectedChatId);
@@ -134,17 +217,17 @@ const Messaging: React.FC = () => {
       };
       fetchChats();
       console.log("fetch chats complete");
-  }, []);*/
-  
+  }, []);
+
 
   useEffect(() => {
     const fetchData = async () => {
-      setLoadingChatList(true);
-  
-      handleChatsSwitch();
+
+
+
       const token = localStorage.getItem('token');
       console.log(token);
-  
+
       const getCurrentUser = async () => {
         if (token) {
           try {
@@ -156,17 +239,18 @@ const Messaging: React.FC = () => {
             console.error('Error fetching current user:', error);
           }
         }
-      };
-  
+      }
+      await getCurrentUser();
       const syncStudyGroupChats = async () => {
         try {
+          // Fetch the user's study groups or chats (assumed from user context or current user API)
           const response = await axios.get(`${REACT_APP_API_URL}/api/chats`, {
             headers: { Authorization: `Bearer ${token}` },
           });
-  
-          // Sync study group chats
+
+          // Loop through each chat and sync study group chats first
           for (const chat of response.data) {
-            if (chat.studyGroupId) {
+            if (chat.studyGroupId) {  // Ensure it's a study group chat
               await axios.post(`${REACT_APP_API_URL}/api/sync-study-group-chat`, {
                 studyGroupId: chat.studyGroupId,
               });
@@ -176,47 +260,54 @@ const Messaging: React.FC = () => {
           console.error('Error syncing study group chats:', error);
         }
       };
-  
-      const syncUserChats = async () => {
-        try {
-          const userResponse = await axios.get(`${REACT_APP_API_URL}/api/users`);
-          setUsers(userResponse.data);
-  
-          const chatResponse = await axios.get(`${REACT_APP_API_URL}/api/chats`, {
-            headers: { Authorization: `Bearer ${token}` },
-          });
-  
-          const chatsWithMessages = chatResponse.data.map((chat: Chat) => ({
-            ...chat,
-            messages: chat.messages || [], // Ensure messages is always an array
-            users: chat.users || [], // Ensure users is always an array
-          }));
-  
-          setChats(chatsWithMessages);
-  
-          const likedMessagesMap = chatResponse.data.reduce((acc: Record<number, boolean>, chat: Chat) => {
-            chat.messages?.forEach((msg: Message) => {
-              acc[msg.id] = msg.liked ?? false; // Default to false if missing
-            });
-            return acc;
-          }, {});
-  
-          setHeartedMessages(likedMessagesMap);
-        } catch (error) {
-          console.error('Error fetching users or chats:', error);
-        }
-      };
-  
-      await getCurrentUser();
+
+      // Call the sync function first
       await syncStudyGroupChats();
+
+      const syncUserChats = async () => {
+
+        // Proceed with fetching users and chats after sync
+        axios.get(`${REACT_APP_API_URL}/api/users`)
+          .then((userResponse) => setUsers(userResponse.data))
+          .catch((error) => console.error('Error fetching users:', error));
+
+        // Proceed with fetching chats after sync
+        axios.get(`${REACT_APP_API_URL}/api/chats`, {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+          .then((chatResponse) => {
+            const chatsWithMessages = chatResponse.data.map((chat: Chat) => ({
+              ...chat,
+              messages: chat.messages || [], // Ensure messages is always an array
+              users: chat.users || [], // Ensure users is always an array
+            }));
+
+            setChats(chatsWithMessages);
+
+            // Ensure storing liked messages correctly
+            const likedMessagesMap = chatResponse.data.reduce((acc: Record<number, boolean>, chat: Chat) => {
+              chat.messages?.forEach((msg: Message) => {
+                acc[msg.id] = msg.liked ?? false; // Default to false if missing
+              });
+              return acc;
+            }, {});
+
+            setHeartedMessages(likedMessagesMap); // Store liked states
+          })
+          .catch((error) => console.error('Error fetching chats:', error));
+      };
+
+
+
       await syncUserChats();
-  
+
       setLoadingChatList(false);
-    };
-  
+
+    }
     fetchData();
-  }, [isPanelVisible, activeTab, selectedChat]); // Unified dependencies
-  // reloads when selected or tab changes, allows for updates to users
+
+  }, [activeTab, selectedChat]);  // reloads when selected or tab changes, allows for updates to users
+
 
 
   useEffect(() => {
