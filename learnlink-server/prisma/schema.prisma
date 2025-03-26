@@ -127,7 +127,12 @@ model StudyGroup {
 
   profilePic   String?  // Optional field to store a profile picture
 
-  Availability Availability[]
+  availability Availability[]
+
+  scheduleDays String[] @default(["Sun", "Mon", "Tues", "Wed", "Thur", "Fri", "Sat"])
+  scheduleStartTime String @default("9:00 AM")
+  scheduleEndTime String @default("5:00 PM")
+
 }
 
 model Swipe {

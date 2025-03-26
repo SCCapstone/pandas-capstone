@@ -67,15 +67,16 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ studyGroupId }) => {
       const closeEditModal = () => setModalOpen(false);
     
       const saveSchedule = async (updatedSchedule: { days: string[]; startTime: string; endTime: string }) => {
-        const response = await fetch('/api/updateSchedule', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(updatedSchedule),
-        });
+        // const response = await fetch('/api/updateSchedule', {
+        //   method: 'POST',
+        //   headers: { 'Content-Type': 'application/json' },
+        //   body: JSON.stringify(updatedSchedule),
+        // });
     
-        if (response.ok) {
-          setSchedule(updatedSchedule);  // Update the schedule state with new values
-        }
+        // if (response.ok) {
+        //   setSchedule(updatedSchedule);  // Update the schedule state with new values
+        // }
+        return
       };
 
     // Fetch study group data and users' availability
@@ -248,13 +249,13 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ studyGroupId }) => {
     };
 
     const getCellClass = (day: Day, timeSlot: string) => {
-        console.log("usersAvailable:")
+        // console.log("usersAvailable:")
         // Count the number of users available at this time slot
         const usersAvailable = users?.filter((user) => usersAvailability[user.id]?.[day]?.includes(timeSlot)).length || 0;
         const totalUsers = users?.length || 1;
-        console.log("totalUsers:", users?.length)
+        // console.log("totalUsers:", users?.length)
 
-        console.log("usersAvailable: for timeslot", day, timeSlot, usersAvailable)
+        // console.log("usersAvailable: for timeslot", day, timeSlot, usersAvailable)
 
         // Scale the opacity from transparent to semi-opaque to solid based on the number of users available
         const opacity = usersAvailable / totalUsers;
@@ -269,7 +270,7 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ studyGroupId }) => {
     };
 
     const getCellAvailability = (day: Day, timeSlot: string) => {
-        console.log("usersAvailable:")
+        // console.log("usersAvailable:")
         // users available at this time slot
         const usersAvailable = users?.filter((user) => usersAvailability[user.id]?.[day]?.includes(timeSlot));
         const countUsersAvailable = usersAvailable?.length;
@@ -279,8 +280,8 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ studyGroupId }) => {
 
         const countTotalUsers = users?.length
 
-        console.log("usersAvailable: for timeslot", day, timeSlot, usersAvailable)
-        console.log("users UnAvailable: for timeslot", day, timeSlot, usersUnavailable)
+        // console.log("usersAvailable: for timeslot", day, timeSlot, usersAvailable)
+        // console.log("users UnAvailable: for timeslot", day, timeSlot, usersUnavailable)
 
         return {
             usersAvailable,
@@ -301,13 +302,17 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ studyGroupId }) => {
                         {/* <p>{currStudyGroup.description}</p> */}
                     </div>
                 )}
-      <button onClick={openEditModal}>Edit Schedule</button>
-      {/* Pass props to the modal */}
-      <EditScheduleModal
-        isOpen={isModalOpen}
-        onClose={closeEditModal}
-        onSave={saveSchedule}
-      />
+                <button onClick={openEditModal}>Edit Schedule</button>
+                {/* Pass props to the modal */}
+                {currStudyGroup?.id && (
+                    <EditScheduleModal
+                        isOpen={isModalOpen}
+                        onClose={closeEditModal}
+                        onSave={saveSchedule}
+                        groupId={currStudyGroup?.id}
+                    />
+                )}
+
             </div>
             <div className="schedule-tables-container">
                 <div className="current-user-schedule">

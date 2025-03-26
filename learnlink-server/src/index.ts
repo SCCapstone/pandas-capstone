@@ -321,6 +321,159 @@ app.get('/api/users/profile', authenticate, async (req, res):Promise<any> => {
   }
 });
 
+// Update study group schedule
+app.put('/api/study-groups/:groupId/schedule', authenticate, async (req, res): Promise<any> => {
+  const { groupId } = req.params;
+  const { scheduleDays, scheduleStartTime, scheduleEndTime } = req.body;
+  console.log(req.body)
+
+  if (!scheduleDays || !scheduleStartTime || !scheduleEndTime) {
+    return res.status(400).json({ message: 'Missing required fields' });
+  }
+
+  // Validate the format of scheduleDays
+  if (!Array.isArray(scheduleDays) || scheduleDays.some(day => !["Sun", "Mon", "Tues", "Wed", "Thur", "Fri", "Sat"].includes(day))) {
+    return res.status(400).json({ message: 'Invalid scheduleDays format' });
+  }
+
+  // Validate times are in correct format (HH:MM AM/PM)
+  const timeFormat = /^(0?[1-9]|1[0-2]):([0-5][0-9])\s?(AM|PM)$/i;
+  if (!timeFormat.test(scheduleStartTime) || !timeFormat.test(scheduleEndTime)) {
+    return res.status(400).json({ message: 'Invalid time format. Use HH:MM' });
+  }
+
+  try {
+    // Check if the study group exists
+    const studyGroup = await prisma.studyGroup.findUnique({
+      where: { id: Number(groupId) },
+      include: { availability: true }, // Fetch related availability data
+    });
+
+    if (!studyGroup) {
+      return res.status(404).json({ message: 'Study group not found' });
+    }
+
+    // Convert the start and end time to Date objects
+    const newStartTime = new Date(`1970-01-01T${scheduleStartTime}:00`);
+    const newEndTime = new Date(`1970-01-01T${scheduleEndTime}:00`);
+
+    // Iterate over each user's availability and update or delete invalid entries
+    // await Promise.all(
+    //   studyGroup.availability.map(async (availability) => {
+    //     let userAvailability = {};
+    //     if (typeof availability.availability === 'string') {
+    //       try {
+    //         userAvailability = JSON.parse(availability.availability);
+    //       } catch (e) {
+    //         console.error('Error parsing availability:', e);
+    //         return; // Skip this user if the JSON is invalid
+    //       }
+    //     }
+
+        // // Filter out invalid availability slots for each user
+        // const filteredAvailability = Object.entries(userAvailability).reduce((acc, [day, times]) => {
+        //   if (scheduleDays.includes(day)) {
+        //     const validTimes = (times as string[]).filter((time: string) => {
+        //       const timeObj = new Date(`1970-01-01T${time}:00`);
+        //       return timeObj >= newStartTime && timeObj <= newEndTime;
+        //     });
+
+        //     if (validTimes.length > 0) acc[day] = validTimes;
+        //   }
+        //   return acc;
+        // }, {} as Record<string, string[]>);
+
+        // If no valid availability remains, delete the record
+        // if (Object.keys(filteredAvailability).length === 0) {
+        //   await prisma.availability.delete({
+        //     where: { id: availability.id },
+        //   });
+        // } else {
+        //   // Otherwise, update the availability with the filtered times
+        //   await prisma.availability.update({
+        //     where: { id: availability.id },
+        //     data: { availability: JSON.stringify(filteredAvailability) },
+        //   });
+        // }
+    //   })
+    // );
+
+    // Update the study group's schedule
+    const updatedGroup = await prisma.studyGroup.update({
+      where: { id: Number(groupId) },
+      data: {
+        scheduleDays,
+        scheduleStartTime,
+        scheduleEndTime,
+      },
+    });
+
+    res.json({
+      message: 'Study group schedule updated successfully',
+      studyGroup: updatedGroup,
+    });
+  } catch (error) {
+    console.error('Error updating study group schedule:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Get study group schedule and availability
+app.get('/api/study-groups/:groupId/schedule', authenticate, async (req: Request, res: Response): Promise<any> => {
+  const { groupId } = req.params;
+
+  try {
+    // Fetch the study group with the associated schedule and availability
+    const studyGroup = await prisma.studyGroup.findUnique({
+      where: { id: Number(groupId) },
+      include: {
+        availability: true, // Include availability data for the study group        
+      },
+    });
+
+    // If the study group is not found
+    if (!studyGroup) {
+      return res.status(404).json({ message: 'Study group not found' });
+    }
+
+    // Format the study group response data
+    const groupDetails = {
+      id: studyGroup.id,
+      name: studyGroup.name,
+      scheduleDays: studyGroup.scheduleDays,
+      scheduleStartTime: studyGroup.scheduleStartTime,
+      scheduleEndTime: studyGroup.scheduleEndTime,
+      availability: studyGroup.availability.map((availability) => {
+        let userAvailability = {};
+        try {
+          let userAvailability = {};
+          if (typeof availability.availability === 'string') {
+            try {
+              userAvailability = JSON.parse(availability.availability);
+            } catch (e) {
+              console.error('Error parsing availability:', e);
+              return; // Skip this user if the JSON is invalid
+            }
+          }        
+        } catch (e) {
+          console.error('Error parsing availability:', e);
+          return { userId: availability.userId, availability: {} }; // If invalid JSON, return empty
+        }
+        return {
+          userId: availability.userId,
+          availability: userAvailability,
+        };
+      }),
+    };
+
+    // Respond with the study group details and availability
+    res.json(groupDetails);
+  } catch (error) {
+    console.error('Error fetching study group schedule:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 // Fetch user profile data
 app.get('/api/users/profile/:userId', authenticate, async (req, res):Promise<any> => {
   const userId = parseInt(req.params.userId);
