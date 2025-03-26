@@ -305,7 +305,7 @@ const Profile: React.FC = () => {
             <div className="profile-details">
               <div className="profile-side">
                 <label>
-                  Age: <input type="number" name="age" value={formData.age} onChange={handleChange} />
+                  Age: <input type="number" name="age" value={formData.age} onChange={handleChange} min={0} max={100}/>
                 </label>
                 <div className="college-select">
               <label>College: <br />

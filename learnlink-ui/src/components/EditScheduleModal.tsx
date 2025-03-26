@@ -76,11 +76,22 @@ const EditScheduleModal: React.FC<EditScheduleModalProps> = ({ isOpen, onClose, 
                   throw new Error('Failed to fetch schedule');
               }
               const data = await response.json();
-              // Assuming the response contains the schedule info
-              setSelectedDays(data.scheduleDays || []);
+
+              // Define the correct order of days
+              const dayOrder = ["Sun", "Mon", "Tues", "Wed", "Thur", "Fri", "Sat"];
+
+              // Sort received days according to the correct order
+              const sortedDays = (data.scheduleDays || []).sort(
+                  (a: string, b: string) => dayOrder.indexOf(a) - dayOrder.indexOf(b)
+              );
+
+              console.log(sortedDays)
+
+
+              setSelectedDays(sortedDays || []);
               setStartTime(data.scheduleStartTime || "9:00 AM");
-          setEndTime(data.scheduleEndTime || "10:00 AM");
-        } catch (error) {
+              setEndTime(data.scheduleEndTime || "10:00 AM");
+          } catch (error) {
           console.error('Error fetching schedule:', error);
           setAlerts((prevAlerts) => [
             ...prevAlerts,

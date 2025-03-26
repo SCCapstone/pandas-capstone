@@ -219,7 +219,7 @@ body {
 @media(max-width: 1200px) {
     .merged-availability-table th,
     .schedule-table th {
-        font-size: 13px;
+        font-size: 11px;
     }
 }
 
