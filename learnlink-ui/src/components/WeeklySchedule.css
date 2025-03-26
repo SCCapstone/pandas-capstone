@@ -17,7 +17,7 @@ body {
     color: var(--text-100);
 }
 
-.schedule-table {
+.schedule-table, .merged-availability-table {
     width: 100%;
     border-collapse: collapse;
     border: hidden;
@@ -29,7 +29,7 @@ body {
     table-layout: fixed;
 }
 
-.schedule-table thead {
+.schedule-table thead, .merged-availability-table thead {
     background: var(--primary-200);
     color: var(--text-200);
     text-transform: uppercase;
@@ -38,21 +38,26 @@ body {
 }
 
 .schedule-table th,
-.schedule-table td {
+.schedule-table td ,
+.merged-availability-table th,
+.merged-availability-table td{
     padding: 12px;
     text-align: center;
     border: 1px solid #3b3c3d6e;
 }
-.schedule-table th.empty-cell {
+.schedule-table th.empty-cell,
+.merged-availability-table th.empty-cell {
     background: white !important;
     border: none;
 }
 
-.schedule-table tbody tr:nth-child(odd) {
+.schedule-table tbody tr:nth-child(odd),
+.merged-availability-table tbody tr:nth-child(odd) {
     background: var(--bg-100);
 }
 
-.schedule-table tbody tr:nth-child(even) {
+.schedule-table tbody tr:nth-child(even),
+.merged-availability-table tbody  tr:nth-child(even) {
     background: var(--bg-200);
 }
 
@@ -80,6 +85,21 @@ body {
 
 .cell.selected:hover {
     background: var(--accent-100);
+}
+
+.cell.solid {
+    background-color: #00668C;
+    /* Solid green (fully available) */
+}
+
+.cell.translucent {
+    background-color: rgba(0, 128, 0, 0.5);
+    /* Semi-opaque green (some users available) */
+}
+
+.cell.transparent {
+    background-color: rgba(0, 128, 0, 0.1);
+    /* Transparent green (no users available) */
 }
 
 /* Responsive Design */

@@ -115,7 +115,34 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ studyGroupId }) => {
             const studyGroupData = await studyGroupResponse.json();
             setCurrStudyGroup(studyGroupData);
             setUsers(studyGroupData.studyGroup.users);
+            const usersAvailabilityData: Record<number, Availability> = {};
+
+            // Populate users' availability
+            studyGroupData.studyGroup.users.forEach((user: User) => {
+                const userAvailability = availabilityData.find((item: any) => item.userId === user.id);
+                if (userAvailability) {
+                    const availabilityJson = userAvailability.availability;
+                    const availabilityForUser: Availability = {
+                        Sun: [],
+                        Mon: [],
+                        Tues: [],
+                        Wed: [],
+                        Thur: [],
+                        Fri: [],
+                        Sat: [],
+                    };
     
+                    Object.keys(availabilityJson).forEach((day: string) => {
+                        availabilityForUser[day as Day] = availabilityJson[day] || [];
+                    });
+    
+                    usersAvailabilityData[user.id] = availabilityForUser;
+                }
+            });
+    
+            // Now set the state for all users' availability
+            setUsersAvailability(usersAvailabilityData);
+        
         } catch (error) {
             console.error(error);
         }
@@ -194,103 +221,118 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ studyGroupId }) => {
         }));
     };
 
+    const getCellClass = (day: Day, timeSlot: string) => {
+        console.log("usersAvailable:")
+        // Count the number of users available at this time slot
+        const usersAvailable = users?.filter((user) => usersAvailability[user.id]?.[day]?.includes(timeSlot)).length || 0;
+        const totalUsers = users?.length || 1;
+        console.log("totalUsers:", users?.length)
+
+        console.log("usersAvailable: for timeslot", day, timeSlot, usersAvailable)
+
+        // Scale the opacity from transparent to semi-opaque to solid based on the number of users available
+        const opacity = usersAvailable / totalUsers;
+        
+        // Return the appropriate class for the cell (semi-opaque to solid)
+        return {
+            backgroundColor: `rgba(0, 128, 0, ${opacity})`, // Green background with varying opacity
+            // backgroundColor: `rgb(0, 102, 140, ${opacity})`, // Blue background with varying opacity
+
+            color: opacity > 0.5 ? 'white' : 'black',  // Dark text when solid, light when transparent
+        };
+    };
+
     return (
         <div className="schedule-page">
-          {/* Study Group Legend */}
-          <div className="schedule-table-legend">
-            {currStudyGroup && (
-              <div>
-                <h2>{currStudyGroup.name}</h2>
-                <p>{currStudyGroup.description}</p>
-              </div>
-            )}
-      
-            {/* Editable Schedule Table (Current User's Availability) */}
-            <h3>Your Availability</h3>
-            <table className="schedule-table" onMouseUp={handleMouseUp} onMouseLeave={handleMouseUp}>
-              <thead>
-                <tr>
-                  <th className="empty-cell"></th>
-                  {days.map((day) => (
-                    <th key={day}>{day}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {timeSlots.map((timeSlot) => (
-                  <tr key={timeSlot}>
-                    <td className="time-slot">{timeSlot}</td>
-                    {days.map((day) => {
-                      const isSelected = availability[day].includes(timeSlot);
-                      const isInRange =
-                        isDragging &&
-                        draggingDay === day &&
-                        startTimeSlot &&
-                        endTimeSlot &&
-                        timeSlots.indexOf(timeSlot) >= timeSlots.indexOf(startTimeSlot) &&
-                        timeSlots.indexOf(timeSlot) <= timeSlots.indexOf(endTimeSlot);
-      
-                      return (
-                        <td
-                          key={`${day}-${timeSlot}`}
-                          className={`cell ${isSelected || isInRange ? "selected" : ""}`}
-                          onMouseDown={(e) => handleMouseDown(day, timeSlot, e)}
-                          onMouseMove={(e) => handleMouseMove(day, timeSlot, e)}
-                          onClick={(e) => handleTimeSlotClick(day, timeSlot, e)}
-                        >
-                          {isSelected || isInRange ? "" : ""}
-                        </td>
-                      );
-                    })}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-      
-            {/* Merged Users' Availability Table */}
-            <h3>Users' Combined Availability</h3>
-            <table className="merged-availability-table">
-              <thead>
-                <tr>
-                  <th className="empty-cell"></th>
-                  {days.map((day) => (
-                    <th key={day}>{day}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {timeSlots.map((timeSlot) => (
-                  <tr key={timeSlot}>
-                    <td className="time-slot">{timeSlot}</td>
-                    {days.map((day) => {
-                      // Check if all users are available at this time
-                      const allAvailable = users?.every((user) => {
-                        return usersAvailability[user.id]?.[day]?.includes(timeSlot);
-                      });
-      
-                      // Determine the cell class based on availability
-                      const cellClass = allAvailable ? "solid" : "translucent";
-                      
-                      return (
-                        <td
-                          key={`${day}-${timeSlot}`}
-                          className={`cell ${cellClass}`}
-                        >
-                          {/* Optionally, display something here */}
-                          {allAvailable && "✔"}
-                        </td>
-                      );
-                    })}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-      
-          {/* Save Availability Button */}
-          <button onClick={saveAvailability}>Save Availability</button>
+            {/* Study Group Legend */}
+            <div className="schedule-table-legend">
+                {currStudyGroup && (
+                    <div>
+                        <h2>{currStudyGroup.name}</h2>
+                        <p>{currStudyGroup.description}</p>
+                    </div>
+                )}
+
+                {/* Editable Schedule Table (Current User's Availability) */}
+                <h3>Your Availability</h3>
+                <table className="schedule-table" onMouseUp={handleMouseUp} onMouseLeave={handleMouseUp}>
+                    <thead>
+                        <tr>
+                            <th className="empty-cell"></th>
+                            {days.map((day) => (
+                                <th key={day}>{day}</th>
+                            ))}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {timeSlots.map((timeSlot) => (
+                            <tr key={timeSlot}>
+                                <td className="time-slot">{timeSlot}</td>
+                                {days.map((day) => {
+                                    const isSelected = availability[day].includes(timeSlot);
+                                    const isInRange =
+                                        isDragging &&
+                                        draggingDay === day &&
+                                        startTimeSlot &&
+                                        endTimeSlot &&
+                                        timeSlots.indexOf(timeSlot) >= timeSlots.indexOf(startTimeSlot) &&
+                                        timeSlots.indexOf(timeSlot) <= timeSlots.indexOf(endTimeSlot);
+
+                                    return (
+                                        <td
+                                            key={`${day}-${timeSlot}`}
+                                            className={`cell ${isSelected || isInRange ? "selected" : ""}`}
+                                            onMouseDown={(e) => handleMouseDown(day, timeSlot, e)}
+                                            onMouseMove={(e) => handleMouseMove(day, timeSlot, e)}
+                                            onClick={(e) => handleTimeSlotClick(day, timeSlot, e)}
+                                        >
+                                            {isSelected || isInRange ? "" : ""}
+                                        </td>
+                                    );
+                                })}
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+
+                {/* Merged Users' Availability Table */}
+                <h3>Users' Combined Availability</h3>
+
+                <table className="merged-availability-table">
+                    <thead>
+                        <tr>
+                            <th className="empty-cell"></th>
+                            {days.map((day) => (
+                                <th key={day}>{day}</th>
+                            ))}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {timeSlots.map((timeSlot) => (
+                            <tr key={timeSlot}>
+                                <td className="time-slot">{timeSlot}</td>
+                                {days.map((day) => {
+                                    const cellStyle = getCellClass(day, timeSlot);
+                                    return (
+                                        <td
+                                            key={`${day}-${timeSlot}`}
+                                            className="cell"
+                                            style={cellStyle}
+                                        >
+                                            {cellStyle.backgroundColor !== 'rgba(0, 128, 0, 0)' && ""}
+                                        </td>
+                                    );
+                                })}
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+
+            {/* Save Availability Button */}
+            <button onClick={saveAvailability}>Save Availability</button>
         </div>
-      );
+    );
 };
 
 export default WeeklySchedule;

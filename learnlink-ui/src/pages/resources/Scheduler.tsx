@@ -26,7 +26,6 @@ const Scheduler: React.FC = () => {
 
 
       <div className='resources-content'>
-        <ResourcesNavBar />
         <main className="main-content">
           <WeeklySchedule 
           studyGroupId={groupId}
