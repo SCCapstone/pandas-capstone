@@ -120,7 +120,7 @@ const MatchesList: React.FC<MatchesListProps> = ({ handleSelectUser }) => {
                 setError("A chat with this user already exists.");
 
                 navigate(`/messaging?selectedChatId=${chatCheckResponse.data.chatId}`);
-
+                
                 return; // Stop function execution
               }
               console.log("chat w user", userId)

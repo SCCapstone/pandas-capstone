@@ -72,6 +72,7 @@ const Network = () => {
     if (inputtedActive === "matches") {
       setActiveTab("matches");
     }
+    navigate(window.location.pathname, { replace: true });
   }, [inputtedActive]); 
   
   // Set the active tab based on the query parameter
