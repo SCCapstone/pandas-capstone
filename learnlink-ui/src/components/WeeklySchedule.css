@@ -77,7 +77,8 @@ body {
 .merged-availability-table td{
     padding: 12px;
     text-align: center;
-    border: 1px solid #3b3c3d6e;
+    /* border: 1px solid #3b3c3d6e; */
+    border-right: 1px solid #3b3c3d6e ;
 }
 .schedule-table th.empty-cell,
 .merged-availability-table th.empty-cell {
@@ -105,6 +106,7 @@ body {
     background: var(--primary-100);
     font-weight: bold;
     color: var(--text-200);
+    font-size: 11px;
 }
 
 .cell {
@@ -205,6 +207,16 @@ body {
         background-color: #005270;
         cursor: pointer;
 }
+
+.dotted-line td {
+    border-top: 1px dotted #3b3c3d6e !important;  /* Apply dotted line under */
+}
+
+.solid-line td {
+    border-top: 1px solid #3b3c3d6e !important;  /* Apply dotted line under */
+}
+
+
 
 /* Responsive Design */
 @media (max-width: 768px) {

@@ -423,34 +423,43 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ studyGroupId }) => {
                             </tr>
                         </thead>
                         <tbody>
-                            {timeSlots.map((timeSlot) => (
-                                <tr key={timeSlot}>
-                                    <td className="time-slot">{timeSlot}</td>
-                                    {days.map((day) => {
-                                        const isSelected = availability[day].includes(timeSlot);
-                                        const isInRange =
-                                            isDragging &&
-                                            draggingDay === day &&
-                                            startTimeSlot &&
-                                            endTimeSlot &&
-                                            timeSlots.indexOf(timeSlot) >= timeSlots.indexOf(startTimeSlot) &&
-                                            timeSlots.indexOf(timeSlot) <= timeSlots.indexOf(endTimeSlot);
+    {timeSlots.map((timeSlot, index) => {
+        const isFullHour = timeSlot.endsWith(":00 AM") || timeSlot.endsWith(":00 PM");
+        const isHalfHour = timeSlot.endsWith(":30 AM") || timeSlot.endsWith(":30 PM");
 
-                                        return (
-                                            <td
-                                                key={`${day}-${timeSlot}`}
-                                                className={`cell ${isSelected || isInRange ? "selected" : ""}`}
-                                                onMouseDown={(e) => handleMouseDown(day, timeSlot, e)}
-                                                onMouseMove={(e) => handleMouseMove(day, timeSlot, e)}
-                                                onClick={(e) => handleTimeSlotClick(day, timeSlot, e)}
-                                            >
-                                                {isSelected || isInRange ? "" : ""}
-                                            </td>
-                                        );
-                                    })}
-                                </tr>
-                            ))}
-                        </tbody>
+        return (
+            <tr key={timeSlot} className={isHalfHour ? "dotted-line" : "solid-line"}>
+                {/* Merge row headers for :00 and :30 times */}
+                {isFullHour && (
+                    <td className="time-slot" rowSpan={2}>{timeSlot}</td>
+                )}
+                {isHalfHour && null} {/* Skip rendering the label on :30 rows */}
+                
+                {days.map((day) => {
+                    const isSelected = availability[day].includes(timeSlot);
+                    const isInRange =
+                        isDragging &&
+                        draggingDay === day &&
+                        startTimeSlot &&
+                        endTimeSlot &&
+                        timeSlots.indexOf(timeSlot) >= timeSlots.indexOf(startTimeSlot) &&
+                        timeSlots.indexOf(timeSlot) <= timeSlots.indexOf(endTimeSlot);
+
+                    return (
+                        <td
+                            key={`${day}-${timeSlot}`}
+                            className={`cell ${isSelected || isInRange ? "selected" : ""}`}
+                            onMouseDown={(e) => handleMouseDown(day, timeSlot, e)}
+                            onMouseMove={(e) => handleMouseMove(day, timeSlot, e)}
+                            onClick={(e) => handleTimeSlotClick(day, timeSlot, e)}
+                        >
+                        </td>
+                    );
+                })}
+            </tr>
+        );
+    })}
+</tbody>
                     </table>
                     {/* Save Availability Button */}
                     <button className="save-button" onClick={saveAvailability}>Save Availability</button>
@@ -490,11 +499,21 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ studyGroupId }) => {
                             </tr>
                         </thead>
                         <tbody>
-                            {timeSlots.map((timeSlot) => (
-                                <tr key={timeSlot}>
-                                    <td className="time-slot">{timeSlot}</td>
+                            {timeSlots.map((timeSlot) =>  {
+                                const isFullHour = timeSlot.endsWith(":00 AM") || timeSlot.endsWith(":00 PM");
+                                const isHalfHour = timeSlot.endsWith(":30 AM") || timeSlot.endsWith(":30 PM");
+                        
+                            return (
+                                
+                                <tr key={timeSlot} className={isHalfHour ? "dotted-line" : "solid-line"}>
+                                    {isFullHour && (
+                    <td className="time-slot" rowSpan={2}>{timeSlot}</td>
+                )}
+                {isHalfHour && null} {/* Skip rendering the label on :30 rows */}
+                
                                     {days.map((day) => {
                                         const cellStyle = getCellClass(day, timeSlot);
+                                        
 
                                         return (
                                             <td
@@ -515,7 +534,7 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ studyGroupId }) => {
                                         );
                                     })}
                                 </tr>
-                            ))}
+                            )})}
                         </tbody>
                     </table>
                     {/* Tooltip */}
