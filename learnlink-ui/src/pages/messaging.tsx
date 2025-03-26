@@ -1064,6 +1064,12 @@ const handleGetChatUsername = async (userId: number) => {
             />
           )}
 
+          <div className='newChat'>
+            <button  className='newChatButton'>
+              + New Chat
+            </button>
+          </div>
+
       
         </div>
 
