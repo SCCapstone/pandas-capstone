@@ -12,6 +12,7 @@ import { unescape } from 'querystring';
 import GroupUserContainer from '../components/GroupUserContainer';
 import { useNavigate } from "react-router-dom";
 import CreateStudyGroup from '../components/CreateStudyGroup';
+import PlusButtonProps from '../components/PlusButtonProps'
 
 
 interface Chat {
@@ -1014,6 +1015,10 @@ const handleGetChatUsername = async (userId: number) => {
     }
   };
 
+  const handlePlusSelect = () => {
+    return
+  }
+
   return (
     <div className="Messaging">
       <div>
@@ -1191,6 +1196,11 @@ const handleGetChatUsername = async (userId: number) => {
 
 
               <div className="ChatInput">
+                <PlusButtonProps
+                onSelect={handlePlusSelect}
+                studyGroupId=''
+                
+                />
                 <input
                   type="text"
                   placeholder="Type a message..."
