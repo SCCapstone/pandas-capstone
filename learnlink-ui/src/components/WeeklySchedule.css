@@ -17,6 +17,40 @@ body {
     color: var(--text-100);
 }
 
+.schedule-page h1 {
+    font-size: xx-large;
+    font-weight: 600;
+
+}
+.schedule-page h2 {
+    font-size: x-large;
+    font-weight: 600;
+}
+.schedule-page h3 {
+    font-size: large;
+}
+.schedule-page p {
+    font-size: medium;
+}
+
+.schedule-page li {
+    display: flex;
+    list-style-type: none;
+    justify-content: cen;
+    flex-direction: row;
+    align-content: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    margin-left: 0 !important;
+
+}
+
+.tooltip-pfp {
+    height: 30px;
+
+}
+
+
 .schedule-table, .merged-availability-table {
     width: 100%;
     border-collapse: collapse;
@@ -51,7 +85,7 @@ body {
     border: none;
 }
 
-.schedule-table tbody tr:nth-child(odd),
+/* .schedule-table tbody tr:nth-child(odd),
 .merged-availability-table tbody tr:nth-child(odd) {
     background: var(--bg-100);
 }
@@ -59,6 +93,10 @@ body {
 .schedule-table tbody tr:nth-child(even),
 .merged-availability-table tbody  tr:nth-child(even) {
     background: var(--bg-200);
+} */
+.schedule-table tbody tr,
+.merged-availability-table tbody tr {
+    background: var(--bg-100);
 }
 
 .schedule-table .time-slot,
@@ -111,6 +149,39 @@ body {
     margin-bottom: 20px;
 }
 
+.current-user-schedule-color-legend {
+    width: 200px;
+    border-collapse: collapse;
+    border: hidden;
+    margin: 20px auto;
+    border: none;
+    /* border-radius: 8px; */
+    overflow: hidden;
+    table-layout: fixed;
+}
+.current-user-schedule-color-legend tbody{
+    height: 50px;
+    border-collapse: collapse;
+    border: hidden;
+    margin: 20px auto;
+    border: 1px solid #3b3c3dd1;
+    /* border-radius: 8px; */
+    overflow: hidden;
+    table-layout: fixed;
+}
+.current-user-schedule-color-legend thead {
+    border: none; /* Removes the border from the header */
+    text-align: center;
+    font-size: 15px;
+}
+
+.current-user-schedule-color-legend thead th {
+    border: none !important; /* Ensures no borders on individual header cells */
+}
+
+.current-user-schedule-color-legend tbody td{
+    border: 1px solid #3b3c3dd1;
+}
 /* Responsive Design */
 @media (max-width: 768px) {
     .schedule-table th,
