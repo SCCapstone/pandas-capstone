@@ -1955,6 +1955,68 @@ app.get('/api/users/:id', async (req, res) : Promise<any> => {
   }
 });
 
+app.get('/api/chats/lastOpened/:userId', async (req, res): Promise<any> => {
+  const { userId } = req.params; // Get userId from the URL parameter
+
+  if (!userId) {
+    return res.status(400).json({ error: "Missing required userId parameter" });
+  }
+
+  try {
+    // Fetch all lastOpened timestamps for the given user
+    const lastOpenedEntries = await prisma.lastOpened.findMany({
+      where: {
+        userId: parseInt(userId as string),
+      },
+    });
+
+    if (lastOpenedEntries.length === 0) {
+      return res.status(404).json({ error: "No last opened timestamps found for this user" });
+    }
+
+    res.json({ success: true, data: lastOpenedEntries });
+  } catch (error) {
+    console.error("Error fetching lastOpened:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+
+
+
+app.post('/api/chats/updateLastOpened', async (req, res) : Promise<any>=> {
+  const { chatId, userId, lastOpened } = req.body;
+
+  if (!chatId || !userId || !lastOpened) {
+    return res.status(400).json({ error: "Missing required fields" });
+  }
+
+  try {
+    // Update the last opened timestamp in the database
+    const updatedEntry = await prisma.lastOpened.upsert({
+      where: {
+        chatId_userId: {
+          chatId,
+          userId
+        }
+      },
+      update: {
+        timestamp: lastOpened
+      },
+      create: {
+        chatId,
+        userId,
+        timestamp: lastOpened
+      }
+    });
+
+    res.json({ success: true, data: updatedEntry });
+  } catch (error) {
+    console.error("Error updating lastOpened timestamp:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
 
 // Get all chats for a user
 // WORKS
