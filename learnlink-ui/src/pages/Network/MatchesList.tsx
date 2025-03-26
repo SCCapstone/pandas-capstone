@@ -6,6 +6,7 @@ import CustomAlert from '../../components/CustomAlert';
 import { getLoggedInUserId } from '../../utils/auth';
 import ConfirmPopup from '../../components/ConfirmPopup'
 import { set } from 'react-hook-form';
+import { useNavigate } from "react-router-dom";
 
 
 interface MatchesListProps {
@@ -22,7 +23,7 @@ const MatchesList: React.FC<MatchesListProps> = ({ handleSelectUser }) => {
   const [displayRemoveWarning, setDisplayRemoveWarning] = useState<boolean>(false);
   const [selectedFriend, setSelectedFriend] = useState<number | null>(null); // Track friend being removed
   const [error, setError] = useState<string | null>(null);
-
+  const navigate = useNavigate();
   const currentUserId = getLoggedInUserId();
 
   useEffect(() => {
@@ -117,7 +118,10 @@ const MatchesList: React.FC<MatchesListProps> = ({ handleSelectUser }) => {
               if (chatCheckResponse.data.exists) {
                 console.log("A chat with this user already exists.");
                 setError("A chat with this user already exists.");
+                navigate(`/messaging?selectedChatId=${chatCheckResponse.data.chatId}`);
+                
                 //todo add something where the search params and navigate to the chat on the messaging page
+
                 return; // Stop function execution
               }
               console.log("chat w user", userId)
