@@ -118,9 +118,8 @@ const MatchesList: React.FC<MatchesListProps> = ({ handleSelectUser }) => {
               if (chatCheckResponse.data.exists) {
                 console.log("A chat with this user already exists.");
                 setError("A chat with this user already exists.");
+
                 navigate(`/messaging?selectedChatId=${chatCheckResponse.data.chatId}`);
-                
-                //todo add something where the search params and navigate to the chat on the messaging page
 
                 return; // Stop function execution
               }
@@ -141,6 +140,8 @@ const MatchesList: React.FC<MatchesListProps> = ({ handleSelectUser }) => {
         if (response.status === 200 || response.status === 201) {
               // If chat was created successfully, update parent component
               console.log("response 200");
+              
+              navigate(`/messaging?selectedChatId=${response.data.id}`);
               //todo navigate to the newly created chat
             } 
           
