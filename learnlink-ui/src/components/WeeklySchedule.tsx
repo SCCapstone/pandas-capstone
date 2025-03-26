@@ -55,7 +55,7 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ studyGroupId }) => {
     // Fetch study group data and users' availability
     const getStudyGroup = async () => {
         const userId = getLoggedInUserId(); // Get the logged-in user ID
-    
+
         try {
             // Fetch the study group data and all users' availability
             const response = await fetch(`${REACT_APP_API_URL}/api/studyGroup/${studyGroupId}/availability`, {
@@ -65,16 +65,16 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ studyGroupId }) => {
                     'Authorization': `Bearer ${localStorage.getItem('token')}`
                 },
             });
-    
+
             if (!response.ok) {
                 throw new Error("Failed to fetch study group data");
             }
-    
+
             const availabilityData = await response.json();
-    
+
             // Filter the availability data to find the current user's availability
             const currentUserAvailability = availabilityData.find((item: any) => item.userId === userId);
-    
+
             if (currentUserAvailability) {
                 // If the current user's availability is found, map it to the required format
                 const userAvailability: Availability = {
@@ -86,19 +86,19 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ studyGroupId }) => {
                     Fri: [],
                     Sat: [],
                 };
-    
+
                 // Assuming availability is stored as a JSON object
                 const availabilityJson = currentUserAvailability.availability;
                 Object.keys(availabilityJson).forEach((day: string) => {
                     userAvailability[day as Day] = availabilityJson[day] || [];
                 });
-    
+
                 // Set the current user's availability in state
                 setAvailability(userAvailability);
             } else {
                 console.error("Current user's availability not found");
             }
-    
+
             // Fetch study group data (optional, if needed for the UI)
             const studyGroupResponse = await fetch(`${REACT_APP_API_URL}/api/study-groups/${studyGroupId}`, {
                 method: "GET",
@@ -107,13 +107,13 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ studyGroupId }) => {
                     'Authorization': `Bearer ${localStorage.getItem('token')}`
                 },
             });
-    
+
             if (!studyGroupResponse.ok) {
                 throw new Error("Failed to fetch study group");
             }
-    
+
             const studyGroupData = await studyGroupResponse.json();
-            setCurrStudyGroup(studyGroupData);
+            setCurrStudyGroup(studyGroupData.studyGroup);
             setUsers(studyGroupData.studyGroup.users);
             const usersAvailabilityData: Record<number, Availability> = {};
 
@@ -131,33 +131,32 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ studyGroupId }) => {
                         Fri: [],
                         Sat: [],
                     };
-    
+
                     Object.keys(availabilityJson).forEach((day: string) => {
                         availabilityForUser[day as Day] = availabilityJson[day] || [];
                     });
-    
+
                     usersAvailabilityData[user.id] = availabilityForUser;
                 }
             });
-    
+
             // Now set the state for all users' availability
             setUsersAvailability(usersAvailabilityData);
-        
+
         } catch (error) {
             console.error(error);
         }
     };
-    
+
     // Save the current user's availability
     const saveAvailability = async () => {
-        const userId = getLoggedInUserId(); // Replace with the actual logged-in user ID
+        const userId = getLoggedInUserId();
 
         const response = await fetch(`${REACT_APP_API_URL}/api/studyGroup/${studyGroupId}/availability`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
                 'Authorization': `Bearer ${localStorage.getItem('token')}`
-
             },
             body: JSON.stringify({
                 userId,
@@ -167,6 +166,7 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ studyGroupId }) => {
 
         if (response.ok) {
             console.log("Availability saved successfully");
+            await getStudyGroup(); // Refresh study group data, including users' availability
         } else {
             console.log("Failed to save availability");
         }
@@ -232,7 +232,7 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ studyGroupId }) => {
 
         // Scale the opacity from transparent to semi-opaque to solid based on the number of users available
         const opacity = usersAvailable / totalUsers;
-        
+
         // Return the appropriate class for the cell (semi-opaque to solid)
         return {
             backgroundColor: `rgba(0, 128, 0, ${opacity})`, // Green background with varying opacity
@@ -245,92 +245,96 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ studyGroupId }) => {
     return (
         <div className="schedule-page">
             {/* Study Group Legend */}
-            <div className="schedule-table-legend">
+            <div className="schedule-table-title">
                 {currStudyGroup && (
                     <div>
-                        <h2>{currStudyGroup.name}</h2>
-                        <p>{currStudyGroup.description}</p>
+                        <h2>Weekly Scheduler for Study Group: {currStudyGroup.name}</h2>
+                        {/* <p>{currStudyGroup.description}</p> */}
                     </div>
                 )}
-
-                {/* Editable Schedule Table (Current User's Availability) */}
-                <h3>Your Availability</h3>
-                <table className="schedule-table" onMouseUp={handleMouseUp} onMouseLeave={handleMouseUp}>
-                    <thead>
-                        <tr>
-                            <th className="empty-cell"></th>
-                            {days.map((day) => (
-                                <th key={day}>{day}</th>
-                            ))}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {timeSlots.map((timeSlot) => (
-                            <tr key={timeSlot}>
-                                <td className="time-slot">{timeSlot}</td>
-                                {days.map((day) => {
-                                    const isSelected = availability[day].includes(timeSlot);
-                                    const isInRange =
-                                        isDragging &&
-                                        draggingDay === day &&
-                                        startTimeSlot &&
-                                        endTimeSlot &&
-                                        timeSlots.indexOf(timeSlot) >= timeSlots.indexOf(startTimeSlot) &&
-                                        timeSlots.indexOf(timeSlot) <= timeSlots.indexOf(endTimeSlot);
-
-                                    return (
-                                        <td
-                                            key={`${day}-${timeSlot}`}
-                                            className={`cell ${isSelected || isInRange ? "selected" : ""}`}
-                                            onMouseDown={(e) => handleMouseDown(day, timeSlot, e)}
-                                            onMouseMove={(e) => handleMouseMove(day, timeSlot, e)}
-                                            onClick={(e) => handleTimeSlotClick(day, timeSlot, e)}
-                                        >
-                                            {isSelected || isInRange ? "" : ""}
-                                        </td>
-                                    );
-                                })}
+                <div className="schedule-tables-container">
+                <div className="current-user-schedule">
+                    {/* Editable Schedule Table (Current User's Availability) */}
+                    <h3>Your Availability</h3>
+                    <table className="schedule-table" onMouseUp={handleMouseUp} onMouseLeave={handleMouseUp}>
+                        <thead>
+                            <tr>
+                                <th className="empty-cell"></th>
+                                {days.map((day) => (
+                                    <th key={day}>{day}</th>
+                                ))}
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {timeSlots.map((timeSlot) => (
+                                <tr key={timeSlot}>
+                                    <td className="time-slot">{timeSlot}</td>
+                                    {days.map((day) => {
+                                        const isSelected = availability[day].includes(timeSlot);
+                                        const isInRange =
+                                            isDragging &&
+                                            draggingDay === day &&
+                                            startTimeSlot &&
+                                            endTimeSlot &&
+                                            timeSlots.indexOf(timeSlot) >= timeSlots.indexOf(startTimeSlot) &&
+                                            timeSlots.indexOf(timeSlot) <= timeSlots.indexOf(endTimeSlot);
 
-                {/* Merged Users' Availability Table */}
-                <h3>Users' Combined Availability</h3>
-
-                <table className="merged-availability-table">
-                    <thead>
-                        <tr>
-                            <th className="empty-cell"></th>
-                            {days.map((day) => (
-                                <th key={day}>{day}</th>
+                                        return (
+                                            <td
+                                                key={`${day}-${timeSlot}`}
+                                                className={`cell ${isSelected || isInRange ? "selected" : ""}`}
+                                                onMouseDown={(e) => handleMouseDown(day, timeSlot, e)}
+                                                onMouseMove={(e) => handleMouseMove(day, timeSlot, e)}
+                                                onClick={(e) => handleTimeSlotClick(day, timeSlot, e)}
+                                            >
+                                                {isSelected || isInRange ? "" : ""}
+                                            </td>
+                                        );
+                                    })}
+                                </tr>
                             ))}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {timeSlots.map((timeSlot) => (
-                            <tr key={timeSlot}>
-                                <td className="time-slot">{timeSlot}</td>
-                                {days.map((day) => {
-                                    const cellStyle = getCellClass(day, timeSlot);
-                                    return (
-                                        <td
-                                            key={`${day}-${timeSlot}`}
-                                            className="cell"
-                                            style={cellStyle}
-                                        >
-                                            {cellStyle.backgroundColor !== 'rgba(0, 128, 0, 0)' && ""}
-                                        </td>
-                                    );
-                                })}
+                        </tbody>
+                    </table>
+                    {/* Save Availability Button */}
+                    <button className="save-button" onClick={saveAvailability}>Save Availability</button>
+                </div>
+                <div className="combined-group-schedule">
+
+                    {/* Merged Users' Availability Table */}
+                    <h3>Group's Combined Availability</h3>
+
+                    <table className="merged-availability-table">
+                        <thead>
+                            <tr>
+                                <th className="empty-cell"></th>
+                                {days.map((day) => (
+                                    <th key={day}>{day}</th>
+                                ))}
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {timeSlots.map((timeSlot) => (
+                                <tr key={timeSlot}>
+                                    <td className="time-slot">{timeSlot}</td>
+                                    {days.map((day) => {
+                                        const cellStyle = getCellClass(day, timeSlot);
+                                        return (
+                                            <td
+                                                key={`${day}-${timeSlot}`}
+                                                className="cell"
+                                                style={cellStyle}
+                                            >
+                                                {cellStyle.backgroundColor !== 'rgba(0, 128, 0, 0)' && ""}
+                                            </td>
+                                        );
+                                    })}
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+                </div>
             </div>
-
-            {/* Save Availability Button */}
-            <button onClick={saveAvailability}>Save Availability</button>
         </div>
     );
 };
