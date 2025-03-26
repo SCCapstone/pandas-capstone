@@ -2025,7 +2025,7 @@ app.get('/api/chats/check', async (req, res): Promise<any> => {
         return res.json({ exists: true, chatId: nonStudyGroupChats[0].id });
       }
 
-      if (existingChats.length === 1 && existingChats[0].studyGroupId !== null){
+      if (nonStudyGroupChats.length === 0){
         return res.json({exists: false })
       }
      
