@@ -4,8 +4,8 @@ import "./WeeklySchedule.css";
 import EditScheduleModal from './EditScheduleModal';  // Import the modal component
 
 
-const days = ["Sun", "Mon", "Tues", "Wed", "Thur", "Fri", "Sat"] as const;
-const timeSlots = ["9:00 AM", "10:00 AM", "11:00 AM", "12:00 PM", "1:00 PM", "2:00 PM"];
+// const days = ["Sun", "Mon", "Tues", "Wed", "Thur", "Fri", "Sat"] as const;
+// const timeSlots = ["9:00 AM", "10:00 AM", "11:00 AM", "12:00 PM", "1:00 PM", "2:00 PM"];
 const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
 
 export interface StudyGroup {
@@ -27,8 +27,6 @@ export interface User {
     profilePic?: string;
 }
 
-type Day = typeof days[number];
-type Availability = Record<Day, string[]>;
 
 interface WeeklyScheduleProps {
     studyGroupId: number;
@@ -55,30 +53,107 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ studyGroupId }) => {
     const [users, setUsers] = useState<User[] | null>(null);
     const [hoveredSlot, setHoveredSlot] = useState<{ day: string; timeSlot: string } | null>(null);
     const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+    const [alerts, setAlerts] = useState<{ id: number; alertText: string; alertSeverity: "error" | "warning" | "info" | "success"; visible: boolean }[]>([]);
 
-    const [schedule, setSchedule] = useState({
-        days: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
-        startTime: '09:00 AM',
-        endTime: '05:00 PM',
-      });
-      const [isModalOpen, setModalOpen] = useState(false);
-    
-      const openEditModal = () => setModalOpen(true);
-      const closeEditModal = () => setModalOpen(false);
-    
-      const saveSchedule = async (updatedSchedule: { days: string[]; startTime: string; endTime: string }) => {
-        // const response = await fetch('/api/updateSchedule', {
-        //   method: 'POST',
-        //   headers: { 'Content-Type': 'application/json' },
-        //   body: JSON.stringify(updatedSchedule),
-        // });
-    
-        // if (response.ok) {
-        //   setSchedule(updatedSchedule);  // Update the schedule state with new values
-        // }
-        return
-      };
+    // const [schedule, setSchedule] = useState({
+    //     days: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+    //     startTime: '09:00 AM',
+    //     endTime: '05:00 PM',
+    //   });
+    const [days, setDays] = useState(["Sun", "Mon", "Tues", "Wed", "Thur", "Fri", "Sat"]);
+    const [timeSlots, setTimeSlots] = useState(["9:00 AM", "10:00 AM", "11:00 AM", "12:00 PM", "1:00 PM", "2:00 PM"]);
+    const [scheduleStartTime, setScheduleStartTime] = useState<string>("9:00 AM");
+    const [scheduleEndTime, setScheduleEndTime] = useState<string>("5:00 PM");
+    type Day = typeof days[number];
+    type Availability = Record<Day, string[]>;
+    const [isModalOpen, setModalOpen] = useState(false);
+    const [loading, setLoading] = useState(true)
 
+    const openEditModal = () => setModalOpen(true);
+    const closeEditModal = () => setModalOpen(false);
+
+    function generateTimeSlots(startTime: string, endTime: string): string[] {
+        const times: string[] = [];
+        let currentTime = new Date(`1970-01-01T${convertTo24Hour(startTime)}:00`);
+        const end = new Date(`1970-01-01T${convertTo24Hour(endTime)}:00`);
+    
+        while (currentTime <= end) {
+            times.push(formatAMPM(currentTime));
+            currentTime.setMinutes(currentTime.getMinutes() + 30);
+        }
+    
+        return times;
+    }
+    
+    function convertTo24Hour(time: string): string {
+        const [timePart, modifier] = time.split(" ");
+        let [hours, minutes] = timePart.split(":").map(Number);
+    
+        if (modifier === "PM" && hours !== 12) {
+            hours += 12;
+        } else if (modifier === "AM" && hours === 12) {
+            hours = 0;
+        }
+    
+        return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
+    }
+    
+    function formatAMPM(date: Date): string {
+        let hours = date.getHours();
+        let minutes = date.getMinutes();
+        const ampm = hours >= 12 ? "PM" : "AM";
+    
+        hours = hours % 12 || 12; // Convert 0 to 12 for AM
+        const minutesStr = String(minutes).padStart(2, "0");
+    
+        return `${hours}:${minutesStr} ${ampm}`;
+    }
+    
+    // Fetch current schedule when modal opens
+    useEffect(() => {
+        {
+            const fetchSchedule = async () => {
+                setLoading(true);
+                try {
+                    const token = localStorage.getItem('token');
+                    if (!token) {
+                        // alert('You need to be logged in to edit the study group.');
+                        setAlerts((prevAlerts) => [
+                            ...prevAlerts,
+                            { id: Date.now(), alertText: 'You need to be logged in to edit the schedule.', alertSeverity: "error", visible: true },
+                        ]);
+                        return;
+                    }
+                    const response = await fetch(`${REACT_APP_API_URL}/api/study-groups/${studyGroupId}/schedule`, {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                    });
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch schedule');
+                    }
+                    const data = await response.json();
+                    // Assuming the response contains the schedule info
+                    setDays(data.scheduleDays || []);
+                    setScheduleStartTime(data.scheduleStartTime || "9:00 AM");
+                    setScheduleEndTime(data.scheduleEndTime || "5:00 PM");
+                    setTimeSlots(generateTimeSlots(scheduleStartTime,scheduleEndTime))
+                } catch (error) {
+                    console.error('Error fetching schedule:', error);
+                    setAlerts((prevAlerts) => [
+                        ...prevAlerts,
+                        { id: Date.now(), alertText: 'Failed to load schedule.', alertSeverity: "error", visible: true },
+                    ]);
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            fetchSchedule();
+        }
+    }, [isModalOpen, studyGroupId]);
     // Fetch study group data and users' availability
     const getStudyGroup = async () => {
         const userId = getLoggedInUserId(); // Get the logged-in user ID
@@ -308,7 +383,6 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ studyGroupId }) => {
                     <EditScheduleModal
                         isOpen={isModalOpen}
                         onClose={closeEditModal}
-                        onSave={saveSchedule}
                         groupId={currStudyGroup?.id}
                     />
                 )}

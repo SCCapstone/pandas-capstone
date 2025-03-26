@@ -6,12 +6,11 @@ interface EditScheduleModalProps {
   isOpen: boolean;
   onClose: () => void;
   groupId: number; // Assuming groupId is passed as a prop to fetch the schedule
-  onSave: (updatedSchedule: { days: string[]; startTime: string; endTime: string }) => void;
 }
 const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
 
 
-const EditScheduleModal: React.FC<EditScheduleModalProps> = ({ isOpen, onClose, onSave, groupId }) => {
+const EditScheduleModal: React.FC<EditScheduleModalProps> = ({ isOpen, onClose, groupId }) => {
   const [days, setSelectedDays] = useState<string[]>(['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']);
   const [startTime, setStartTime] = useState<string>("9:00 AM");
   const [endTime, setEndTime] = useState<string>("10:00 AM");
@@ -62,7 +61,7 @@ const EditScheduleModal: React.FC<EditScheduleModalProps> = ({ isOpen, onClose, 
                   // alert('You need to be logged in to edit the study group.');
                   setAlerts((prevAlerts) => [
                       ...prevAlerts,
-                      { id: Date.now(), alertText: 'You need to be logged in to edit the study group.', alertSeverity: "error", visible: true },
+                      { id: Date.now(), alertText: 'You need to be logged in to edit the schedule.', alertSeverity: "error", visible: true },
                   ]);
                   return;
               }
@@ -172,7 +171,7 @@ const EditScheduleModal: React.FC<EditScheduleModalProps> = ({ isOpen, onClose, 
         }
 
         const updatedData = await response.json();
-        onSave({ days, startTime, endTime });
+        // onSave({ days, startTime, endTime });
         setAlerts([])
         onClose();
       } catch (error) {
