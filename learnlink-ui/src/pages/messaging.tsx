@@ -31,6 +31,7 @@ interface Message{
   chatId: number;
   liked: boolean;
   system: boolean;
+  seen: boolean;
   
 }
 interface User {
@@ -460,6 +461,7 @@ useEffect(() => {
           chatId: selectedChat.id,
           liked: false,
           system: false,
+          seen: false,
         };
   
         // sends the message via a websocket to the other user
@@ -582,6 +584,7 @@ useEffect(() => {
           chatId: selectedChat.id,
           liked: false,
           system: true,
+          seen: false,
         };
   
         // sends the message via a websocket to the other user

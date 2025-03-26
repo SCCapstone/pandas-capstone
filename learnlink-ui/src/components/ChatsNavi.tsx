@@ -23,6 +23,7 @@ interface Message {
   chatId: number;     
   liked: boolean;  
   system: boolean;   
+  seen: boolean;
 }
 
 // Represents a user participating in a chat
