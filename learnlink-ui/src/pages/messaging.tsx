@@ -1190,15 +1190,10 @@ const handleGetChatUsername = async (userId: number) => {
                   <div className="NoChatSelected">Please select a chat</div> // Show message if no chat is selected
                 )}
               </div>
-
-
-
-
-
               <div className="ChatInput">
                 <PlusButtonProps
                 onSelect={handlePlusSelect}
-                studyGroupId=''
+                studyGroupId={currentGroupId}
                 
                 />
                 <input
