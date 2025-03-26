@@ -1065,7 +1065,7 @@ const handleGetChatUsername = async (userId: number) => {
           )}
 
           <div className='newChat'>
-            <button  className='newChatButton'>
+            <button  className='newChatButton' onClick={() => navigate(`/network?active='matches'`)}>
               + New Chat
             </button>
           </div>
