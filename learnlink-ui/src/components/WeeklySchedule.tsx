@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { getLoggedInUserId } from "../utils/auth";
 import "./WeeklySchedule.css";
+import EditScheduleModal from './EditScheduleModal';  // Import the modal component
+
 
 const days = ["Sun", "Mon", "Tues", "Wed", "Thur", "Fri", "Sat"] as const;
 const timeSlots = ["9:00 AM", "10:00 AM", "11:00 AM", "12:00 PM", "1:00 PM", "2:00 PM"];
@@ -53,6 +55,28 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ studyGroupId }) => {
     const [users, setUsers] = useState<User[] | null>(null);
     const [hoveredSlot, setHoveredSlot] = useState<{ day: string; timeSlot: string } | null>(null);
     const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+
+    const [schedule, setSchedule] = useState({
+        days: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+        startTime: '09:00 AM',
+        endTime: '05:00 PM',
+      });
+      const [isModalOpen, setModalOpen] = useState(false);
+    
+      const openEditModal = () => setModalOpen(true);
+      const closeEditModal = () => setModalOpen(false);
+    
+      const saveSchedule = async (updatedSchedule: { days: string[]; startTime: string; endTime: string }) => {
+        const response = await fetch('/api/updateSchedule', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(updatedSchedule),
+        });
+    
+        if (response.ok) {
+          setSchedule(updatedSchedule);  // Update the schedule state with new values
+        }
+      };
 
     // Fetch study group data and users' availability
     const getStudyGroup = async () => {
@@ -253,7 +277,7 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ studyGroupId }) => {
         const usersUnavailable = users?.filter(user => !usersAvailability[user.id]?.[day]?.includes(timeSlot));
         const countUsersUnavailable = usersUnavailable?.length;
 
-        const countTotalUsers= users?.length
+        const countTotalUsers = users?.length
 
         console.log("usersAvailable: for timeslot", day, timeSlot, usersAvailable)
         console.log("users UnAvailable: for timeslot", day, timeSlot, usersUnavailable)
@@ -277,30 +301,38 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ studyGroupId }) => {
                         {/* <p>{currStudyGroup.description}</p> */}
                     </div>
                 )}
-                <div className="schedule-tables-container">
+      <button onClick={openEditModal}>Edit Schedule</button>
+      {/* Pass props to the modal */}
+      <EditScheduleModal
+        isOpen={isModalOpen}
+        onClose={closeEditModal}
+        onSave={saveSchedule}
+      />
+            </div>
+            <div className="schedule-tables-container">
                 <div className="current-user-schedule">
-                <h2>Your Availability</h2>
-                <p>Click and drag to toggle. Save using button below.</p>
+                    <h2>Your Availability</h2>
+                    <p>Click and drag to toggle. Save using button below.</p>
 
-                        <table className="current-user-schedule-color-legend">
-                            <thead>
-                                <tr>
-                                    <td>Unavailable</td>
-                                    <td>Available</td>
+                    <table className="current-user-schedule-color-legend">
+                        <thead>
+                            <tr>
+                                <td>Unavailable</td>
+                                <td>Available</td>
 
-                                </tr>
+                            </tr>
 
-                            </thead>
+                        </thead>
 
-                            <tbody>
-                                <tr>
-                                    <td></td>
-                                    <td
-                                        style={{ background: "#00678c93" }
-                                        }></td>
-                                </tr>
-                            </tbody>
-                        </table>
+                        <tbody>
+                            <tr>
+                                <td></td>
+                                <td
+                                    style={{ background: "#00678c93" }
+                                    }></td>
+                            </tr>
+                        </tbody>
+                    </table>
                     {/* Editable Schedule Table (Current User's Availability) */}
                     <table className="schedule-table" onMouseUp={handleMouseUp} onMouseLeave={handleMouseUp}>
                         <thead>
@@ -350,24 +382,24 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ studyGroupId }) => {
                     <h2>Group's Combined Availability</h2>
                     <p>Hover on timeslots to see whose available.</p>
                     <table className="current-user-schedule-color-legend">
-                            <thead>
-                                <tr>
-                                    <td>0/{ users?.length || 1} Available</td>
-                                    <td>{ users?.length || 1}/{ users?.length || 1} Available</td>
+                        <thead>
+                            <tr>
+                                <td>0/{users?.length || 1} Available</td>
+                                <td>{users?.length || 1}/{users?.length || 1} Available</td>
 
-                                </tr>
+                            </tr>
 
-                            </thead>
+                        </thead>
 
-                            <tbody>
-                                <tr>
-                                    <td></td>
-                                    <td
-                                        style={{ background: "rgba(0,128,0)" }
-                                        }></td>
-                                </tr>
-                            </tbody>
-                        </table>
+                        <tbody>
+                            <tr>
+                                <td></td>
+                                <td
+                                    style={{ background: "rgba(0,128,0)" }
+                                    }></td>
+                            </tr>
+                        </tbody>
+                    </table>
 
                     <table className="merged-availability-table">
                         <thead>
@@ -384,7 +416,7 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ studyGroupId }) => {
                                     <td className="time-slot">{timeSlot}</td>
                                     {days.map((day) => {
                                         const cellStyle = getCellClass(day, timeSlot);
-                        
+
                                         return (
                                             <td
                                                 key={`${day}-${timeSlot}`}
@@ -393,110 +425,109 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ studyGroupId }) => {
                                                 onMouseEnter={(e) => {
                                                     setHoveredSlot({ day, timeSlot });
                                                     setMousePos({ x: e.pageX, y: e.pageY });
-                                                  }}
-                                                  onMouseMove={(e) => {
+                                                }}
+                                                onMouseMove={(e) => {
                                                     setMousePos({ x: e.pageX, y: e.pageY });
-                                                  }}
-                                                  onMouseLeave={() => setHoveredSlot(null)}
-                                                >
-                                                  {cellStyle.backgroundColor !== "rgba(0, 128, 0, 0)" && ""}
-                                                </td>
+                                                }}
+                                                onMouseLeave={() => setHoveredSlot(null)}
+                                            >
+                                                {cellStyle.backgroundColor !== "rgba(0, 128, 0, 0)" && ""}
+                                            </td>
                                         );
                                     })}
                                 </tr>
                             ))}
                         </tbody>
-                        </table>
-                        {/* Tooltip */}
-                        {hoveredSlot && (() => {
-    const { usersAvailable, usersUnavailable, countUsersUnavailable, countUsersAvailable, countTotalUsers } = getCellAvailability(hoveredSlot.day as "Sun" | "Mon" | "Tues" | "Wed" | "Thur" | "Fri" | "Sat", 
-        hoveredSlot.timeSlot);
-        const getTooltipPosition = () => {
-            const tooltipWidth = 200; // Adjust this based on your tooltip's width
-            const tooltipHeight = 150; // Adjust this based on your tooltip's height
-            const offset = 10; // Space between the mouse and tooltip
-        
-            // Check if the tooltip goes beyond the right side of the screen
-            let tooltipX = mousePos.x + offset;
-            if (tooltipX + tooltipWidth > window.innerWidth) {
-                tooltipX = mousePos.x - tooltipWidth - offset; // Position to the left if it goes off the right edge
-            }
-        
-            // Check if the tooltip goes beyond the bottom of the screen
-            let tooltipY = mousePos.y + offset;
-            if (tooltipY + tooltipHeight > window.innerHeight) {
-                tooltipY = mousePos.y - tooltipHeight - offset; // Position above if it goes off the bottom
-            }
-        
-            return { top: tooltipY, left: tooltipX };
-        };
+                    </table>
+                    {/* Tooltip */}
+                    {hoveredSlot && (() => {
+                        const { usersAvailable, usersUnavailable, countUsersUnavailable, countUsersAvailable, countTotalUsers } = getCellAvailability(hoveredSlot.day as "Sun" | "Mon" | "Tues" | "Wed" | "Thur" | "Fri" | "Sat",
+                            hoveredSlot.timeSlot);
+                        const getTooltipPosition = () => {
+                            const tooltipWidth = 200; // Adjust this based on your tooltip's width
+                            const tooltipHeight = 150; // Adjust this based on your tooltip's height
+                            const offset = 10; // Space between the mouse and tooltip
 
-    return (
-        <div
-            className="absolute bg-white shadow-lg p-2 border rounded-lg text-sm"
-            style={{
-                top: getTooltipPosition().top,
-                left: getTooltipPosition().left,
-                position: "absolute",
-                background: "#fff",
-                padding: "16px",
-                borderRadius: "8px",
-                boxShadow: "0 8px 20px rgba(0, 0, 0, 0.25)",
-                fontFamily: "'Inter', sans-serif", // Clean modern font
-                maxWidth: "300px",
-                width: "fit-content",
-                zIndex: 1000,
-                transition: "opacity 0.3s ease-in-out", // Smooth fade in
-                opacity: 1,
-            }}
-        >
-            <strong style={{ fontSize: "1.1rem", fontWeight: "600", lineHeight: "30px"}}>{countUsersAvailable}/{countTotalUsers} Available</strong> <br></br>
+                            // Check if the tooltip goes beyond the right side of the screen
+                            let tooltipX = mousePos.x + offset;
+                            if (tooltipX + tooltipWidth > window.innerWidth) {
+                                tooltipX = mousePos.x - tooltipWidth - offset; // Position to the left if it goes off the right edge
+                            }
 
-            <strong style={{ fontSize: "1.05rem", fontWeight: "600" }}>Available:</strong>
-            <ul style={{ marginTop: "8px", paddingLeft: "15px", listStyle: "none" }}>
-                {usersAvailable && usersAvailable.length > 0 ? (
-                    usersAvailable.map(user => 
-                    <li 
-                    key={user.id}>
-                    <img
-                    src={user.profilePic}
-                    alt={`${user.firstName} ${user.lastName}`}
-                    className="tooltip-pfp"                    
-                    ></img>
-                    <div>
-                    {user.firstName} {user.lastName}
+                            // Check if the tooltip goes beyond the bottom of the screen
+                            let tooltipY = mousePos.y + offset;
+                            if (tooltipY + tooltipHeight > window.innerHeight) {
+                                tooltipY = mousePos.y - tooltipHeight - offset; // Position above if it goes off the bottom
+                            }
 
-                    </div>
-                    </li>)
-                ) : (
-                    <li className="text-gray-500">None</li>
-                )}
-            </ul>
-            <strong style={{ fontSize: "1.05rem", fontWeight: "600" }}>Unavailable:</strong>
-            <ul style={{ marginTop: "8px", paddingLeft: "15px", listStyle: "none" }}>
-                {usersUnavailable && usersUnavailable.length > 0 ? (
-                    usersUnavailable.map(user => 
-                        <li 
-                        key={user.id}>
-                        <img
-                        src={user.profilePic}
-                        alt={`${user.firstName} ${user.lastName}`}
-                        className="tooltip-pfp"                    
-                        ></img>
-                        <div>
-                        {user.firstName} {user.lastName}
-    
-                        </div>
-                        </li>
-                    )
-                ) : (
-                    <li className="text-gray-500">None</li>
-                )}
-            </ul>
-        </div>
-    );
-})()}
-                    </div>
+                            return { top: tooltipY, left: tooltipX };
+                        };
+
+                        return (
+                            <div
+                                className="absolute bg-white shadow-lg p-2 border rounded-lg text-sm"
+                                style={{
+                                    top: getTooltipPosition().top,
+                                    left: getTooltipPosition().left,
+                                    position: "absolute",
+                                    background: "#fff",
+                                    padding: "16px",
+                                    borderRadius: "8px",
+                                    boxShadow: "0 8px 20px rgba(0, 0, 0, 0.25)",
+                                    fontFamily: "'Inter', sans-serif", // Clean modern font
+                                    maxWidth: "300px",
+                                    width: "fit-content",
+                                    zIndex: 1000,
+                                    transition: "opacity 0.3s ease-in-out", // Smooth fade in
+                                    opacity: 1,
+                                }}
+                            >
+                                <strong style={{ fontSize: "1.1rem", fontWeight: "600", lineHeight: "30px" }}>{countUsersAvailable}/{countTotalUsers} Available</strong> <br></br>
+
+                                <strong style={{ fontSize: "1.05rem", fontWeight: "600" }}>Available:</strong>
+                                <ul style={{ marginTop: "8px", paddingLeft: "15px", listStyle: "none" }}>
+                                    {usersAvailable && usersAvailable.length > 0 ? (
+                                        usersAvailable.map(user =>
+                                            <li
+                                                key={user.id}>
+                                                <img
+                                                    src={user.profilePic || 'https://learnlink-public.s3.us-east-2.amazonaws.com/AvatarPlaceholder.svg'}
+                                                    alt={`${user.firstName} ${user.lastName}`}
+                                                    className="tooltip-pfp"
+                                                ></img>
+                                                <div>
+                                                    {user.firstName} {user.lastName}
+
+                                                </div>
+                                            </li>)
+                                    ) : (
+                                        <li className="text-gray-500">None</li>
+                                    )}
+                                </ul>
+                                <strong style={{ fontSize: "1.05rem", fontWeight: "600" }}>Unavailable:</strong>
+                                <ul style={{ marginTop: "8px", paddingLeft: "15px", listStyle: "none" }}>
+                                    {usersUnavailable && usersUnavailable.length > 0 ? (
+                                        usersUnavailable.map(user =>
+                                            <li
+                                                key={user.id}>
+                                                <img
+                                                    src={user.profilePic || 'https://learnlink-public.s3.us-east-2.amazonaws.com/AvatarPlaceholder.svg'}
+                                                    alt={`${user.firstName} ${user.lastName}`}
+                                                    className="tooltip-pfp"
+                                                ></img>
+                                                <div>
+                                                    {user.firstName} {user.lastName}
+
+                                                </div>
+                                            </li>
+                                        )
+                                    ) : (
+                                        <li className="text-gray-500">None</li>
+                                    )}
+                                </ul>
+                            </div>
+                        );
+                    })()}
                 </div>
             </div>
         </div>

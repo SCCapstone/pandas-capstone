@@ -161,6 +161,7 @@ body {
 }
 .current-user-schedule-color-legend tbody{
     height: 50px;
+    min-height: 50px;
     border-collapse: collapse;
     border: hidden;
     margin: 20px auto;
@@ -182,6 +183,29 @@ body {
 .current-user-schedule-color-legend tbody td{
     border: 1px solid #3b3c3dd1;
 }
+
+.schedule-table-title {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.schedule-table-title button{
+    font-weight: bold;
+    color: #fff;
+    background-color: #00668C;
+    border: none;
+    border-radius: 5px;
+    padding: 15px;
+    width: 120px;
+    gap: 20px;
+}
+.schedule-table-title button:hover{
+        background-color: #005270;
+        cursor: pointer;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .schedule-table th,
