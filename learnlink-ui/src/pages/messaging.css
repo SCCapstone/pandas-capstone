@@ -301,16 +301,14 @@
   cursor: pointer;
   font-size: 20px;
   font-weight: bold;
-  color: #B6CCD8;
+  color: #fff;
   background-color: transparent;
   border: none;
   outline: none;
   transition: all 0.3s ease;
 }
 
-.Tab.active {
-  color: #fff;
-}
+
 
 .Tab:hover {
   color: #fff;

@@ -70,7 +70,6 @@ const Messaging: React.FC = () => {
   //for matching stuff ie chats tab and requests tab
   const [showMessagesPanel, setShowMessagesPanel] = useState(false);
   const [showRequestsPanel, setShowRequestsPanel] = useState(false);
-  const [activeTab, setActiveTab] = useState<'messages' | 'requests'>('messages');
   const [selectedChatUsers, setSelectedChatUsers] = useState<User[] | null>(null);
   // for user panel
   const [isUserPanelVisible, setIsUserPanelVisible] = useState(false);
@@ -99,7 +98,6 @@ const Messaging: React.FC = () => {
     const fetchData = async () => {
       setLoadingChatList(true);
 
-      handleChatsSwitch();
       const token = localStorage.getItem('token');
       console.log(token);
       const getCurrentUser = async () => {
@@ -297,7 +295,7 @@ const Messaging: React.FC = () => {
     }
     fetchData();
 
-  }, [activeTab, selectedChat]);  // reloads when selected or tab changes, allows for updates to users
+  }, [selectedChat]);  // reloads when selected or tab changes, allows for updates to users
 
 
   useEffect(() => {
@@ -353,7 +351,7 @@ useEffect(() => {
       
     });
   }
-}, [selectedChat, activeTab]);
+}, [selectedChat]);
 
 
   //Used for retrieving the user names of a chat and the users within
@@ -365,7 +363,7 @@ useEffect(() => {
         }
       });
     }
-  }, [selectedChat, activeTab]);
+  }, [selectedChat]);
   
   // Web socket functionality for sending and receiving messages
   useEffect(() => {
@@ -436,20 +434,7 @@ useEffect(() => {
   }, [selectedChat?.messages]); // Runs every time messages change
   
 
-  // Switches from the Requests tab to the Chats tab
-  const handleChatsSwitch = () => {
-    setActiveTab('messages');
-    setShowRequestsPanel(false);
-    setShowMessagesPanel(true);
-  };
   
-  // Switches from the Chats tab to the Requests Tab
-  const handleRequestsSwitch = () => {
-    setSelectedChat(null);
-    setActiveTab('requests');
-    setShowMessagesPanel(false);
-    setShowRequestsPanel(true);
-  };
 
 
   // sends messages between users
@@ -1043,7 +1028,7 @@ const handleGetChatUsername = async (userId: number) => {
         <div className="ChatsSidebar">
           <div className="TabsContainer">
             <button 
-              className={`Tab ${activeTab === 'messages' ? 'active' : ''}`} 
+              className="Tab" 
             >
               Chats
             </button>
