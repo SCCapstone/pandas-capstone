@@ -70,6 +70,7 @@ const Messaging: React.FC = () => {
   //for matching stuff ie chats tab and requests tab
   const [showMessagesPanel, setShowMessagesPanel] = useState(false);
   const [showRequestsPanel, setShowRequestsPanel] = useState(false);
+  const [activeTab, setActiveTab] = useState<'messages' | 'requests'>('messages');
   const [selectedChatUsers, setSelectedChatUsers] = useState<User[] | null>(null);
   // for user panel
   const [isUserPanelVisible, setIsUserPanelVisible] = useState(false);
@@ -98,6 +99,7 @@ const Messaging: React.FC = () => {
     const fetchData = async () => {
       setLoadingChatList(true);
 
+      handleChatsSwitch();
       const token = localStorage.getItem('token');
       console.log(token);
       const getCurrentUser = async () => {
@@ -295,7 +297,7 @@ const Messaging: React.FC = () => {
     }
     fetchData();
 
-  }, [selectedChat]);  // reloads when selected or tab changes, allows for updates to users
+  }, [activeTab, selectedChat]);  // reloads when selected or tab changes, allows for updates to users
 
 
   useEffect(() => {
@@ -351,7 +353,7 @@ useEffect(() => {
       
     });
   }
-}, [selectedChat]);
+}, [selectedChat, activeTab]);
 
 
   //Used for retrieving the user names of a chat and the users within
@@ -363,7 +365,7 @@ useEffect(() => {
         }
       });
     }
-  }, [selectedChat]);
+  }, [selectedChat, activeTab]);
   
   // Web socket functionality for sending and receiving messages
   useEffect(() => {
@@ -434,7 +436,14 @@ useEffect(() => {
   }, [selectedChat?.messages]); // Runs every time messages change
   
 
+  // Switches from the Requests tab to the Chats tab
+  const handleChatsSwitch = () => {
+    setActiveTab('messages');
+    setShowRequestsPanel(false);
+    setShowMessagesPanel(true);
+  };
   
+ 
 
 
   // sends messages between users
@@ -1028,7 +1037,7 @@ const handleGetChatUsername = async (userId: number) => {
         <div className="ChatsSidebar">
           <div className="TabsContainer">
             <button 
-              className="Tab" 
+              className={`Tab ${activeTab === 'messages' ? 'active' : ''}`} 
             >
               Chats
             </button>
