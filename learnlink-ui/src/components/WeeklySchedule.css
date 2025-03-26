@@ -216,6 +216,13 @@ body {
     border-top: 1px solid #3b3c3d6e !important;  /* Apply dotted line under */
 }
 
+@media(max-width: 1200px) {
+    .merged-availability-table th,
+    .schedule-table th {
+        font-size: 13px;
+    }
+}
+
 
 
 /* Responsive Design */
@@ -223,7 +230,17 @@ body {
     .schedule-table th,
     .schedule-table td {
         padding: 8px;
-        font-size: 14px;
+        font-size: 11px;
+    }
+
+
+    .schedule-tables-container{
+        flex-direction: column;
+    }
+
+    .merged-availability-table th,
+    .schedule-table th {
+        font-size: 11px;
     }
 }
 

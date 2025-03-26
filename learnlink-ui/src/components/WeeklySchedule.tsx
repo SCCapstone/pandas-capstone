@@ -76,39 +76,39 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ studyGroupId }) => {
         const times: string[] = [];
         let currentTime = new Date(`1970-01-01T${convertTo24Hour(startTime)}:00`);
         const end = new Date(`1970-01-01T${convertTo24Hour(endTime)}:00`);
-    
+
         while (currentTime <= end) {
             times.push(formatAMPM(currentTime));
             currentTime.setMinutes(currentTime.getMinutes() + 30);
         }
-    
+
         return times;
     }
-    
+
     function convertTo24Hour(time: string): string {
         const [timePart, modifier] = time.split(" ");
         let [hours, minutes] = timePart.split(":").map(Number);
-    
+
         if (modifier === "PM" && hours !== 12) {
             hours += 12;
         } else if (modifier === "AM" && hours === 12) {
             hours = 0;
         }
-    
+
         return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
     }
-    
+
     function formatAMPM(date: Date): string {
         let hours = date.getHours();
         let minutes = date.getMinutes();
         const ampm = hours >= 12 ? "PM" : "AM";
-    
+
         hours = hours % 12 || 12; // Convert 0 to 12 for AM
         const minutesStr = String(minutes).padStart(2, "0");
-    
+
         return `${hours}:${minutesStr} ${ampm}`;
     }
-    
+
     // Fetch current schedule when modal opens
     useEffect(() => {
         {
@@ -139,7 +139,7 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ studyGroupId }) => {
                     setDays(data.scheduleDays || []);
                     setScheduleStartTime(data.scheduleStartTime || "9:00 AM");
                     setScheduleEndTime(data.scheduleEndTime || "5:00 PM");
-                    setTimeSlots(generateTimeSlots(scheduleStartTime,scheduleEndTime))
+                    setTimeSlots(generateTimeSlots(scheduleStartTime, scheduleEndTime))
                 } catch (error) {
                     console.error('Error fetching schedule:', error);
                     setAlerts((prevAlerts) => [
@@ -423,43 +423,43 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ studyGroupId }) => {
                             </tr>
                         </thead>
                         <tbody>
-    {timeSlots.map((timeSlot, index) => {
-        const isFullHour = timeSlot.endsWith(":00 AM") || timeSlot.endsWith(":00 PM");
-        const isHalfHour = timeSlot.endsWith(":30 AM") || timeSlot.endsWith(":30 PM");
+                            {timeSlots.map((timeSlot, index) => {
+                                const isFullHour = timeSlot.endsWith(":00 AM") || timeSlot.endsWith(":00 PM");
+                                const isHalfHour = timeSlot.endsWith(":30 AM") || timeSlot.endsWith(":30 PM");
 
-        return (
-            <tr key={timeSlot} className={isHalfHour ? "dotted-line" : "solid-line"}>
-                {/* Merge row headers for :00 and :30 times */}
-                {isFullHour && (
-                    <td className="time-slot" rowSpan={2}>{timeSlot}</td>
-                )}
-                {isHalfHour && null} {/* Skip rendering the label on :30 rows */}
-                
-                {days.map((day) => {
-                    const isSelected = availability[day].includes(timeSlot);
-                    const isInRange =
-                        isDragging &&
-                        draggingDay === day &&
-                        startTimeSlot &&
-                        endTimeSlot &&
-                        timeSlots.indexOf(timeSlot) >= timeSlots.indexOf(startTimeSlot) &&
-                        timeSlots.indexOf(timeSlot) <= timeSlots.indexOf(endTimeSlot);
+                                return (
+                                    <tr key={timeSlot} className={isHalfHour ? "dotted-line" : "solid-line"}>
+                                        {/* Merge row headers for :00 and :30 times */}
+                                        {isFullHour && (
+                                            <td className="time-slot" rowSpan={2}>{timeSlot}</td>
+                                        )}
+                                        {isHalfHour && null} {/* Skip rendering the label on :30 rows */}
 
-                    return (
-                        <td
-                            key={`${day}-${timeSlot}`}
-                            className={`cell ${isSelected || isInRange ? "selected" : ""}`}
-                            onMouseDown={(e) => handleMouseDown(day, timeSlot, e)}
-                            onMouseMove={(e) => handleMouseMove(day, timeSlot, e)}
-                            onClick={(e) => handleTimeSlotClick(day, timeSlot, e)}
-                        >
-                        </td>
-                    );
-                })}
-            </tr>
-        );
-    })}
-</tbody>
+                                        {days.map((day) => {
+                                            const isSelected = availability[day].includes(timeSlot);
+                                            const isInRange =
+                                                isDragging &&
+                                                draggingDay === day &&
+                                                startTimeSlot &&
+                                                endTimeSlot &&
+                                                timeSlots.indexOf(timeSlot) >= timeSlots.indexOf(startTimeSlot) &&
+                                                timeSlots.indexOf(timeSlot) <= timeSlots.indexOf(endTimeSlot);
+
+                                            return (
+                                                <td
+                                                    key={`${day}-${timeSlot}`}
+                                                    className={`cell ${isSelected || isInRange ? "selected" : ""}`}
+                                                    onMouseDown={(e) => handleMouseDown(day, timeSlot, e)}
+                                                    onMouseMove={(e) => handleMouseMove(day, timeSlot, e)}
+                                                    onClick={(e) => handleTimeSlotClick(day, timeSlot, e)}
+                                                >
+                                                </td>
+                                            );
+                                        })}
+                                    </tr>
+                                );
+                            })}
+                        </tbody>
                     </table>
                     {/* Save Availability Button */}
                     <button className="save-button" onClick={saveAvailability}>Save Availability</button>
@@ -499,42 +499,43 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ studyGroupId }) => {
                             </tr>
                         </thead>
                         <tbody>
-                            {timeSlots.map((timeSlot) =>  {
+                            {timeSlots.map((timeSlot) => {
                                 const isFullHour = timeSlot.endsWith(":00 AM") || timeSlot.endsWith(":00 PM");
                                 const isHalfHour = timeSlot.endsWith(":30 AM") || timeSlot.endsWith(":30 PM");
-                        
-                            return (
-                                
-                                <tr key={timeSlot} className={isHalfHour ? "dotted-line" : "solid-line"}>
-                                    {isFullHour && (
-                    <td className="time-slot" rowSpan={2}>{timeSlot}</td>
-                )}
-                {isHalfHour && null} {/* Skip rendering the label on :30 rows */}
-                
-                                    {days.map((day) => {
-                                        const cellStyle = getCellClass(day, timeSlot);
-                                        
 
-                                        return (
-                                            <td
-                                                key={`${day}-${timeSlot}`}
-                                                className="cell"
-                                                style={cellStyle}
-                                                onMouseEnter={(e) => {
-                                                    setHoveredSlot({ day, timeSlot });
-                                                    setMousePos({ x: e.pageX, y: e.pageY });
-                                                }}
-                                                onMouseMove={(e) => {
-                                                    setMousePos({ x: e.pageX, y: e.pageY });
-                                                }}
-                                                onMouseLeave={() => setHoveredSlot(null)}
-                                            >
-                                                {cellStyle.backgroundColor !== "rgba(0, 128, 0, 0)" && ""}
-                                            </td>
-                                        );
-                                    })}
-                                </tr>
-                            )})}
+                                return (
+
+                                    <tr key={timeSlot} className={isHalfHour ? "dotted-line" : "solid-line"}>
+                                        {isFullHour && (
+                                            <td className="time-slot" rowSpan={2}>{timeSlot}</td>
+                                        )}
+                                        {isHalfHour && null} {/* Skip rendering the label on :30 rows */}
+
+                                        {days.map((day) => {
+                                            const cellStyle = getCellClass(day, timeSlot);
+
+
+                                            return (
+                                                <td
+                                                    key={`${day}-${timeSlot}`}
+                                                    className="cell"
+                                                    style={cellStyle}
+                                                    onMouseEnter={(e) => {
+                                                        setHoveredSlot({ day, timeSlot });
+                                                        setMousePos({ x: e.pageX, y: e.pageY });
+                                                    }}
+                                                    onMouseMove={(e) => {
+                                                        setMousePos({ x: e.pageX, y: e.pageY });
+                                                    }}
+                                                    onMouseLeave={() => setHoveredSlot(null)}
+                                                >
+                                                    {cellStyle.backgroundColor !== "rgba(0, 128, 0, 0)" && ""}
+                                                </td>
+                                            );
+                                        })}
+                                    </tr>
+                                )
+                            })}
                         </tbody>
                     </table>
                     {/* Tooltip */}
