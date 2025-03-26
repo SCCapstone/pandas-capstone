@@ -296,7 +296,7 @@
   border-bottom: 2px solid #ccc;
 }
 
-.Tab {
+.ChatTab {
   padding: 10px 20px;
   cursor: pointer;
   font-size: 20px;
@@ -310,7 +310,7 @@
 
 
 
-.Tab:hover {
+.ChatTab:hover {
   color: #fff;
 }
 

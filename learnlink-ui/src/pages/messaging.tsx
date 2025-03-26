@@ -1037,7 +1037,7 @@ const handleGetChatUsername = async (userId: number) => {
         <div className="ChatsSidebar">
           <div className="TabsContainer">
             <button 
-              className={`Tab ${activeTab === 'messages' ? 'active' : ''}`} 
+              className={`ChatTab ${activeTab === 'messages' ? 'active' : ''}`} 
             >
               Chats
             </button>
