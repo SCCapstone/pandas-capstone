@@ -317,6 +317,7 @@
 }
 
 .ChatsSidebar {
+  position: relative;
   overflow-y: scroll;
   width: 30%;
   max-width: 30%;
@@ -409,6 +410,34 @@
   border: 1px solid #f5c6cb;
 }
 
+
+
+.newChat {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+}
+
+.newChatButton {
+  font-weight: 700;
+  font-size: large;
+  width: 100%;
+  padding: 10px;
+  background-color: #00668C;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  text-align: center;
+}
+
+.newChatButton:hover {
+  background-color: #01506d;
+}
+
+
 /* Responsive Adjustments */
 @media (max-width: 768px) {
   .Messaging {
@@ -500,6 +529,7 @@
   }
 
   .ChatsSidebar {
+    position: relative;
     width: 100%;
     max-width: 100%;
     border-right: none;
