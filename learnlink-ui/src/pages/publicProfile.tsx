@@ -43,15 +43,17 @@ const PublicProfile: React.FC = () => {
       }, [matchButton]);
 
       // Example: after performing a match-related action, refresh the status
-  const handleMatchButtonClick = async () => {
-    if (!matchButton.isButtonDisabled) {
-      // Execute your match action logic here
-      // For example, send a match request, etc.
-      console.log("Match button clicked!");
-      // After completing the action, refresh the status:
-      matchButton.refreshStatus();
-    }
-  };
+      const handleMatchButtonClick = async () => {
+        if (!matchButton.isButtonDisabled) {
+            console.log("Match button clicked!");
+            
+            // Send match notification
+            await handleMatchNotification(); 
+            
+            // Refresh button status after the action
+            matchButton.refreshStatus();
+        }
+    };
 
     const handleSwipe = async (direction: 'Yes' | 'No', targetId: number, isStudyGroup: boolean, message:string | undefined) => {
         try {
