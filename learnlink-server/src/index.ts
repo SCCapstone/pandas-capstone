@@ -2912,6 +2912,26 @@ app.delete('/api/notifications/delete/:id', async (req, res): Promise<any> => {
   }
 });
 
+app.delete('/api/notifications/deleteAll', authenticate, async (req, res) => {
+  console.log("deleting all notifications...");
+  const userId = res.locals.userId;
+
+  try {
+    await prisma.notification.deleteMany({
+      where: { user_id: userId },
+    });
+
+    res.status(200).json({ message: 'All notifications deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting all notifications:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
+
+
+
 import { SwipeStatus } from '@prisma/client'; // Import enum
 
 app.put('/api/swipe-requests/:id', async (req, res): Promise<any> => {
