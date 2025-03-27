@@ -115,7 +115,7 @@ import { handleSendSystemMessage } from "../utils/messageUtils";
                     const response = await axios.get(`${REACT_APP_API_URL}/api/study-groups`, {
                         headers: { Authorization: `Bearer ${token}` },
                       });
-                    setGroups(response.data);
+                      setGroups(response.data.sort((a: Group, b: Group) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()));
             
                 } catch (error) {
                     console.error('Error fetching study groups:', error);
