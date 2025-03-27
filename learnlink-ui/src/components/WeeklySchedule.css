@@ -11,12 +11,6 @@
     --accent-200: #00668C;
 }
 
-body {
-    background-color: var(--bg-100);
-    font-family: "Inter", sans-serif;
-    color: var(--text-100);
-}
-
 .schedule-page h1 {
     font-size: xx-large;
     font-weight: 600;
