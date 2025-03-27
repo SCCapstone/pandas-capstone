@@ -73,16 +73,12 @@ const ChatsNavi: React.FC<ChatsNaviProps> = ({
     setSortedChats(sorted);
   }, [chats]);
 
+  
   useEffect(() => {
-    fetchLastOpened();
-  }, [currentUserId]);
-
-  const fetchLastOpened = async () => {
-    try {
-      if (currentUserId) {
-        const response = await axios.get(
-          `${REACT_APP_API_URL}/api/chats/lastOpened/${currentUserId}`
-        );
+    const fetchLastOpened = async () => {
+      if (!currentUserId) return;
+      try {
+        const response = await axios.get(`${REACT_APP_API_URL}/api/chats/lastOpened/${currentUserId}`);
         const formattedData = response.data.data.reduce(
           (acc: { [chatId: number]: { [userId: number]: string } }, entry: any) => {
             const { chatId, userId, timestamp } = entry;
@@ -93,67 +89,45 @@ const ChatsNavi: React.FC<ChatsNaviProps> = ({
           {}
         );
         setLastOpenedTimes(formattedData);
+      } catch (error) {
+        console.error('Error fetching lastOpened times:', error);
       }
-    } catch (error) {
-      console.error('Error fetching lastOpened times:', error);
-    }
-  };
-
+    };
   
-
+    fetchLastOpened();
+  }, [currentUserId]); // Only fetch when currentUserId changes
+  
   const handleChatClick = async (chat: Chat) => {
     setSelectedChat(chat);
     const currentUser = currentUserId;
     const lastOpenedTimestamp = new Date().toISOString();
-
+  
     // Optimistically update UI
     setLastOpenedTimes((prev) => ({
       ...prev,
-      [chat.id]: {
-        ...prev[chat.id],
-        [currentUser]: lastOpenedTimestamp,
-      },
+      [chat.id]: { ...prev[chat.id], [currentUser]: lastOpenedTimestamp },
     }));
-
-    // Update the time every 5 seconds while chat is selected
-    const intervalId = setInterval(async () => {
-      try {
-        const timestamp = new Date().toISOString(); // Update timestamp every interval
-        await axios.post(`${REACT_APP_API_URL}/api/chats/updateLastOpened`, {
-          chatId: chat.id,
-          userId: currentUser,
-          lastOpened: timestamp,
-        });
-      } catch (error) {
-        console.error('Error updating lastOpened:', error);
-      }
-    }, 1000); // 1000 ms = 1 seconds
-
-    // Clean up interval when the chat is deselected or component unmounts
-    return () => clearInterval(intervalId);
+  
+    try {
+      await axios.post(`${REACT_APP_API_URL}/api/chats/updateLastOpened`, {
+        chatId: chat.id,
+        userId: currentUser,
+        lastOpened: lastOpenedTimestamp,
+      });
+    } catch (error) {
+      console.error('Error updating lastOpened:', error);
+    }
   };
   
-
-  // Determine if the chat name should be highlighted based on the comparison of lastOpened and updatedAt times
   const shouldHighlightChat = (chat: Chat) => {
-    fetchLastOpened();
-    handleChatClick(chat);
     const lastOpenedTimestamp = lastOpenedTimes[chat.id]?.[currentUserId];
     const chatUpdatedAt = new Date(chat.updatedAt).getTime();
     const lastOpenedAt = lastOpenedTimestamp ? new Date(lastOpenedTimestamp).getTime() : 0;
-
-    // Prevent highlighting if the current user is already in the chat and their own update triggered the updatedAt time
-    // Don't highlight the chat if it's the selected chat already
-    if (selectedChat?.id === chat.id) {
-
-      return false;
-      
-    }
-
-    
+  
+    if (selectedChat?.id === chat.id) return false;
     return chatUpdatedAt > lastOpenedAt;
   };
-
+  
   return (
     <div className="messages-panel">
       {/* List of chats */}

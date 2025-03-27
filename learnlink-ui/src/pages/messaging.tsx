@@ -98,8 +98,6 @@ const Messaging: React.FC = () => {
 
   const [alerts, setAlerts] = useState<{ id: number; alertText: string; alertSeverity: "error" | "warning" | "info" | "success"; visible: boolean }[]>([]);
   const alertVisible = alerts.some(alert => alert.visible);
-
-
   useEffect(() => {
     const fetchData = async () => {
       setLoadingChatList(true);
@@ -220,13 +218,16 @@ const Messaging: React.FC = () => {
       fetchChats();
       console.log("fetch chats complete");
   }, []);
-  
+
 
   useEffect(() => {
     const fetchData = async () => {
 
+
+
       const token = localStorage.getItem('token');
       console.log(token);
+
       const getCurrentUser = async () => {
         if (token) {
           try {
@@ -296,6 +297,8 @@ const Messaging: React.FC = () => {
           .catch((error) => console.error('Error fetching chats:', error));
       };
 
+
+
       await syncUserChats();
 
       setLoadingChatList(false);
@@ -306,6 +309,7 @@ const Messaging: React.FC = () => {
   }, [activeTab, selectedChat]);  // reloads when selected or tab changes, allows for updates to users
 
 
+
   useEffect(() => {
     if (selectedChat) {
       socket.emit('joinChat', selectedChat.id, currentUserId);
@@ -313,7 +317,6 @@ const Messaging: React.FC = () => {
   }, [selectedChat, currentUserId]);
 
   useEffect(() => {
-    console.log ("rerendering chats");
     socket.on("chatUpdated", (updatedUsers) => {
         setChats((prevChats) =>
             prevChats.map((chat) =>
