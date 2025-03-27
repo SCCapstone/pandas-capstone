@@ -160,58 +160,52 @@ import { handleSendSystemMessage } from "../utils/messageUtils";
     };
 
 
-
-    
-    //deletes a user from a study group
     const removeUser = async (userId: number, groupId: number | null) => {
-        if (!groupId) {
-        console.error('Group ID is missing.');
-        return;
-        }
-        try {
-        const response = await axios.delete(`${REACT_APP_API_URL}/api/study-groups/${groupId}/users/${userId}`);
-        
-        if (response.status === 200) {
-            // Log the updated users state to ensure it reflects the change
-            //setSelectedChatUsers(prevUsers => (prevUsers || []).filter(user => user.id !== userId));
-
-            setSelectedGroupUsers((prevUsers) => (prevUsers|| []).filter(user => user.id !== userId));
-            if (selectedGroup?.id === userId) {
-            setSelectedGroup(null);
-            }
-            /*
-            // add left/removed from chat message here
-            const username = chatUsernames[userId] || "Unknown";
-            let mess = "";
-            // console.log(username);
-            if (userId === currentUserId) {
-            mess = `${username} left the group.`;
-            
-            } else {
-            mess = `${username} was removed from the group.`;
-            }
-            setUpdateMessage(mess);
-
-            
-
-            console.log("update message " ,  mess);
-            handleSendSystemMessage(mess);
-            */
-            if(selectedGroupUsers){
-              const username = selectedGroupUsers[userId] || "Unknown";
-            }
-            
-            //let mess = userId === currentUserId ? `${username} left the group.` : `${username} was removed from the group.`;
-            let mess = '';
-
-            handleSendSystemMessage(mess, selectedGroup?.chatID);
-        } else {
-            console.error('Failed to delete the user.');
-        }
-        } catch (error) {
-        console.error('Error deleting user:', error);
-        }
-    };
+      if (!groupId) {
+          console.error('Group ID is missing.');
+          return;
+      }
+      try {
+          const response = await axios.delete(`${REACT_APP_API_URL}/api/study-groups/${groupId}/users/${userId}`);
+          
+          if (response.status === 200) {
+              // Update selectedGroupUsers state
+              setSelectedGroupUsers(prevUsers => (prevUsers || []).filter(user => user.id !== userId));
+  
+              // Update the groups state dynamically
+              setGroups(prevGroups =>
+                  prevGroups.map(group =>
+                      group.id === groupId
+                          ? { ...group, users: group.users.filter(user => user.id !== userId) }
+                          : group
+                  )
+              );
+  
+              // If the removed user was the last user in the group, remove the group
+              setGroups(prevGroups => prevGroups.filter(group => group.users.length > 0));
+  
+              // Update selectedGroup if needed
+              if (selectedGroup?.id === groupId && selectedGroupUsers?.length === 1) {
+                  setSelectedGroup(null);
+              }
+  
+              // Send a system message when a user is removed
+              const removedUser = selectedGroupUsers?.find(user => user.id === userId);
+              if (removedUser) {
+                  let mess = userId === currentUserId
+                      ? `${removedUser.firstName} ${removedUser.lastName}  left the group.`
+                      : `${removedUser.firstName} ${removedUser.lastName}  was removed from the group.`;
+                  
+                  handleSendSystemMessage(mess, selectedGroup?.chatID);
+              }
+          } else {
+              console.error('Failed to delete the user.');
+          }
+      } catch (error) {
+          console.error('Error deleting user:', error);
+      }
+  };
+  
   
     return (
         <div className="Groups">
