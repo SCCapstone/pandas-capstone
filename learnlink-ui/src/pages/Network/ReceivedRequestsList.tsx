@@ -6,6 +6,7 @@ import { getLoggedInUserId } from '../../utils/auth';
 import openProfilePopup from '../messaging'
 import { updateSwipeStatus } from '../../utils/userServices';
 import { FaCheck, FaXmark } from 'react-icons/fa6';
+import { handleSendSystemMessage } from "../../utils/messageUtils";
 
 interface ReceivedRequestsListProps {
     handleSelectUser: (userId: number) => void;
@@ -22,6 +23,7 @@ const ReceivedRequestsList: React.FC<ReceivedRequestsListProps> = ({ handleSelec
     const [loadingApproval, setLoadingApproval] = useState<number | null>(null); // Tracks which request is being approved
     const [receivedRequestsList, setRecievedRequestsList] = useState<SwipeRequest[]>([]);
     const currentUserId = getLoggedInUserId();
+    
 
     useEffect(() => {
         console.log("currentUserId:", currentUserId);
@@ -137,6 +139,20 @@ const handleApproval = async (
         // Sync the study group chat users
         if (studyGroupId) {
           await axios.post(`${REACT_APP_API_URL}/api/sync-study-group-chat`, { studyGroupId });
+
+          // Fetch the user's name
+          const addedUserResponse = await axios.get(`${REACT_APP_API_URL}/api/users/${requestUserId}`);
+          const addedUser = addedUserResponse.data;
+
+          const studyGroupChatIDRes = await axios.get(`${REACT_APP_API_URL}/api/study-groups/${studyGroupId}/chat`);
+          const studyGroupChatID = studyGroupChatIDRes.data;
+
+          let mess =`${addedUser.firstName} ${addedUser.lastName} was added to the group.`;
+          console.log ("mess::::", mess);
+          console.log("study group chat id", studyGroupChatID.chatId);
+          // Send system message
+          handleSendSystemMessage(mess, studyGroupChatID.chatId);
+         
         }
   
         // NOTIFICATION
