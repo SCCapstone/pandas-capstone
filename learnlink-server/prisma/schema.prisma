@@ -106,6 +106,7 @@ model User {
   availability        Availability[]
   unReadMessages      Boolean?      @default(true)
   lastOpened          LastOpened[] 
+  lastUpdatedChats Chat[] @relation("LastUpdatedBy") // Inverse relation for lastUpdatedBy
 }
 
 model StudyGroup {
@@ -174,6 +175,8 @@ model Chat {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @default(now())
   users         User[]    @relation("ChatUsers") // One-to-many through the join table
+  lastUpdatedBy User?     @relation("LastUpdatedBy", fields: [lastUpdatedById], references: [id]) // Named relation
+  lastUpdatedById Int?  
   messages      Message[] // One-to-many relationship to Message
   studyGroupId  Int?      @unique // Add this line to define the studyGroupId field
   studyGroup    StudyGroup? @relation("StudyGroupChat", fields: [studyGroupId], references: [id]) // Optional relation to StudyGroup

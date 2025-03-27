@@ -22,6 +22,7 @@ interface Chat {
   users: User[]; 
   createdAt: string;
   updatedAt: string;
+  lastUpdatedById: number | null;
   lastOpened: { [userId: number]: string };
 }
 
@@ -510,6 +511,7 @@ useEffect(() => {
                   ...chat,
                   messages: [...(chat.messages || []), messageData],
                   updatedAt: new Date().toISOString(), // Convert Date to string here
+                  lastUpdatedById: currentUserId,
                 }
               : chat
           );

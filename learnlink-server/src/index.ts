@@ -2527,7 +2527,7 @@ io.on("connection", (socket) => {
       // After saving the message, update the chat's `updatedAt` timestamp
       const updatedChat = await prisma.chat.update({
         where: { id: data.chatId },
-        data: { updatedAt: new Date() },
+        data: { updatedAt: new Date(), lastUpdatedById: data.userId},
         include: { users: true },
       });
 

@@ -13,6 +13,7 @@ interface Chat {
   users: User[];
   createdAt: string;
   updatedAt: string;
+  lastUpdatedById: number|null;
   lastOpened: { [userId: number]: string };
 }
 
@@ -102,7 +103,7 @@ const ChatsNavi: React.FC<ChatsNaviProps> = ({
     const currentUser = currentUserId;
     const lastOpenedTimestamp = new Date().toISOString();
   
-    // Optimistically update UI
+    // Optimistically update UI before the request
     setLastOpenedTimes((prev) => ({
       ...prev,
       [chat.id]: { ...prev[chat.id], [currentUser]: lastOpenedTimestamp },
@@ -120,13 +121,19 @@ const ChatsNavi: React.FC<ChatsNaviProps> = ({
   };
   
   const shouldHighlightChat = (chat: Chat) => {
+    //console.log("last updated by ::::",chat);
+    if (chat.lastUpdatedById === currentUserId) return false; // Ignore updates made by the current user
+  
     const lastOpenedTimestamp = lastOpenedTimes[chat.id]?.[currentUserId];
     const chatUpdatedAt = new Date(chat.updatedAt).getTime();
     const lastOpenedAt = lastOpenedTimestamp ? new Date(lastOpenedTimestamp).getTime() : 0;
   
+    // Don't highlight the chat if the user was just in it
     if (selectedChat?.id === chat.id) return false;
+  
     return chatUpdatedAt > lastOpenedAt;
   };
+  
   
   return (
     <div className="messages-panel">
