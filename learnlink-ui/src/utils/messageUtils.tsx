@@ -1,6 +1,7 @@
 // src/utils/messageUtils.ts
 
 import io from "socket.io-client";
+import axios from 'axios';
 
 const REACT_APP_API_URL = process.env.REACT_APP_API_URL || "http://localhost:2000";
 
@@ -82,3 +83,14 @@ export const handleSendSystemMessage = (
     }
   }
 };
+
+
+export const updateChatTimestamp = async (chatId: any) => {
+    try {
+      await axios.put(`${REACT_APP_API_URL}/api/study-groups/chats/${chatId}`);
+      console.log(`Chat ${chatId} updated time successfully`);
+    } catch (error) {
+      console.error("Failed to update chat timestamp:", error);
+    }
+  };
+  

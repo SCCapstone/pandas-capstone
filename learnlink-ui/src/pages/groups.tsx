@@ -15,7 +15,7 @@ import JoinReqProfile from '../components/JoinReqProfile';
 import CustomAlert from '../components/CustomAlert';
 import { unescape } from 'querystring';
 import { useNavigate } from "react-router-dom";
-import { handleSendSystemMessage } from "../utils/messageUtils";
+import { handleSendSystemMessage,updateChatTimestamp} from "../utils/messageUtils";
 
 
   interface User {
@@ -39,6 +39,28 @@ import { handleSendSystemMessage } from "../utils/messageUtils";
     profile_pic: string;
   }
 
+  interface Chat {
+    id: number;
+    name: string;
+    messages: Message[];
+    users: User[]; 
+    createdAt: string;
+    updatedAt: string;
+    lastUpdatedById: number | null;
+    lastOpened: { [userId: number]: string };
+  }
+
+  interface Message{
+    id: number;
+    content: string;
+    createdAt: string;
+    userId: number | undefined;
+    chatId: number;
+    liked: boolean;
+    system: boolean;
+    
+  }
+
   const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
 
 
@@ -55,7 +77,7 @@ import { handleSendSystemMessage } from "../utils/messageUtils";
     const [alerts, setAlerts] = useState<{ id: number; alertText: string; alertSeverity: "error" | "warning" | "info" | "success"; visible: boolean }[]>([]);
     const alertVisible = alerts.some(alert => alert.visible);
   
-
+    const [chats, setChats] = useState<Chat[]>([]);
     const [isUserPanelVisible, setIsUserPanelVisible] = useState(false);
     const [isPanelVisible, setIsPanelVisible] = useState(false);
     const [selectedGroupUsers, setSelectedGroupUsers] = useState<User[] | null>(null);
@@ -197,6 +219,7 @@ import { handleSendSystemMessage } from "../utils/messageUtils";
                       : `${removedUser.firstName} ${removedUser.lastName}  was removed from the group.`;
                   
                   handleSendSystemMessage(mess, selectedGroup?.chatID);
+                  updateChatTimestamp(selectedGroup?.chatID);
               }
           } else {
               console.error('Failed to delete the user.');

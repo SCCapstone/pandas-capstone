@@ -932,6 +932,8 @@ const handleGetChatUsername = async (userId: number) => {
         if (selectedChat){
           handleSendSystemMessage(mess, selectedChat.id, setSelectedChat, setChats, setUpdateMessage);
         }
+
+        
       } else {
         console.error('Failed to delete the user.');
       }

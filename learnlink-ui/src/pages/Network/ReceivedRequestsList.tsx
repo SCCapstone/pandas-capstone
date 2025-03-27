@@ -6,7 +6,7 @@ import { getLoggedInUserId } from '../../utils/auth';
 import openProfilePopup from '../messaging'
 import { updateSwipeStatus } from '../../utils/userServices';
 import { FaCheck, FaXmark } from 'react-icons/fa6';
-import { handleSendSystemMessage } from "../../utils/messageUtils";
+import { handleSendSystemMessage, updateChatTimestamp} from "../../utils/messageUtils";
 
 interface ReceivedRequestsListProps {
     handleSelectUser: (userId: number) => void;
@@ -152,7 +152,7 @@ const handleApproval = async (
           console.log("study group chat id", studyGroupChatID.chatId);
           // Send system message
           handleSendSystemMessage(mess, studyGroupChatID.chatId);
-         
+          updateChatTimestamp(studyGroupChatID.chatId);
         }
   
         // NOTIFICATION

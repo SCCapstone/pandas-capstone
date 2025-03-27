@@ -2350,6 +2350,21 @@ app.post('/api/chats', async (req, res) : Promise<any> => {
   }
 });
 
+app.put("/api/study-groups/chats/:chatId", async (req, res) => {
+  try {
+    const { chatId } = req.params;
+
+    const updatedChat = await prisma.chat.update({
+      where: { id: parseInt(chatId) }, // Ensure chatId is an integer if necessary
+      data: { updatedAt: new Date() },
+    });
+
+    res.status(200).json({ message: "Chat updated successfully", chat: updatedChat });
+  } catch (error) {
+    console.error("Error updating chat timestamp:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
 
 
 app.post('/api/chats/:userId', authenticate, async (req: Request, res: Response): Promise<any> => {
