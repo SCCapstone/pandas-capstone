@@ -2356,7 +2356,7 @@ app.put("/api/study-groups/chats/:chatId", async (req, res) => {
 
     const updatedChat = await prisma.chat.update({
       where: { id: parseInt(chatId) }, // Ensure chatId is an integer if necessary
-      data: { updatedAt: new Date() },
+      data: { updatedAt: new Date() , lastUpdatedById: null},
     });
 
     res.status(200).json({ message: "Chat updated successfully", chat: updatedChat });
