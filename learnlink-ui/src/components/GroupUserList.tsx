@@ -60,6 +60,7 @@ const GroupUserList = (
 
 
   const handleRemoveUser = (userId: number) => {
+    console.log(groupId);
     if (groupId !== null) {
       onRemoveUser(userId, groupId); // Pass both userId and groupId
     } else {

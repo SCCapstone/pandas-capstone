@@ -228,7 +228,7 @@ const StudyGroupInfo =(
           <label className='members-label'>Members:</label>
               <div className="member-list">
                 <GroupUserContainer
-                  groupId={currentGroupId}
+                  groupId={groupId}
                   currentId={currentId}
                   users={users}
                   chatId={chatID}

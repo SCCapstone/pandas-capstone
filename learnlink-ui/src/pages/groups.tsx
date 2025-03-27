@@ -15,7 +15,7 @@ import JoinReqProfile from '../components/JoinReqProfile';
 import CustomAlert from '../components/CustomAlert';
 import { unescape } from 'querystring';
 import { useNavigate } from "react-router-dom";
-
+import { handleSendSystemMessage } from "../utils/messageUtils";
 
 
   interface User {
@@ -197,6 +197,14 @@ import { useNavigate } from "react-router-dom";
             console.log("update message " ,  mess);
             handleSendSystemMessage(mess);
             */
+            if(selectedGroupUsers){
+              const username = selectedGroupUsers[userId] || "Unknown";
+            }
+            
+            //let mess = userId === currentUserId ? `${username} left the group.` : `${username} was removed from the group.`;
+            let mess = '';
+
+            handleSendSystemMessage(mess, selectedGroup?.chatID);
         } else {
             console.error('Failed to delete the user.');
         }

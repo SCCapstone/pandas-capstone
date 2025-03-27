@@ -5,6 +5,7 @@ import './GroupUserContainer.css'
 import Navbar from '../components/Navbar';
 import CopyrightFooter from '../components/CopyrightFooter';
 import GroupUserList from '../components/GroupUserList';
+import { group } from 'console';
 
 
 
@@ -41,6 +42,9 @@ const GroupUserContainer = ({
     isPopup: boolean; 
     }) => {
 
+      useEffect(()=>{
+        console.log("group id:::: ", groupId);
+      }, []);
   return (
     <div>
 

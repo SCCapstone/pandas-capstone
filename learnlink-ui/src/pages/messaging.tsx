@@ -13,7 +13,7 @@ import GroupUserContainer from '../components/GroupUserContainer';
 import { useNavigate } from "react-router-dom";
 import CreateStudyGroup from '../components/CreateStudyGroup';
 import PlusButtonProps from '../components/PlusButtonProps'
-
+import { handleSendSystemMessage } from "../utils/messageUtils";
 
 interface Chat {
   id: number;
@@ -583,80 +583,6 @@ useEffect(() => {
   };
     
 
-
-  // sends messages between users
-  const handleSendSystemMessage = async (mss: String) => {
-    // Authorization
-    const token = localStorage.getItem('token');
-    if (mss.trim() && selectedChat) {
-      try {
-        const messageData: Message = {
-          id: Date.now(), // Use a unique ID generator
-          content: mss.trim(),
-          createdAt: new Date().toISOString(),
-          userId: undefined,
-          chatId: selectedChat.id,
-          liked: false,
-          system: true,
-        };
-  
-        // sends the message via a websocket to the other user
-        socket.emit(
-          'message',
-          {
-            chatId: selectedChat.id,
-            content: mss,
-            userId: undefined,
-            system: true,
-            token,
-          },
-          (response: { success: boolean; message?: string; error?: string }) => {
-            if (response.success) {
-              console.log('Message sent successfully:', response.message);
-            } else {
-              console.log('Message send failed:', response.error);
-            }
-          }
-        );
-        setCurrentMessage('');
-        
-        
-        // Update the selectedChat to include the new message
-        setSelectedChat((prevSelectedChat) =>
-          prevSelectedChat
-            ? { ...prevSelectedChat, messages: [...(prevSelectedChat.messages || []), messageData] }
-            : null
-        );
-
-        setChats((prevChats) => {
-          const updatedChats = prevChats.map((chat) =>
-            chat.id === selectedChat.id
-              ? {
-                  ...chat,
-                  messages: [...(chat.messages || []), messageData],
-                  updatedAt: new Date().toISOString(), // Convert Date to string here
-                }
-              : chat
-          );
-          // Sort chats by updatedAt (most recent first)
-          return updatedChats.sort(
-            (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
-          );
-        });
-        
-        setUpdateMessage('');
-
-   
-      } catch (error) {
-        console.error('Error sending message:', error);
-      }
-    }
-  };
-  
-  
-
-
-
   // Used to access the study group name or chat name for displaying properly on the UI
   const getChatName = async (chat: Chat) => {
     // getting the study group name
@@ -1003,7 +929,9 @@ const handleGetChatUsername = async (userId: number) => {
         
 
         console.log("update message " ,  mess);
-        handleSendSystemMessage(mess);
+        if (selectedChat){
+          handleSendSystemMessage(mess, selectedChat.id, setSelectedChat, setChats, setUpdateMessage);
+        }
       } else {
         console.error('Failed to delete the user.');
       }
