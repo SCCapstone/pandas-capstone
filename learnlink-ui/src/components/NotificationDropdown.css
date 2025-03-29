@@ -24,7 +24,6 @@
     cursor: pointer;
     border-bottom: 1px solid #eee;
     min-height: 50px;
-    gap: 12px;
 }
 
 .notif-dropdown li:hover{
@@ -46,6 +45,7 @@
     flex: 1;
     line-height: 1.4;
     display: flex;
+    padding-left: 6px;
 }
 
 .notif-icon {
