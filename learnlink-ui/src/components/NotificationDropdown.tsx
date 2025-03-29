@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './NotificationDropdown.css';
+import { FaXmark } from 'react-icons/fa6';
 
 // Define notification types
 enum NotificationType {
@@ -143,6 +144,7 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ setNotifCou
           <li key={notif.id} onClick={() => handleSelectNotif(notif)} className={notif.read ? 'read' : 'unread'}>
             <span className="notif-icon">{getNotificationIcon(notif.type)}</span>
             <p>{notif.message}</p>
+            <button className="DeleteButton"> <FaXmark /></button>
           </li>
         ))}
       </ul>
