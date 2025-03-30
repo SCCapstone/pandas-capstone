@@ -1273,7 +1273,31 @@ app.get('/api/profiles/:userId', async (req, res): Promise<any> => {
 export const deleteUserById = async (userId: number) => {
   try {
     // Delete related records in explicit join tables
-    await prisma.chat.deleteMany({ where: { users: { some: { id: userId } } } });
+    // only if there is exactly one other user in the chat
+    await prisma.chat.deleteMany({
+      where: {
+        users: {
+          some: { id: userId },
+        },
+        AND: [
+          {
+            users: {
+              // Ensure there is exactly one other user in the chat
+              some: { id: { not: userId } },
+            },
+          },
+          {
+            users: {
+              // Ensure there are only two users in the chat (the user being deleted + one other user)
+              every: { id: { not: userId } },
+            },
+          },
+          {
+            studyGroupId: null, // Ensure there is no study group ID associated with the chat
+          },
+        ],
+      },
+    });
 
     // Delete swipes
     await prisma.swipe.deleteMany({ where: { OR: [{ userId }, { targetUserId: userId }] } });
