@@ -144,8 +144,14 @@ const EditStudyGroup =(
         ]);
         return;
       }
+      
+    
+      await handleUpload();
 
-      const updatedStudyGroup = { name, description, subject, chatID, ideal_match_factor };
+      console.log(imageUrl);
+    
+      
+      const updatedStudyGroup = { name, description, subject, chatID, ideal_match_factor, imageUrl };
 
       if (name==='' || name === null) {
         // alert('Please enter a study group name.');
@@ -171,13 +177,16 @@ const EditStudyGroup =(
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      handleUpload();
+      
 
 
 
       console.log('Study group updated:', response.data);
       
       
+      
+
+     
 
       updateChatName(chatID, name);
 
@@ -201,12 +210,19 @@ const EditStudyGroup =(
   const handleUpload = async () => {
     console.log('Uploading image...'); // Debug log
     if (!image) return;
-
+    console.log(image);
+  
     const formData = new FormData();
     formData.append('profilePic', image);
     formData.append('chatID', chatID.toString());
     const token = localStorage.getItem('token');
-    if (token) {
+    if (!token) {
+      console.error("No token found in localStorage");
+      return;
+    }
+  
+    try {
+      console.log("Sending request to API...");
       const res = await fetch(`${REACT_APP_API_URL}/api/study-group/upload-pfp`, {
         method: 'POST',
         body: formData,
@@ -214,19 +230,26 @@ const EditStudyGroup =(
           'Authorization': `Bearer ${token}`,
         },
       });
-      const data = await res.json();
-      if (res.ok) setImageUrl(data.profilePic);
+  
+      // Check if the response is OK
       if (!res.ok) {
-        console.error("Upload error:", data.error || "Unknown error");
-        // alert(`Error: ${data.error || "Failed to upload image"}`);
+        const data = await res.json();
+        console.error("API Error:", data.error || "Unknown error");
         setAlerts((prevAlerts) => [
           ...prevAlerts,
           { id: Date.now(), alertText: ` ${data.error || "Failed to upload image"}`, alertSeverity: "error", visible: true },
         ]);
         return;
       }
+  
+      const data = await res.json();
+      console.log("api call success:", data);  // Log the successful response
+      setImageUrl(data.profilePic);
+    } catch (error) {
+      console.error("API call failed:", error);
     }
   };
+  
 
   // Handle form submission
     
@@ -252,6 +275,7 @@ const EditStudyGroup =(
           method: "POST",
           body: formData,  // Send the FormData
         });
+        
     
         if (response.ok) {
           const data = await response.json();

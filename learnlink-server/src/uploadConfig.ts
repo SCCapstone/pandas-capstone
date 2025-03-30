@@ -209,6 +209,7 @@ const resizeAndUploadStudyGroup = async (req: Request, res: Response, next: Next
 
   try {
     // Convert HEIC to JPEG if necessary
+    console.log("Checking content type:", contentType);
     if (contentType === "image/heic" || contentType === "image/heif") {
       const convertedBuffer = await heicConvert({
         buffer: req.file.buffer,
@@ -217,9 +218,11 @@ const resizeAndUploadStudyGroup = async (req: Request, res: Response, next: Next
       });
       imageBuffer = Buffer.from(convertedBuffer);
       contentType = "image/jpeg";
+      console.log("HEIC conversion successful");
     }
 
-
+    
+    console.log("Resizing image...");
     // 📏 Resize image and apply circular crop
     const resizedBuffer = await sharp(imageBuffer)
       .resize(400, 400, { fit: "cover" }) // Crop to 400x400
@@ -238,6 +241,7 @@ const resizeAndUploadStudyGroup = async (req: Request, res: Response, next: Next
         global.gc();
       }
 
+      console.log("Image resized successfully");
     // Generate unique file name
     const fileName = `profile-pictures/${Date.now()}_${req.file.originalname.replace(/\s+/g, "_")}`;
 
@@ -251,7 +255,7 @@ const resizeAndUploadStudyGroup = async (req: Request, res: Response, next: Next
         ACL: "public-read",
       })
     );
-
+    console.log("Upload to S3 successful");
     if (global.gc) {
       global.gc();
     }
@@ -280,6 +284,7 @@ const resizeAndUploadStudyGroup = async (req: Request, res: Response, next: Next
       } catch (deleteError) {
         console.error("Failed to delete old image:", deleteError);
       }
+      console.log("Old image deleted successfully");
       if (global.gc) {
         global.gc();
       }
@@ -293,7 +298,8 @@ const resizeAndUploadStudyGroup = async (req: Request, res: Response, next: Next
 
     // Set the new profile picture URL in the request body to pass to the next middleware
     req.body.profilePicUrl = newProfilePicUrl;
-
+    console.log(newProfilePicUrl);
+    next();
 
     return;
   } catch (error) {

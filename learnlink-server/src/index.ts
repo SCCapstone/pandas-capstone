@@ -1479,7 +1479,7 @@ app.get("/api/study-groups/chat/:chatId", async (req, res): Promise<any> => {
 
 app.put('/api/study-groups/chat/:chatID', async (req, res) : Promise<any> =>  {
   const { chatID } = req.params; // Extract chatID from the URL
-  const { name, description, subject, ideal_match_factor } = req.body; // Extract new study group data from the request body
+  const { name, description, subject, ideal_match_factor, profile_pic } = req.body; // Extract new study group data from the request body
 
   // Validate the input
   if (!name) {
@@ -1495,6 +1495,7 @@ app.put('/api/study-groups/chat/:chatID', async (req, res) : Promise<any> =>  {
         description,
         subject,
         ideal_match_factor: ideal_match_factor.value,
+        profilePic: profile_pic,
       },
     });
 
@@ -2798,6 +2799,7 @@ app.post(
 app.post('/api/study-group/upload-pfp',
   authenticate,
   (req, res, next) => {
+    console.log("Upload middleware started");
     upload(req, res, (err) => {
       if (err instanceof multer.MulterError) {
         if (err.code === "LIMIT_FILE_SIZE") {
@@ -2806,11 +2808,13 @@ app.post('/api/study-group/upload-pfp',
       } else if (err) {
         return res.status(400).json({ error: err.message });
       }
+      console.log("Upload successful");
       next(); // Proceed to the next middleware if no errors
     });
   },
   async (req, res, next): Promise<any> => {
     try {
+      console.log("Processing image");
       await resizeAndUploadStudyGroup(req, res, next); // Image processing
     } catch (err) {
       console.error("Image processing error:", err);
@@ -2818,6 +2822,7 @@ app.post('/api/study-group/upload-pfp',
     }
   },
   async (req, res): Promise<any> => {
+    console.log("Final handler reached");
     const chatID = parseInt(req.body.chatID);
     const profilePic = req.body.profilePicUrl;
     console.log("IN UPLOAD")

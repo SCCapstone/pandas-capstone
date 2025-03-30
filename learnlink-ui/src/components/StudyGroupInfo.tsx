@@ -88,9 +88,6 @@ const StudyGroupInfo =(
 
   const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
 
-
-
-  // Fetch the study group details when the component is mounted
   useEffect(() => {
     const fetchStudyGroup = async () => {
       try {
@@ -132,6 +129,8 @@ const StudyGroupInfo =(
       }
     };
 
+  // Fetch the study group details when the component is mounted
+
     fetchStudyGroup();
   }, [chatID, isEdit]);
 
@@ -142,6 +141,9 @@ const StudyGroupInfo =(
   };
   
 
+  const handleClose = () => {
+    setIsEdit(false);
+  };
   
 
   if (!studyGroup) return <div>Loading...</div>; // Show loading message while fetching the study group data
@@ -149,7 +151,7 @@ const StudyGroupInfo =(
   return (isEdit ? (
     <EditStudyGroup
       chatID={chatID}
-      onClose={() => setIsEdit(false)}
+      onClose={handleClose} 
       updateChatName={updateChatName}
       groupId={groupId}
       currentId={currentId}
