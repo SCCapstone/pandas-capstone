@@ -61,6 +61,15 @@ enum NotificationType {
   StudyGroup
 }
 
+model Button {
+  id           Int     @id @default(autoincrement())
+  label        String
+  action       String
+  studyGroupId Int?
+
+  message      Message? 
+}
+
 model User {
   id                  Int            @id @default(autoincrement())
   created_at          DateTime       @default(now())
@@ -205,6 +214,11 @@ model Message {
   chat         Chat        @relation(fields: [chatId], references: [id], onDelete: Cascade) // One-to-many relation to Chat
   liked        Boolean     @default(false)
   system       Boolean     @default(false)
+  
+  
+  isButton     Boolean  @default(false)
+  buttonDataId Int?     @unique // Nullable for non-button messages
+  buttonData   Button?  @relation(fields: [buttonDataId], references: [id], onDelete: Cascade)
 }
 
 model Notification {

@@ -26,6 +26,14 @@ interface Message {
   chatId: number;
   liked: boolean;
   system: boolean;
+  isButton: boolean;
+  buttonData?: Button;
+}
+interface Button {
+  id: number;
+  label: string;
+  action: string;
+  studyGroupId?: number | null;
 }
 
 // Represents a user participating in a chat

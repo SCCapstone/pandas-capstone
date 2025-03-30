@@ -84,6 +84,89 @@ export const handleSendSystemMessage = (
   }
 };
 
+export const handleSendButtonMessage = (
+  buttonData: { label: string; action: string; studyGroupId?: number },
+  selectedChatid: any,
+  setSelectedChat?: Function,
+  setChats?: Function,
+  setUpdateMessage?: Function
+) => {
+  const token = localStorage.getItem("token");
+  console.log('eep')
+
+  if (selectedChatid && buttonData.label.trim()) {
+    try {
+      const messageData = {
+        id: Date.now(),
+        content: buttonData.label, // Display label as message content
+        createdAt: new Date().toISOString(),
+        userId: undefined,
+        chatId: selectedChatid,
+        liked: false,
+        system: true, // Consider button messages as system messages
+        isButton: true,
+        buttonData: { ...buttonData }, // Attach button data
+      };
+
+      socket.emit(
+        "message",
+        {
+          chatId: selectedChatid,
+          content: buttonData.label,
+          userId: undefined,
+          system: true,
+          isButton: true,
+          buttonData,
+          token,
+        },
+        (response: { success: boolean; message?: string; error?: string }) => {
+          if (response.success) {
+            console.log("Button message sent successfully:", response.message);
+          } else {
+            console.log("Button message send failed:", response.error);
+          }
+        }
+      );
+
+      if (setSelectedChat) {
+        setSelectedChat((prevSelectedChat: any) =>
+          prevSelectedChat
+            ? {
+                ...prevSelectedChat,
+                messages: [...(prevSelectedChat.messages || []), messageData],
+              }
+            : null
+        );
+      }
+
+      if (setChats) {
+        setChats((prevChats: any) => {
+          const updatedChats = prevChats.map((chat: any) =>
+            chat.id === selectedChatid
+              ? {
+                  ...chat,
+                  messages: [...(chat.messages || []), messageData],
+                  updatedAt: new Date().toISOString(),
+                }
+              : chat
+          );
+
+          return updatedChats.sort(
+            (a: any, b: any) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+          );
+        });
+      }
+
+      if (setUpdateMessage) {
+        setUpdateMessage("");
+      }
+    } catch (error) {
+      console.error("Error sending button message:", error);
+    }
+  }
+};
+
+
 
 export const updateChatTimestamp = async (chatId: any) => {
     try {

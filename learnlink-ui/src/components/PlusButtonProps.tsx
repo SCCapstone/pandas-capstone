@@ -1,13 +1,15 @@
 import { JSX, useState } from "react";
 import { Plus, Calendar, Table } from "lucide-react";
-import './PlusButtonProps.css'
+import './PlusButtonProps.css';
 
 interface PlusButtonProps {
     onSelect: (element: JSX.Element) => void;
     studyGroupId: number | null;
+    selectedChatId: string | null;
+    onSendButtonMessage: (buttonData: { action: string; studyGroupId?: number; label: string }) => void; // 👈 Pass this function from Messaging.tsx
 }
 
-export default function PlusButton({ onSelect, studyGroupId }: PlusButtonProps) {
+export default function PlusButton({ onSelect, studyGroupId, selectedChatId, onSendButtonMessage }: PlusButtonProps) {
     const [isOpen, setIsOpen] = useState(false);
 
     const options = [
@@ -24,42 +26,30 @@ export default function PlusButton({ onSelect, studyGroupId }: PlusButtonProps) 
     ];
 
     const handleSelect = (value: string) => {
-        let element: JSX.Element | null = null;
+        console.log('beep');
 
-        if (value === "weekly-scheduler") {
-            element = (
-                <button
-                    className="chat-button"
-                    onClick={() => console.log("Opening Weekly Scheduler")}
-                >
-                    📅 Open Weekly Scheduler
-                </button>
-            );
-        } else if (value === "calendar-event") {
-            element = (
-                <button
-                    className="chat-button"
-                    onClick={() => console.log("Opening Calendar Event")}
-                >
-                    🗓️ Add Calendar Event
-                </button>
-            );
-        }
+        if (!selectedChatId) return; // Ensure a chat is selected
 
-        if (element) {
-            onSelect(element);
-        }
-        setIsOpen(false);
+        const parsedStudyGroupId = isNaN(parseInt(selectedChatId, 10)) ? undefined : parseInt(selectedChatId, 10);
+
+        const buttonData = {
+            action: value, // "weekly-scheduler" or "calendar-event"
+            studyGroupId: parsedStudyGroupId,  // Will be a number or undefined
+            label: value === "weekly-scheduler" ? "📅 Open Weekly Scheduler" : "🗓️ Add Calendar Event",
+        };
+
+        // 🔄 Instead of calling handleSendButtonMessage, call the passed function from Messaging.tsx
+        onSendButtonMessage(buttonData); 
+
+        setIsOpen(false); // Close the selection UI
     };
 
     return (
         <div className="plus-button-container">
-            {/* Floating + Button */}
             <button className="plus-button" onClick={() => setIsOpen(!isOpen)}>
                 <Plus size={30} color="White" />
             </button>
 
-            {/* Pop-up Menu */}
             <div className={`plus-menu ${isOpen ? "open" : ""}`}>
                 {options.map((option) => (
                     <button

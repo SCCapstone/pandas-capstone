@@ -13,8 +13,9 @@ import { unescape } from 'querystring';
 import GroupUserContainer from '../components/GroupUserContainer';
 import { useNavigate } from "react-router-dom";
 import CreateStudyGroup from '../components/CreateStudyGroup';
-import PlusButtonProps from '../components/PlusButtonProps'
-import { handleSendSystemMessage } from "../utils/messageUtils";
+import PlusButtonProps from '../components/PlusButtonProps';
+import { handleSendSystemMessage, handleSendButtonMessage } from "../utils/messageUtils";
+import { NullValueFields } from 'aws-sdk/clients/glue';
 
 interface Chat {
   id: number;
@@ -35,8 +36,18 @@ interface Message{
   chatId: number;
   liked: boolean;
   system: boolean;
+  isButton: boolean;
+  buttonData?: Button;
   
 }
+
+interface Button {
+  id: number;
+  label: string;
+  action: string;
+  studyGroupId?: number | null;
+}
+
 interface User {
   id: number;
   username: string;
@@ -476,6 +487,7 @@ useEffect(() => {
           chatId: selectedChat.id,
           liked: false,
           system: false,
+          isButton: false
         };
   
         // sends the message via a websocket to the other user
@@ -964,6 +976,56 @@ const handleGetChatUsername = async (userId: number) => {
     return
   }
 
+  const handleButtonClick = (action: string | undefined, studyGroupId: number | undefined | null) => {
+    if (action == undefined) {
+      console.log("no button action")
+      return
+    }
+
+    switch (action) {
+      case "weeklyScheduler":
+        if (studyGroupId) {
+          openWeeklyScheduler(studyGroupId);
+        } else {
+          console.error("Study group ID is missing for weekly scheduler action.");
+        }
+        break;
+  
+      case "calendarEvent":
+        if (studyGroupId) {
+          openCalendarEvent(studyGroupId);
+        } else {
+          console.error("Study group ID is missing for calendar event action.");
+        }
+        break;
+  
+      default:
+        console.warn(`Unhandled button action: ${action}`);
+    }
+  };
+
+  const handleButtonMessage = (buttonData: { action: string; studyGroupId?: number; label: string }) => {
+    if (!selectedChatId) return; // Ensure a chat is selected
+
+    handleSendButtonMessage(buttonData, selectedChatId,setSelectedChat, setChats, setUpdateMessage); // Now we call it here ✅
+};
+  
+  // Function to open the Weekly Scheduler for a study group
+  const openWeeklyScheduler = (studyGroupId: number) => {
+    console.log(`Opening Weekly Scheduler for study group ID: ${studyGroupId}`);
+    // Add logic to open the weekly scheduler modal/page
+    // Example: navigate(`/study-groups/${studyGroupId}/schedule`);
+  };
+  
+  // Function to open a Calendar Event creation for a study group
+  const openCalendarEvent = (studyGroupId: number) => {
+    console.log(`Opening Calendar Event for study group ID: ${studyGroupId}`);
+    // Add logic to open the calendar event creation modal/page
+    // Example: navigate(`/study-groups/${studyGroupId}/calendar`);
+  };
+  
+  
+
   return (
     <div className="Messaging">
       <div>
@@ -1030,70 +1092,70 @@ const handleGetChatUsername = async (userId: number) => {
                 {/* Button Container for grouping buttons together */}
                   <div className="ButtonContainer">
                     {/* User List Button */}
-                    {hasStudyGroup && (
-                      <button
-                        className="UserListButton"
-                        onClick={() => {
-                          handleGetUsers(selectedChat.id);
-                          setIsUserPanelVisible(true);
-                        }}
-                      >
-                        Members
-                      </button>
-                    )}
+                  {hasStudyGroup && (
+                    <button
+                      className="UserListButton"
+                      onClick={() => {
+                        handleGetUsers(selectedChat.id);
+                        setIsUserPanelVisible(true);
+                      }}
+                    >
+                      Members
+                    </button>
+                  )}
 
-                    {/* Edit/Create Study Group Button */}
-                    
-                    {hasStudyGroup ? (
-                      <button
-                        className="EditStudyGroupButton"
-                        onClick={() => {
-                          navigate(`/groups?groupId=${currentGroupId}&tab=true`);
-                        }}
-                      >
-                        Edit Study Group
-                      </button>
-                    ) : (
-                      <button
-                        className="CreateStudyGroupButton"
-                        onClick={() => {
-                          handleCreateStudyGroup(selectedChat.id);
-                          setIsPanelVisible(true);
-                        }}
-                      >
-                        Create Study Group
-                      </button>
-                    )}
+                  {/* Edit/Create Study Group Button */}
+
+                  {hasStudyGroup ? (
+                    <button
+                      className="EditStudyGroupButton"
+                      onClick={() => {
+                        navigate(`/groups?groupId=${currentGroupId}&tab=true`);
+                      }}
+                    >
+                      Edit Study Group
+                    </button>
+                  ) : (
+                    <button
+                      className="CreateStudyGroupButton"
+                      onClick={() => {
+                        handleCreateStudyGroup(selectedChat.id);
+                        setIsPanelVisible(true);
+                      }}
+                    >
+                      Create Study Group
+                    </button>
+                  )}
+                </div>
+                {/* User List Panel */}
+                {isUserPanelVisible && selectedChatUsers && (
+                  <div className="Popup-members-users-panel">
+                    <GroupUserContainer
+                      groupId={groupId}
+                      currentId={currentUserId}
+                      users={selectedChatUsers ?? []}
+                      chatId={selectedChat.id}
+                      onRemoveUser={removeUser}
+                      updateUsers={updateUsers}
+                      onClose={() => setIsUserPanelVisible(false)}
+                      isPopup={true}
+                    />
                   </div>
-                  {/* User List Panel */}
-                  {isUserPanelVisible && selectedChatUsers && (
-                    <div className="Popup-members-users-panel">
-                      <GroupUserContainer
-                        groupId={groupId}
-                        currentId={currentUserId}
-                        users={selectedChatUsers ?? []}
-                        chatId={selectedChat.id}
-                        onRemoveUser={removeUser}
-                        updateUsers={updateUsers}
-                        onClose={() => setIsUserPanelVisible(false)}
-                        isPopup={true}
-                      />
-                    </div>
-                  )}
+                )}
 
-                  {/* Study Group Panel */}
-                  {isPanelVisible && (
-                    <div className="c-study-group-panel">
-                      <CreateStudyGroup
-                        chatID={selectedChat.id}
-                        onClose={() => setIsPanelVisible(false)}
-                        updateChatName={updateChatName}
-                      />
-                    </div>
-                  )}
-                  
-                                  </div>
-             
+                {/* Study Group Panel */}
+                {isPanelVisible && (
+                  <div className="c-study-group-panel">
+                    <CreateStudyGroup
+                      chatID={selectedChat.id}
+                      onClose={() => setIsPanelVisible(false)}
+                      updateChatName={updateChatName}
+                    />
+                  </div>
+                )}
+
+              </div>
+
 
               <div className="ChatWindow" ref={chatWindowRef}>
                 {selectedChat ? (
@@ -1114,11 +1176,20 @@ const handleGetChatUsername = async (userId: number) => {
                             className={`MessageBubble ${message.system ? 'SystemMessage' : (message.userId === currentUserId ? 'MyMessage' : 'OtherMessage')}`}
                             onDoubleClick={() => handleDoubleClick(message.id)}
                           >
-                            {typeof message === 'string'
-                              ? message
-                              : typeof message.content === 'string'
-                              ? message.content
-                              : JSON.stringify(message)}
+                            {/* Check if the message is a button message */}
+                            {message.isButton && message.buttonData ? (
+                              <button
+                                className="ChatButton"
+                                onClick={() => handleButtonClick(message.buttonData?.action, message.buttonData?.studyGroupId)}
+                              >
+                                {message.buttonData?.label}
+                              </button>
+                            ) : (
+                              <span>
+                                {typeof message.content === 'string' ? message.content : JSON.stringify(message.content)}
+                              </span>
+                            )}
+
                           </div>
                           {/* Show heart if message was double-clicked */}
                           {heartedMessages[message.id] && <div className="Heart">❤️</div>}
@@ -1137,9 +1208,12 @@ const handleGetChatUsername = async (userId: number) => {
               </div>
               <div className="ChatInput">
                 <PlusButtonProps
-                onSelect={handlePlusSelect}
-                studyGroupId={currentGroupId}
-                
+                  onSelect={handlePlusSelect}
+                  studyGroupId={currentGroupId}
+                  selectedChatId={selectedChatId}
+                  onSendButtonMessage={handleButtonMessage} // 👈 Pass function to handle button messages
+
+
                 />
                 <input
                   type="text"
