@@ -154,6 +154,7 @@
 .NoChatSelected {
   display: flex;
   justify-content: center;
+  align-self: center;
   align-items: center;
   height: 100%;
   color: #888;

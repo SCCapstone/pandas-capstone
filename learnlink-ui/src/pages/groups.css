@@ -18,6 +18,17 @@
     overflow-y: hidden;
   }
 
+
+  .NoGroupSelected {
+    display: flex;
+    justify-content: center;  /* Centers horizontally */
+    align-items: center;  /* Centers vertically */
+    flex: 1;  /* Makes it take up the full available space */
+    color: #888;
+    text-align: center;
+}
+
+
   .GroupHeader {
     display: flex;
     justify-content: space-between;
@@ -38,6 +49,8 @@
     box-sizing: border-box;
     border-radius: 8px;
     background-color: #fff;
+    height: 100%;
+    
   }
 
   .GroupsSidebar {

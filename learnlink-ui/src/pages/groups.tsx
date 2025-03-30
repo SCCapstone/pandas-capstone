@@ -279,29 +279,29 @@ import { handleSendSystemMessage,updateChatTimestamp} from "../utils/messageUtil
                 </div>
             </div>
             <div className="GroupInfo">
-            {/* Group Stuff */}
-                {selectedGroup && (
-                <>
-                
-                {selectedGroupUsers && (
-                    <div className="study-group-panel">
+              {/* Display message if no group is selected */}
+              {!selectedGroup ? (
+                <div className="NoGroupSelected">
+                  Please select a group
+                </div>
+              ) : (
+                selectedGroupUsers && (
+                  <div className="study-group-panel">
                     <StudyGroupInfo
-                        chatID={selectedGroup.chatID}
-                        updateChatName={updateChatName}
-                        groupId={currentGroupId}
-                        currentId={currentUserId}
-                        users={selectedGroupUsers.filter(user => user.id !== currentUserId) ?? []}
-                        onRemoveUser={removeUser}
-                        updateUsers={updateUsers}
-                        isItEdit ={isEditMode}
+                      chatID={selectedGroup.chatID}
+                      updateChatName={updateChatName}
+                      groupId={currentGroupId}
+                      currentId={currentUserId}
+                      users={selectedGroupUsers.filter((user) => user.id !== currentUserId) ?? []}
+                      onRemoveUser={removeUser}
+                      updateUsers={updateUsers}
+                      isItEdit={isEditMode}
                     />
-                    </div>
-                )}
-               
-                </>
-            )}
+                  </div>
+                )
+              )}
             </div>
-            </div>
+          </div>
             
             <CopyrightFooter />
         </div>
