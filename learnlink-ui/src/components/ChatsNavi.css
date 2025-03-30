@@ -25,18 +25,13 @@
     color: black; /* Default color */
   }
   
-  .chat-name.unread {
-    color: blue; /* Change color when there are unread messages */
-  }
+  
 
   .ChatListItem .chat-name.highlighted {
     color: blue; /* Highlighted color */
     font-weight: bold;
   }
-  .ChatListItem .chat-name.highlighted {
-    color: blue; /* Make sure to adjust this color to your needs */
-    font-weight: bold; /* You could also add other styles for visibility */
-  }
+  
   
   .chat-name.highlighted::before {
     content: '';
