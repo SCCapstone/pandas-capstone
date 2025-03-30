@@ -251,16 +251,26 @@ import { handleSendSystemMessage,updateChatTimestamp} from "../utils/messageUtil
                 </div>
             )}
             
+            
             <div className="GroupsSidebar">
+              <div className="TabsContainer">
+              <button 
+                className="GroupsTab" 
+              >
+                Groups
+              </button>
+
+            
+            </div>
             {/* List of groups */}
-                <div className="groups-panel">
+              
                     {/* List of groups */}
                     {loadingGroups ? (
                         <div className="loading-container">
                         Loading... <span className="loading-spinner"></span>
                         </div>
                     ) : (
-                        <ul className="GroupList">
+                        <div className="GroupList">
                         {groups.map((group) => (
                             <li
                             key={group.id}
@@ -274,9 +284,9 @@ import { handleSendSystemMessage,updateChatTimestamp} from "../utils/messageUtil
                             <span>{group.name}</span>
                             </li>
                         ))}
-                        </ul>
+                        </div>
                     )}
-                </div>
+              
             </div>
             <div className="GroupInfo">
               {/* Display message if no group is selected */}

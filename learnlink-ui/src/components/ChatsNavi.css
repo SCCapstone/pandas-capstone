@@ -2,14 +2,14 @@
     display: flex;
     flex-direction: column;
     flex-grow: 1;
-    overflow: hidden; /* Prevents overflow issues */
+    overflow: hidden;
+    padding: 5px; /* Prevents overflow issues */
   }
   
   .ChatList {
     flex-grow: 1;
     overflow-y: auto; /* Enables scrolling when needed */
     max-height: 100%;
-    padding-right: 10px;
   }
 
   .blue-dot {

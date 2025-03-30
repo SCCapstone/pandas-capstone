@@ -282,6 +282,7 @@
 }
 
 .ChatListItem.active {
+  font-weight: bold;
   background-color: #e3e3e3;
 }
 

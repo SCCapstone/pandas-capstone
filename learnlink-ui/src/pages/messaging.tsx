@@ -4,6 +4,7 @@ import './messaging.css';
 import Navbar from '../components/Navbar';
 import CopyrightFooter from '../components/CopyrightFooter';
 import './LandingPage.css';
+import '../components/ChatsNavi.css'
 import axios from 'axios';
 import { useSearchParams } from 'react-router-dom';
 import ChatsNavi from "../components/ChatsNavi";
