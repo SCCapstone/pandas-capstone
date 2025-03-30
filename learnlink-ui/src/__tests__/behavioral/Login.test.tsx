@@ -78,4 +78,4 @@ describe("Login Behavioral Tests", () => {
     });
 });
 
-/* Test cases has failed/Needs fixing */
+/* Test cases has 2 fails and 10 passes/Needs fixing */

@@ -164,9 +164,9 @@ const Settings: React.FC = () => {
       <div className="settings">
         <div className="heading">Manage Account</div>
         <div className="buttons">
-          <button onClick={logout}>Log Out</button>
-          <button onClick={handleUpdateEmail}>Update Email</button>
-          <button onClick={handleChangePassword}>Change Password</button>
+          <button onClick={logout} data-testid="logout">Log Out</button>
+          <button onClick={handleUpdateEmail} data-testid="buttonemail">Update Email</button>
+          <button onClick={handleChangePassword} data-testid="buttonchangepass">Change Password</button>
           <button onClick={() => setConfirmDeleteVisible(true)}>Delete Account</button>
         </div>
       </div>
