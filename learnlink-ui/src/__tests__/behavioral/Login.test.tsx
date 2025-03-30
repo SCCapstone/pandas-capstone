@@ -36,13 +36,14 @@ describe("Login Behavioral Tests", () => {
             </MemoryRouter>
         );
 
-        fireEvent.change(screen.getByTestId("testusername"), { 
-            target: { value: "user1" } 
+        fireEvent.change(screen.getByPlaceholderText("JohnDoe123"), { 
+            target: { value: "existing_user" } 
         });
         fireEvent.change(screen.getByTestId("testpassword"), {
             target: { value: "password123" } 
         });
 
+        // Correctly selecting the "Login" button instead of "Sign Up"
         fireEvent.click(screen.getByTestId("testbutton"));
 
         await waitFor(() => {
@@ -63,8 +64,8 @@ describe("Login Behavioral Tests", () => {
             </MemoryRouter>
         );
 
-        fireEvent.change(screen.getByTestId("testusername"), { 
-            target: { value: "user1" } 
+        fireEvent.change(screen.getByPlaceholderText("JohnDoe123"), { 
+            target: { value: "existing_user" } 
         });
         fireEvent.change(screen.getByTestId("testpassword"), { 
             target: { value: "password123" } 
@@ -74,7 +75,7 @@ describe("Login Behavioral Tests", () => {
 
         await waitFor(() => {
             expect(localStorage.getItem("token")).toBe("fake-jwt-token");
-            expect(navigateMock).toHaveBeenCalledWith("/LandingPage");
+            expect(navigateMock).toHaveBeenCalledWith("/swiping");
         });
     });
 });
