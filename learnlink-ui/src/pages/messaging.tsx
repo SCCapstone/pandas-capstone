@@ -983,7 +983,7 @@ const handleGetChatUsername = async (userId: number) => {
     }
 
     switch (action) {
-      case "weeklyScheduler":
+      case "weekly-scheduler":
         if (studyGroupId) {
           openWeeklyScheduler(studyGroupId);
         } else {
@@ -991,7 +991,7 @@ const handleGetChatUsername = async (userId: number) => {
         }
         break;
   
-      case "calendarEvent":
+      case "calendar-event":
         if (studyGroupId) {
           openCalendarEvent(studyGroupId);
         } else {
@@ -1015,8 +1015,11 @@ const handleGetChatUsername = async (userId: number) => {
   // Function to open the Weekly Scheduler for a study group
   const openWeeklyScheduler = (studyGroupId: number) => {
     console.log(`Opening Weekly Scheduler for study group ID: ${studyGroupId}`);
+    // <Link to={`/studyGroup/${groupId}/schedule`}>
+    //         <button className='Availability-Button'> Availability </button>
+    //       </Link>
     // Add logic to open the weekly scheduler modal/page
-    // Example: navigate(`/study-groups/${studyGroupId}/schedule`);
+    navigate(`/studyGroup/${studyGroupId}/schedule`);
   };
   
   // Function to open a Calendar Event creation for a study group

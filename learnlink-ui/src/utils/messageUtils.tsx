@@ -114,8 +114,8 @@ export const handleSendButtonMessage = (
         {
           chatId: selectedChatid,
           content: buttonData.label,
-          userId: undefined,
-          system: true,
+          userId,
+          system: false,
           isButton: true,
           buttonData,
           token,

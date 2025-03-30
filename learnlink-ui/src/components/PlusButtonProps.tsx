@@ -26,7 +26,7 @@ export default function PlusButton({ onSelect, studyGroupId, selectedChatId, onS
     ];
 
     const handleSelect = (value: string) => {
-        console.log('beep');
+        console.log('vale',value);
     
         if (!selectedChatId) return; // Ensure a chat is selected
     
