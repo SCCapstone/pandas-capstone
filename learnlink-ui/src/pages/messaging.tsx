@@ -1009,7 +1009,7 @@ const handleGetChatUsername = async (userId: number) => {
     if (!selectedChat?.id) return; // Ensure a chat is selected
     console.log('inHandlebuttonmessage twooo')
 
-    handleSendButtonMessage(buttonData, selectedChat.id,setSelectedChat, setChats, setUpdateMessage); // Now we call it here ✅
+    handleSendButtonMessage(buttonData, selectedChat.id, currentUserId, setSelectedChat, setChats, setUpdateMessage); // Now we call it here ✅
 };
   
   // Function to open the Weekly Scheduler for a study group

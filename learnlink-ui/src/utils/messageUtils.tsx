@@ -87,6 +87,7 @@ export const handleSendSystemMessage = (
 export const handleSendButtonMessage = (
   buttonData: { label: string; action: string; studyGroupId?: number },
   selectedChatid: any,
+  userId: any,
   setSelectedChat?: Function,
   setChats?: Function,
   setUpdateMessage?: Function
@@ -100,10 +101,10 @@ export const handleSendButtonMessage = (
         id: Date.now(),
         content: buttonData.label, // Display label as message content
         createdAt: new Date().toISOString(),
-        userId: undefined,
+        userId,
         chatId: selectedChatid,
         liked: false,
-        system: true, // Consider button messages as system messages
+        system: false, // Consider button messages as system messages
         isButton: true,
         buttonData: { ...buttonData }, // Attach button data
       };
