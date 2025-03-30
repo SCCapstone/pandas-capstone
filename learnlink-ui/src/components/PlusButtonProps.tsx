@@ -5,7 +5,7 @@ import './PlusButtonProps.css';
 interface PlusButtonProps {
     onSelect: (element: JSX.Element) => void;
     studyGroupId: number | null;
-    selectedChatId: string | null;
+    selectedChatId: number | null;
     onSendButtonMessage: (buttonData: { action: string; studyGroupId?: number; label: string }) => void; // 👈 Pass this function from Messaging.tsx
 }
 
@@ -27,22 +27,24 @@ export default function PlusButton({ onSelect, studyGroupId, selectedChatId, onS
 
     const handleSelect = (value: string) => {
         console.log('beep');
-
+    
         if (!selectedChatId) return; // Ensure a chat is selected
-
-        const parsedStudyGroupId = isNaN(parseInt(selectedChatId, 10)) ? undefined : parseInt(selectedChatId, 10);
-
+    
+        // Ensure studyGroupId is either a number or undefined (avoid null)
+        const validStudyGroupId = studyGroupId ?? undefined; 
+    
         const buttonData = {
             action: value, // "weekly-scheduler" or "calendar-event"
-            studyGroupId: parsedStudyGroupId,  // Will be a number or undefined
+            studyGroupId: validStudyGroupId, // ✅ Correct study group ID
             label: value === "weekly-scheduler" ? "📅 Open Weekly Scheduler" : "🗓️ Add Calendar Event",
         };
-
-        // 🔄 Instead of calling handleSendButtonMessage, call the passed function from Messaging.tsx
+    
+        // Pass to Messaging.tsx instead of calling `handleSendButtonMessage` directly
         onSendButtonMessage(buttonData); 
-
+    
         setIsOpen(false); // Close the selection UI
     };
+    
 
     return (
         <div className="plus-button-container">

@@ -1004,10 +1004,12 @@ const handleGetChatUsername = async (userId: number) => {
     }
   };
 
-  const handleButtonMessage = (buttonData: { action: string; studyGroupId?: number; label: string }) => {
-    if (!selectedChatId) return; // Ensure a chat is selected
+  const handleButtonMessage = (buttonData: { action: string; studyGroupId?: number | undefined; label: string }) => {
+    console.log('inHandlebuttonmessage')
+    if (!selectedChat?.id) return; // Ensure a chat is selected
+    console.log('inHandlebuttonmessage twooo')
 
-    handleSendButtonMessage(buttonData, selectedChatId,setSelectedChat, setChats, setUpdateMessage); // Now we call it here ✅
+    handleSendButtonMessage(buttonData, selectedChat.id,setSelectedChat, setChats, setUpdateMessage); // Now we call it here ✅
 };
   
   // Function to open the Weekly Scheduler for a study group
@@ -1210,7 +1212,7 @@ const handleGetChatUsername = async (userId: number) => {
                 <PlusButtonProps
                   onSelect={handlePlusSelect}
                   studyGroupId={currentGroupId}
-                  selectedChatId={selectedChatId}
+                  selectedChatId={selectedChat.id}
                   onSendButtonMessage={handleButtonMessage} // 👈 Pass function to handle button messages
 
 

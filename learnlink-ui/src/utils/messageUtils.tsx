@@ -91,9 +91,9 @@ export const handleSendButtonMessage = (
   setChats?: Function,
   setUpdateMessage?: Function
 ) => {
-  const token = localStorage.getItem("token");
   console.log('eep')
 
+  const token = localStorage.getItem("token");
   if (selectedChatid && buttonData.label.trim()) {
     try {
       const messageData = {
