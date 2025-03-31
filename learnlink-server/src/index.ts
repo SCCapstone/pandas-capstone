@@ -1948,6 +1948,8 @@ app.get('/api/users', async (req, res) => {
 });
 
 
+
+
 //used for getting request list in messaging page
 app.get('/api/users/:id', async (req, res) : Promise<any> => {
   try {
@@ -2066,6 +2068,9 @@ app.get('/api/chats', authenticate, async (req, res): Promise<any> => {
         messages: {  // Include messages for each chat
           orderBy: {
             createdAt: 'asc', // Sort messages by creation time (optional)
+          },
+          include: {
+            buttonData: true, // Ensure button messages retain their data
           },
         },
         
@@ -2538,31 +2543,55 @@ io.on("connection", (socket) => {
 
       let newMessage;
       console.log(data.system);
-
       if (data.system) {
-        // If it's a system message, no user should be connected
+        // SYSTEM MESSAGE (No userId, no buttonData)
         newMessage = await prisma.message.create({
           data: {
             content: data.content,
             createdAt: new Date(),
             chatId: data.chatId,
             system: true,
-            // No userId for system messages
           },
-          include: { chat: { include: { users: true } } }, // Include chat and users if needed
+          include: { chat: { include: { users: true } } },
         });
-      } else {
-        // Regular user message
+      } else if (data.isButton) {
+        console.log("BUTT:::", data.buttonData);
+        // Create message linked to the button entry
         newMessage = await prisma.message.create({
           data: {
             content: data.content,
             createdAt: new Date(),
-            user: { connect: { id: data.userId } },  // Ensure userId is connected for user messages
+            user: { connect: { id: data.userId } },
             chat: { connect: { id: data.chatId } },
+            isButton: true,
+            buttonData:
+            {
+              create: {
+                action: data.buttonData.action,
+                studyGroupId: data.buttonData.studyGroupId,
+                label: data.buttonData.label,
+              }
+            }
+          },
+          include: { user: true, chat: { include: { users: true } }, buttonData: true },
+        });
+
+        console.log("NEW:::", newMessage);
+      
+      } else {
+        // REGULAR USER MESSAGE
+        newMessage = await prisma.message.create({
+          data: {
+            content: data.content,
+            createdAt: new Date(),
+            user: { connect: { id: data.userId } },
+            chat: { connect: { id: data.chatId } },
+            isButton: false,
           },
           include: { user: true, chat: { include: { users: true } } },
         });
       }
+      
 
       // After saving the message, update the chat's `updatedAt` timestamp
       const updatedChat = await prisma.chat.update({
