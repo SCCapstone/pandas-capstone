@@ -7,11 +7,10 @@ import axios from 'axios';
 
 interface JoinReqProfileProps {
   id: number;
-  name: string;
   onClose: () => void;
 }
 
-const JoinReqProfile: React.FC<JoinReqProfileProps> = ({ id, name, onClose }) => {
+const JoinReqProfile: React.FC<JoinReqProfileProps> = ({ id, onClose }) => {
 
   const panelRef = useRef<HTMLDivElement>(null);
   const [user, setUser] = useState<any>(null);
@@ -58,7 +57,7 @@ const JoinReqProfile: React.FC<JoinReqProfileProps> = ({ id, name, onClose }) =>
   return (
     <div ref={panelRef} className="popup-profile-panel">
       <div className="popup-profile-header">
-        <h1>{name}'s Profile</h1>
+        <h1>{user.first_name} {user.last_name}'s Profile</h1>
         <button className="popup-close-button" onClick={onClose}>X</button>
       </div>
       <div className='popup-content'>
