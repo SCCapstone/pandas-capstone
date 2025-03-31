@@ -944,7 +944,9 @@ const handleGetChatUsername = async (userId: number) => {
         console.log("update message " ,  mess);
         if (selectedChat){
           handleSendSystemMessage(mess, selectedChat.id, setSelectedChat, setChats, setUpdateMessage);
+          updateChats(selectedChat.id);
         }
+        
 
         
       } else {
