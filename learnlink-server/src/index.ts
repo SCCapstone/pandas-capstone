@@ -1681,7 +1681,7 @@ app.post('/api/sync-study-group-chat', async (req, res): Promise<any> => {
 });
 
 
-// Deletes a user by userId from a study group 
+// Deletes a user by userId from a study group
 app.delete('/api/study-groups/:groupId/users/:userId', async (req, res): Promise<any> => {
   const { groupId, userId } = req.params;
 
@@ -1689,7 +1689,7 @@ app.delete('/api/study-groups/:groupId/users/:userId', async (req, res): Promise
     // Check if the study group exists
     const studyGroup = await prisma.studyGroup.findUnique({
       where: { id: parseInt(groupId, 10) },
-      include: { users: true, chat: true }, // Include users and chat to remove user and handle chat
+      include: { users: true, chat: true }, // Include users and chat
     });
 
     if (!studyGroup) {
@@ -1698,9 +1698,17 @@ app.delete('/api/study-groups/:groupId/users/:userId', async (req, res): Promise
 
     // Check if the user is in the study group
     const userInGroup = studyGroup.users.some(user => user.id === parseInt(userId, 10));
-
     if (!userInGroup) {
       return res.status(404).json({ error: 'User is not in this study group' });
+    }
+
+    // If only two users remain, delete the study group and associated chat
+    if (studyGroup.users.length === 2) {
+      if (studyGroup.chat) {
+        await prisma.chat.delete({ where: { id: studyGroup.chat.id } });
+      }
+      await prisma.studyGroup.delete({ where: { id: parseInt(groupId, 10) } });
+      return res.status(200).json({ message: 'Study group and associated chat deleted as only one user would remain' });
     }
 
     // Remove the user from the study group
@@ -1708,7 +1716,7 @@ app.delete('/api/study-groups/:groupId/users/:userId', async (req, res): Promise
       where: { id: parseInt(groupId, 10) },
       data: {
         users: {
-          disconnect: { id: parseInt(userId, 10) }, // Disconnect user from the study group
+          disconnect: { id: parseInt(userId, 10) },
         },
       },
     });
@@ -1719,7 +1727,7 @@ app.delete('/api/study-groups/:groupId/users/:userId', async (req, res): Promise
         where: { id: studyGroup.chat.id },
         data: {
           users: {
-            disconnect: { id: parseInt(userId, 10) }, // Disconnect user from the chat
+            disconnect: { id: parseInt(userId, 10) },
           },
         },
       });
@@ -1731,6 +1739,7 @@ app.delete('/api/study-groups/:groupId/users/:userId', async (req, res): Promise
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
 
 
 
