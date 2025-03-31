@@ -572,3 +572,29 @@
     max-width: 100%;
   }
 }
+
+
+/* .PlusButton {
+  height: 30px;
+  border-radius: 5px;
+  border: var(--primary-200) 1px solid;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.10);
+
+  background-color: var(--primary-100);
+} */
+
+.PlusButton {
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: bold;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  background-color: #00668C; /* Deep Blue */
+  color: white;
+  transition: background 0.2s ease-in-out;
+}
+
+.PlusButton:hover {
+  background-color: #00465f; /* Slightly darker blue on hover */
+}

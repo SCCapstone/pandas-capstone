@@ -1184,7 +1184,7 @@ const handleGetChatUsername = async (userId: number) => {
                             {/* Check if the message is a button message */}
                             {message.isButton && message.buttonData ? (
                               <button
-                                className="ChatButton"
+                                className="PlusButton"
                                 onClick={() => handleButtonClick(message.buttonData?.action, message.buttonData?.studyGroupId)}
                               >
                                 {message.buttonData?.label}
