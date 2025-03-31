@@ -6,7 +6,7 @@ import { ReactComponent as GroupLogo } from './GroupLogo.svg'
 import InviteMessagePanel from '../components/InviteMessagePanel';
 import { set } from 'react-hook-form';
 import axios from 'axios';
-import JoinReqProfile from './JoinReqProfile';
+import PopupProfile from './PopupProfile';
 
 const SwipeProfiles = ({ userId }: { userId: number }) => {
   const [profiles, setProfiles] = useState<any>({ users: [], studyGroups: [] });
@@ -336,7 +336,7 @@ const SwipeProfiles = ({ userId }: { userId: number }) => {
         onConfirm={handleSendMessage} 
       />
       {selectedMember && (
-        <JoinReqProfile 
+        <PopupProfile 
           id={selectedMember.id} 
           onClose={() => setSelectedMember(null)} 
         />

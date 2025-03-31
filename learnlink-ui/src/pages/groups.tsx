@@ -11,7 +11,7 @@ import StudyGroupInfo from '../components/StudyGroupInfo';
 import ChatsNavi from "../components/ChatsNavi";
 import JoinRequests from '../components/JoinRequests';
 import GroupUserList from '../components/GroupUserList';
-import JoinReqProfile from '../components/JoinReqProfile';
+import JoinReqProfile from '../components/PopupProfile';
 import CustomAlert from '../components/CustomAlert';
 import { unescape } from 'querystring';
 import { useNavigate } from "react-router-dom";
