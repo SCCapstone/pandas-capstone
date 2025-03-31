@@ -7,7 +7,7 @@ import MatchesList from './MatchesList';
 import SentRequestsList from './SentRequestsList';
 import ReceivedRequestsList from './ReceivedRequestsList';
 import React, { useState, useEffect } from "react";
-
+import { useSearchParams } from 'react-router-dom';
 interface User {
     id: number;
     username: string;
@@ -61,9 +61,20 @@ const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:200
 
 const Network = () => {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState("matches");
   const currentLocation = useLocation();
 
+  const inputtedActive = searchParams.get("active");
+
+
+  useEffect(() => {
+    if (inputtedActive === "matches") {
+      setActiveTab("matches");
+    }
+    navigate(window.location.pathname, { replace: true });
+  }, [inputtedActive]); 
+  
   // Set the active tab based on the query parameter
   useEffect(() => {
     const queryParams = new URLSearchParams(currentLocation.search);

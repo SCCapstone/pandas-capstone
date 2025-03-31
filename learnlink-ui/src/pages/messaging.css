@@ -48,18 +48,43 @@
   margin: 0;
 }
 
-.ChatListItem {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px solid #ddd;
-  cursor: pointer;
-}
 
 .ChatListItem:hover,
 .ChatListItem.active {
   background-color: #f0f0f0;
 }
+
+.ChatListItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 30px;
+  border-bottom: 1px solid #ddd;
+  cursor: pointer;
+  position: relative; /* Make sure to add this to position the dot */
+}
+
+.chat-name {
+  position: relative; /* Positioning context for the dot */
+  color: black; /* Default color */
+}
+
+.chat-name.unread {
+  color: blue; /* Color for unread messages */
+}
+
+.chat-name.highlighted::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: blue;
+  position: absolute;
+  left: -12px;  /* Adjust this to your layout */
+  top: 50%;
+  transform: translateY(-50%); /* Center vertically */
+}
+
 
 .ChatSection {
   flex: 1;
@@ -129,6 +154,7 @@
 .NoChatSelected {
   display: flex;
   justify-content: center;
+  align-self: center;
   align-items: center;
   height: 100%;
   color: #888;
@@ -256,6 +282,7 @@
 }
 
 .ChatListItem.active {
+  font-weight: bold;
   background-color: #e3e3e3;
 }
 
@@ -296,28 +323,26 @@
   border-bottom: 2px solid #ccc;
 }
 
-.Tab {
+.ChatTab {
   padding: 10px 20px;
   cursor: pointer;
   font-size: 20px;
   font-weight: bold;
-  color: #B6CCD8;
+  color: #fff;
   background-color: transparent;
   border: none;
   outline: none;
   transition: all 0.3s ease;
 }
 
-.Tab.active {
-  border-bottom: 3px solid #fff;
-  color: #fff;
-}
 
-.Tab:hover {
+
+.ChatTab:hover {
   color: #fff;
 }
 
 .ChatsSidebar {
+  position: relative;
   overflow-y: scroll;
   width: 30%;
   max-width: 30%;
@@ -410,6 +435,34 @@
   border: 1px solid #f5c6cb;
 }
 
+
+
+.newChat {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+}
+
+.newChatButton {
+  font-weight: 700;
+  font-size: large;
+  width: 100%;
+  padding: 10px;
+  background-color: #00668C;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  text-align: center;
+}
+
+.newChatButton:hover {
+  background-color: #01506d;
+}
+
+
 /* Responsive Adjustments */
 @media (max-width: 768px) {
   .Messaging {
@@ -501,6 +554,7 @@
   }
 
   .ChatsSidebar {
+    position: relative;
     width: 100%;
     max-width: 100%;
     border-right: none;
@@ -517,4 +571,30 @@
   .OtherMessage {
     max-width: 100%;
   }
+}
+
+
+/* .PlusButton {
+  height: 30px;
+  border-radius: 5px;
+  border: var(--primary-200) 1px solid;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.10);
+
+  background-color: var(--primary-100);
+} */
+
+.PlusButton {
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: bold;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  background-color: #00668C; /* Deep Blue */
+  color: white;
+  transition: background 0.2s ease-in-out;
+}
+
+.PlusButton:hover {
+  background-color: #00465f; /* Slightly darker blue on hover */
 }

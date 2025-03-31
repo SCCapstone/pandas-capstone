@@ -4,19 +4,18 @@ import './messaging.css';
 import Navbar from '../components/Navbar';
 import CopyrightFooter from '../components/CopyrightFooter';
 import './LandingPage.css';
+import '../components/ChatsNavi.css'
 import axios from 'axios';
 import { useSearchParams } from 'react-router-dom';
-import EditStudyGroup from '../components/EditStudyGroup';
 import ChatsNavi from "../components/ChatsNavi";
-import JoinRequests from '../components/JoinRequests';
-import GroupUserList from '../components/GroupUserList';
-import JoinReqProfile from '../components/JoinReqProfile';
 import CustomAlert from '../components/CustomAlert';
 import { unescape } from 'querystring';
 import GroupUserContainer from '../components/GroupUserContainer';
 import { useNavigate } from "react-router-dom";
 import CreateStudyGroup from '../components/CreateStudyGroup';
-
+import PlusButtonProps from '../components/PlusButtonProps';
+import { handleSendSystemMessage, handleSendButtonMessage } from "../utils/messageUtils";
+import { NullValueFields } from 'aws-sdk/clients/glue';
 
 interface Chat {
   id: number;
@@ -25,6 +24,8 @@ interface Chat {
   users: User[]; 
   createdAt: string;
   updatedAt: string;
+  lastUpdatedById: number | null;
+  lastOpened: { [userId: number]: string };
 }
 
 interface Message{
@@ -35,13 +36,24 @@ interface Message{
   chatId: number;
   liked: boolean;
   system: boolean;
+  isButton: boolean;
+  buttonData?: Button;
   
 }
+
+interface Button {
+  id: number;
+  label: string;
+  action: string;
+  studyGroupId?: number | null;
+}
+
 interface User {
   id: number;
   username: string;
   firstName: string;
   lastName: string;
+  unReadMessages?: boolean; 
 }
 
 
@@ -83,6 +95,8 @@ const Messaging: React.FC = () => {
   const [chatUsernames, setChatUsernames] = useState<{ [key: number]: string }>({});
   const [groupId, setGroupId] = useState<number | null>(null);
   
+  const [unseenMessages, setUnseenMessages] = useState<{ [chatId: number]: boolean }>({});
+
 
   const [updateMessage, setUpdateMessage] = useState<string>('');
   const [visibleMessage, setVisibleMessage] = useState("");
@@ -97,8 +111,6 @@ const Messaging: React.FC = () => {
 
   const [alerts, setAlerts] = useState<{ id: number; alertText: string; alertSeverity: "error" | "warning" | "info" | "success"; visible: boolean }[]>([]);
   const alertVisible = alerts.some(alert => alert.visible);
-
-
   useEffect(() => {
     const fetchData = async () => {
       setLoadingChatList(true);
@@ -162,6 +174,7 @@ const Messaging: React.FC = () => {
 
             setChats(chatsWithMessages);
 
+
             // Ensure storing liked messages correctly
             const likedMessagesMap = chatResponse.data.reduce((acc: Record<number, boolean>, chat: Chat) => {
               chat.messages?.forEach((msg: Message) => {
@@ -218,13 +231,16 @@ const Messaging: React.FC = () => {
       fetchChats();
       console.log("fetch chats complete");
   }, []);
-  
+
 
   useEffect(() => {
     const fetchData = async () => {
 
+
+
       const token = localStorage.getItem('token');
       console.log(token);
+
       const getCurrentUser = async () => {
         if (token) {
           try {
@@ -294,6 +310,8 @@ const Messaging: React.FC = () => {
           .catch((error) => console.error('Error fetching chats:', error));
       };
 
+
+
       await syncUserChats();
 
       setLoadingChatList(false);
@@ -304,6 +322,7 @@ const Messaging: React.FC = () => {
   }, [activeTab, selectedChat]);  // reloads when selected or tab changes, allows for updates to users
 
 
+
   useEffect(() => {
     if (selectedChat) {
       socket.emit('joinChat', selectedChat.id, currentUserId);
@@ -312,17 +331,19 @@ const Messaging: React.FC = () => {
 
   useEffect(() => {
     socket.on("chatUpdated", (updatedUsers) => {
-      setChats((prevChats) =>
-        prevChats.map((chat) =>
-          chat.id === selectedChat?.id ? { ...chat, users: updatedUsers } : chat
-        )
-      );
+        setChats((prevChats) =>
+            prevChats.map((chat) =>
+                chat.id === selectedChat?.id
+                    ? { ...chat, users: updatedUsers, messages: [...chat.messages] } // Preserve messages
+                    : chat
+            )
+        );
     });
 
     return () => {
-      socket.off("chatUpdated");
+        socket.off("chatUpdated");
     };
-  }, [selectedChat]);
+}, [selectedChat]);
 
 
   // Used for editing study groups
@@ -388,6 +409,8 @@ useEffect(() => {
             : chat
         );
       });
+      console.log("changing chats!!");
+
     });
     
     return () => {
@@ -447,13 +470,7 @@ useEffect(() => {
     setShowMessagesPanel(true);
   };
   
-  // Switches from the Chats tab to the Requests Tab
-  const handleRequestsSwitch = () => {
-    setSelectedChat(null);
-    setActiveTab('requests');
-    setShowMessagesPanel(false);
-    setShowRequestsPanel(true);
-  };
+ 
 
 
   // sends messages between users
@@ -470,6 +487,7 @@ useEffect(() => {
           chatId: selectedChat.id,
           liked: false,
           system: false,
+          isButton: false
         };
   
         // sends the message via a websocket to the other user
@@ -506,6 +524,7 @@ useEffect(() => {
                   ...chat,
                   messages: [...(chat.messages || []), messageData],
                   updatedAt: new Date().toISOString(), // Convert Date to string here
+                  lastUpdatedById: currentUserId,
                 }
               : chat
           );
@@ -576,78 +595,6 @@ useEffect(() => {
     }
   };
     
-
-
-  // sends messages between users
-  const handleSendSystemMessage = async (mss: String) => {
-    // Authorization
-    const token = localStorage.getItem('token');
-    if (mss.trim() && selectedChat) {
-      try {
-        const messageData: Message = {
-          id: Date.now(), // Use a unique ID generator
-          content: mss.trim(),
-          createdAt: new Date().toISOString(),
-          userId: undefined,
-          chatId: selectedChat.id,
-          liked: false,
-          system: true,
-        };
-  
-        // sends the message via a websocket to the other user
-        socket.emit(
-          'message',
-          {
-            chatId: selectedChat.id,
-            content: mss,
-            userId: undefined,
-            system: true,
-            token,
-          },
-          (response: { success: boolean; message?: string; error?: string }) => {
-            if (response.success) {
-              console.log('Message sent successfully:', response.message);
-            } else {
-              console.log('Message send failed:', response.error);
-            }
-          }
-        );
-        setCurrentMessage('');
-        
-        
-        // Update the selectedChat to include the new message
-        setSelectedChat((prevSelectedChat) =>
-          prevSelectedChat
-            ? { ...prevSelectedChat, messages: [...(prevSelectedChat.messages || []), messageData] }
-            : null
-        );
-
-        setChats((prevChats) => {
-          const updatedChats = prevChats.map((chat) =>
-            chat.id === selectedChat.id
-              ? {
-                  ...chat,
-                  messages: [...(chat.messages || []), messageData],
-                  updatedAt: new Date().toISOString(), // Convert Date to string here
-                }
-              : chat
-          );
-          // Sort chats by updatedAt (most recent first)
-          return updatedChats.sort(
-            (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
-          );
-        });
-        
-        setUpdateMessage('');
-
-   
-      } catch (error) {
-        console.error('Error sending message:', error);
-      }
-    }
-  };
-    
-  
 
   // Used to access the study group name or chat name for displaying properly on the UI
   const getChatName = async (chat: Chat) => {
@@ -940,17 +887,6 @@ const handleGetChatUsername = async (userId: number) => {
   }
 };
 
-
-
-  // passed into joinrequests component, ensures the name is updated when a request is approved
-  const addNewChat = (newChat: any) => {
-    setChats((prevChats) => [...prevChats, newChat]); // Add new chat
-    setChatNames((prevNames) => ({
-      ...prevNames,
-      [newChat.id]: newChat.name, // Ensure new chat name is added
-    }));
-  };
-
   // passed into editstudygroup component, ensures the name is updated when updated
   const updateChatName = (chatId: number, newName: string) => {
     setChatNames((prevChatNames) => ({
@@ -1006,7 +942,13 @@ const handleGetChatUsername = async (userId: number) => {
         
 
         console.log("update message " ,  mess);
-        handleSendSystemMessage(mess);
+        if (selectedChat){
+          handleSendSystemMessage(mess, selectedChat.id, setSelectedChat, setChats, setUpdateMessage);
+          updateChats(selectedChat.id);
+        }
+        
+
+        
       } else {
         console.error('Failed to delete the user.');
       }
@@ -1031,6 +973,65 @@ const handleGetChatUsername = async (userId: number) => {
       handleSendMessage();
     }
   };
+
+  const handlePlusSelect = () => {
+    return
+  }
+
+  const handleButtonClick = (action: string | undefined, studyGroupId: number | undefined | null) => {
+    if (action == undefined) {
+      console.log("no button action")
+      return
+    }
+
+    switch (action) {
+      case "weekly-scheduler":
+        if (studyGroupId) {
+          openWeeklyScheduler(studyGroupId);
+        } else {
+          console.error("Study group ID is missing for weekly scheduler action.");
+        }
+        break;
+  
+      case "calendar-event":
+        if (studyGroupId) {
+          openCalendarEvent(studyGroupId);
+        } else {
+          console.error("Study group ID is missing for calendar event action.");
+        }
+        break;
+  
+      default:
+        console.warn(`Unhandled button action: ${action}`);
+    }
+  };
+
+  const handleButtonMessage = (buttonData: { action: string; studyGroupId?: number | undefined; label: string }) => {
+    console.log('inHandlebuttonmessage')
+    if (!selectedChat?.id) return; // Ensure a chat is selected
+    console.log('inHandlebuttonmessage twooo')
+
+    handleSendButtonMessage(buttonData, selectedChat.id, currentUserId, setSelectedChat, setChats, setUpdateMessage); // Now we call it here ✅
+};
+  
+  // Function to open the Weekly Scheduler for a study group
+  const openWeeklyScheduler = (studyGroupId: number) => {
+    console.log(`Opening Weekly Scheduler for study group ID: ${studyGroupId}`);
+    // <Link to={`/studyGroup/${groupId}/schedule`}>
+    //         <button className='Availability-Button'> Availability </button>
+    //       </Link>
+    // Add logic to open the weekly scheduler modal/page
+    navigate(`/studyGroup/${studyGroupId}/schedule`);
+  };
+  
+  // Function to open a Calendar Event creation for a study group
+  const openCalendarEvent = (studyGroupId: number) => {
+    console.log(`Opening Calendar Event for study group ID: ${studyGroupId}`);
+    // Add logic to open the calendar event creation modal/page
+    // Example: navigate(`/study-groups/${studyGroupId}/calendar`);
+  };
+  
+  
 
   return (
     <div className="Messaging">
@@ -1058,40 +1059,32 @@ const handleGetChatUsername = async (userId: number) => {
         <div className="ChatsSidebar">
           <div className="TabsContainer">
             <button 
-              className={`Tab ${activeTab === 'messages' ? 'active' : ''}`} 
-              onClick={handleChatsSwitch}
+              className={`ChatTab ${activeTab === 'messages' ? 'active' : ''}`} 
             >
               Chats
             </button>
 
-            <button 
-              className={`Tab ${activeTab === 'requests' ? 'active' : ''}`}
-              onClick={handleRequestsSwitch}
-            >
-              Requests
-            </button>
+           
           </div>
 
           {/* Conditionally show the messages panel */}
-          {showMessagesPanel && (
+          {showMessagesPanel && currentUserId && (
             <ChatsNavi 
               chats={chats}
               selectedChat={selectedChat} 
               setSelectedChat={setSelectedChat} 
+              currentUserId = {currentUserId}
               handleDeleteChat={handleDeleteChat} 
               chatNames={chatNames} 
               loadingChatList={loadingChatList}
-
             />
           )}
-          {/* Conditionally show the requests panel */}
-          {showRequestsPanel && (
-            <JoinRequests 
-            currentUserId={currentUserId} 
-            addNewChat={addNewChat} // Passing addNewChat as a prop
-            openProfilePopup={openProfilePopup}
-          />
-          )}
+
+          <div className='newChat'>
+            <button  className='newChatButton' onClick={() => navigate(`/network?active='matches'`)}>
+              + New Chat
+            </button>
+          </div>
 
       
         </div>
@@ -1106,70 +1099,70 @@ const handleGetChatUsername = async (userId: number) => {
                 {/* Button Container for grouping buttons together */}
                   <div className="ButtonContainer">
                     {/* User List Button */}
-                    {hasStudyGroup && (
-                      <button
-                        className="UserListButton"
-                        onClick={() => {
-                          handleGetUsers(selectedChat.id);
-                          setIsUserPanelVisible(true);
-                        }}
-                      >
-                        Members
-                      </button>
-                    )}
+                  {hasStudyGroup && (
+                    <button
+                      className="UserListButton"
+                      onClick={() => {
+                        handleGetUsers(selectedChat.id);
+                        setIsUserPanelVisible(true);
+                      }}
+                    >
+                      Members
+                    </button>
+                  )}
 
-                    {/* Edit/Create Study Group Button */}
-                    
-                    {hasStudyGroup ? (
-                      <button
-                        className="EditStudyGroupButton"
-                        onClick={() => {
-                          navigate(`/groups?groupId=${currentGroupId}&tab=true`);
-                        }}
-                      >
-                        Edit Study Group
-                      </button>
-                    ) : (
-                      <button
-                        className="CreateStudyGroupButton"
-                        onClick={() => {
-                          handleCreateStudyGroup(selectedChat.id);
-                          setIsPanelVisible(true);
-                        }}
-                      >
-                        Create Study Group
-                      </button>
-                    )}
+                  {/* Edit/Create Study Group Button */}
+
+                  {hasStudyGroup ? (
+                    <button
+                      className="EditStudyGroupButton"
+                      onClick={() => {
+                        navigate(`/groups?groupId=${currentGroupId}&tab=true`);
+                      }}
+                    >
+                      Edit Study Group
+                    </button>
+                  ) : (
+                    <button
+                      className="CreateStudyGroupButton"
+                      onClick={() => {
+                        handleCreateStudyGroup(selectedChat.id);
+                        setIsPanelVisible(true);
+                      }}
+                    >
+                      Create Study Group
+                    </button>
+                  )}
+                </div>
+                {/* User List Panel */}
+                {isUserPanelVisible && selectedChatUsers && (
+                  <div className="Popup-members-users-panel">
+                    <GroupUserContainer
+                      groupId={groupId}
+                      currentId={currentUserId}
+                      users={selectedChatUsers ?? []}
+                      chatId={selectedChat.id}
+                      onRemoveUser={removeUser}
+                      updateUsers={updateUsers}
+                      onClose={() => setIsUserPanelVisible(false)}
+                      isPopup={true}
+                    />
                   </div>
-                  {/* User List Panel */}
-                  {isUserPanelVisible && selectedChatUsers && (
-                    <div className="Popup-members-users-panel">
-                      <GroupUserContainer
-                        groupId={groupId}
-                        currentId={currentUserId}
-                        users={selectedChatUsers ?? []}
-                        chatId={selectedChat.id}
-                        onRemoveUser={removeUser}
-                        updateUsers={updateUsers}
-                        onClose={() => setIsUserPanelVisible(false)}
-                        isPopup={true}
-                      />
-                    </div>
-                  )}
+                )}
 
-                  {/* Study Group Panel */}
-                  {isPanelVisible && (
-                    <div className="c-study-group-panel">
-                      <CreateStudyGroup
-                        chatID={selectedChat.id}
-                        onClose={() => setIsPanelVisible(false)}
-                        updateChatName={updateChatName}
-                      />
-                    </div>
-                  )}
-                  
-                                  </div>
-             
+                {/* Study Group Panel */}
+                {isPanelVisible && (
+                  <div className="c-study-group-panel">
+                    <CreateStudyGroup
+                      chatID={selectedChat.id}
+                      onClose={() => setIsPanelVisible(false)}
+                      updateChatName={updateChatName}
+                    />
+                  </div>
+                )}
+
+              </div>
+
 
               <div className="ChatWindow" ref={chatWindowRef}>
                 {selectedChat ? (
@@ -1190,11 +1183,20 @@ const handleGetChatUsername = async (userId: number) => {
                             className={`MessageBubble ${message.system ? 'SystemMessage' : (message.userId === currentUserId ? 'MyMessage' : 'OtherMessage')}`}
                             onDoubleClick={() => handleDoubleClick(message.id)}
                           >
-                            {typeof message === 'string'
-                              ? message
-                              : typeof message.content === 'string'
-                              ? message.content
-                              : JSON.stringify(message)}
+                            {/* Check if the message is a button message */}
+                            {message.isButton && message.buttonData ? (
+                              <button
+                                className="PlusButton"
+                                onClick={() => handleButtonClick(message.buttonData?.action, message.buttonData?.studyGroupId)}
+                              >
+                                {message.buttonData?.label}
+                              </button>
+                            ) : (
+                              <span>
+                                {typeof message.content === 'string' ? message.content : JSON.stringify(message.content)}
+                              </span>
+                            )}
+
                           </div>
                           {/* Show heart if message was double-clicked */}
                           {heartedMessages[message.id] && <div className="Heart">❤️</div>}
@@ -1211,12 +1213,15 @@ const handleGetChatUsername = async (userId: number) => {
                   <div className="NoChatSelected">Please select a chat</div> // Show message if no chat is selected
                 )}
               </div>
-
-
-
-
-
               <div className="ChatInput">
+                <PlusButtonProps
+                  onSelect={handlePlusSelect}
+                  studyGroupId={currentGroupId}
+                  selectedChatId={selectedChat.id}
+                  onSendButtonMessage={handleButtonMessage} // 👈 Pass function to handle button messages
+
+
+                />
                 <input
                   type="text"
                   placeholder="Type a message..."
@@ -1235,13 +1240,6 @@ const handleGetChatUsername = async (userId: number) => {
          {/* Render the popup at the Messaging level */}
          
       </div>
-      {selectedProfile && (
-            <JoinReqProfile
-              id={selectedProfile.id}
-              name={selectedProfile.name}
-              onClose={closeProfilePopup}
-            />
-          )}
       <div>
         <CopyrightFooter />
       </div>

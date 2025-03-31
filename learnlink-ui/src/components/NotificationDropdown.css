@@ -24,11 +24,11 @@
     cursor: pointer;
     border-bottom: 1px solid #eee;
     min-height: 50px;
-    gap: 12px;
 }
 
 .notif-dropdown li:hover{
     background-color:#D4EAF7;
+    border-radius: 5px;
 }
 
 .notif-dropdown li:last-child {
@@ -37,18 +37,15 @@
 
 .notif-dropdown p {
     color: #00668C;
-    font-size: 12px;
+    font-size: 11px;
     font-family: Arial, Helvetica, sans-serif;
     cursor: pointer;
     margin: 0;
     text-align: left;
     flex: 1;
-    word-wrap: break-word;
-    overflow-wrap: break-word;
-    white-space: normal;
     line-height: 1.4;
     display: flex;
-    align-items: center;
+    padding-left: 6px;
 }
 
 .notif-icon {
@@ -67,3 +64,59 @@
     padding: 8px;
     text-align: center;
 }
+.clear-all-btn {
+    display: block;
+    width: 100%;
+    background-color: #00668C;
+    color: white;
+    border: none;
+    padding: 8px;
+    cursor: pointer;
+    text-align: center;
+    font-size: 14px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    border-radius: 5px;
+  }
+  
+  .clear-all-btn:hover {
+    background-color: #005A7A;
+  }
+  
+  .notif-dropdown {
+    border: 1px solid #ccc;
+    padding: 10px;
+    background-color: white;
+    border-radius: 5px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    width: 250px;
+  }
+  
+  .notif-dropdown ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .notif-dropdown li {
+    padding: 10px;
+    cursor: pointer;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .notif-dropdown li:last-child {
+    border-bottom: none;
+  }
+  
+  .notif-dropdown .unread {
+    font-weight: bold;
+  }
+  
+  .notif-dropdown .read {
+    color: #777;
+  }
+
+  .DeleteButton{
+    padding: 0px;
+  }
+  

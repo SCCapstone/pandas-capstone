@@ -1,0 +1,84 @@
+.plus-button-container {
+    position: relative;
+    display: inline-block;
+}
+
+.plus-button {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s ease-in-out, transform 0.1s ease-in-out;
+    border: none;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.plus-button:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.plus-button:active {
+    transform: scale(0.95);
+}
+.plus-menu {
+    position: absolute;
+    bottom: 55px; /* Adjust as needed */
+    left: 100%; /* Position to the right of the button */
+    transform: translateX(-20%) translateY(10px); /* Start slightly below */
+    width: 200px;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(12px);
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
+    z-index: 100;
+}
+
+/* When open, keep the offset */
+.plus-menu.open {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-20%) translateY(0);
+}
+
+.ChatInput button.plus-button {
+    width: 50px;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    background: #00668C;
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s ease-in-out;
+    padding: 5px;
+    box-sizing: border-box;
+
+}
+
+.plus-menu button {
+    width: 100%;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    color: #333;
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s ease-in-out;
+}
+
+.plus-menu button:hover {
+    background: rgba(0, 0, 0, 0.05);
+}

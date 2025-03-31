@@ -15,12 +15,10 @@ describe("Login Behavioral Tests", () => {
         navigateMock = jest.fn();
         (ReactRouterDom.useNavigate as jest.Mock).mockReturnValue(navigateMock);
         global.fetch = jest.fn();
-        localStorage.clear(); 
     });
 
     afterEach(() => {
         jest.restoreAllMocks();
-        localStorage.clear(); 
     });
 
     test("Shows an error if the credentials do not match", async () => {
@@ -29,26 +27,27 @@ describe("Login Behavioral Tests", () => {
             ok: false,
             json: async () => ({ message: "Invalid Credentials" }),
         });
-
+    
         render(
             <MemoryRouter>
                 <Login />
             </MemoryRouter>
         );
-
-        fireEvent.change(screen.getByTestId("testusername"), { 
-            target: { value: "user1" } 
+    
+        fireEvent.change(screen.getByPlaceholderText("JohnDoe123"), { 
+            target: { value: "existing_user" } 
         });
         fireEvent.change(screen.getByTestId("testpassword"), {
             target: { value: "password123" } 
         });
-
+    
         fireEvent.click(screen.getByTestId("testbutton"));
-
+    
         await waitFor(() => {
+            // Target the error inside the alert box specifically
             expect(screen.getByText("Invalid username or password.")).toBeInTheDocument();
         });
-    });
+    });    
 
     test("Successfully logs in and navigates to landing page", async () => {
         // Mocking a successful login response with a fake token
@@ -63,8 +62,8 @@ describe("Login Behavioral Tests", () => {
             </MemoryRouter>
         );
 
-        fireEvent.change(screen.getByTestId("testusername"), { 
-            target: { value: "user1" } 
+        fireEvent.change(screen.getByPlaceholderText("JohnDoe123"), { 
+            target: { value: "existing_user" } 
         });
         fireEvent.change(screen.getByTestId("testpassword"), { 
             target: { value: "password123" } 
@@ -74,9 +73,9 @@ describe("Login Behavioral Tests", () => {
 
         await waitFor(() => {
             expect(localStorage.getItem("token")).toBe("fake-jwt-token");
-            expect(navigateMock).toHaveBeenCalledWith("/LandingPage");
+            expect(navigateMock).toHaveBeenCalledWith("/swiping");
         });
     });
 });
 
-/* Test cases has failed/Needs fixing */
+/* Test cases has 2 fails and 10 passes/Needs fixing */

@@ -2,12 +2,46 @@
     display: flex;
     flex-direction: column;
     flex-grow: 1;
-    overflow: hidden; /* Prevents overflow issues */
+    overflow: hidden;
+    padding: 5px; /* Prevents overflow issues */
   }
   
   .ChatList {
     flex-grow: 1;
     overflow-y: auto; /* Enables scrolling when needed */
     max-height: 100%;
-    padding-right: 10px;
   }
+
+  .blue-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: blue;
+    position: absolute;
+    right: 10px; /* Adjust this to position it appropriately */
+  }
+
+  .chat-name {
+    color: black; /* Default color */
+  }
+  
+  
+
+  .ChatListItem .chat-name.highlighted {
+    color: blue; /* Highlighted color */
+    font-weight: bold;
+  }
+  
+  
+  .chat-name.highlighted::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: blue;
+    position: absolute;
+    left: -12px;  /* Adjust position to move the dot next to the name */
+    top: 50%;
+    transform: translateY(-50%); /* Center it vertically */
+  }
+  

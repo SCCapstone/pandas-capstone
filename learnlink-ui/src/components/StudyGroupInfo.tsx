@@ -11,7 +11,7 @@ import { StylesConfig, ControlProps, CSSObjectWithLabel } from 'react-select';
 import CustomAlert from './CustomAlert';
 import GroupUserContainer from './GroupUserContainer';
 import EditStudyGroup from './EditStudyGroup';
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 
 const animatedComponents = makeAnimated();
@@ -88,9 +88,6 @@ const StudyGroupInfo =(
 
   const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
 
-
-
-  // Fetch the study group details when the component is mounted
   useEffect(() => {
     const fetchStudyGroup = async () => {
       try {
@@ -132,6 +129,8 @@ const StudyGroupInfo =(
       }
     };
 
+  // Fetch the study group details when the component is mounted
+
     fetchStudyGroup();
   }, [chatID, isEdit]);
 
@@ -142,6 +141,9 @@ const StudyGroupInfo =(
   };
   
 
+  const handleClose = () => {
+    setIsEdit(false);
+  };
   
 
   if (!studyGroup) return <div>Loading...</div>; // Show loading message while fetching the study group data
@@ -149,7 +151,7 @@ const StudyGroupInfo =(
   return (isEdit ? (
     <EditStudyGroup
       chatID={chatID}
-      onClose={() => setIsEdit(false)}
+      onClose={handleClose} 
       updateChatName={updateChatName}
       groupId={groupId}
       currentId={currentId}
@@ -179,7 +181,9 @@ const StudyGroupInfo =(
               navigate(`/messaging?selectedChatId=${chatID}`);
             }}
         >Chat</button>
+        <Link to={`/studyGroup/${groupId}/schedule`}>
         <button className='Availability-Button'> Availability </button>
+      </Link>
         <button className='Edit-Button' onClick={handleEdit}> Edit </button>
 
       </div>
@@ -226,7 +230,7 @@ const StudyGroupInfo =(
           <label className='members-label'>Members:</label>
               <div className="member-list">
                 <GroupUserContainer
-                  groupId={currentGroupId}
+                  groupId={groupId}
                   currentId={currentId}
                   users={users}
                   chatId={chatID}

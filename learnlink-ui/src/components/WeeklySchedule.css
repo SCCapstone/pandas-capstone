@@ -1,76 +1,250 @@
-.schedule-container {
-  /* display: grid; */
-  grid-template-columns: repeat(7, 1fr);
-  gap: 10px;
-  max-width: 100%;
-  margin: 0 auto;
-  padding: 20px;
+:root {
+    --primary-100: #D4EAF7;
+    --primary-200: #B6CCD8;
+    --primary-300: #71C4EF;
+    --text-100: #3B3C3D;
+    --text-200: #1D1C1C;
+    --bg-100: #FFFEFB;
+    --bg-200: #F5F4F1;
+    --bg-300: #CCCBC8;
+    --accent-100: #FEAD2B;
+    --accent-200: #00668C;
 }
 
-.time-slot-header {
-  display: grid;
-  grid-template-columns: 1fr repeat(7, 1fr);
-  gap: 10px;
-  font-weight: bold;
-  text-align: center;
+.schedule-page h1 {
+    font-size: xx-large;
+    font-weight: 600;
+
+}
+.schedule-page h2 {
+    font-size: x-large;
+    font-weight: 600;
+}
+.schedule-page h3 {
+    font-size: large;
+}
+.schedule-page p {
+    font-size: medium;
 }
 
-.day-header {
-  padding: 10px;
-  background-color: #f0f0f0;
-  border: 1px solid #ddd;
+.schedule-page li {
+    display: flex;
+    list-style-type: none;
+    justify-content: cen;
+    flex-direction: row;
+    align-content: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    margin-left: 0 !important;
+
 }
 
-.empty-cell {
-  padding: 10px;
+.tooltip-pfp {
+    height: 30px;
+
 }
 
-.time-slot-row {
-  display: grid;
-  grid-template-columns: 1fr repeat(7, 1fr);
-  gap: 10px;
-  text-align: center;
+
+.schedule-table, .merged-availability-table {
+    width: 100%;
+    border-collapse: collapse;
+    border: hidden;
+    margin: 20px auto;
+    background: var(--bg-200);
+    /* box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); */
+    /* border-radius: 8px; */
+    overflow: hidden;
+    table-layout: fixed;
 }
 
-.time-slot {
-  padding: 10px;
-  background-color: #f9f9f9;
-  border: 1px solid #ddd;
+.schedule-table thead, .merged-availability-table thead {
+    background: var(--primary-200);
+    color: var(--text-200);
+    text-transform: uppercase;
+    font-weight: bold;
+
+}
+
+.schedule-table th,
+.schedule-table td ,
+.merged-availability-table th,
+.merged-availability-table td{
+    padding: 12px;
+    text-align: center;
+    /* border: 1px solid #3b3c3d6e; */
+    border-right: 1px solid #3b3c3d6e ;
+}
+.schedule-table th.empty-cell,
+.merged-availability-table th.empty-cell {
+    background: white !important;
+    border: none;
+}
+
+/* .schedule-table tbody tr:nth-child(odd),
+.merged-availability-table tbody tr:nth-child(odd) {
+    background: var(--bg-100);
+}
+
+.schedule-table tbody tr:nth-child(even),
+.merged-availability-table tbody  tr:nth-child(even) {
+    background: var(--bg-200);
+} */
+.schedule-table tbody tr,
+.merged-availability-table tbody tr {
+    background: var(--bg-100);
+}
+
+.schedule-table .time-slot,
+.merged-availability-table .time-slot
+ {
+    background: var(--primary-100);
+    font-weight: bold;
+    color: var(--text-200);
+    font-size: 11px;
 }
 
 .cell {
-  padding: 15px;
-  text-align: center;
-  cursor: pointer;
-  background-color: #ffffff;
-  border: 1px solid #ddd;
+    cursor: pointer;
+    transition: background 0.2s ease-in-out;
+}
+
+.cell:hover {
+    background: var(--primary-300);
 }
 
 .cell.selected {
-    background-color: #4CAF50; /* Green background for selected slots */
-    color: white;
-  }
-  
+    background: #00678c93;
+    color: var(--bg-100);
+    font-weight: bold;
+    /* border-radius: 6px; */
+}
 
+.cell.selected:hover {
+    background: var(--accent-100);
+}
+
+.cell.solid {
+    background-color: #00668C;
+    /* Solid green (fully available) */
+}
+
+.cell.translucent {
+    background-color: rgba(0, 128, 0, 0.5);
+    /* Semi-opaque green (some users available) */
+}
+
+.cell.transparent {
+    background-color: rgba(0, 128, 0, 0.1);
+    /* Transparent green (no users available) */
+}
+
+.schedule-tables-container {
+    display: flex;
+    flex-direction: row;
+    gap: 60px;
+    margin-bottom: 20px;
+}
+
+.current-user-schedule-color-legend {
+    width: 200px;
+    border-collapse: collapse;
+    border: hidden;
+    margin: 20px auto;
+    border: none;
+    /* border-radius: 8px; */
+    overflow: hidden;
+    table-layout: fixed;
+}
+.current-user-schedule-color-legend tbody{
+    height: 50px;
+    min-height: 50px;
+    border-collapse: collapse;
+    border: hidden;
+    margin: 20px auto;
+    border: 1px solid #3b3c3dd1;
+    /* border-radius: 8px; */
+    overflow: hidden;
+    table-layout: fixed;
+}
+.current-user-schedule-color-legend thead {
+    border: none; /* Removes the border from the header */
+    text-align: center;
+    font-size: 15px;
+}
+
+.current-user-schedule-color-legend thead th {
+    border: none !important; /* Ensures no borders on individual header cells */
+}
+
+.current-user-schedule-color-legend tbody td{
+    border: 1px solid #3b3c3dd1;
+}
+
+.schedule-table-title {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.schedule-table-title button{
+    font-weight: bold;
+    color: #fff;
+    background-color: #00668C;
+    border: none;
+    border-radius: 5px;
+    padding: 15px;
+    width: 120px;
+    gap: 20px;
+}
+.schedule-table-title button:hover{
+        background-color: #005270;
+        cursor: pointer;
+}
+
+.dotted-line td {
+    border-top: 1px dotted #3b3c3d6e !important;  /* Apply dotted line under */
+}
+
+.solid-line td {
+    border-top: 1px solid #3b3c3d6e !important;  /* Apply dotted line under */
+}
+
+@media(max-width: 1200px) {
+    .merged-availability-table th,
+    .schedule-table th {
+        font-size: 11px;
+    }
+}
+
+
+
+/* Responsive Design */
 @media (max-width: 768px) {
-  .schedule-container {
-    grid-template-columns: repeat(6, 1fr);
-  }
+    .schedule-table th,
+    .schedule-table td {
+        padding: 8px;
+        font-size: 11px;
+    }
 
-  .time-slot-header,
-  .time-slot-row {
-    grid-template-columns: 1fr repeat(7, 1fr);
-  }
 
-  .time-slot, .cell {
-    font-size: 12px;
-  }
+    .schedule-tables-container{
+        flex-direction: column;
+    }
 
-  .time-slot-header {
-    font-size: 14px;
-  }
+    .merged-availability-table th,
+    .schedule-table th {
+        font-size: 11px;
+    }
+}
 
-  .schedule-container {
-    grid-template-columns: repeat(7, 1fr);
-  }
+@media (max-width: 480px) {
+    .schedule-table {
+        font-size: 12px;
+    }
+
+    .schedule-table th,
+    .schedule-table td {
+        padding: 6px;
+    }
 }

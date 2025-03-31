@@ -321,6 +321,159 @@ app.get('/api/users/profile', authenticate, async (req, res):Promise<any> => {
   }
 });
 
+// Update study group schedule
+app.put('/api/study-groups/:groupId/schedule', authenticate, async (req, res): Promise<any> => {
+  const { groupId } = req.params;
+  const { scheduleDays, scheduleStartTime, scheduleEndTime } = req.body;
+  console.log(req.body)
+
+  if (!scheduleDays || !scheduleStartTime || !scheduleEndTime) {
+    return res.status(400).json({ message: 'Missing required fields' });
+  }
+
+  // Validate the format of scheduleDays
+  if (!Array.isArray(scheduleDays) || scheduleDays.some(day => !["Sun", "Mon", "Tues", "Wed", "Thur", "Fri", "Sat"].includes(day))) {
+    return res.status(400).json({ message: 'Invalid scheduleDays format' });
+  }
+
+  // Validate times are in correct format (HH:MM AM/PM)
+  const timeFormat = /^(0?[1-9]|1[0-2]):([0-5][0-9])\s?(AM|PM)$/i;
+  if (!timeFormat.test(scheduleStartTime) || !timeFormat.test(scheduleEndTime)) {
+    return res.status(400).json({ message: 'Invalid time format. Use HH:MM' });
+  }
+
+  try {
+    // Check if the study group exists
+    const studyGroup = await prisma.studyGroup.findUnique({
+      where: { id: Number(groupId) },
+      include: { availability: true }, // Fetch related availability data
+    });
+
+    if (!studyGroup) {
+      return res.status(404).json({ message: 'Study group not found' });
+    }
+
+    // Convert the start and end time to Date objects
+    const newStartTime = new Date(`1970-01-01T${scheduleStartTime}:00`);
+    const newEndTime = new Date(`1970-01-01T${scheduleEndTime}:00`);
+
+    // Iterate over each user's availability and update or delete invalid entries
+    // await Promise.all(
+    //   studyGroup.availability.map(async (availability) => {
+    //     let userAvailability = {};
+    //     if (typeof availability.availability === 'string') {
+    //       try {
+    //         userAvailability = JSON.parse(availability.availability);
+    //       } catch (e) {
+    //         console.error('Error parsing availability:', e);
+    //         return; // Skip this user if the JSON is invalid
+    //       }
+    //     }
+
+        // // Filter out invalid availability slots for each user
+        // const filteredAvailability = Object.entries(userAvailability).reduce((acc, [day, times]) => {
+        //   if (scheduleDays.includes(day)) {
+        //     const validTimes = (times as string[]).filter((time: string) => {
+        //       const timeObj = new Date(`1970-01-01T${time}:00`);
+        //       return timeObj >= newStartTime && timeObj <= newEndTime;
+        //     });
+
+        //     if (validTimes.length > 0) acc[day] = validTimes;
+        //   }
+        //   return acc;
+        // }, {} as Record<string, string[]>);
+
+        // If no valid availability remains, delete the record
+        // if (Object.keys(filteredAvailability).length === 0) {
+        //   await prisma.availability.delete({
+        //     where: { id: availability.id },
+        //   });
+        // } else {
+        //   // Otherwise, update the availability with the filtered times
+        //   await prisma.availability.update({
+        //     where: { id: availability.id },
+        //     data: { availability: JSON.stringify(filteredAvailability) },
+        //   });
+        // }
+    //   })
+    // );
+
+    // Update the study group's schedule
+    const updatedGroup = await prisma.studyGroup.update({
+      where: { id: Number(groupId) },
+      data: {
+        scheduleDays,
+        scheduleStartTime,
+        scheduleEndTime,
+      },
+    });
+
+    res.json({
+      message: 'Study group schedule updated successfully',
+      studyGroup: updatedGroup,
+    });
+  } catch (error) {
+    console.error('Error updating study group schedule:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Get study group schedule and availability
+app.get('/api/study-groups/:groupId/schedule', authenticate, async (req: Request, res: Response): Promise<any> => {
+  const { groupId } = req.params;
+
+  try {
+    // Fetch the study group with the associated schedule and availability
+    const studyGroup = await prisma.studyGroup.findUnique({
+      where: { id: Number(groupId) },
+      include: {
+        availability: true, // Include availability data for the study group        
+      },
+    });
+
+    // If the study group is not found
+    if (!studyGroup) {
+      return res.status(404).json({ message: 'Study group not found' });
+    }
+
+    // Format the study group response data
+    const groupDetails = {
+      id: studyGroup.id,
+      name: studyGroup.name,
+      scheduleDays: studyGroup.scheduleDays,
+      scheduleStartTime: studyGroup.scheduleStartTime,
+      scheduleEndTime: studyGroup.scheduleEndTime,
+      availability: studyGroup.availability.map((availability) => {
+        let userAvailability = {};
+        try {
+          let userAvailability = {};
+          if (typeof availability.availability === 'string') {
+            try {
+              userAvailability = JSON.parse(availability.availability);
+            } catch (e) {
+              console.error('Error parsing availability:', e);
+              return; // Skip this user if the JSON is invalid
+            }
+          }        
+        } catch (e) {
+          console.error('Error parsing availability:', e);
+          return { userId: availability.userId, availability: {} }; // If invalid JSON, return empty
+        }
+        return {
+          userId: availability.userId,
+          availability: userAvailability,
+        };
+      }),
+    };
+
+    // Respond with the study group details and availability
+    res.json(groupDetails);
+  } catch (error) {
+    console.error('Error fetching study group schedule:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 // Fetch user profile data
 app.get('/api/users/profile/:userId', authenticate, async (req, res):Promise<any> => {
   const userId = parseInt(req.params.userId);
@@ -1120,7 +1273,31 @@ app.get('/api/profiles/:userId', async (req, res): Promise<any> => {
 export const deleteUserById = async (userId: number) => {
   try {
     // Delete related records in explicit join tables
-    await prisma.chat.deleteMany({ where: { users: { some: { id: userId } } } });
+    // only if there is exactly one other user in the chat
+    await prisma.chat.deleteMany({
+      where: {
+        users: {
+          some: { id: userId },
+        },
+        AND: [
+          {
+            users: {
+              // Ensure there is exactly one other user in the chat
+              some: { id: { not: userId } },
+            },
+          },
+          {
+            users: {
+              // Ensure there are only two users in the chat (the user being deleted + one other user)
+              every: { id: { not: userId } },
+            },
+          },
+          {
+            studyGroupId: null, // Ensure there is no study group ID associated with the chat
+          },
+        ],
+      },
+    });
 
     // Delete swipes
     await prisma.swipe.deleteMany({ where: { OR: [{ userId }, { targetUserId: userId }] } });
@@ -1184,18 +1361,7 @@ app.post('/api/study-groups', authenticate, async (req, res): Promise<any> => {
       return res.status(400).json({ error: 'Name is required' });
     }
 
-    const existingStudyGroup = await prisma.studyGroup.findFirst({
-      where: {
-        users: {
-          every: { id: { in: users } }, // Check if all users in the provided list are in the study group
-        },
-      },
-    });
-
-    if (existingStudyGroup) {
-      return res.json({ message: 'Study group already exists for these users.', studyGroupId: existingStudyGroup.id });
-    }
-
+    
     console.log('Creating study group with:', { name, subject, description, users });
 
 
@@ -1337,7 +1503,7 @@ app.get("/api/study-groups/chat/:chatId", async (req, res): Promise<any> => {
 
 app.put('/api/study-groups/chat/:chatID', async (req, res) : Promise<any> =>  {
   const { chatID } = req.params; // Extract chatID from the URL
-  const { name, description, subject, ideal_match_factor } = req.body; // Extract new study group data from the request body
+  const { name, description, subject, ideal_match_factor, profile_pic } = req.body; // Extract new study group data from the request body
 
   // Validate the input
   if (!name) {
@@ -1353,6 +1519,7 @@ app.put('/api/study-groups/chat/:chatID', async (req, res) : Promise<any> =>  {
         description,
         subject,
         ideal_match_factor: ideal_match_factor.value,
+        profilePic: profile_pic,
       },
     });
 
@@ -1363,6 +1530,8 @@ app.put('/api/study-groups/chat/:chatID', async (req, res) : Promise<any> =>  {
     res.status(500).json({ error: 'Failed to update the study group' });
   }
 });
+
+
 
 app.get("/api/study-groups/:studyGroupId/chat", async (req, res): Promise<any> => {
   const { studyGroupId } = req.params;
@@ -1512,7 +1681,7 @@ app.post('/api/sync-study-group-chat', async (req, res): Promise<any> => {
 });
 
 
-// Deletes a user by userId from a study group 
+// Deletes a user by userId from a study group
 app.delete('/api/study-groups/:groupId/users/:userId', async (req, res): Promise<any> => {
   const { groupId, userId } = req.params;
 
@@ -1520,7 +1689,7 @@ app.delete('/api/study-groups/:groupId/users/:userId', async (req, res): Promise
     // Check if the study group exists
     const studyGroup = await prisma.studyGroup.findUnique({
       where: { id: parseInt(groupId, 10) },
-      include: { users: true, chat: true }, // Include users and chat to remove user and handle chat
+      include: { users: true, chat: true }, // Include users and chat
     });
 
     if (!studyGroup) {
@@ -1529,9 +1698,17 @@ app.delete('/api/study-groups/:groupId/users/:userId', async (req, res): Promise
 
     // Check if the user is in the study group
     const userInGroup = studyGroup.users.some(user => user.id === parseInt(userId, 10));
-
     if (!userInGroup) {
       return res.status(404).json({ error: 'User is not in this study group' });
+    }
+
+    // If only two users remain, delete the study group and associated chat
+    if (studyGroup.users.length === 2) {
+      if (studyGroup.chat) {
+        await prisma.chat.delete({ where: { id: studyGroup.chat.id } });
+      }
+      await prisma.studyGroup.delete({ where: { id: parseInt(groupId, 10) } });
+      return res.status(200).json({ message: 'Study group and associated chat deleted as only one user would remain' });
     }
 
     // Remove the user from the study group
@@ -1539,7 +1716,7 @@ app.delete('/api/study-groups/:groupId/users/:userId', async (req, res): Promise
       where: { id: parseInt(groupId, 10) },
       data: {
         users: {
-          disconnect: { id: parseInt(userId, 10) }, // Disconnect user from the study group
+          disconnect: { id: parseInt(userId, 10) },
         },
       },
     });
@@ -1550,7 +1727,7 @@ app.delete('/api/study-groups/:groupId/users/:userId', async (req, res): Promise
         where: { id: studyGroup.chat.id },
         data: {
           users: {
-            disconnect: { id: parseInt(userId, 10) }, // Disconnect user from the chat
+            disconnect: { id: parseInt(userId, 10) },
           },
         },
       });
@@ -1562,6 +1739,7 @@ app.delete('/api/study-groups/:groupId/users/:userId', async (req, res): Promise
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
 
 
 
@@ -1779,6 +1957,8 @@ app.get('/api/users', async (req, res) => {
 });
 
 
+
+
 //used for getting request list in messaging page
 app.get('/api/users/:id', async (req, res) : Promise<any> => {
   try {
@@ -1811,6 +1991,68 @@ app.get('/api/users/:id', async (req, res) : Promise<any> => {
   }
 });
 
+app.get('/api/chats/lastOpened/:userId', async (req, res): Promise<any> => {
+  const { userId } = req.params; // Get userId from the URL parameter
+
+  if (!userId) {
+    return res.status(400).json({ error: "Missing required userId parameter" });
+  }
+
+  try {
+    // Fetch all lastOpened timestamps for the given user
+    const lastOpenedEntries = await prisma.lastOpened.findMany({
+      where: {
+        userId: parseInt(userId as string),
+      },
+    });
+
+    if (lastOpenedEntries.length === 0) {
+      return res.status(404).json({ error: "No last opened timestamps found for this user" });
+    }
+
+    res.json({ success: true, data: lastOpenedEntries });
+  } catch (error) {
+    console.error("Error fetching lastOpened:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+
+
+
+app.post('/api/chats/updateLastOpened', async (req, res) : Promise<any>=> {
+  const { chatId, userId, lastOpened } = req.body;
+
+  if (!chatId || !userId || !lastOpened) {
+    return res.status(400).json({ error: "Missing required fields" });
+  }
+
+  try {
+    // Update the last opened timestamp in the database
+    const updatedEntry = await prisma.lastOpened.upsert({
+      where: {
+        chatId_userId: {
+          chatId,
+          userId
+        }
+      },
+      update: {
+        timestamp: lastOpened
+      },
+      create: {
+        chatId,
+        userId,
+        timestamp: lastOpened
+      }
+    });
+
+    res.json({ success: true, data: updatedEntry });
+  } catch (error) {
+    console.error("Error updating lastOpened timestamp:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
 
 // Get all chats for a user
 // WORKS
@@ -1835,6 +2077,9 @@ app.get('/api/chats', authenticate, async (req, res): Promise<any> => {
         messages: {  // Include messages for each chat
           orderBy: {
             createdAt: 'asc', // Sort messages by creation time (optional)
+          },
+          include: {
+            buttonData: true, // Ensure button messages retain their data
           },
         },
         
@@ -1881,7 +2126,7 @@ app.get('/api/chats/check', async (req, res): Promise<any> => {
         return res.json({ exists: true, chatId: nonStudyGroupChats[0].id });
       }
 
-      if (existingChats.length === 1 && existingChats[0].studyGroupId !== null){
+      if (nonStudyGroupChats.length === 0){
         return res.json({exists: false })
       }
      
@@ -2144,6 +2389,21 @@ app.post('/api/chats', async (req, res) : Promise<any> => {
   }
 });
 
+app.put("/api/study-groups/chats/:chatId", async (req, res) => {
+  try {
+    const { chatId } = req.params;
+
+    const updatedChat = await prisma.chat.update({
+      where: { id: parseInt(chatId) }, // Ensure chatId is an integer if necessary
+      data: { updatedAt: new Date() , lastUpdatedById: null},
+    });
+
+    res.status(200).json({ message: "Chat updated successfully", chat: updatedChat });
+  } catch (error) {
+    console.error("Error updating chat timestamp:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
 
 
 app.post('/api/chats/:userId', authenticate, async (req: Request, res: Response): Promise<any> => {
@@ -2292,36 +2552,60 @@ io.on("connection", (socket) => {
 
       let newMessage;
       console.log(data.system);
-
       if (data.system) {
-        // If it's a system message, no user should be connected
+        // SYSTEM MESSAGE (No userId, no buttonData)
         newMessage = await prisma.message.create({
           data: {
             content: data.content,
             createdAt: new Date(),
             chatId: data.chatId,
             system: true,
-            // No userId for system messages
           },
-          include: { chat: { include: { users: true } } }, // Include chat and users if needed
+          include: { chat: { include: { users: true } } },
         });
-      } else {
-        // Regular user message
+      } else if (data.isButton) {
+        console.log("BUTT:::", data.buttonData);
+        // Create message linked to the button entry
         newMessage = await prisma.message.create({
           data: {
             content: data.content,
             createdAt: new Date(),
-            user: { connect: { id: data.userId } },  // Ensure userId is connected for user messages
+            user: { connect: { id: data.userId } },
             chat: { connect: { id: data.chatId } },
+            isButton: true,
+            buttonData:
+            {
+              create: {
+                action: data.buttonData.action,
+                studyGroupId: data.buttonData.studyGroupId,
+                label: data.buttonData.label,
+              }
+            }
+          },
+          include: { user: true, chat: { include: { users: true } }, buttonData: true },
+        });
+
+        console.log("NEW:::", newMessage);
+      
+      } else {
+        // REGULAR USER MESSAGE
+        newMessage = await prisma.message.create({
+          data: {
+            content: data.content,
+            createdAt: new Date(),
+            user: { connect: { id: data.userId } },
+            chat: { connect: { id: data.chatId } },
+            isButton: false,
           },
           include: { user: true, chat: { include: { users: true } } },
         });
       }
+      
 
       // After saving the message, update the chat's `updatedAt` timestamp
       const updatedChat = await prisma.chat.update({
         where: { id: data.chatId },
-        data: { updatedAt: new Date() },
+        data: { updatedAt: new Date(), lastUpdatedById: data.userId},
         include: { users: true },
       });
 
@@ -2577,6 +2861,7 @@ app.post(
 app.post('/api/study-group/upload-pfp',
   authenticate,
   (req, res, next) => {
+    console.log("Upload middleware started");
     upload(req, res, (err) => {
       if (err instanceof multer.MulterError) {
         if (err.code === "LIMIT_FILE_SIZE") {
@@ -2585,11 +2870,13 @@ app.post('/api/study-group/upload-pfp',
       } else if (err) {
         return res.status(400).json({ error: err.message });
       }
+      console.log("Upload successful");
       next(); // Proceed to the next middleware if no errors
     });
   },
   async (req, res, next): Promise<any> => {
     try {
+      console.log("Processing image");
       await resizeAndUploadStudyGroup(req, res, next); // Image processing
     } catch (err) {
       console.error("Image processing error:", err);
@@ -2597,6 +2884,7 @@ app.post('/api/study-group/upload-pfp',
     }
   },
   async (req, res): Promise<any> => {
+    console.log("Final handler reached");
     const chatID = parseInt(req.body.chatID);
     const profilePic = req.body.profilePicUrl;
     console.log("IN UPLOAD")
@@ -2706,6 +2994,26 @@ app.delete('/api/notifications/delete/:id', async (req, res): Promise<any> => {
   }
 });
 
+app.delete('/api/notifications/deleteAll', authenticate, async (req, res) => {
+  console.log("deleting all notifications...");
+  const userId = res.locals.userId;
+
+  try {
+    await prisma.notification.deleteMany({
+      where: { user_id: userId },
+    });
+
+    res.status(200).json({ message: 'All notifications deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting all notifications:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
+
+
+
 import { SwipeStatus } from '@prisma/client'; // Import enum
 
 app.put('/api/swipe-requests/:id', async (req, res): Promise<any> => {
@@ -2795,6 +3103,59 @@ app.put('/api/swipe-requests/:id', async (req, res): Promise<any> => {
 //   const userId = res.locals.userId;
 //   const pendingRequests = await prisma..findMany({
 // });
+
+app.get("/api/studyGroup/:studyGroupId/availability", authenticate,  async (req, res) => {
+  const { studyGroupId } = req.params;
+
+  try {
+    const availability = await prisma.availability.findMany({
+      where: {
+        studyGroupId: Number(studyGroupId),
+      },
+      include: {
+        user: true, // Optionally, include user details if needed
+      },
+    });
+
+    res.json(availability);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Failed to fetch availability" });
+  }
+});
+const days = ["Sun", "Mon", "Tues", "Wed", "Thur", "Fri", "Sat"] as const;
+
+type Day = typeof days[number];
+
+app.post("/api/studyGroup/:studyGroupId/availability", async (req, res) => {
+  const { studyGroupId } = req.params;
+  const { userId, availability } = req.body; // `availability` should be a JSON object
+
+  try {
+    // Delete any existing availability for the user in this study group
+    await prisma.availability.deleteMany({
+      where: {
+        userId: Number(userId),
+        studyGroupId: Number(studyGroupId),
+      },
+    });
+
+    // Save the new availability as a JSON object
+    await prisma.availability.create({
+      data: {
+        userId: Number(userId),
+        studyGroupId: Number(studyGroupId),
+        availability: availability, // Store the entire availability JSON object
+      },
+    });
+
+    res.status(200).json({ message: "Availability saved successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Failed to save availability" });
+  }
+});
+
 
 
 

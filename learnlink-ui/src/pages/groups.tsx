@@ -11,11 +11,11 @@ import StudyGroupInfo from '../components/StudyGroupInfo';
 import ChatsNavi from "../components/ChatsNavi";
 import JoinRequests from '../components/JoinRequests';
 import GroupUserList from '../components/GroupUserList';
-import JoinReqProfile from '../components/JoinReqProfile';
+import JoinReqProfile from '../components/PopupProfile';
 import CustomAlert from '../components/CustomAlert';
 import { unescape } from 'querystring';
 import { useNavigate } from "react-router-dom";
-
+import { handleSendSystemMessage,updateChatTimestamp} from "../utils/messageUtils";
 
 
   interface User {
@@ -39,6 +39,28 @@ import { useNavigate } from "react-router-dom";
     profile_pic: string;
   }
 
+  interface Chat {
+    id: number;
+    name: string;
+    messages: Message[];
+    users: User[]; 
+    createdAt: string;
+    updatedAt: string;
+    lastUpdatedById: number | null;
+    lastOpened: { [userId: number]: string };
+  }
+
+  interface Message{
+    id: number;
+    content: string;
+    createdAt: string;
+    userId: number | undefined;
+    chatId: number;
+    liked: boolean;
+    system: boolean;
+    
+  }
+
   const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
 
 
@@ -55,7 +77,7 @@ import { useNavigate } from "react-router-dom";
     const [alerts, setAlerts] = useState<{ id: number; alertText: string; alertSeverity: "error" | "warning" | "info" | "success"; visible: boolean }[]>([]);
     const alertVisible = alerts.some(alert => alert.visible);
   
-
+    const [chats, setChats] = useState<Chat[]>([]);
     const [isUserPanelVisible, setIsUserPanelVisible] = useState(false);
     const [isPanelVisible, setIsPanelVisible] = useState(false);
     const [selectedGroupUsers, setSelectedGroupUsers] = useState<User[] | null>(null);
@@ -115,7 +137,7 @@ import { useNavigate } from "react-router-dom";
                     const response = await axios.get(`${REACT_APP_API_URL}/api/study-groups`, {
                         headers: { Authorization: `Bearer ${token}` },
                       });
-                    setGroups(response.data);
+                      setGroups(response.data.sort((a: Group, b: Group) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()));
             
                 } catch (error) {
                     console.error('Error fetching study groups:', error);
@@ -149,6 +171,13 @@ import { useNavigate } from "react-router-dom";
     };
 
 
+    const updateGroups= (groupId: number) => {
+      // updates the displayed chats to delete the chat from the UI
+      setGroups((prevGroups) => prevGroups.filter((group) => group.id !== groupId));
+      if (selectedGroup?.id === groupId) {
+        setSelectedGroup(null);
+      }
+    }
 
 
 
@@ -160,50 +189,53 @@ import { useNavigate } from "react-router-dom";
     };
 
 
-
-    
-    //deletes a user from a study group
     const removeUser = async (userId: number, groupId: number | null) => {
-        if (!groupId) {
-        console.error('Group ID is missing.');
-        return;
-        }
-        try {
-        const response = await axios.delete(`${REACT_APP_API_URL}/api/study-groups/${groupId}/users/${userId}`);
-        
-        if (response.status === 200) {
-            // Log the updated users state to ensure it reflects the change
-            //setSelectedChatUsers(prevUsers => (prevUsers || []).filter(user => user.id !== userId));
+      if (!groupId) {
+          console.error('Group ID is missing.');
+          return;
+      }
+      try {
+          const response = await axios.delete(`${REACT_APP_API_URL}/api/study-groups/${groupId}/users/${userId}`);
+          
+          if (response.status === 200) {
+              // Update selectedGroupUsers state
+              setSelectedGroupUsers(prevUsers => (prevUsers || []).filter(user => user.id !== userId));
+  
+              // Update the groups state dynamically
+              setGroups(prevGroups =>
+                  prevGroups.map(group =>
+                      group.id === groupId
+                          ? { ...group, users: group.users.filter(user => user.id !== userId) }
+                          : group
+                  )
+              );
+  
+              
+              // Update selectedGroup if needed
+              if (selectedGroup) {
+                  updateGroups(selectedGroup.id);
+              }
+  
+              // Send a system message when a user is removed
+              const removedUser = selectedGroupUsers?.find(user => user.id === userId);
+              if (removedUser ) {
+                  let mess = userId === currentUserId
+                      ? `${removedUser.firstName} ${removedUser.lastName}  left the group.`
+                      : `${removedUser.firstName} ${removedUser.lastName}  was removed from the group.`;
+                  
+                  handleSendSystemMessage(mess, selectedGroup?.chatID);
 
-            setSelectedGroupUsers((prevUsers) => (prevUsers|| []).filter(user => user.id !== userId));
-            if (selectedGroup?.id === userId) {
-            setSelectedGroup(null);
-            }
-            /*
-            // add left/removed from chat message here
-            const username = chatUsernames[userId] || "Unknown";
-            let mess = "";
-            // console.log(username);
-            if (userId === currentUserId) {
-            mess = `${username} left the group.`;
-            
-            } else {
-            mess = `${username} was removed from the group.`;
-            }
-            setUpdateMessage(mess);
-
-            
-
-            console.log("update message " ,  mess);
-            handleSendSystemMessage(mess);
-            */
-        } else {
-            console.error('Failed to delete the user.');
-        }
-        } catch (error) {
-        console.error('Error deleting user:', error);
-        }
-    };
+                  updateChatTimestamp(selectedGroup?.chatID);
+              
+              }
+          } else {
+              console.error('Failed to delete the user.');
+          }
+      } catch (error) {
+          console.error('Error deleting user:', error);
+      }
+  };
+  
   
     return (
         <div className="Groups">
@@ -226,16 +258,26 @@ import { useNavigate } from "react-router-dom";
                 </div>
             )}
             
+            
             <div className="GroupsSidebar">
+              <div className="TabsContainer">
+              <button 
+                className="GroupsTab" 
+              >
+                Groups
+              </button>
+
+            
+            </div>
             {/* List of groups */}
-                <div className="groups-panel">
+              
                     {/* List of groups */}
                     {loadingGroups ? (
                         <div className="loading-container">
                         Loading... <span className="loading-spinner"></span>
                         </div>
                     ) : (
-                        <ul className="GroupList">
+                        <div className="GroupList">
                         {groups.map((group) => (
                             <li
                             key={group.id}
@@ -249,34 +291,34 @@ import { useNavigate } from "react-router-dom";
                             <span>{group.name}</span>
                             </li>
                         ))}
-                        </ul>
+                        </div>
                     )}
-                </div>
+              
             </div>
             <div className="GroupInfo">
-            {/* Group Stuff */}
-                {selectedGroup && (
-                <>
-                
-                {selectedGroupUsers && (
-                    <div className="study-group-panel">
+              {/* Display message if no group is selected */}
+              {!selectedGroup ? (
+                <div className="NoGroupSelected">
+                  Please select a group
+                </div>
+              ) : (
+                selectedGroupUsers && (
+                  <div className="study-group-panel">
                     <StudyGroupInfo
-                        chatID={selectedGroup.chatID}
-                        updateChatName={updateChatName}
-                        groupId={currentGroupId}
-                        currentId={currentUserId}
-                        users={selectedGroupUsers.filter(user => user.id !== currentUserId) ?? []}
-                        onRemoveUser={removeUser}
-                        updateUsers={updateUsers}
-                        isItEdit ={isEditMode}
+                      chatID={selectedGroup.chatID}
+                      updateChatName={updateChatName}
+                      groupId={currentGroupId}
+                      currentId={currentUserId}
+                      users={selectedGroupUsers.filter((user) => user.id !== currentUserId) ?? []}
+                      onRemoveUser={removeUser}
+                      updateUsers={updateUsers}
+                      isItEdit={isEditMode}
                     />
-                    </div>
-                )}
-               
-                </>
-            )}
+                  </div>
+                )
+              )}
             </div>
-            </div>
+          </div>
             
             <CopyrightFooter />
         </div>

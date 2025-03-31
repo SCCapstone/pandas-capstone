@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './NotificationDropdown.css';
+import { FaXmark } from 'react-icons/fa6';
 
 // Define notification types
 enum NotificationType {
@@ -77,6 +78,38 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ setNotifCou
     }
   };
 
+  const handleClearAll = async () => {
+    try {
+      setNotifs([]);
+    
+      const token = localStorage.getItem('token');
+      if (!token) return;
+    
+      const response = await fetch(`${REACT_APP_API_URL}/api/notifications/deleteAll`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+    
+      if (!response.ok) {
+        throw new Error('Error clearing notifications');
+      }
+    
+      const data = await response.json();
+      console.log('Notifications cleared:', data);
+  
+      setNotifCount(0);
+    
+    } catch (error) {
+      console.error('Error clearing notifications:', error);
+    }
+  };
+  
+  
+  
+
   // Map NotificationType to emoji icons
   const getNotificationIcon = (type: NotificationType) => {
     let icon;
@@ -98,14 +131,20 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ setNotifCou
   };
 
   return (
-    <div>
-      <ul className="notif-dropdown">
-        {error && <p>{error}</p>}
+    <div className="notif-dropdown">
+      {error && <p>{error}</p>}
+      {notifs.length > 0 && (
+        <button className="clear-all-btn" onClick={handleClearAll}>
+          Clear All
+        </button>
+      )}
+      <ul>
         {notifs.length === 0 && !loading && <div id="none">No new notifications</div>}
         {notifs.map((notif) => (
           <li key={notif.id} onClick={() => handleSelectNotif(notif)} className={notif.read ? 'read' : 'unread'}>
             <span className="notif-icon">{getNotificationIcon(notif.type)}</span>
             <p>{notif.message}</p>
+            <button className="DeleteButton"> <FaXmark /></button>
           </li>
         ))}
       </ul>

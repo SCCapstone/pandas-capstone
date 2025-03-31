@@ -61,6 +61,15 @@ enum NotificationType {
   StudyGroup
 }
 
+model Button {
+  id           Int     @id @default(autoincrement())
+  label        String
+  action       String
+  studyGroupId Int?
+
+  message      Message? 
+}
+
 model User {
   id                  Int            @id @default(autoincrement())
   created_at          DateTime       @default(now())
@@ -102,6 +111,11 @@ model User {
   // Password reset fields
   resetToken          String?        @unique // Nullable, unique reset token
   resetTokenExpiry    DateTime?      // Expiration timestamp for the reset token
+
+  availability        Availability[]
+  unReadMessages      Boolean?      @default(true)
+  lastOpened          LastOpened[] 
+  lastUpdatedChats Chat[] @relation("LastUpdatedBy") // Inverse relation for lastUpdatedBy
 }
 
 model StudyGroup {
@@ -124,6 +138,13 @@ model StudyGroup {
   ideal_match_factor  StudyTags?
 
   profilePic   String?  // Optional field to store a profile picture
+
+  availability Availability[]
+
+  scheduleDays String[] @default(["Sun", "Mon", "Tues", "Wed", "Thur", "Fri", "Sat"])
+  scheduleStartTime String @default("9:00 AM")
+  scheduleEndTime String @default("5:00 PM")
+
 }
 
 model Swipe {
@@ -163,11 +184,25 @@ model Chat {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @default(now())
   users         User[]    @relation("ChatUsers") // One-to-many through the join table
+  lastUpdatedBy User?     @relation("LastUpdatedBy", fields: [lastUpdatedById], references: [id]) // Named relation
+  lastUpdatedById Int?  
   messages      Message[] // One-to-many relationship to Message
   studyGroupId  Int?      @unique // Add this line to define the studyGroupId field
   studyGroup    StudyGroup? @relation("StudyGroupChat", fields: [studyGroupId], references: [id]) // Optional relation to StudyGroup
+  lastOpened     LastOpened[] // <-- Relation to track when each user last opened the chat
 }
 
+model LastOpened {
+  id        Int      @id @default(autoincrement())
+  chatId    Int
+  userId    Int
+  timestamp DateTime @default(now())
+
+  chat      Chat  @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  user      User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([chatId, userId]) // Ensures each user has only one timestamp per chat
+}
 
 model Message {
   id           Int         @id @default(autoincrement())
@@ -179,6 +214,11 @@ model Message {
   chat         Chat        @relation(fields: [chatId], references: [id], onDelete: Cascade) // One-to-many relation to Chat
   liked        Boolean     @default(false)
   system       Boolean     @default(false)
+  
+  
+  isButton     Boolean  @default(false)
+  buttonDataId Int?     @unique // Nullable for non-button messages
+  buttonData   Button?  @relation(fields: [buttonDataId], references: [id], onDelete: Cascade)
 }
 
 model Notification {
@@ -190,4 +230,15 @@ model Notification {
   created_at DateTime @default(now())
 
   user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
+
+model Availability {
+  id           Int        @id @default(autoincrement())
+  userId       Int
+  studyGroupId Int
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  studyGroup   StudyGroup @relation(fields: [studyGroupId], references: [id], onDelete: Cascade)
+  availability Json       // Stores selected time slots in JSON format
+
+  @@unique([userId, studyGroupId]) // Ensures one availability entry per user per study group
 }
