@@ -228,7 +228,7 @@ model Notification {
   message    String
   read       Boolean  @default(false)
   created_at DateTime @default(now())
-
+  chatID     Int?
   user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
 }
 

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './NotificationDropdown.css';
 import { FaXmark } from 'react-icons/fa6';
+import { useNavigate } from 'react-router-dom';
 
 // Define notification types
 enum NotificationType {
@@ -16,6 +17,7 @@ interface Notification {
   read: boolean;
   created_at: string;
   type: NotificationType;
+  chatID: number;
 }
 
 interface NotificationDropdownProps {
@@ -26,6 +28,7 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ setNotifCou
   const [notifs, setNotifs] = useState<Notification[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
   const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
 
   useEffect(() => {
@@ -45,6 +48,7 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ setNotifCou
         if (!response.ok) throw new Error(`Error: ${response.status}`);
 
         const data = await response.json();
+        console.log(data);
         setNotifs(data);
       } catch (err) {
         setError('Error loading notifications');
@@ -60,6 +64,16 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ setNotifCou
     try {
       const token = localStorage.getItem('token');
       if (!token) return;
+
+      if (notif.type === NotificationType.Message){
+        navigate(`/messaging?selectedChatId=${notif.chatID}`);
+      }
+      else if (notif.type === NotificationType.Match) {
+        navigate('/matches');
+      }
+      else if (notif.type === NotificationType.StudyGroup) {
+        navigate('/pending-requests'); // For study group notifications, navigate to the pending requests page
+      }
 
       const response = await fetch(`${REACT_APP_API_URL}/api/notifications/delete/${notif.id}`, {
         method: 'DELETE',
