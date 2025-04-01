@@ -3085,14 +3085,55 @@ app.put('/api/swipe-requests/:id', async (req, res): Promise<any> => {
           });
       }
 
-      if(status==="Accepted" && swipe.targetGroupId) {
+      if (status === "Accepted" && swipe.targetGroupId) {
+        // Step 1: Get all members of the target study group
+        const members = await prisma.studyGroup.findUnique({
+          where: { id: swipe.targetGroupId },
+          select: {
+            users: {
+              select: {
+                id: true,
+              },
+            },
+          },
+        });
+      
+        // Step 2: Create the match for each member in the study group
+        if (members?.users && members.users.length > 0) {
+          for (const member of members.users) {
+            // Avoid matching the user with themselves
+            if (member.id !== swipe.userId) {
+
+              await prisma.swipe.create({
+                data: {
+                  userId: swipe.userId,
+                  targetUserId: member.id,
+                  direction: 'Yes',
+                  status: 'Accepted'
+                }
+              })
+
+              await prisma.match.create({
+                data: {
+                  user1Id: swipe.userId,
+                  user2Id: member.id, // Create a match with the member
+                  studyGroupId: swipe.targetGroupId,
+                  isStudyGroupMatch: false,
+                },
+              });
+
+            }
+          }
+        }
+      
+        // Step 3: Create the initial match with the study group
         await prisma.match.create({
           data: {
             user1Id: swipe.userId,
             studyGroupId: swipe.targetGroupId,
             isStudyGroupMatch: true,
           },
-        })
+        });
       }
 
       res.json(updatedRequest);

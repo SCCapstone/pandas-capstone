@@ -185,15 +185,15 @@ const handleApproval = async (
   
         // handleDeleteRequest(requestId); // Remove request after approval
         handleRequestsChange(requestId);
-      } 
-    
+      }
+
     } catch (err: unknown) {
       console.error("Error approving request:", err);
       if (axios.isAxiosError(err) && err.response?.status === 405) {
         console.log("Caught 405 error in catch block");
         setError("This study group is full. You cannot approve this request.");
         handleDenial(requestId);
-  
+
         // handleDeleteRequest(requestId);
         handleRequestsChange(requestId);
       }
@@ -216,119 +216,131 @@ const handleApproval = async (
       setLoadingApproval(null); // Reset loading state
     }
   };
-  
-  
-    // Function to reject a join request
-    const handleDenial = async (requestId: number) => {
-      updateSwipeStatus(requestId, SwipeStatus.Denied);  // Pass the enum value
-      // handleDeleteRequest(requestId);
-      handleRequestsChange(requestId);
-    };
-  
-    // Function to delete a request from the system
-    const handleDeleteRequest = async (requestId: number) => {
-      try {
-        await axios.delete(`${REACT_APP_API_URL}/api/swipe/${requestId}`);
-        setRecievedRequestsList(receivedRequestsList.filter((request) => request.id !== requestId));
-      } catch (err) {
-        console.error('Error rejecting request:', err);
-        setError('Failed to reject request.');
-      }
-    };
-  
-    const handleRequestsChange  = async (requestId: number) => { 
-        setRecievedRequestsList(receivedRequestsList.filter((request) => request.id !== requestId));
-  
-    };
-  
-    const handleProfilePopup = (userId: number) => {
-      const user = receivedRequestsList.find((req) => req.user.id === userId)?.user;
-      if (user) {
-        openProfilePopup({ id: user.id, name: `${user.firstName} ${user.lastName}` });
-      }
-    };
-    
-  
-    const closeProfilePopup = () => {
-      setSelectedProfile(null);
-    };
 
-    return (
-        <div className="TabPanel">
-            {/* Display error message if any */}
-            {error && <p className="error-message">{error}</p>}
 
-            {loadingRequests ? (
-                <div className="loading-container">
-                    Loading... <span className="loading-spinner"></span>
-                </div>
-            ) : receivedRequestsList.length === 0 ? (
-                <p className="no-requests">No recieved requests.</p>
-            ) : (
-                <div className="network-list-container">
-                    {/* <h3>Your Matches</h3>
-            <p>List of matched study partners...</p> */}
-                    <ul className="network-list">
-                        <div className='network-list-info'></div>
+  // Function to reject a join request
+  const handleDenial = async (requestId: number) => {
+    updateSwipeStatus(requestId, SwipeStatus.Denied);  // Pass the enum value
+    // handleDeleteRequest(requestId);
+    handleRequestsChange(requestId);
+  };
 
-                        {receivedRequestsList.map((request) => (
-                            <ul key={request.id} onClick={() => handleSelectUser(request.user.id)}>
-                                <div className='network-list-container'>
-                                    <div className='network-list-info'>
-                                        <img
-                                            src={request.user.profilePic || 'https://learnlink-public.s3.us-east-2.amazonaws.com/AvatarPlaceholder.svg'}
-                                            alt={`${request.user.firstName} ${request.user.lastName}`}
-                                            className='network-profile-pic'
-                                        />
-                                        <div className='network-bio'>
-                                            <h3>{request.user.username}</h3>
-                                            <p>{request.user.firstName} {request.user.lastName}</p>
-                                            {request.message ? (
-                                            <div className='network-message'>
-                                                {/* <h3>Message:</h3> */}
-                                                <p>{request.message}</p>
-                                            </div>
-                                            ) : null
-                                            }
-                                        </div>
-                                    </div>
-                                    <div className='network-list-status'>
-                                        <button
-                                            className='network-accept-button'
-                                            onClick={(event: React.MouseEvent<HTMLButtonElement>) => {
-                                                event.stopPropagation();
-                                                handleApproval(
-                                                    request.id,
-                                                    request.targetGroupId ?? undefined, // Passing the targetGroupId (or undefined)
-                                                    request.targetUserId ?? undefined, // Passing the targetUserId (or undefined)
-                                                    request.user.id // Passing the requestUserId
-                                                )
-                                            }
-                                            }
-                                            disabled={loadingApproval === request.id}
+  // Function to delete a request from the system
+  const handleDeleteRequest = async (requestId: number) => {
+    try {
+      await axios.delete(`${REACT_APP_API_URL}/api/swipe/${requestId}`);
+      setRecievedRequestsList(receivedRequestsList.filter((request) => request.id !== requestId));
+    } catch (err) {
+      console.error('Error rejecting request:', err);
+      setError('Failed to reject request.');
+    }
+  };
 
-                                        >
-                                            {loadingApproval === request.id ? 'Approving...' : <><FaCheck /> Accept</>}
-                                        </button>
-                                        <button className='network-deny-button'
-                                            onClick={(event: React.MouseEvent<HTMLButtonElement>) => {
-                                                event.stopPropagation();
-                                                handleDenial(request.id)
-                                            }}
-                                        >
-                                            <FaXmark />
-                                            Reject
-                                        </button>
-                                    </div>
-                                </div>
-                            </ul>
-                        ))}
-                    </ul>
+  const handleRequestsChange = async (requestId: number) => {
+    setRecievedRequestsList(receivedRequestsList.filter((request) => request.id !== requestId));
 
-                </div>
-            )}
+  };
+
+  const handleProfilePopup = (userId: number) => {
+    const user = receivedRequestsList.find((req) => req.user.id === userId)?.user;
+    if (user) {
+      openProfilePopup({ id: user.id, name: `${user.firstName} ${user.lastName}` });
+    }
+  };
+
+
+  const closeProfilePopup = () => {
+    setSelectedProfile(null);
+  };
+
+  return (
+    <div className="TabPanel">
+      {/* Display error message if any */}
+      {error && <p className="error-message">{error}</p>}
+
+      {loadingRequests ? (
+        <div className="loading-container">
+          Loading... <span className="loading-spinner"></span>
         </div>
-    );
+      ) : receivedRequestsList.length === 0 ? (
+        <p className="no-requests">No recieved requests.</p>
+      ) : (
+        <div className="network-list-container">
+          {/* <h3>Your Matches</h3>
+            <p>List of matched study partners...</p> */}
+          <ul className="network-list">
+            <div className='network-list-info'></div>
+
+            {receivedRequestsList.map((request) => (
+              <ul key={request.id} onClick={() => handleSelectUser(request.user.id)}>
+
+                <div className='network-list-parent'>
+                  {request.targetGroupId ? (
+                    <div className='study-group-request'>
+                      <p>
+                        Request to join the study group:
+                        <strong> {request.targetGroup?.studyGroup.name || 'Unnamed Study Group'}</strong>
+                      </p>
+                    </div>
+                  ) : null}
+                <div className='network-list-container'>
+                <div className='network-list-info'>
+
+                    <img
+                      src={request.user.profilePic || 'https://learnlink-public.s3.us-east-2.amazonaws.com/AvatarPlaceholder.svg'}
+                      alt={`${request.user.firstName} ${request.user.lastName}`}
+                      className='network-profile-pic'
+                    />
+                    <div className='network-bio'>
+                      <h3>{request.user.username}</h3>
+                      <p>{request.user.firstName} {request.user.lastName}</p>
+                      {request.message ? (
+                        <div className='network-message'>
+                          {/* <h3>Message:</h3> */}
+                          <p>{request.message}</p>
+                        </div>
+                      ) : null
+                      }
+                    </div>
+                  </div>
+                  <div className='network-list-status'>
+                    <button
+                      className='network-accept-button'
+                      onClick={(event: React.MouseEvent<HTMLButtonElement>) => {
+                        event.stopPropagation();
+                        handleApproval(
+                          request.id,
+                          request.targetGroupId ?? undefined, // Passing the targetGroupId (or undefined)
+                          request.targetUserId ?? undefined, // Passing the targetUserId (or undefined)
+                          request.user.id // Passing the requestUserId
+                        )
+                      }
+                      }
+                      disabled={loadingApproval === request.id}
+
+                    >
+                      {loadingApproval === request.id ? 'Approving...' : <><FaCheck /> Accept</>}
+                    </button>
+                    <button className='network-deny-button'
+                      onClick={(event: React.MouseEvent<HTMLButtonElement>) => {
+                        event.stopPropagation();
+                        handleDenial(request.id)
+                      }}
+                    >
+                      <FaXmark />
+                      Reject
+                    </button>
+                  </div>
+                  </div>
+                </div>
+              </ul>
+            ))}
+          </ul>
+
+        </div>
+      )}
+    </div>
+  );
 };
 
 export default ReceivedRequestsList
