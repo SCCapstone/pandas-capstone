@@ -69,9 +69,16 @@ const Network = () => {
 
 
   useEffect(() => {
+    console.log('searchParams:', searchParams.toString());
+    console.log('inputtedActive:', inputtedActive);
     if (inputtedActive === "matches") {
+      console.log("setting active tab to matches");
       setActiveTab("matches");
+    } else if (inputtedActive === "rr") {
+      console.log("setting active tab to rr");
+      setActiveTab("receivedRequests");
     }
+
     navigate(window.location.pathname, { replace: true });
   }, [inputtedActive]); 
   

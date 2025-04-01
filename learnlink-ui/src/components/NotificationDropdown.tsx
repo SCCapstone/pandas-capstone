@@ -69,11 +69,9 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ setNotifCou
         navigate(`/messaging?selectedChatId=${notif.chatID}`);
       }
       else if (notif.type === NotificationType.Match) {
-        navigate('/matches');
+        navigate(`/network?active=rr`);
       }
-      else if (notif.type === NotificationType.StudyGroup) {
-        navigate('/pending-requests'); // For study group notifications, navigate to the pending requests page
-      }
+     
 
       const response = await fetch(`${REACT_APP_API_URL}/api/notifications/delete/${notif.id}`, {
         method: 'DELETE',
