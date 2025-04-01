@@ -344,6 +344,8 @@
 .ChatsSidebar {
   position: relative;
   overflow-y: scroll;
+  flex-direction: column;
+  display: flex;
   width: 30%;
   max-width: 30%;
   border-right: 1px solid #ccc;
