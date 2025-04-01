@@ -1152,6 +1152,12 @@ app.get('/api/profiles/:userId', async (req, res): Promise<any> => {
           {
             swipesReceived: { some: { userId: userId } },  // Exclude users where the current user has already swiped
           },
+          {
+            OR: [
+              { matchesAsUser1: { some: { user2Id: userId } } }, // Exclude users the current user has matched with
+              { matchesAsUser2: { some: { user1Id: userId } } }, // Exclude users who have matched with the current user
+            ],
+          },
         ],
       },
       select: {
@@ -3125,7 +3131,23 @@ app.put('/api/swipe-requests/:id', async (req, res): Promise<any> => {
           for (const member of members.users) {
             // Avoid matching the user with themselves
             if (member.id !== swipe.userId) {
-
+                // Delete any other requests between the two users
+                await prisma.swipe.deleteMany({
+                  where: {
+                      userId: swipe.userId,
+                      targetUserId: member.id,
+                      NOT: { id: Number(id) } // Exclude the current request
+                  }
+              });
+        
+              await prisma.swipe.deleteMany({
+                  where: {
+                      userId: member.id,
+                      targetUserId: swipe.userId,
+                      NOT: { id: Number(id) } // Exclude the current request
+                  }
+              });
+            
               await prisma.swipe.create({
                 data: {
                   userId: swipe.userId,
