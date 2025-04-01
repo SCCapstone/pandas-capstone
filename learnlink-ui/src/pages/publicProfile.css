@@ -140,6 +140,11 @@
     background-color: #afafaf;
     cursor:default;
 }
+
+.public-action-buttons .match-button-status-match:disabled {
+    background-color: #afafaf;
+    cursor:default;
+}
 .public-action-buttons .match-button-status-connected {
     background-color: #4CAF50;
     cursor:default;

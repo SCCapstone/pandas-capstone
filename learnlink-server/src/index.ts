@@ -789,6 +789,10 @@ app.get('/api/swipe/user/pendingRequestCheck/:targetUser', authenticate, async (
   const currentUserId = parseInt(currentUser, 10);
   const targetUserId  = parseInt(targetUser, 10);
 
+  if (currentUserId == targetUserId) {
+    return null
+  }
+
   console.log('Fetching requests between user: ', currentUserId, ' and', targetUserId);
 
 
@@ -797,6 +801,22 @@ app.get('/api/swipe/user/pendingRequestCheck/:targetUser', authenticate, async (
   }
 
   try {
+
+    const match = await prisma.match.findMany({
+      where: {
+        OR: [
+          { user1Id: currentUserId, user2Id: targetUserId },
+          { user1Id: targetUserId, user2Id: currentUserId }
+        ]
+      }
+    });
+
+    console.log('match', match)
+    
+    if (match.length > 0) {
+      return res.status(200).json("Accepted");
+    }
+    
     const sentRequests = await prisma.swipe.findMany({
       where: {
         AND: {
@@ -816,6 +836,8 @@ app.get('/api/swipe/user/pendingRequestCheck/:targetUser', authenticate, async (
         updatedAt: true
       },
     });
+
+    console.log(sentRequests)
 
     const mostRecentRequest = sentRequests.sort((a, b) => {
       // Compare updatedAt values (latest date first)
@@ -3117,7 +3139,7 @@ app.put('/api/swipe-requests/:id', async (req, res): Promise<any> => {
                 data: {
                   user1Id: swipe.userId,
                   user2Id: member.id, // Create a match with the member
-                  studyGroupId: swipe.targetGroupId,
+                  studyGroupId: null,
                   isStudyGroupMatch: false,
                 },
               });
