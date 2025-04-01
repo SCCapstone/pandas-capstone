@@ -1,15 +1,11 @@
 import React from 'react';
 import CopyrightFooter from '../../components/CopyrightFooter';
-import {render, screen, fireEvent} from '@testing-library/react'
-import { MemoryRouter } from 'react-router';
+import {render, screen} from '@testing-library/react'
 
-describe ('Copyright Footer Component', () => {
-    it('renders the copyright footer', () => {
-        render(<MemoryRouter>
-            <CopyrightFooter />
-            </MemoryRouter>);
+describe ('CopyrightFooter Component', () => {
+    it('renders the copyright text correctly', () => {
+        render(<CopyrightFooter />);
 
-        const copyrightElement = screen.getByText('LearnLink');
-        expect(copyrightElement).toBeInTheDocument();
+        expect(screen.getByText('© LearnLink')).toBeInTheDocument();
     });
 });
