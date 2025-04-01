@@ -175,8 +175,10 @@ const handleApproval = async (
         // Send the notification
         await axios.post(`${REACT_APP_API_URL}/notifications/send`, {
           userId: requestUserId,
+          other_id: currentUser.id,
           message: notificationMessage,
           type: "StudyGroup",
+          studyGroupID: studyGroupId,
         });
   
         updateSwipeStatus(requestId, SwipeStatus.Accepted); // Update status to accepted

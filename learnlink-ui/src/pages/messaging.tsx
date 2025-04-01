@@ -569,7 +569,7 @@ useEffect(() => {
       }
 
       const chatID = selectedChat.id;
-      console.log("CHATTT: ", chatID);
+      
       console.log('Notification message:', notificationMessage);
 
       // Send notification to each recipient
@@ -588,6 +588,7 @@ useEffect(() => {
               message: notificationMessage,
               type: "Message",
               chatID: chatID,
+
             }),
           });
         })
