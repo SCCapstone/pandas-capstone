@@ -8,8 +8,9 @@
   
   .ChatList {
     overflow-y: scroll; /* Enables scrolling when needed */
-    max-height: 90%;
-  }
+    flex:1;
+    margin-bottom: 70px;
+    }
 
   .blue-dot {
     width: 8px;
