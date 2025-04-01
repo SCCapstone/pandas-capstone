@@ -224,11 +224,13 @@ model Message {
 model Notification {
   id         Int      @id @default(autoincrement())
   user_id    Int
+  other_id   Int?
   type       NotificationType
   message    String
   read       Boolean  @default(false)
   created_at DateTime @default(now())
   chatID     Int?
+  studyGroupID Int?
   user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
 }
 
