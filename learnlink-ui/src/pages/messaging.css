@@ -593,6 +593,12 @@
   background-color: #00668C; /* Deep Blue */
   color: white;
   transition: background 0.2s ease-in-out;
+  text-align: left;
+}
+
+.PlusButton.weekly-scheduler-class {
+  text-align: center;
+
 }
 
 .PlusButton:hover {
