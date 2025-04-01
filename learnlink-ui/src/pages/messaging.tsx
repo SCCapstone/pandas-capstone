@@ -1267,6 +1267,7 @@ const handleGetChatUsername = async (userId: number) => {
                 )}
               </div>
               <div className="ChatInput">
+                
                 <PlusButtonProps
                   onSelect={handlePlusSelect}
                   studyGroupId={currentGroupId}

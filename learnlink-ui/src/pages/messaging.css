@@ -519,6 +519,11 @@
     padding: 10px;
   }
 
+  .inputs-bar {
+    flex-direction: row;
+
+  }
+
   .ChatInput input {
     width: 100%;
     margin-bottom: 10px;
@@ -588,6 +593,8 @@
   font-size: 14px;
   font-weight: bold;
   border-radius: 6px;
+  padding-top: 15px;
+  padding-bottom: 15px;
   border: none;
   cursor: pointer;
   background-color: #00668C; /* Deep Blue */
