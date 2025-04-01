@@ -14,7 +14,7 @@ import GroupUserContainer from '../components/GroupUserContainer';
 import { useNavigate } from "react-router-dom";
 import CreateStudyGroup from '../components/CreateStudyGroup';
 import PlusButtonProps from '../components/PlusButtonProps';
-import { handleSendSystemMessage, handleSendButtonMessage } from "../utils/messageUtils";
+import { handleSendSystemMessage, handleSendButtonMessage, openCalendarEvent } from "../utils/messageUtils";
 import { NullValueFields } from 'aws-sdk/clients/glue';
 import CalendarEventPopup from '../components/CalendarEventPopup'
 
@@ -986,8 +986,11 @@ const handleGetChatUsername = async (userId: number) => {
       console.log("no button action")
       return
     }
+      const [actionType, eventURL] = action.split(',');
+      console.log("Action Type:", actionType);
+      console.log("Event URL:", eventURL);
 
-    switch (action) {
+    switch (actionType) {
       case "weekly-scheduler":
         if (studyGroupId) {
           openWeeklyScheduler(studyGroupId);
@@ -997,9 +1000,7 @@ const handleGetChatUsername = async (userId: number) => {
         break;
   
       case "calendar-event":
-          // setCalendarModalOpen(true);
-
-          // openCalendarEvent();
+          openCalendarEvent(eventURL);
 
         break;
   
@@ -1042,80 +1043,6 @@ const handleGetChatUsername = async (userId: number) => {
     window.open(url, "_blank");
   };
   
-
-  // Function to open a Calendar Event creation for a study group
-  const openCalendarEvent = (eventDetails: {
-    title: string;
-    date: string;
-    startTime: string;
-    endTime: string;
-    description: string;
-    location: string;
-  }) => {
-    // Convert date and time strings into Date objects
-    const startDate = new Date(`${eventDetails.date}T${eventDetails.startTime}:00`);
-    const endDate = new Date(`${eventDetails.date}T${eventDetails.endTime}:00`);
-  
-    // Format dates for Google & Outlook URLs
-    const formattedStart = startDate.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
-    const formattedEnd = endDate.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
-  
-    // Google Calendar URL
-    const googleCalendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(eventDetails.title)}&details=${encodeURIComponent(eventDetails.description)}&location=${encodeURIComponent(eventDetails.location)}&dates=${formattedStart}/${formattedEnd}`;
-  
-    // Outlook Calendar URL
-    const outlookCalendarUrl = `https://outlook.live.com/calendar/0/deeplink/compose?subject=${encodeURIComponent(eventDetails.title)}&body=${encodeURIComponent(eventDetails.description)}&location=${encodeURIComponent(eventDetails.location)}&startdt=${startDate.toISOString()}&enddt=${endDate.toISOString()}`;
-  
-    // Create .ics file for Apple Calendar and other local apps
-    const icsContent = `BEGIN:VCALENDAR
-  VERSION:2.0
-  BEGIN:VEVENT
-  SUMMARY:${eventDetails.title}
-  LOCATION:${eventDetails.location}
-  DESCRIPTION:${eventDetails.description}
-  DTSTART:${formattedStart}
-  DTEND:${formattedEnd}
-  END:VEVENT
-  END:VCALENDAR`;
-  
-    const blob = new Blob([icsContent], { type: "text/calendar" });
-    const icsUrl = URL.createObjectURL(blob);
-  
-    // Detect platform
-    const isMac = navigator.platform.toUpperCase().includes("MAC");
-    const isWindows = navigator.userAgent.includes("Windows NT");
-  
-    if (isMac) {
-      // Offer .ics file for Apple Calendar
-      const link = document.createElement("a");
-      link.href = icsUrl;
-      link.download = "event.ics";
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    } else if (isWindows) {
-      window.open(outlookCalendarUrl, "_blank");
-    } else {
-      window.open(googleCalendarUrl, "_blank");
-    }
-  };
-  
-
-  // Function to handle event creation
-const handleCreateCalendarEvent = (eventDetails: {
-  title: string;
-  date: string;
-  startTime: string;
-  endTime: string;
-  description: string;
-  location: string
-}) => {
-  openCalendarEvent(eventDetails); // This will open the user's calendar app with event details
-  setCalendarModalOpen(false);
-};
-  
-
-
 
 
   return (
@@ -1250,14 +1177,6 @@ const handleCreateCalendarEvent = (eventDetails: {
 
 
               <div className="ChatWindow" ref={chatWindowRef}>
-                <CalendarEventPopup
-                  open={calendarModalOpen}
-                  onClose={() => setCalendarModalOpen(false)}
-                  onSubmit={(eventDetails) => {
-                    openCalendarEvent(eventDetails); // Implement this to open the calendar app
-                    setCalendarModalOpen(false);
-                  }}
-                />
                 {selectedChat ? (
                   // If selectedChat exists
                   Array.isArray(selectedChat.messages) ? (

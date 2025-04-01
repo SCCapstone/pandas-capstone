@@ -1,5 +1,7 @@
 import { JSX, useState } from "react";
 import { Plus, Calendar, Table } from "lucide-react";
+import {createCalendarEvent} from '../utils/messageUtils';
+import CalendarEventPopup from "./CalendarEventPopup";
 import './PlusButtonProps.css';
 
 interface PlusButtonProps {
@@ -11,6 +13,9 @@ interface PlusButtonProps {
 
 export default function PlusButton({ onSelect, studyGroupId, selectedChatId, onSendButtonMessage }: PlusButtonProps) {
     const [isOpen, setIsOpen] = useState(false);
+    const [calendarModalOpen, setCalendarModalOpen] = useState(false);
+    const [calendarEventURL, setCalendarEventURL] = useState<string | null>(null);
+    
 
     const options = [
         {
@@ -25,25 +30,53 @@ export default function PlusButton({ onSelect, studyGroupId, selectedChatId, onS
         },
     ];
 
-    const handleSelect = (value: string) => {
-        console.log('vale',value);
-    
-        if (!selectedChatId) return; // Ensure a chat is selected
-    
-        // Ensure studyGroupId is either a number or undefined (avoid null)
+    const handleCalendarURL = (eventDetails: {
+        title: string;
+        date: string;
+        startTime: string;
+        endTime: string;
+        description: string;
+        location: string;
+      }) => { 
+        const eventURL = createCalendarEvent(eventDetails);
+        setCalendarEventURL(eventURL);
+      
+        if (selectedChatId) {
+          const validStudyGroupId = studyGroupId ?? undefined; 
+      
+          const buttonData = {
+            action: `calendar-event,${eventURL}`, // Append URL here
+            studyGroupId: validStudyGroupId,
+            label: "🗓️ Add Calendar Event",
+          };
+      
+          onSendButtonMessage(buttonData);
+        }
+      };
+      
+
+      const handleSelect = (value: string) => {
+        console.log("Selected value:", value);
+      
+        if (!selectedChatId) return; 
+      
+        if (value === "calendar-event") {
+          setCalendarModalOpen(true);
+          return; // Don't proceed further until the modal is submitted
+        }
+      
         const validStudyGroupId = studyGroupId ?? undefined; 
-    
+      
         const buttonData = {
-            action: value, // "weekly-scheduler" or "calendar-event"
-            studyGroupId: validStudyGroupId, // ✅ Correct study group ID
-            label: value === "weekly-scheduler" ? "📅 Open Weekly Scheduler" : "🗓️ Add Calendar Event",
+          action: value,
+          studyGroupId: validStudyGroupId,
+          label: "📅 Open Weekly Scheduler",
         };
-    
-        // Pass to Messaging.tsx instead of calling `handleSendButtonMessage` directly
-        onSendButtonMessage(buttonData); 
-    
-        setIsOpen(false); // Close the selection UI
-    };
+      
+        onSendButtonMessage(buttonData);
+        setIsOpen(false);
+      };
+      
     
 
     return (
@@ -64,6 +97,14 @@ export default function PlusButton({ onSelect, studyGroupId, selectedChatId, onS
                     </button>
                 ))}
             </div>
+            <CalendarEventPopup
+                  open={calendarModalOpen}
+                  onClose={() => setCalendarModalOpen(false)}
+                  onSubmit={(eventDetails) => {
+                    handleCalendarURL(eventDetails); // Implement this to open the calendar app
+                    setCalendarModalOpen(false);
+                  }}
+                />
         </div>
     );
 }
