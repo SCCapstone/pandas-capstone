@@ -2938,7 +2938,7 @@ app.get('/api/notifications', authenticate, async (req: Request, res: Response) 
 
 app.post('/notifications/send', async (req, res): Promise<any> => {
   try {
-    const { userId, message, type, chatID } = req.body;
+    const { userId, other_id, message, type, chatID, studyGroupID} = req.body;
 
     if (!userId || !message || !type) {
       return res.status(400).json({ error: 'Missing required fields' });
@@ -2952,10 +2952,12 @@ app.post('/notifications/send', async (req, res): Promise<any> => {
     const notification = await prisma.notification.create({
       data: {
         user_id: userId,
+        other_id: other_id,
         message,
         read: false,
         type,
         chatID,
+        studyGroupID,
       },
     });
 
