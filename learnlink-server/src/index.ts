@@ -2938,7 +2938,7 @@ app.get('/api/notifications', authenticate, async (req: Request, res: Response) 
 
 app.post('/notifications/send', async (req, res): Promise<any> => {
   try {
-    const { userId, message, type } = req.body;
+    const { userId, message, type, chatID } = req.body;
 
     if (!userId || !message || !type) {
       return res.status(400).json({ error: 'Missing required fields' });
@@ -2955,6 +2955,7 @@ app.post('/notifications/send', async (req, res): Promise<any> => {
         message,
         read: false,
         type,
+        chatID,
       },
     });
 
