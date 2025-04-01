@@ -11,7 +11,7 @@ import StudyGroupInfo from '../components/StudyGroupInfo';
 import ChatsNavi from "../components/ChatsNavi";
 import JoinRequests from '../components/JoinRequests';
 import GroupUserList from '../components/GroupUserList';
-import JoinReqProfile from '../components/JoinReqProfile';
+import JoinReqProfile from '../components/PopupProfile';
 import CustomAlert from '../components/CustomAlert';
 import { unescape } from 'querystring';
 import { useNavigate } from "react-router-dom";
@@ -171,6 +171,13 @@ import { handleSendSystemMessage,updateChatTimestamp} from "../utils/messageUtil
     };
 
 
+    const updateGroups= (groupId: number) => {
+      // updates the displayed chats to delete the chat from the UI
+      setGroups((prevGroups) => prevGroups.filter((group) => group.id !== groupId));
+      if (selectedGroup?.id === groupId) {
+        setSelectedGroup(null);
+      }
+    }
 
 
 
@@ -203,23 +210,23 @@ import { handleSendSystemMessage,updateChatTimestamp} from "../utils/messageUtil
                   )
               );
   
-              // If the removed user was the last user in the group, remove the group
-              setGroups(prevGroups => prevGroups.filter(group => group.users.length > 0));
-  
+              
               // Update selectedGroup if needed
-              if (selectedGroup?.id === groupId && selectedGroupUsers?.length === 1) {
-                  setSelectedGroup(null);
+              if (selectedGroup) {
+                  updateGroups(selectedGroup.id);
               }
   
               // Send a system message when a user is removed
               const removedUser = selectedGroupUsers?.find(user => user.id === userId);
-              if (removedUser) {
+              if (removedUser ) {
                   let mess = userId === currentUserId
                       ? `${removedUser.firstName} ${removedUser.lastName}  left the group.`
                       : `${removedUser.firstName} ${removedUser.lastName}  was removed from the group.`;
                   
                   handleSendSystemMessage(mess, selectedGroup?.chatID);
+
                   updateChatTimestamp(selectedGroup?.chatID);
+              
               }
           } else {
               console.error('Failed to delete the user.');

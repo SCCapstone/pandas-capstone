@@ -1,17 +1,16 @@
-import './JoinReqProfile.css'
+import './PopupProfile.css'
 import '../pages/messaging.css';
 import { formatEnum } from '../utils/format';
 import './components.css';
 import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 
-interface JoinReqProfileProps {
+interface PopupProfileProps {
   id: number;
-  name: string;
   onClose: () => void;
 }
 
-const JoinReqProfile: React.FC<JoinReqProfileProps> = ({ id, name, onClose }) => {
+const PopupProfile: React.FC<PopupProfileProps> = ({ id, onClose }) => {
 
   const panelRef = useRef<HTMLDivElement>(null);
   const [user, setUser] = useState<any>(null);
@@ -58,7 +57,7 @@ const JoinReqProfile: React.FC<JoinReqProfileProps> = ({ id, name, onClose }) =>
   return (
     <div ref={panelRef} className="popup-profile-panel">
       <div className="popup-profile-header">
-        <h1>{name}'s Profile</h1>
+        <h1>{user.first_name} {user.last_name}'s Profile</h1>
         <button className="popup-close-button" onClick={onClose}>X</button>
       </div>
       <div className='popup-content'>
@@ -103,4 +102,4 @@ const JoinReqProfile: React.FC<JoinReqProfileProps> = ({ id, name, onClose }) =>
   );
 };
 
-export default JoinReqProfile;
+export default PopupProfile;

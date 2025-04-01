@@ -6,7 +6,7 @@ import { ReactComponent as GroupLogo } from './GroupLogo.svg'
 import InviteMessagePanel from '../components/InviteMessagePanel';
 import { set } from 'react-hook-form';
 import axios from 'axios';
-
+import PopupProfile from './PopupProfile';
 
 const SwipeProfiles = ({ userId }: { userId: number }) => {
   const [profiles, setProfiles] = useState<any>({ users: [], studyGroups: [] });
@@ -15,6 +15,7 @@ const SwipeProfiles = ({ userId }: { userId: number }) => {
   const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
   const [showInvitePanel, setShowInvitePanel] = useState(false);
   const [loadingProfiles, setLoadingProfiles] = useState(true)
+  const [selectedMember, setSelectedMember] = useState<{ id: number } | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -203,7 +204,7 @@ const SwipeProfiles = ({ userId }: { userId: number }) => {
                   <div className="member-cards">
                     {currentProfile.users && currentProfile.users.length > 0 ? (
                       currentProfile.users.map((member: any, index: number) => (
-                        <div key={index} className="member-card">
+                        <div key={index} className="member-card"  onClick={() => setSelectedMember({ id: member.id})}>
                           <div className="member-card-top">
                             <h1>{member.name}</h1>
                             <div className="member-card-top-left" >
@@ -334,6 +335,12 @@ const SwipeProfiles = ({ userId }: { userId: number }) => {
         onClose={() => setShowInvitePanel(false)} 
         onConfirm={handleSendMessage} 
       />
+      {selectedMember && (
+        <PopupProfile 
+          id={selectedMember.id} 
+          onClose={() => setSelectedMember(null)} 
+        />
+      )}
     </div>
   );
 };
