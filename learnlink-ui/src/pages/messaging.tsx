@@ -1200,34 +1200,49 @@ const handleGetChatUsername = async (userId: number) => {
                             {/* Check if the message is a button message */}
                             {message.isButton && message.buttonData ? (
                               <button
-                              className={`PlusButton ${message.buttonData?.action === 'weekly-scheduler' ? 'weekly-scheduler-class' : ''}`}
-                              onClick={() => handleButtonClick(message.buttonData?.action, message.buttonData?.studyGroupId)}
-                            >
-                              <div>
-                                {message.buttonData?.label.split("\n").map((line, index) => {
-                               // Ignore empty lines (but still render them with no colon)
-    if (!line.trim()) {
-      return (
-        <div key={index}>
-          <br />
-        </div>
-      );
-    }
+                                className={`PlusButton ${message.buttonData?.action === 'weekly-scheduler' ? 'weekly-scheduler-class' : ''}`}
+                                onClick={() => handleButtonClick(message.buttonData?.action, message.buttonData?.studyGroupId)}
+                              >
+                                <div>
+                                  {message.buttonData?.label.split("\n").map((line, index) => {
+                                    // Ignore empty lines (but still render them with no colon)
+                                    if (!line.trim()) {
+                                      return (
+                                        <div key={index}>
+                                          <br />
+                                        </div>
+                                      );
+                                    }
 
-    // Split the line only at the first colon
-    const [label, ...valueParts] = line.split(":");
-    const value = valueParts.join(":").trim(); // Join back if there are additional colons
+                                    // Check if the line contains a colon
+                                    if (line.includes(":")) {
+                                      const [label, ...valueParts] = line.split(":");
+                                      const value = valueParts.join(":").trim(); // Join back if there are additional colons
 
-    return (
-      <div key={index}>
-        <span style={{ fontWeight: "bold" }}>{label}: </span> 
-        <span style={{ fontWeight: "normal" }}>{value}</span>
-        <br />
-      </div>
-    );
-})}
-                              </div>
-                            </button>
+                                      return (
+                                        <div key={index}>
+                                          {/* <span style={{ fontWeight: "bold" }}>{label}: </span>
+                                          <span style={{ fontWeight: "normal" }}>{value}</span>
+                                          <br /> */}
+                                          
+                                          <div className="calendarDetails">
+                                          <label>{label}</label>
+                                          <p>{value}</p>
+                                          </div>
+                                        </div>
+                                      );
+                                    } else {
+                                      // If no colon, just display the line as is without a colon
+                                      return (
+                                        <div key={index}>
+                                          <span>{line}</span>
+                                          <br />
+                                        </div>
+                                      );
+                                    }
+                                  })}
+                                </div>
+                              </button>
                             ) : (
                               <span>
                                 {typeof message.content === 'string' ? message.content : JSON.stringify(message.content)}

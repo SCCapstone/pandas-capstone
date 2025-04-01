@@ -59,6 +59,16 @@ export default function PlusButton({ onSelect, studyGroupId, selectedChatId, onS
             label: `🗓️ Add to Calendar\n\nTitle: ${eventDetails.title}\nOn: ${eventDetails.date}\nFrom: ${convertTo12HourFormat(eventDetails.startTime)} to ${convertTo12HourFormat(eventDetails.endTime)}\nAt: ${eventDetails.location}`,
         };
           
+        // if (selectedChatId) {
+        //     const validStudyGroupId = studyGroupId ?? undefined; 
+        
+        //     const buttonData = {
+        //       action: `calendar-event,${eventDetails}`, // Append URL here
+        //       studyGroupId: validStudyGroupId,
+        //       label: `🗓️ Add to Calendar`
+        //   };
+
+          console.log('sedning buttondata', buttonData.label)
     
           onSendButtonMessage(buttonData);
           setIsOpen(false);
@@ -111,7 +121,10 @@ export default function PlusButton({ onSelect, studyGroupId, selectedChatId, onS
             </div>
             <CalendarEventPopup
                   open={calendarModalOpen}
-                  onClose={() => setCalendarModalOpen(false)}
+                  onClose={() => {
+                    setCalendarModalOpen(false);
+                    setIsOpen(false)
+                }}
                   onSubmit={(eventDetails) => {
                     handleCalendarURL(eventDetails); // Implement this to open the calendar app
                     setCalendarModalOpen(false);
