@@ -16,6 +16,7 @@ import CreateStudyGroup from '../components/CreateStudyGroup';
 import PlusButtonProps from '../components/PlusButtonProps';
 import { handleSendSystemMessage, handleSendButtonMessage } from "../utils/messageUtils";
 import { NullValueFields } from 'aws-sdk/clients/glue';
+import CalendarEventPopup from '../components/CalendarEventPopup'
 
 interface Chat {
   id: number;
@@ -103,6 +104,8 @@ const Messaging: React.FC = () => {
   const [selectedProfile, setSelectedProfile] = useState<{ id: number; name: string } | null>(null);
   const [loadingChatList, setLoadingChatList] = useState(true);
   const [currentGroupId, setCurrentGroupId] = useState<number | null>(null);
+  const [calendarModalOpen, setCalendarModalOpen] = useState(false);
+
   const navigate = useNavigate();
 
   const selectedChatId = searchParams.get("selectedChatId");
@@ -992,11 +995,10 @@ const handleGetChatUsername = async (userId: number) => {
         break;
   
       case "calendar-event":
-        if (studyGroupId) {
-          openCalendarEvent(studyGroupId);
-        } else {
-          console.error("Study group ID is missing for calendar event action.");
-        }
+          // setCalendarModalOpen(true);
+
+          // openCalendarEvent();
+
         break;
   
       default:
@@ -1021,15 +1023,98 @@ const handleGetChatUsername = async (userId: number) => {
     // Add logic to open the weekly scheduler modal/page
     navigate(`/studyGroup/${studyGroupId}/schedule`);
   };
+
+  const openGoogleCalendar = (studyGroupId: number) => {
+    const title = encodeURIComponent("Study Group Meeting");
+    const details = encodeURIComponent("Join the study session for our course!");
+    const location = encodeURIComponent("Online / Library");
+    
+    const startTime = new Date().toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+    const endTime = new Date(new Date().getTime() + 60 * 60 * 1000)
+      .toISOString()
+      .replace(/[-:]/g, "")
+      .split(".")[0] + "Z";
   
-  // Function to open a Calendar Event creation for a study group
-  const openCalendarEvent = (studyGroupId: number) => {
-    console.log(`Opening Calendar Event for study group ID: ${studyGroupId}`);
-    // Add logic to open the calendar event creation modal/page
-    // Example: navigate(`/study-groups/${studyGroupId}/calendar`);
+    const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&details=${details}&location=${location}&dates=${startTime}/${endTime}`;
+    
+    window.open(url, "_blank");
   };
   
+
+  // Function to open a Calendar Event creation for a study group
+  const openCalendarEvent = (eventDetails: {
+    title: string;
+    date: string;
+    startTime: string;
+    endTime: string;
+    description: string;
+    location: string;
+  }) => {
+    // Convert date and time strings into Date objects
+    const startDate = new Date(`${eventDetails.date}T${eventDetails.startTime}:00`);
+    const endDate = new Date(`${eventDetails.date}T${eventDetails.endTime}:00`);
   
+    // Format dates for Google & Outlook URLs
+    const formattedStart = startDate.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+    const formattedEnd = endDate.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+  
+    // Google Calendar URL
+    const googleCalendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(eventDetails.title)}&details=${encodeURIComponent(eventDetails.description)}&location=${encodeURIComponent(eventDetails.location)}&dates=${formattedStart}/${formattedEnd}`;
+  
+    // Outlook Calendar URL
+    const outlookCalendarUrl = `https://outlook.live.com/calendar/0/deeplink/compose?subject=${encodeURIComponent(eventDetails.title)}&body=${encodeURIComponent(eventDetails.description)}&location=${encodeURIComponent(eventDetails.location)}&startdt=${startDate.toISOString()}&enddt=${endDate.toISOString()}`;
+  
+    // Create .ics file for Apple Calendar and other local apps
+    const icsContent = `BEGIN:VCALENDAR
+  VERSION:2.0
+  BEGIN:VEVENT
+  SUMMARY:${eventDetails.title}
+  LOCATION:${eventDetails.location}
+  DESCRIPTION:${eventDetails.description}
+  DTSTART:${formattedStart}
+  DTEND:${formattedEnd}
+  END:VEVENT
+  END:VCALENDAR`;
+  
+    const blob = new Blob([icsContent], { type: "text/calendar" });
+    const icsUrl = URL.createObjectURL(blob);
+  
+    // Detect platform
+    const isMac = navigator.platform.toUpperCase().includes("MAC");
+    const isWindows = navigator.userAgent.includes("Windows NT");
+  
+    if (isMac) {
+      // Offer .ics file for Apple Calendar
+      const link = document.createElement("a");
+      link.href = icsUrl;
+      link.download = "event.ics";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } else if (isWindows) {
+      window.open(outlookCalendarUrl, "_blank");
+    } else {
+      window.open(googleCalendarUrl, "_blank");
+    }
+  };
+  
+
+  // Function to handle event creation
+const handleCreateCalendarEvent = (eventDetails: {
+  title: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  description: string;
+  location: string
+}) => {
+  openCalendarEvent(eventDetails); // This will open the user's calendar app with event details
+  setCalendarModalOpen(false);
+};
+  
+
+
+
 
   return (
     <div className="Messaging">
@@ -1163,6 +1248,14 @@ const handleGetChatUsername = async (userId: number) => {
 
 
               <div className="ChatWindow" ref={chatWindowRef}>
+                <CalendarEventPopup
+                  open={calendarModalOpen}
+                  onClose={() => setCalendarModalOpen(false)}
+                  onSubmit={(eventDetails) => {
+                    openCalendarEvent(eventDetails); // Implement this to open the calendar app
+                    setCalendarModalOpen(false);
+                  }}
+                />
                 {selectedChat ? (
                   // If selectedChat exists
                   Array.isArray(selectedChat.messages) ? (
