@@ -29,6 +29,15 @@ export default function PlusButton({ onSelect, studyGroupId, selectedChatId, onS
             value: "calendar-event",
         },
     ];
+    const convertTo12HourFormat = (time: string) => {
+        const [hours, minutes] = time.split(":").map(Number);
+        const date = new Date();
+        date.setHours(hours);
+        date.setMinutes(minutes);
+      
+        const options: Intl.DateTimeFormatOptions = { hour: '2-digit', minute: '2-digit', hour12: true };
+        return date.toLocaleTimeString([], options);
+      };
 
     const handleCalendarURL = (eventDetails: {
         title: string;
@@ -47,10 +56,13 @@ export default function PlusButton({ onSelect, studyGroupId, selectedChatId, onS
           const buttonData = {
             action: `calendar-event,${eventURL}`, // Append URL here
             studyGroupId: validStudyGroupId,
-            label: "🗓️ Add Calendar Event",
-          };
-      
+            label: `🗓️ Add to Calendar\n\nTitle: ${eventDetails.title}\nOn: ${eventDetails.date}\nFrom: ${convertTo12HourFormat(eventDetails.startTime)} to ${convertTo12HourFormat(eventDetails.endTime)}\nAt: ${eventDetails.location}`,
+        };
+          
+    
           onSendButtonMessage(buttonData);
+          setIsOpen(false);
+
         }
       };
       
