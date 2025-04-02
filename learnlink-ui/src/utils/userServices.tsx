@@ -1,6 +1,7 @@
 import { PrismaClient, } from '@prisma/client';
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { getLoggedInUserId } from './auth';
+import {StudyGroup, User} from './types'
 import axios from "axios";
 
 
@@ -140,6 +141,124 @@ export const useMatchButtonStatus = (targetUserId: number) => {
 
   return { ...status, refreshStatus };
 };
+
+export const useMatchButtonStatusGroup = (targetGroupId: number) => {
+  const [status, setStatus] = useState({
+    buttonText: "Match",
+    isButtonDisabled: false,
+    matchButtonError: null as string | null,
+  });
+
+  // A counter to force re-fetching
+  const [refreshCounter, setRefreshCounter] = useState(0);
+
+
+  // Function to refresh the status
+  const refreshStatus = useCallback(() => {
+    setRefreshCounter((prev) => prev + 1);
+  }, []);
+
+  useEffect(() => {
+    const checkMatchStatus = async () => {
+      console.log('IN GROUP BUTTON3')
+
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          console.error("No token found, user might not be logged in.");
+          return;
+        }
+
+        const currUserId = getLoggedInUserId();
+        try {
+          const response = await fetch(`${REACT_APP_API_URL}/api/study-groups/${targetGroupId}`, {
+              headers: {
+                  Authorization: `Bearer ${localStorage.getItem('token')}`,
+              },
+          });
+          if (!response.ok) {
+              // setAlerts((prevAlerts) => [
+              //     ...prevAlerts,
+              //     { id: Date.now(), alertText: 'Failed to fetch user', alertSeverity: "error", visible: true },
+              //   ]);
+              throw new Error('Failed to fetch user');
+          }
+          const data = await response.json();
+          console.log('studygroup', data.studyGroup);
+          const studyGroup = data.studyGroup
+          console.log('studygroup3', studyGroup);
+
+          console.log("BUTTON STUDYGROUP", studyGroup)
+          if (studyGroup.users.some((user: User) => user.id === currUserId)) {
+            return setStatus({ buttonText: "Connected", isButtonDisabled: true, matchButtonError: null });
+            }
+
+
+      } catch (err) {
+          if (err instanceof Error) {
+              // setError(err.message);
+              // setAlerts((prevAlerts) => [
+              //     ...prevAlerts,
+              //     { id: Date.now(), alertText: err instanceof Error ? err.message : 'An unknown error occurred', alertSeverity: "error", visible: true },
+              //   ]);
+              throw new Error
+          } else {
+              // setError('An unknown error occurred');
+              // setAlerts((prevAlerts) => [
+              //     ...prevAlerts,
+              //     { id: Date.now(), alertText: 'An unknown error occurred', alertSeverity: "error", visible: true },
+              //   ]);
+              throw new Error
+
+          }
+      }
+
+        const requestResponse = await fetch(
+          `${process.env.REACT_APP_API_URL}/api/swipe/user/pendingRequestCheck/Group/${targetGroupId}`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if (!requestResponse.ok) {
+          throw new Error("Failed to fetch match availability");
+        }
+
+        const statusString = await requestResponse.json();
+
+        console.log("Match button id:", targetGroupId, statusString);
+
+        // Update status based on response
+        switch (statusString) {
+          case null:
+          case "Denied":
+            setStatus({ buttonText: "Match", isButtonDisabled: false, matchButtonError: null });
+            break;
+          case "Accepted":
+            setStatus({ buttonText: "Connected", isButtonDisabled: true, matchButtonError: null });
+            break;
+          case "Pending":
+            setStatus({ buttonText: "Pending", isButtonDisabled: true, matchButtonError: null });
+            break;
+          default:
+            setStatus({ buttonText: "Match", isButtonDisabled: true, matchButtonError: "Unknown status" });
+        }
+      } catch (error: any) {
+        console.error("Error fetching match button status:", error);
+        setStatus({ buttonText: "Match", isButtonDisabled: true, matchButtonError: error.message || "Error" });
+      }
+    };
+
+    checkMatchStatus();
+  }, [targetGroupId, refreshCounter]); // Dependencies
+
+  return { ...status, refreshStatus };
+};
+
 
 
 /**

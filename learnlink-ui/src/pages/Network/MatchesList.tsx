@@ -1,6 +1,6 @@
 // src/pages/Network/MatchesList.tsx
 import React, { useState, useEffect } from 'react';
-import { Match, User } from './types';
+import { Match, User } from '../../utils/types';
 import axios from 'axios';
 import CustomAlert from '../../components/CustomAlert';
 import { getLoggedInUserId } from '../../utils/auth';
@@ -10,7 +10,7 @@ import { useNavigate } from "react-router-dom";
 
 
 interface MatchesListProps {
-  handleSelectUser: (userId: number) => void;
+  handleSelectUser: (id: number, isStudyGroup:boolean) => void;
 }
 const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
 
@@ -204,7 +204,7 @@ const MatchesList: React.FC<MatchesListProps> = ({ handleSelectUser }) => {
               return null; // Skip the match if it's the current user matching with themselves
           }
           return (
-              <ul key={match.id} onClick={() => handleSelectUser(friend.id)}>
+              <ul key={match.id} onClick={() => handleSelectUser(friend.id , false)}>
                   <div className='network-list-container'>
                       <div className='network-list-info'>
                           <img

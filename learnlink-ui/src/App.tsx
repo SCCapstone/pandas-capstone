@@ -27,6 +27,7 @@ import Scheduler from './pages/resources/Scheduler'
 import JoinRequestNotifs from './components/JoinRequestsContext';
 import JoinRequestsNotificationBadge from './components/JoinRequestsNotificationBadge';
 import { getLoggedInUserId } from './utils/auth';
+import PublicGroupProfile from './pages/publicGroupProfile';
 
 function App() {
   const currentUserId = getLoggedInUserId();
@@ -68,6 +69,7 @@ function App() {
             <Route path="/changepassword" element={<ChangePassword />} />
             <Route path="/accountDetails" element={<AccountDetails />} />
             <Route path="/user-profile/:id" element={<PublicProfile />} />
+            <Route path="/group-profile/:id" element={<PublicGroupProfile />} />
             <Route path="/advancedsearch" element={<AdvancedSearch />} />
           </Route>
         </Routes>

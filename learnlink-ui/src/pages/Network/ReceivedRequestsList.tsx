@@ -1,7 +1,7 @@
 // src/pages/Network/ReceivedRequestsList.tsx
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { SwipeRequest, SwipeStatus } from './types';
+import { SwipeRequest, SwipeStatus } from '../../utils/types';
 import { getLoggedInUserId } from '../../utils/auth';
 import openProfilePopup from '../messaging'
 import { updateSwipeStatus } from '../../utils/userServices';
@@ -11,7 +11,7 @@ import { useJoinRequest } from '../../components/JoinRequestsContext'; // Correc
 
 
 interface ReceivedRequestsListProps {
-    handleSelectUser: (userId: number) => void;
+    handleSelectUser: (id: number | null, isStudyGroup: boolean) => void;
 }
 
 
@@ -283,7 +283,7 @@ const handleApproval = async (
             <div className='network-list-info'></div>
 
             {receivedRequestsList.map((request) => (
-              <ul key={request.id} onClick={() => handleSelectUser(request.user.id)}>
+              <ul key={request.id}   onClick={() => handleSelectUser(request.user.id ?? request.targetGroupId, !!request.targetGroupId)}>
 
                 <div className='network-list-parent'>
                   {request.targetGroupId ? (

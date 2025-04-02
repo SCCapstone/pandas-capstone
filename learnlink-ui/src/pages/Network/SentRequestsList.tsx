@@ -1,17 +1,17 @@
 // src/pages/Network/SentRequestsList.tsx
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { SwipeRequest, SwipeStatus } from './types';
+import { SwipeRequest, SwipeStatus } from '../../utils/types';
 import { getLoggedInUserId } from '../../utils/auth';
 
 interface SentRequestsListProps {
-  handleSelectUser: (userId: number) => void;
+    handleSelectUser: (id: number | null, isStudyGroup: boolean) => void;
 }
 
 const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
 
 // Sent Requests Tab Content
-const SentRequestsList:React.FC<SentRequestsListProps> = ({ handleSelectUser }: { handleSelectUser: (userId: number) => void }) => { 
+const SentRequestsList:React.FC<SentRequestsListProps> = ({ handleSelectUser }) => { 
     const [error, setError] = useState<string | null>(null);
     const [selectedProfile, setSelectedProfile] = useState<{ id: number; name: string } | null>(null);
     const [loadingRequests, setLoadingRequests] = useState<boolean>(false);
@@ -107,7 +107,7 @@ const SentRequestsList:React.FC<SentRequestsListProps> = ({ handleSelectUser }: 
             <p>List of matched study partners...</p> */}
             <ul className="network-list">
                         {sentRequestsList.map((request) => (
-                            <ul key={request.id} onClick={() => request.targetUserId && handleSelectUser(request.targetUserId!)}>
+                            <ul key={request.id} onClick={() => handleSelectUser(request.targetGroupId ?? request.targetUserId, !!request.targetGroupId)}>
                                 {request.targetUserId && request.targetUser ? (
                                     // Display target user details
                                     <div className='network-list-container'>
@@ -153,7 +153,7 @@ const SentRequestsList:React.FC<SentRequestsListProps> = ({ handleSelectUser }: 
                                         </div>
                                         <div className='network-list-status'>
                                             {request.status === 'Pending' ? (
-                                                <button className='network-withdraw-button' onClick={() => handleDeleteRequest(request.id)}>Withdraw</button>
+                                                <button className='network-withdraw-button'onClick={(event: React.MouseEvent<HTMLButtonElement>) => { event.stopPropagation();  handleDeleteRequest(request.id)}}>Withdraw</button>
                                             ) : null}
                                             <button className={`status-${request.status.toLowerCase()}`}>{request.status}</button>
                                         </div>

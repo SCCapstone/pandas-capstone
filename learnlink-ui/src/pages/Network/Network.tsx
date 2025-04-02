@@ -93,8 +93,16 @@ const Network = () => {
     }
   }, [currentLocation.search]);
 
-  const handleSelectUser = (userId: number) => {
-    navigate(`/user-profile/${userId}`);
+  const handleSelectUser = (id: number | null, isStudyGroup:boolean) => {
+    console.log("handleselect" , id, isStudyGroup)
+    if (!id) {
+      throw new Error
+    }
+    if (isStudyGroup) {
+      navigate(`/group-profile/${id}`);
+    } else {
+      navigate(`/user-profile/${id}`);
+    }
   };
 
 
