@@ -41,6 +41,7 @@ export interface User {
     direction: 'Yes' | 'No';
     targetUser?: User;
     status: SwipeStatus;
+    updatedAt: Date;
   }
   
   export interface Match {

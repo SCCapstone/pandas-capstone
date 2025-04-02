@@ -74,6 +74,9 @@ const ReceivedRequestsList: React.FC<ReceivedRequestsListProps> = ({ handleSelec
                     return req;
                 })
             );
+
+            updatedRequests.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+
     
             setRecievedRequestsList(updatedRequests);
             console.log("Updated Requests List:", updatedRequests);

@@ -770,6 +770,7 @@ app.get('/api/swipe/sentRequests/:currentUser', async (req, res): Promise<any> =
         direction: true,
         message: true,
         status: true,
+        updatedAt: true
       },
     });
 

@@ -57,13 +57,15 @@ const MatchesList: React.FC<MatchesListProps> = ({ handleSelectUser }) => {
           seenMatches.add(userPair);
           return true;
         });
+          // Sort by `createdAt` in descending order (newest matches first)
+          uniqueMatches.sort((a: { createdAt: string | number | Date; }, b: { createdAt: string | number | Date; }) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
-            setMatchesList(uniqueMatches);
+          setMatchesList(uniqueMatches);
 
         } catch (err) {
-            setAlerts((prevAlerts) => [
-                ...prevAlerts,
-                { id: Date.now(), alertText:`Failed to fetch matches. Please try again later.`, alertSeverity: 'error', visible: true },
+          setAlerts((prevAlerts) => [
+            ...prevAlerts,
+            { id: Date.now(), alertText:`Failed to fetch matches. Please try again later.`, alertSeverity: 'error', visible: true },
               ]);
       } finally {
         setLoading(false);

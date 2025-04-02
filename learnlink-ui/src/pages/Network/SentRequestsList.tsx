@@ -75,6 +75,9 @@ const SentRequestsList:React.FC<SentRequestsListProps> = ({ handleSelectUser }: 
                 })
             );
 
+            updatedRequests.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+
+
             setSentRequestsList(updatedRequests);
 
             console.log("finally",sentRequestsList);
