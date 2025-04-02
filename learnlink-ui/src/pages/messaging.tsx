@@ -93,6 +93,8 @@ const Messaging: React.FC = () => {
   const [isUserPanelVisible, setIsUserPanelVisible] = useState(false);
   // for displaying names above messages sent
   const [msgUsernames, setMsgUsernames] = useState<{ [key: number]: string }>({});
+  const [msgPfps, setMsgPfps] = useState<{ [key: number]: string }>({});
+
   const [chatUsernames, setChatUsernames] = useState<{ [key: number]: string }>({});
   const [groupId, setGroupId] = useState<number | null>(null);
   
@@ -105,6 +107,7 @@ const Messaging: React.FC = () => {
   const [loadingChatList, setLoadingChatList] = useState(true);
   const [currentGroupId, setCurrentGroupId] = useState<number | null>(null);
   const [calendarModalOpen, setCalendarModalOpen] = useState(false);
+  const genericUserPfp = "https://learnlink-public.s3.us-east-2.amazonaws.com/AvatarPlaceholder.svg"
 
   const navigate = useNavigate();
 
@@ -870,7 +873,9 @@ const handleGetMessageUsername = async (userId: number) => {
   try {
     const response = await axios.get(`${REACT_APP_API_URL}/api/users/${userId}`);
     const username = response.data.firstName + " " + response.data.lastName;
+    const pfp = response.data.profilePic || genericUserPfp;
     setMsgUsernames((prev) => ({ ...prev, [userId]: username }));
+    setMsgPfps((prev) => ({ ...prev, [userId]: pfp }));
     //console.log(username);
   } catch (error) {
     console.error("Error fetching username:", error);
@@ -1184,77 +1189,115 @@ const handleGetChatUsername = async (userId: number) => {
                   // If selectedChat exists
                   Array.isArray(selectedChat.messages) ? (
                     selectedChat.messages.length > 0 ? (
-                      selectedChat.messages.map((message, index) => (
-                        <div key={index} className="MessageContainer">
-                          {/* Display usernames */}
-                          {!message.system && (index === 0 || selectedChat.messages[index - 1].userId !== message.userId) && (
-                            <div className={`username ${message.userId === currentUserId ? 'MyUsername' : ''}`}>
-                              {message.userId !== undefined && msgUsernames[message.userId] ? msgUsernames[message.userId] : "Loading..."}
-                            </div>
-                          )}
+                      selectedChat.messages.map((message, index) => {
+                        const isLastInCluster =
+                          index === selectedChat.messages.length - 1 || // Last message overall
+                          selectedChat.messages[index + 1].userId !== message.userId; // Next message is from a different user
 
-                          {/* Display messages */}
-                          <div
-                            className={`MessageBubble ${message.system ? 'SystemMessage' : (message.userId === currentUserId ? 'MyMessage' : 'OtherMessage')}`}
-                            onDoubleClick={() => handleDoubleClick(message.id)}
-                          >
-                            {/* Check if the message is a button message */}
-                            {message.isButton && message.buttonData ? (
-                              <button
-                                className={`PlusButton ${message.buttonData?.action === 'weekly-scheduler' ? 'weekly-scheduler-class' : ''}`}
-                                onClick={() => handleButtonClick(message.buttonData?.action, message.buttonData?.studyGroupId)}
-                              >
-                                <div>
-                                  {message.buttonData?.label.split("\n").map((line, index) => {
-                                    // Ignore empty lines (but still render them with no colon)
-                                    if (!line.trim()) {
-                                      return (
-                                        <div key={index}>
-                                          <br />
-                                        </div>
-                                      );
-                                    }
 
-                                    // Check if the line contains a colon
-                                    if (line.includes(":")) {
-                                      const [label, ...valueParts] = line.split(":");
-                                      const value = valueParts.join(":").trim(); // Join back if there are additional colons
+                        return (
+                          <div key={index} className={`Message-pfp-container ${message.userId === currentUserId ? 'MyMessage-pfp-container' : ''}`}>
 
-                                      return (
-                                        <div key={index}>
-                                          {/* <span style={{ fontWeight: "bold" }}>{label}: </span>
-                                          <span style={{ fontWeight: "normal" }}>{value}</span>
-                                          <br /> */}
-                                          
-                                          <div className="calendarDetails">
-                                          <label>{label}</label>
-                                          <p>{value}</p>
-                                          </div>
-                                        </div>
-                                      );
-                                    } else {
-                                      // If no colon, just display the line as is without a colon
-                                      return (
-                                        <div key={index}>
-                                          <span>{line}</span>
-                                          <br />
-                                        </div>
-                                      );
-                                    }
-                                  })}
-                                </div>
-                              </button>
-                            ) : (
-                              <span>
-                                {typeof message.content === 'string' ? message.content : JSON.stringify(message.content)}
-                              </span>
+                            <div className="MessageContainer">
+                              { }
+                            {!message.system && (index === 0 || selectedChat.messages[index - 1].userId !== message.userId) && (
+                              <div className={`username ${message.userId === currentUserId ? 'MyUsername' : ''}`}>
+                                {message.userId !== undefined && msgUsernames[message.userId] ? msgUsernames[message.userId] : "Loading..."}
+                                {/* {message.userId !== undefined && msgPfps[message.userId] ? (
+                                <img src={msgPfps[message.userId] } className="message-pfp" alt="" height={"40px"} />
+                            )
+                              : "Loading..."} */}
+                              </div>
                             )}
 
+                            {/* Display messages */}
+                            <div
+                              className={`MessageBubble ${message.system ? 'SystemMessage' : (message.userId === currentUserId ? 'MyMessage' : 'OtherMessage')}`}
+                              onDoubleClick={() => handleDoubleClick(message.id)}
+                            >
+                              {/* Check if the message is a button message */}
+                              {message.isButton && message.buttonData ? (
+                                <button
+                                  className={`PlusButton ${message.buttonData?.action === 'weekly-scheduler' ? 'weekly-scheduler-class' : ''}`}
+                                  onClick={() => handleButtonClick(message.buttonData?.action, message.buttonData?.studyGroupId)}
+                                >
+                                  <div>
+                                    {message.buttonData?.label.split("\n").map((line, index) => {
+                                      // Ignore empty lines (but still render them with no colon)
+                                      if (!line.trim()) {
+                                        return (
+                                          <div key={index}>
+                                            <br />
+                                          </div>
+                                        );
+                                      }
+
+                                      // Check if the line contains a colon
+                                      if (line.includes(":")) {
+                                        const [label, ...valueParts] = line.split(":");
+                                        const value = valueParts.join(":").trim(); // Join back if there are additional colons
+
+                                        return (
+                                          <div key={index}>
+                                            {/* <span style={{ fontWeight: "bold" }}>{label}: </span>
+                                          <span style={{ fontWeight: "normal" }}>{value}</span>
+                                          <br /> */}
+
+                                            <div className="calendarDetails">
+                                              <label>{label}</label>
+                                              <p>{value}</p>
+                                            </div>
+                                          </div>
+                                        );
+                                      } else {
+                                        // If no colon, just display the line as is without a colon
+                                        return (
+                                          <div key={index}>
+                                            <span>{line}</span>
+                                            <br />
+                                          </div>
+                                        );
+                                      }
+                                    })}
+                                    </div>
+                                  </button>
+                                ) : (
+                                  <span>
+                                    {typeof message.content === 'string' ? message.content : JSON.stringify(message.content)}
+                                  </span>
+                                )}
+
+                              </div>
+                              {/* Show heart if message was double-clicked */}
+                              {heartedMessages[message.id] && <div className="Heart">❤️</div>}
+                            </div>
+                          
+                            {message.userId !== currentUserId ? (
+  !message.system && isLastInCluster ? (
+    <div
+      className={`profilePic ${
+        message.userId === currentUserId ? "MyProfilePic" : ""
+      }`}
+    >
+      {message.userId !== undefined && msgPfps[message.userId] ? (
+        <img
+          src={msgPfps[message.userId]}
+          className="message-pfp"
+          alt=""
+          height={"40px"}
+        />
+      ) : (
+        "Loading..."
+      )}
+    </div>
+  ) : (
+    <div className="pfp-placeholder"></div> // Keeps spacing consistent
+  )
+) : <div className='MyProfilePic'>
+  </div>}
                           </div>
-                          {/* Show heart if message was double-clicked */}
-                          {heartedMessages[message.id] && <div className="Heart">❤️</div>}
-                        </div>
-                      ))
+                        )
+                      })
                     ) : (
                       <div className="NoMessages">No messages to display.</div>
                     )
@@ -1267,7 +1310,7 @@ const handleGetChatUsername = async (userId: number) => {
                 )}
               </div>
               <div className="ChatInput">
-                
+
                 <PlusButtonProps
                   onSelect={handlePlusSelect}
                   studyGroupId={currentGroupId}
@@ -1285,14 +1328,14 @@ const handleGetChatUsername = async (userId: number) => {
                 />
                 <button onClick={handleSendMessage}>Send</button>
               </div>
-              
+
             </>
           ) : (
             <div className="NoChatSelected">Select a chat to start messaging</div>
           )}
         </div>
-         {/* Render the popup at the Messaging level */}
-         
+        {/* Render the popup at the Messaging level */}
+
       </div>
       <div>
         <CopyrightFooter />
