@@ -7,6 +7,8 @@ import openProfilePopup from '../messaging'
 import { updateSwipeStatus } from '../../utils/userServices';
 import { FaCheck, FaXmark } from 'react-icons/fa6';
 import { handleSendSystemMessage, updateChatTimestamp} from "../../utils/messageUtils";
+import { useJoinRequest } from '../../components/JoinRequestsContext'; // Correct path to the file
+
 
 interface ReceivedRequestsListProps {
     handleSelectUser: (userId: number) => void;
@@ -23,6 +25,8 @@ const ReceivedRequestsList: React.FC<ReceivedRequestsListProps> = ({ handleSelec
     const [loadingApproval, setLoadingApproval] = useState<number | null>(null); // Tracks which request is being approved
     const [receivedRequestsList, setRecievedRequestsList] = useState<SwipeRequest[]>([]);
     const currentUserId = getLoggedInUserId();
+    const { joinRequestCount, setJoinRequestCount } = useJoinRequest(); // Get joinRequestCount and the setter function
+
     
 
     useEffect(() => {
@@ -214,6 +218,8 @@ const handleApproval = async (
     }
     finally {
       setLoadingApproval(null); // Reset loading state
+      setJoinRequestCount((prevCount) => prevCount - 1);
+
     }
   };
 
@@ -223,6 +229,8 @@ const handleApproval = async (
     updateSwipeStatus(requestId, SwipeStatus.Denied);  // Pass the enum value
     // handleDeleteRequest(requestId);
     handleRequestsChange(requestId);
+    setJoinRequestCount((prevCount) => prevCount - 1);
+
   };
 
   // Function to delete a request from the system

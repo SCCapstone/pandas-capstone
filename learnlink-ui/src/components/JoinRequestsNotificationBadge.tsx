@@ -1,13 +1,26 @@
 import React from 'react';
 import { useJoinRequest } from './JoinRequestsContext'; // Correct path to the file
+import './JoinRequestsNotificationBadge.css';
 
-const JoinRequestsNotificationBadge: React.FC = () => {
+// Props interface for the component
+interface JoinRequestsNotificationProps {
+  showDotOnly?: boolean; // A flag to decide whether to show the dot only or the badge
+}
+
+const JoinRequestsNotification: React.FC<JoinRequestsNotificationProps> = ({ showDotOnly = false }) => {
   const { joinRequestCount } = useJoinRequest(); // Use the hook to access join request count
+  
+  if (joinRequestCount === 0) {
+    return null; // Don't show anything if no requests
+  }
 
+  // Conditionally render the dot or badge based on showDotOnly
   return (
     <div>
-      {joinRequestCount > 0 && (
-        <div className="notification-badge">
+      {showDotOnly ? (
+        <div className="req-notification-badge-dot" />
+      ) : (
+        <div className="req-notification-badge">
           {joinRequestCount}
         </div>
       )}
@@ -15,4 +28,4 @@ const JoinRequestsNotificationBadge: React.FC = () => {
   );
 };
 
-export default JoinRequestsNotificationBadge;
+export default JoinRequestsNotification;

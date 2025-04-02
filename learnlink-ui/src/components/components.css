@@ -62,7 +62,8 @@
 .nav-links {
   display: flex;
   flex-shrink: 1;
-  overflow: hidden;
+  /* overflow-x: hidden;
+  overflow-y: visible; */
   gap: 1rem;
 }
 
@@ -501,4 +502,9 @@
   align-items: center;
   justify-content: center;
   text-align: center;
+}
+
+.link-w-notif {
+  position: relative;
+  overflow: visible;
 }

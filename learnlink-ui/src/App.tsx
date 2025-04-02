@@ -34,8 +34,7 @@ function App() {
     <Router>
       <div className="App">
         <JoinRequestNotifs currentUserId={currentUserId}>
-          <JoinRequestsNotificationBadge />
-        </JoinRequestNotifs>
+
         <Routes>
           {/* Public Routes */}
           <Route path="/" element={<Welcome />} />
@@ -72,6 +71,8 @@ function App() {
             <Route path="/advancedsearch" element={<AdvancedSearch />} />
           </Route>
         </Routes>
+        </JoinRequestNotifs>
+
       </div>
     </Router>
   );

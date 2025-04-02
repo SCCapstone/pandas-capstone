@@ -1,0 +1,32 @@
+/* Styles for the notification badge */
+.req-notification-badge {
+    position: absolute;
+    top: -5px;
+    right: 0px;
+     background-color: #ffcf43; 
+    color: #00668C; 
+    font-size: 12px;
+    padding: 3px; 
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 10px; 
+    height: 10px;
+    font-size: 9px;
+    font-weight: bold;
+    /* box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);  */
+    z-index: 1000000;  
+  }
+  
+  /* Optional: Add a dot notification */
+  .req-notification-badge-dot {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #ffcf43;
+    left: 0px;
+    top: 43%;
+    font-size: 0;
+  }

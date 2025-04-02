@@ -8,6 +8,8 @@ import SentRequestsList from './SentRequestsList';
 import ReceivedRequestsList from './ReceivedRequestsList';
 import React, { useState, useEffect } from "react";
 import { useSearchParams } from 'react-router-dom';
+import JoinRequestsNotificationBadge from '../../components/JoinRequestsNotificationBadge';
+
 interface User {
     id: number;
     username: string;
@@ -119,8 +121,9 @@ const Network = () => {
           <button
             className={`Tab ${activeTab === "receivedRequests" ? "active" : ""}`}
             onClick={() => setActiveTab("receivedRequests")}
-          >
+          >            
             Requests Recieved
+            <JoinRequestsNotificationBadge showDotOnly={true}/>
           </button>
         </div>
 
