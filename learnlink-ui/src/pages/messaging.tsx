@@ -17,6 +17,7 @@ import PlusButtonProps from '../components/PlusButtonProps';
 import { handleSendSystemMessage, handleSendButtonMessage, openCalendarEvent } from "../utils/messageUtils";
 import { NullValueFields } from 'aws-sdk/clients/glue';
 import CalendarEventPopup from '../components/CalendarEventPopup'
+import { Console } from 'console';
 
 interface Chat {
   id: number;
@@ -55,6 +56,7 @@ interface User {
   firstName: string;
   lastName: string;
   unReadMessages?: boolean; 
+  profilePic?: string;
 }
 
 
@@ -83,7 +85,11 @@ const Messaging: React.FC = () => {
   const selectedUserId = searchParams.get('user'); // Get the matched user ID
   const [heartedMessages, setHeartedMessages] = useState<{ [key: number]: boolean }>({});
   const [studyGroupNames, setStudyGroupNames] = useState<{ [key: number]: string }>({});
+  const [studyGroupPfps, setStudyGroupPfps] = useState<{ [key: number]: string }>({});
+
   const [chatNames, setChatNames] = useState<{ [key: number]: string }>({});
+  const [chatPfps, setChatPfps] = useState<{ [key: number]: string }>({});
+
   //for matching stuff ie chats tab and requests tab
   const [showMessagesPanel, setShowMessagesPanel] = useState(false);
   const [showRequestsPanel, setShowRequestsPanel] = useState(false);
@@ -107,7 +113,8 @@ const Messaging: React.FC = () => {
   const [loadingChatList, setLoadingChatList] = useState(true);
   const [currentGroupId, setCurrentGroupId] = useState<number | null>(null);
   const [calendarModalOpen, setCalendarModalOpen] = useState(false);
-  const genericUserPfp = "https://learnlink-public.s3.us-east-2.amazonaws.com/AvatarPlaceholder.svg"
+  const genericUserPfp = "https://learnlink-public.s3.us-east-2.amazonaws.com/AvatarPlaceholder.svg";
+  const genericStudyGroupPfp = "https://learnlink-pfps.s3.us-east-1.amazonaws.com/profile-pictures/generic_studygroup_pfp.svg";
 
   const navigate = useNavigate();
 
@@ -453,8 +460,35 @@ useEffect(() => {
   
       setChatNames(newChatNames);
     };
+
+    const fetchChatPfps = async() => {
+      const newChatPfps: { [key: number]: string } = { ...chatPfps };
+      
+      // Use Promise.all to fetch all chat names concurrently
+      const fetchPromises = chats.map(async (chat) => {
+        if (!newChatPfps[chat.id]) { // Only fetch if not already in state
+          try {
+            const chatPfp = await getChatPfp(chat);
+            if (chatPfp) {
+              newChatPfps[chat.id] = chatPfp;
+            } else {
+              console.warn(`No pfp for chat with ID: ${chat.id}`);
+            }
+          } catch (error) {
+            console.error(`Error fetching pfp for chat with ID: ${chat.id}`, error);
+          }
+        }
+      });
+  
+      // Wait for all chat names to be fetched
+      await Promise.all(fetchPromises);
+      console.log('Chat pfps:', newChatPfps);
+  
+      setChatPfps(newChatPfps);
+    };
   
     fetchChatNames();
+    fetchChatPfps();
   }, [chats]); // Runs only when `chats` change
   
   useEffect(() => {
@@ -624,6 +658,38 @@ useEffect(() => {
       console.log('Other user:', otherUser);
       if (otherUser) {
           return `${otherUser.firstName} ${otherUser.lastName}`;
+      }
+    }
+    return " ";
+  };
+
+    // Used to access the study group name or chat name for displaying properly on the UI
+  const getChatPfp = async (chat: Chat) => {
+    // getting the study group name
+    try {
+      const response = await axios.get(`${REACT_APP_API_URL}/api/study-groups/chat/${chat.id}`);
+      console.log("PFP TEST", response)
+      // setStudyGroupPfps((prev) => ({
+      //   ...prev,
+      //   [chat.id]: response.data.profilePic ? response.data.profilePic : genericStudyGroupPfp
+      // }));
+
+      if (response.data.studyGroupID !== null) {
+        return response.data.profilePic ? response.data.profilePic : genericStudyGroupPfp;
+      }
+
+
+    } catch (error) {
+      console.error("Error fetching study group name:", error);
+    }
+
+    // not a study group option
+    if (currentUserId) {
+      const otherUser = chat.users?.find((user) => user.id !== currentUserId);
+      console.log('Other user PFPPFP:', otherUser);
+      if (otherUser) {
+        console.log(otherUser.profilePic)
+        return `${otherUser.profilePic ?  otherUser.profilePic : genericUserPfp}`;
       }
     }
     return " ";
@@ -1096,6 +1162,7 @@ const handleGetChatUsername = async (userId: number) => {
               currentUserId = {currentUserId}
               handleDeleteChat={handleDeleteChat} 
               chatNames={chatNames} 
+              chatPfps={chatPfps}
               loadingChatList={loadingChatList}
             />
           )}

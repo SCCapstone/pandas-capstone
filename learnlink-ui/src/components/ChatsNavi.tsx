@@ -52,6 +52,7 @@ interface ChatsNaviProps {
   currentUserId: number;
   handleDeleteChat: (id: number) => void;
   chatNames: { [key: number]: string };
+  chatPfps: { [key: number]: string };
   loadingChatList: boolean;
 }
 
@@ -64,6 +65,7 @@ const ChatsNavi: React.FC<ChatsNaviProps> = ({
   currentUserId,
   handleDeleteChat,
   chatNames,
+  chatPfps,
   loadingChatList,
 }) => {
   const [sortedChats, setSortedChats] = useState<Chat[]>([]);
@@ -158,13 +160,19 @@ const ChatsNavi: React.FC<ChatsNaviProps> = ({
               className={`ChatListItem ${selectedChat?.id === chat.id ? 'active' : ''}`}
               onClick={() => handleChatClick(chat)}
             >
+              <div className='chat-list-name-pfp'>
+                <img src={chatPfps[chat.id]} height ={'40px'}></img>
+
               <span>
+                
                 <span
                   className={`chat-name ${shouldHighlightChat(chat) ? 'highlighted' : ''}`}
                 >
                   {chatNames[chat.id] || 'Loading...'}
                 </span>
               </span>
+              </div>
+              
               {/* Button to delete the chat */}
               <button className="DeleteButton" onClick={() => handleDeleteChat(chat.id)}>
                 <FaXmark />

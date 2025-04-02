@@ -12,6 +12,13 @@
     margin-bottom: 70px;
     }
 
+    .chat-list-name-pfp {
+      display: flex;
+      flex-direction: row;
+      gap:15px;
+      align-items: center;
+    }
+
   .blue-dot {
     width: 8px;
     height: 8px;
