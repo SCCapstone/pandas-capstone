@@ -22,8 +22,6 @@ const NewChatList: React.FC<MatchesListProps> = ({ handleSelectUser, onClose }) 
   const [loading, setLoading] = useState<boolean>(true);
   const [alerts, setAlerts] = useState<{ id: number; alertText: string; alertSeverity: "error" | "warning" | "info" | "success"; visible: boolean }[]>([]);
   const alertVisible = alerts.some(alert => alert.visible);
-  const [displayRemoveWarning, setDisplayRemoveWarning] = useState<boolean>(false);
-  const [selectedFriend, setSelectedFriend] = useState<number | null>(null); // Track friend being removed
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
   const currentUserId = getLoggedInUserId();
@@ -212,7 +210,7 @@ const NewChatList: React.FC<MatchesListProps> = ({ handleSelectUser, onClose }) 
                           </div>
                       </div>
                       <div className='network-list-status'>
-                              <button className='network-message-button' onClick={(event: React.MouseEvent<HTMLButtonElement>) => { event.stopPropagation();  setSelectedFriend(friend.id); handleMessage(friend.id,currentUserId );}}>Message</button>
+                              <button className='network-message-button' onClick={(event: React.MouseEvent<HTMLButtonElement>) => { event.stopPropagation(); handleMessage(friend.id,currentUserId );}}>Message</button>
                       </div>
 
                       
@@ -221,15 +219,7 @@ const NewChatList: React.FC<MatchesListProps> = ({ handleSelectUser, onClose }) 
               </ul>
           );
       })}
-                {/* {matchesList.map((user) => (
-          <li key={user.id} onClick={() => handleSelectUser(user.id)}>
-            <img src={user.profilePic} alt={`${user.firstName} ${user.lastName}`} className="network-profile-pic" />
-            <div className="network-bio">
-              <h3>{user.username}</h3>
-              <p>{user.firstName} {user.lastName}</p>
-            </div>
-          </li>
-        ))} */}
+
             </ul>
         </div>
     );
