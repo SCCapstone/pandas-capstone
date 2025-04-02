@@ -5,10 +5,12 @@ import Navbar from '../components/Navbar';
 import CopyrightFooter from '../components/CopyrightFooter';
 import './LandingPage.css';
 import '../components/ChatsNavi.css'
+import '../components/NewChatList.css'
 import axios from 'axios';
 import { useSearchParams } from 'react-router-dom';
 import ChatsNavi from "../components/ChatsNavi";
 import CustomAlert from '../components/CustomAlert';
+import NewChatList from "../components/NewChatList";
 import { unescape } from 'querystring';
 import GroupUserContainer from '../components/GroupUserContainer';
 import { useNavigate } from "react-router-dom";
@@ -89,6 +91,7 @@ const Messaging: React.FC = () => {
 
   const [chatNames, setChatNames] = useState<{ [key: number]: string }>({});
   const [chatPfps, setChatPfps] = useState<{ [key: number]: string }>({});
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
 
   //for matching stuff ie chats tab and requests tab
   const [showMessagesPanel, setShowMessagesPanel] = useState(false);
@@ -510,6 +513,15 @@ useEffect(() => {
     setShowMessagesPanel(true);
   };
   
+  // Function to open the new chat popup
+  const openPopup = () => {
+    setIsPopupOpen(true);
+  };
+
+  // Function to close the new chat popup
+  const closePopup = () => {
+    setIsPopupOpen(false);
+  };
  
 
 
@@ -1168,13 +1180,27 @@ const handleGetChatUsername = async (userId: number) => {
           )}
 
           <div className='newChat'>
-            <button  className='newChatButton' onClick={() => navigate(`/network?active=matches`)}>
+            <button  className='newChatButton'  onClick={openPopup}>
               + New Chat
             </button>
           </div>
+          </div>
+
+          {isPopupOpen && (
+            <>
+              <div className="matches-popup-overlay" onClick={closePopup}></div>
+              <div className="matches-popup">
+                <div className="matches-popup-header">
+                  <h3>Potential New Chats</h3>
+                  <button className="matches-popup-close" onClick={closePopup}>×</button>
+                </div>
+                <NewChatList handleSelectUser={() => {}} onClose={closePopup} />
+              </div>
+            </>
+          )}
 
       
-        </div>
+       
 
 
         <div className="ChatSection">
