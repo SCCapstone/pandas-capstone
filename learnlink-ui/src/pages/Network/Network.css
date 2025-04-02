@@ -26,6 +26,7 @@
 }
 
 .NetworkTabsContainer .Tab {
+  position: relative;
     padding: 10px 20px;
     cursor: pointer;
     margin: 0 10px;
@@ -65,6 +66,25 @@
     box-sizing: border-box;
   
   
+  }
+
+  .network-list-parent {
+    display: flex;
+    flex-direction: column;
+    flex:1;
+  }
+
+  .study-group-request p {
+    font-size: medium;
+    margin: 10px;
+    color: #001b25;
+    font-weight: 400;
+  }
+
+  .study-group-request {
+    background-color: var(--primary-300);
+    border-radius: 5px;
+    margin-bottom: 15px;
   }
 
   .network-list-container {
@@ -242,4 +262,9 @@
   cursor: pointer;
   background-color: #004b67;
 
+}
+
+.study-group-request {
+  display: flex;
+  flex-direction: column;
 }

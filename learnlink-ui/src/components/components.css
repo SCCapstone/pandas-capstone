@@ -62,7 +62,8 @@
 .nav-links {
   display: flex;
   flex-shrink: 1;
-  overflow: hidden;
+  /* overflow-x: hidden;
+  overflow-y: visible; */
   gap: 1rem;
 }
 
@@ -126,7 +127,8 @@
   left: 10px; 
   /* top: 40%; */
   /* transform: translateY(-50%); */
-  color: #D9D9D9;
+  color: #999999;
+  cursor: pointer;
 }
 
 .icon {
@@ -501,4 +503,9 @@
   align-items: center;
   justify-content: center;
   text-align: center;
+}
+
+.link-w-notif {
+  position: relative;
+  overflow: visible;
 }

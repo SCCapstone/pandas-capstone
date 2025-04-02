@@ -177,4 +177,68 @@ export const updateChatTimestamp = async (chatId: any) => {
       console.error("Failed to update chat timestamp:", error);
     }
   };
+
+  // Function to open a Calendar Event creation for a study group
+  export const createCalendarEvent = (eventDetails: {
+    title: string;
+    date: string;
+    startTime: string;
+    endTime: string;
+    description: string;
+    location: string;
+  }) => {
+    // Convert date and time strings into Date objects
+    const startDate = new Date(`${eventDetails.date}T${eventDetails.startTime}:00`);
+    const endDate = new Date(`${eventDetails.date}T${eventDetails.endTime}:00`);
+  
+    // Format dates for Google & Outlook URLs
+    const formattedStart = startDate.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+    const formattedEnd = endDate.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+  
+    // Google Calendar URL
+    const googleCalendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(eventDetails.title)}&details=${encodeURIComponent(eventDetails.description)}&location=${encodeURIComponent(eventDetails.location)}&dates=${formattedStart}/${formattedEnd}`;
+  
+  //   // Outlook Calendar URL
+  //   const outlookCalendarUrl = `https://outlook.live.com/calendar/0/deeplink/compose?subject=${encodeURIComponent(eventDetails.title)}&body=${encodeURIComponent(eventDetails.description)}&location=${encodeURIComponent(eventDetails.location)}&startdt=${startDate.toISOString()}&enddt=${endDate.toISOString()}`;
+  
+  //   // Create .ics file for Apple Calendar and other local apps
+  //   const icsContent = `BEGIN:VCALENDAR
+  // VERSION:2.0
+  // BEGIN:VEVENT
+  // SUMMARY:${eventDetails.title}
+  // LOCATION:${eventDetails.location}
+  // DESCRIPTION:${eventDetails.description}
+  // DTSTART:${formattedStart}
+  // DTEND:${formattedEnd}
+  // END:VEVENT
+  // END:VCALENDAR`;
+  
+  //   const blob = new Blob([icsContent], { type: "text/calendar" });
+  //   const icsUrl = URL.createObjectURL(blob);
+  
+  //   // Detect platform
+  //   const isMac = navigator.platform.toUpperCase().includes("MAC");
+  //   const isWindows = navigator.userAgent.includes("Windows NT");
+  
+  //   if (isMac) {
+  //     // Offer .ics file for Apple Calendar
+  //     const link = document.createElement("a");
+  //     link.href = icsUrl;
+  //     link.download = "event.ics";
+  //     document.body.appendChild(link);
+  //     link.click();
+  //     document.body.removeChild(link);
+  //   } else if (isWindows) {
+  //     window.open(outlookCalendarUrl, "_blank");
+  //   } else {
+  //     window.open(googleCalendarUrl, "_blank");
+  //   }
+
+  return googleCalendarUrl
+  };
+
+  export const openCalendarEvent = (googleCalendarUrl: string) => {
+    window.open(googleCalendarUrl, "_blank");
+
+  }
   

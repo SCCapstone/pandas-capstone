@@ -12,6 +12,8 @@ import { set } from 'react-hook-form';
 import ReactSlider from 'react-slider'
 import { useEffect } from 'react';
 import NotificationDropdown from './NotificationDropdown';
+import JoinRequestsNotificationBadge from './JoinRequestsNotificationBadge';
+
 
 
 const animatedComponents = makeAnimated();
@@ -321,7 +323,8 @@ const Navbar: React.FC = () => {
       <nav className="nav-links">
         <a href="/swiping">Match</a>
         <a href="/profile">Profile</a>
-        <a href="/network">Network</a>
+        <div className='link-w-notif'>         <a href="/network">Network</a>
+          <JoinRequestsNotificationBadge /></div>
         <a href="/messaging" onClick={handleMessaging}>Messaging</a>
         <a href="/groups" onClick={handleGroups}>Groups</a>
         <a href="/resources/studyTips">Resources</a>

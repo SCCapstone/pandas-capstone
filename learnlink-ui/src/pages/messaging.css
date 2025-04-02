@@ -344,6 +344,8 @@
 .ChatsSidebar {
   position: relative;
   overflow-y: scroll;
+  flex-direction: column;
+  display: flex;
   width: 30%;
   max-width: 30%;
   border-right: 1px solid #ccc;
@@ -380,12 +382,29 @@
   line-height: 1.4;
 }
 
+.Message-pfp-container {
+  width: 100%;
+  display: flex;
+  gap: 10px;
+  flex-direction: row-reverse;
+  justify-content: flex-end;
+}
+
+.MyMessage-pfp-container {
+  width: 100%;
+  display: flex;
+  gap: 10px;
+  flex-direction: row;
+  justify-content: flex-end;
+}
+
 .MessageContainer {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  margin-bottom: 10px;
+  /* margin-bottom: 10px; */
   box-sizing: border-box;
+  width: 100%;
 }
 
 .MyMessage {
@@ -396,6 +415,23 @@
 .OtherMessage {
   background-color: #f0f0f0;
   align-self: flex-start;
+}
+.profilePic {
+  margin-left: 20px;
+  align-self: flex-end;
+  margin-bottom: 0;
+
+}
+.MyProfilePic {
+  margin-left: 0;
+  margin-right: 20px;
+  align-self: flex-end;
+  margin-bottom: 0;
+
+}
+
+.pfp-placeholder {
+  width: 65px;
 }
 
 .MyUsername {
@@ -519,6 +555,11 @@
     padding: 10px;
   }
 
+  .inputs-bar {
+    flex-direction: row;
+
+  }
+
   .ChatInput input {
     width: 100%;
     margin-bottom: 10px;
@@ -588,12 +629,56 @@
   font-size: 14px;
   font-weight: bold;
   border-radius: 6px;
+  padding-top: 15px;
+  padding-bottom: 15px;
   border: none;
   cursor: pointer;
   background-color: #00668C; /* Deep Blue */
   color: white;
   transition: background 0.2s ease-in-out;
+  text-align: left;
 }
+
+.PlusButton.weekly-scheduler-class {
+  text-align: center;
+
+}
+
+.PlusButton .calendarDetails {
+  margin-top: 25px;
+  background-color: #f5f5f5; /* Softer background color for a modern look */
+  border-radius: 12px; /* Smooth rounded corners */
+  border: 1px solid #ccc; /* Lighter, subtler border */
+  /* padding-top: 5px; Space at the top to avoid overlap with text */
+  /* padding-bottom: 5px; Padding at the bottom */
+  padding-left: 20px; /* Padding on the left */
+  padding-right: 20px; /* Padding on the right */
+  /* box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); Light shadow for depth */
+  position: relative; /* Make the container relative for absolute positioning of the label */
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.PlusButton label {
+  position: absolute; /* Position label absolutely within the container */
+  top: -15px; /* Move label up to overlap with the box */
+  left: 0px; /* Align the label with the left padding of the box */
+  font-weight: bold; /* Modern, bold label */
+  color: #ffffff; /* Darker text color for better contrast */
+  font-size: 14px; /* Slightly larger font size for readability */
+  /* text-transform: uppercase; Uppercase for modern, professional look */
+  /* background-color: #f5f5f5; Match the background color to make it blend */
+  padding: 0 5px; /* Add a little padding around the label to make it stand out */
+}
+
+.PlusButton p {
+  margin-left: 0; /* Removed unnecessary left margin */
+  color: #666; /* Softer text color */
+  font-size: 14px; /* Adjust font size for consistency */
+  line-height: 1.5; /* Improved line height for readability */
+}
+
 
 .PlusButton:hover {
   background-color: #00465f; /* Slightly darker blue on hover */

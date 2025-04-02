@@ -14,8 +14,10 @@ import GroupUserContainer from '../components/GroupUserContainer';
 import { useNavigate } from "react-router-dom";
 import CreateStudyGroup from '../components/CreateStudyGroup';
 import PlusButtonProps from '../components/PlusButtonProps';
-import { handleSendSystemMessage, handleSendButtonMessage } from "../utils/messageUtils";
+import { handleSendSystemMessage, handleSendButtonMessage, openCalendarEvent } from "../utils/messageUtils";
 import { NullValueFields } from 'aws-sdk/clients/glue';
+import CalendarEventPopup from '../components/CalendarEventPopup'
+import { Console } from 'console';
 
 interface Chat {
   id: number;
@@ -54,6 +56,7 @@ interface User {
   firstName: string;
   lastName: string;
   unReadMessages?: boolean; 
+  profilePic?: string;
 }
 
 
@@ -82,7 +85,11 @@ const Messaging: React.FC = () => {
   const selectedUserId = searchParams.get('user'); // Get the matched user ID
   const [heartedMessages, setHeartedMessages] = useState<{ [key: number]: boolean }>({});
   const [studyGroupNames, setStudyGroupNames] = useState<{ [key: number]: string }>({});
+  const [studyGroupPfps, setStudyGroupPfps] = useState<{ [key: number]: string }>({});
+
   const [chatNames, setChatNames] = useState<{ [key: number]: string }>({});
+  const [chatPfps, setChatPfps] = useState<{ [key: number]: string }>({});
+
   //for matching stuff ie chats tab and requests tab
   const [showMessagesPanel, setShowMessagesPanel] = useState(false);
   const [showRequestsPanel, setShowRequestsPanel] = useState(false);
@@ -92,6 +99,8 @@ const Messaging: React.FC = () => {
   const [isUserPanelVisible, setIsUserPanelVisible] = useState(false);
   // for displaying names above messages sent
   const [msgUsernames, setMsgUsernames] = useState<{ [key: number]: string }>({});
+  const [msgPfps, setMsgPfps] = useState<{ [key: number]: string }>({});
+
   const [chatUsernames, setChatUsernames] = useState<{ [key: number]: string }>({});
   const [groupId, setGroupId] = useState<number | null>(null);
   
@@ -103,6 +112,10 @@ const Messaging: React.FC = () => {
   const [selectedProfile, setSelectedProfile] = useState<{ id: number; name: string } | null>(null);
   const [loadingChatList, setLoadingChatList] = useState(true);
   const [currentGroupId, setCurrentGroupId] = useState<number | null>(null);
+  const [calendarModalOpen, setCalendarModalOpen] = useState(false);
+  const genericUserPfp = "https://learnlink-public.s3.us-east-2.amazonaws.com/AvatarPlaceholder.svg";
+  const genericStudyGroupPfp = "https://learnlink-pfps.s3.us-east-1.amazonaws.com/profile-pictures/generic_studygroup_pfp.svg";
+
   const navigate = useNavigate();
 
   const selectedChatId = searchParams.get("selectedChatId");
@@ -447,8 +460,35 @@ useEffect(() => {
   
       setChatNames(newChatNames);
     };
+
+    const fetchChatPfps = async() => {
+      const newChatPfps: { [key: number]: string } = { ...chatPfps };
+      
+      // Use Promise.all to fetch all chat names concurrently
+      const fetchPromises = chats.map(async (chat) => {
+        if (!newChatPfps[chat.id]) { // Only fetch if not already in state
+          try {
+            const chatPfp = await getChatPfp(chat);
+            if (chatPfp) {
+              newChatPfps[chat.id] = chatPfp;
+            } else {
+              console.warn(`No pfp for chat with ID: ${chat.id}`);
+            }
+          } catch (error) {
+            console.error(`Error fetching pfp for chat with ID: ${chat.id}`, error);
+          }
+        }
+      });
+  
+      // Wait for all chat names to be fetched
+      await Promise.all(fetchPromises);
+      console.log('Chat pfps:', newChatPfps);
+  
+      setChatPfps(newChatPfps);
+    };
   
     fetchChatNames();
+    fetchChatPfps();
   }, [chats]); // Runs only when `chats` change
   
   useEffect(() => {
@@ -565,6 +605,8 @@ useEffect(() => {
         notificationMessage += ` in ${chatName}`;
       }
 
+      const chatID = selectedChat.id;
+      
       console.log('Notification message:', notificationMessage);
 
       // Send notification to each recipient
@@ -582,7 +624,8 @@ useEffect(() => {
               userId: recipient.id,
               message: notificationMessage,
               type: "Message",
-              chatId: selectedChat.id,
+              chatID: chatID,
+
             }),
           });
         })
@@ -615,6 +658,38 @@ useEffect(() => {
       console.log('Other user:', otherUser);
       if (otherUser) {
           return `${otherUser.firstName} ${otherUser.lastName}`;
+      }
+    }
+    return " ";
+  };
+
+    // Used to access the study group name or chat name for displaying properly on the UI
+  const getChatPfp = async (chat: Chat) => {
+    // getting the study group name
+    try {
+      const response = await axios.get(`${REACT_APP_API_URL}/api/study-groups/chat/${chat.id}`);
+      console.log("PFP TEST", response)
+      // setStudyGroupPfps((prev) => ({
+      //   ...prev,
+      //   [chat.id]: response.data.profilePic ? response.data.profilePic : genericStudyGroupPfp
+      // }));
+
+      if (response.data.studyGroupID !== null) {
+        return response.data.profilePic ? response.data.profilePic : genericStudyGroupPfp;
+      }
+
+
+    } catch (error) {
+      console.error("Error fetching study group name:", error);
+    }
+
+    // not a study group option
+    if (currentUserId) {
+      const otherUser = chat.users?.find((user) => user.id !== currentUserId);
+      console.log('Other user PFPPFP:', otherUser);
+      if (otherUser) {
+        console.log(otherUser.profilePic)
+        return `${otherUser.profilePic ?  otherUser.profilePic : genericUserPfp}`;
       }
     }
     return " ";
@@ -864,7 +939,9 @@ const handleGetMessageUsername = async (userId: number) => {
   try {
     const response = await axios.get(`${REACT_APP_API_URL}/api/users/${userId}`);
     const username = response.data.firstName + " " + response.data.lastName;
+    const pfp = response.data.profilePic || genericUserPfp;
     setMsgUsernames((prev) => ({ ...prev, [userId]: username }));
+    setMsgPfps((prev) => ({ ...prev, [userId]: pfp }));
     //console.log(username);
   } catch (error) {
     console.error("Error fetching username:", error);
@@ -983,8 +1060,11 @@ const handleGetChatUsername = async (userId: number) => {
       console.log("no button action")
       return
     }
+      const [actionType, eventURL] = action.split(',');
+      console.log("Action Type:", actionType);
+      console.log("Event URL:", eventURL);
 
-    switch (action) {
+    switch (actionType) {
       case "weekly-scheduler":
         if (studyGroupId) {
           openWeeklyScheduler(studyGroupId);
@@ -994,11 +1074,8 @@ const handleGetChatUsername = async (userId: number) => {
         break;
   
       case "calendar-event":
-        if (studyGroupId) {
-          openCalendarEvent(studyGroupId);
-        } else {
-          console.error("Study group ID is missing for calendar event action.");
-        }
+          openCalendarEvent(eventURL);
+
         break;
   
       default:
@@ -1023,15 +1100,24 @@ const handleGetChatUsername = async (userId: number) => {
     // Add logic to open the weekly scheduler modal/page
     navigate(`/studyGroup/${studyGroupId}/schedule`);
   };
+
+  const openGoogleCalendar = (studyGroupId: number) => {
+    const title = encodeURIComponent("Study Group Meeting");
+    const details = encodeURIComponent("Join the study session for our course!");
+    const location = encodeURIComponent("Online / Library");
+    
+    const startTime = new Date().toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+    const endTime = new Date(new Date().getTime() + 60 * 60 * 1000)
+      .toISOString()
+      .replace(/[-:]/g, "")
+      .split(".")[0] + "Z";
   
-  // Function to open a Calendar Event creation for a study group
-  const openCalendarEvent = (studyGroupId: number) => {
-    console.log(`Opening Calendar Event for study group ID: ${studyGroupId}`);
-    // Add logic to open the calendar event creation modal/page
-    // Example: navigate(`/study-groups/${studyGroupId}/calendar`);
+    const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&details=${details}&location=${location}&dates=${startTime}/${endTime}`;
+    
+    window.open(url, "_blank");
   };
   
-  
+
 
   return (
     <div className="Messaging">
@@ -1076,12 +1162,13 @@ const handleGetChatUsername = async (userId: number) => {
               currentUserId = {currentUserId}
               handleDeleteChat={handleDeleteChat} 
               chatNames={chatNames} 
+              chatPfps={chatPfps}
               loadingChatList={loadingChatList}
             />
           )}
 
           <div className='newChat'>
-            <button  className='newChatButton' onClick={() => navigate(`/network?active='matches'`)}>
+            <button  className='newChatButton' onClick={() => navigate(`/network?active=matches`)}>
               + New Chat
             </button>
           </div>
@@ -1169,39 +1256,115 @@ const handleGetChatUsername = async (userId: number) => {
                   // If selectedChat exists
                   Array.isArray(selectedChat.messages) ? (
                     selectedChat.messages.length > 0 ? (
-                      selectedChat.messages.map((message, index) => (
-                        <div key={index} className="MessageContainer">
-                          {/* Display usernames */}
-                          {!message.system && (index === 0 || selectedChat.messages[index - 1].userId !== message.userId) && (
-                            <div className={`username ${message.userId === currentUserId ? 'MyUsername' : ''}`}>
-                              {message.userId !== undefined && msgUsernames[message.userId] ? msgUsernames[message.userId] : "Loading..."}
-                            </div>
-                          )}
+                      selectedChat.messages.map((message, index) => {
+                        const isLastInCluster =
+                          index === selectedChat.messages.length - 1 || // Last message overall
+                          selectedChat.messages[index + 1].userId !== message.userId; // Next message is from a different user
 
-                          {/* Display messages */}
-                          <div
-                            className={`MessageBubble ${message.system ? 'SystemMessage' : (message.userId === currentUserId ? 'MyMessage' : 'OtherMessage')}`}
-                            onDoubleClick={() => handleDoubleClick(message.id)}
-                          >
-                            {/* Check if the message is a button message */}
-                            {message.isButton && message.buttonData ? (
-                              <button
-                                className="PlusButton"
-                                onClick={() => handleButtonClick(message.buttonData?.action, message.buttonData?.studyGroupId)}
-                              >
-                                {message.buttonData?.label}
-                              </button>
-                            ) : (
-                              <span>
-                                {typeof message.content === 'string' ? message.content : JSON.stringify(message.content)}
-                              </span>
+
+                        return (
+                          <div key={index} className={`Message-pfp-container ${message.userId === currentUserId ? 'MyMessage-pfp-container' : ''}`}>
+
+                            <div className="MessageContainer">
+                              { }
+                            {!message.system && (index === 0 || selectedChat.messages[index - 1].userId !== message.userId) && (
+                              <div className={`username ${message.userId === currentUserId ? 'MyUsername' : ''}`}>
+                                {message.userId !== undefined && msgUsernames[message.userId] ? msgUsernames[message.userId] : "Loading..."}
+                                {/* {message.userId !== undefined && msgPfps[message.userId] ? (
+                                <img src={msgPfps[message.userId] } className="message-pfp" alt="" height={"40px"} />
+                            )
+                              : "Loading..."} */}
+                              </div>
                             )}
 
+                            {/* Display messages */}
+                            <div
+                              className={`MessageBubble ${message.system ? 'SystemMessage' : (message.userId === currentUserId ? 'MyMessage' : 'OtherMessage')}`}
+                              onDoubleClick={() => handleDoubleClick(message.id)}
+                            >
+                              {/* Check if the message is a button message */}
+                              {message.isButton && message.buttonData ? (
+                                <button
+                                  className={`PlusButton ${message.buttonData?.action === 'weekly-scheduler' ? 'weekly-scheduler-class' : ''}`}
+                                  onClick={() => handleButtonClick(message.buttonData?.action, message.buttonData?.studyGroupId)}
+                                >
+                                  <div>
+                                    {message.buttonData?.label.split("\n").map((line, index) => {
+                                      // Ignore empty lines (but still render them with no colon)
+                                      if (!line.trim()) {
+                                        return (
+                                          <div key={index}>
+                                            <br />
+                                          </div>
+                                        );
+                                      }
+
+                                      // Check if the line contains a colon
+                                      if (line.includes(":")) {
+                                        const [label, ...valueParts] = line.split(":");
+                                        const value = valueParts.join(":").trim(); // Join back if there are additional colons
+
+                                        return (
+                                          <div key={index}>
+                                            {/* <span style={{ fontWeight: "bold" }}>{label}: </span>
+                                          <span style={{ fontWeight: "normal" }}>{value}</span>
+                                          <br /> */}
+
+                                            <div className="calendarDetails">
+                                              <label>{label}</label>
+                                              <p>{value}</p>
+                                            </div>
+                                          </div>
+                                        );
+                                      } else {
+                                        // If no colon, just display the line as is without a colon
+                                        return (
+                                          <div key={index}>
+                                            <span>{line}</span>
+                                            <br />
+                                          </div>
+                                        );
+                                      }
+                                    })}
+                                    </div>
+                                  </button>
+                                ) : (
+                                  <span>
+                                    {typeof message.content === 'string' ? message.content : JSON.stringify(message.content)}
+                                  </span>
+                                )}
+
+                              </div>
+                              {/* Show heart if message was double-clicked */}
+                              {heartedMessages[message.id] && <div className="Heart">❤️</div>}
+                            </div>
+                          
+                            {message.userId !== currentUserId ? (
+  !message.system && isLastInCluster ? (
+    <div
+      className={`profilePic ${
+        message.userId === currentUserId ? "MyProfilePic" : ""
+      }`}
+    >
+      {message.userId !== undefined && msgPfps[message.userId] ? (
+        <img
+          src={msgPfps[message.userId]}
+          className="message-pfp"
+          alt=""
+          height={"40px"}
+        />
+      ) : (
+        "Loading..."
+      )}
+    </div>
+  ) : (
+    <div className="pfp-placeholder"></div> // Keeps spacing consistent
+  )
+) : <div className='MyProfilePic'>
+  </div>}
                           </div>
-                          {/* Show heart if message was double-clicked */}
-                          {heartedMessages[message.id] && <div className="Heart">❤️</div>}
-                        </div>
-                      ))
+                        )
+                      })
                     ) : (
                       <div className="NoMessages">No messages to display.</div>
                     )
@@ -1214,6 +1377,7 @@ const handleGetChatUsername = async (userId: number) => {
                 )}
               </div>
               <div className="ChatInput">
+
                 <PlusButtonProps
                   onSelect={handlePlusSelect}
                   studyGroupId={currentGroupId}
@@ -1231,14 +1395,14 @@ const handleGetChatUsername = async (userId: number) => {
                 />
                 <button onClick={handleSendMessage}>Send</button>
               </div>
-              
+
             </>
           ) : (
             <div className="NoChatSelected">Select a chat to start messaging</div>
           )}
         </div>
-         {/* Render the popup at the Messaging level */}
-         
+        {/* Render the popup at the Messaging level */}
+
       </div>
       <div>
         <CopyrightFooter />

@@ -51,10 +51,10 @@ const Login: React.FC = () => {
             });
 
             if (!response.ok) {
-                setAlerts((prevAlerts) => [
-                    ...prevAlerts,
-                    { id: Date.now(), alertText: "Invalid username or password.", alertSeverity: "error", visible: true },
-                  ]);
+                // setAlerts((prevAlerts) => [
+                //     ...prevAlerts,
+                //     { id: Date.now(), alertText: "Invalid username or password.", alertSeverity: "error", visible: true },
+                //   ]);
                 throw new Error("Invalid username or password.");
                 
             }

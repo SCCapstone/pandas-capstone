@@ -1,5 +1,6 @@
 import { PrismaClient, } from '@prisma/client';
 import { useState, useEffect, useMemo, useCallback } from "react";
+import { getLoggedInUserId } from './auth';
 import axios from "axios";
 
 
@@ -80,11 +81,18 @@ export const useMatchButtonStatus = (targetUserId: number) => {
 
   useEffect(() => {
     const checkMatchStatus = async () => {
+
       try {
         const token = localStorage.getItem("token");
         if (!token) {
           console.error("No token found, user might not be logged in.");
           return;
+        }
+
+        const currUserId = getLoggedInUserId();
+        if (currUserId== targetUserId) {
+          return setStatus({ buttonText: "Match", isButtonDisabled: true, matchButtonError: null });
+
         }
 
         const requestResponse = await fetch(

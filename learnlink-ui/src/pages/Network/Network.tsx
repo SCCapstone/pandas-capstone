@@ -8,6 +8,8 @@ import SentRequestsList from './SentRequestsList';
 import ReceivedRequestsList from './ReceivedRequestsList';
 import React, { useState, useEffect } from "react";
 import { useSearchParams } from 'react-router-dom';
+import JoinRequestsNotificationBadge from '../../components/JoinRequestsNotificationBadge';
+
 interface User {
     id: number;
     username: string;
@@ -69,9 +71,16 @@ const Network = () => {
 
 
   useEffect(() => {
+    console.log('searchParams:', searchParams.toString());
+    console.log('inputtedActive:', inputtedActive);
     if (inputtedActive === "matches") {
+      console.log("setting active tab to matches");
       setActiveTab("matches");
+    } else if (inputtedActive === "rr") {
+      console.log("setting active tab to rr");
+      setActiveTab("receivedRequests");
     }
+
     navigate(window.location.pathname, { replace: true });
   }, [inputtedActive]); 
   
@@ -112,8 +121,9 @@ const Network = () => {
           <button
             className={`Tab ${activeTab === "receivedRequests" ? "active" : ""}`}
             onClick={() => setActiveTab("receivedRequests")}
-          >
+          >            
             Requests Recieved
+            <JoinRequestsNotificationBadge showDotOnly={true}/>
           </button>
         </div>
 

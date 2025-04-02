@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import './NotificationDropdown.css';
 import { FaXmark } from 'react-icons/fa6';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 // Define notification types
 enum NotificationType {
@@ -12,10 +14,14 @@ enum NotificationType {
 // Notification interface
 interface Notification {
   id: number;
+  user_id: number;
+  other_id: number;
   message: string;
   read: boolean;
   created_at: string;
   type: NotificationType;
+  chatID: number;
+  studyGroupID: number;
 }
 
 interface NotificationDropdownProps {
@@ -26,6 +32,7 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ setNotifCou
   const [notifs, setNotifs] = useState<Notification[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
   const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
 
   useEffect(() => {
@@ -45,6 +52,7 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ setNotifCou
         if (!response.ok) throw new Error(`Error: ${response.status}`);
 
         const data = await response.json();
+        console.log(data);
         setNotifs(data);
       } catch (err) {
         setError('Error loading notifications');
@@ -60,6 +68,39 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ setNotifCou
     try {
       const token = localStorage.getItem('token');
       if (!token) return;
+
+      if (notif.type === NotificationType.Message){
+        navigate(`/messaging?selectedChatId=${notif.chatID}`);
+      }
+      else if (notif.type === NotificationType.Match) {
+        navigate(`/network?active=rr`);
+      }
+      else if (notif.type === NotificationType.StudyGroup) {
+        console.log("OTHER::: ", notif.other_id);
+        if(notif.studyGroupID){
+          navigate(`/groups?groupId=${notif.studyGroupID}&tab=false`);
+        }
+        
+        else if (notif.other_id) {
+          const chatCheckResponse = await axios.get(`${REACT_APP_API_URL}/api/chats/check`, {
+            params: { userId1: notif.user_id, userId2: notif.other_id },
+          });
+    
+          console.log(chatCheckResponse.data);
+          if (chatCheckResponse.data.exists) {
+            console.log("A chat with this user already exists.");
+            setError("A chat with this user already exists.");
+
+            navigate(`/messaging?selectedChatId=${chatCheckResponse.data.chatId}`);
+            
+            return; // Stop function execution
+          }
+      }
+    }
+      
+      
+
+     
 
       const response = await fetch(`${REACT_APP_API_URL}/api/notifications/delete/${notif.id}`, {
         method: 'DELETE',

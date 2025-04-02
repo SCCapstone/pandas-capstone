@@ -770,6 +770,7 @@ app.get('/api/swipe/sentRequests/:currentUser', async (req, res): Promise<any> =
         direction: true,
         message: true,
         status: true,
+        updatedAt: true
       },
     });
 
@@ -789,6 +790,10 @@ app.get('/api/swipe/user/pendingRequestCheck/:targetUser', authenticate, async (
   const currentUserId = parseInt(currentUser, 10);
   const targetUserId  = parseInt(targetUser, 10);
 
+  if (currentUserId == targetUserId) {
+    return null
+  }
+
   console.log('Fetching requests between user: ', currentUserId, ' and', targetUserId);
 
 
@@ -797,6 +802,22 @@ app.get('/api/swipe/user/pendingRequestCheck/:targetUser', authenticate, async (
   }
 
   try {
+
+    const match = await prisma.match.findMany({
+      where: {
+        OR: [
+          { user1Id: currentUserId, user2Id: targetUserId },
+          { user1Id: targetUserId, user2Id: currentUserId }
+        ]
+      }
+    });
+
+    console.log('match', match)
+    
+    if (match.length > 0) {
+      return res.status(200).json("Accepted");
+    }
+    
     const sentRequests = await prisma.swipe.findMany({
       where: {
         AND: {
@@ -816,6 +837,8 @@ app.get('/api/swipe/user/pendingRequestCheck/:targetUser', authenticate, async (
         updatedAt: true
       },
     });
+
+    console.log(sentRequests)
 
     const mostRecentRequest = sentRequests.sort((a, b) => {
       // Compare updatedAt values (latest date first)
@@ -1129,6 +1152,12 @@ app.get('/api/profiles/:userId', async (req, res): Promise<any> => {
           },
           {
             swipesReceived: { some: { userId: userId } },  // Exclude users where the current user has already swiped
+          },
+          {
+            OR: [
+              { matchesAsUser1: { some: { user2Id: userId } } }, // Exclude users the current user has matched with
+              { matchesAsUser2: { some: { user1Id: userId } } }, // Exclude users who have matched with the current user
+            ],
           },
         ],
       },
@@ -2938,7 +2967,7 @@ app.get('/api/notifications', authenticate, async (req: Request, res: Response) 
 
 app.post('/notifications/send', async (req, res): Promise<any> => {
   try {
-    const { userId, message, type } = req.body;
+    const { userId, other_id, message, type, chatID, studyGroupID} = req.body;
 
     if (!userId || !message || !type) {
       return res.status(400).json({ error: 'Missing required fields' });
@@ -2952,9 +2981,12 @@ app.post('/notifications/send', async (req, res): Promise<any> => {
     const notification = await prisma.notification.create({
       data: {
         user_id: userId,
+        other_id: other_id,
         message,
         read: false,
         type,
+        chatID,
+        studyGroupID,
       },
     });
 
@@ -3082,14 +3114,71 @@ app.put('/api/swipe-requests/:id', async (req, res): Promise<any> => {
           });
       }
 
-      if(status==="Accepted" && swipe.targetGroupId) {
+      if (status === "Accepted" && swipe.targetGroupId) {
+        // Step 1: Get all members of the target study group
+        const members = await prisma.studyGroup.findUnique({
+          where: { id: swipe.targetGroupId },
+          select: {
+            users: {
+              select: {
+                id: true,
+              },
+            },
+          },
+        });
+      
+        // Step 2: Create the match for each member in the study group
+        if (members?.users && members.users.length > 0) {
+          for (const member of members.users) {
+            // Avoid matching the user with themselves
+            if (member.id !== swipe.userId) {
+                // Delete any other requests between the two users
+                await prisma.swipe.deleteMany({
+                  where: {
+                      userId: swipe.userId,
+                      targetUserId: member.id,
+                      NOT: { id: Number(id) } // Exclude the current request
+                  }
+              });
+        
+              await prisma.swipe.deleteMany({
+                  where: {
+                      userId: member.id,
+                      targetUserId: swipe.userId,
+                      NOT: { id: Number(id) } // Exclude the current request
+                  }
+              });
+            
+              await prisma.swipe.create({
+                data: {
+                  userId: swipe.userId,
+                  targetUserId: member.id,
+                  direction: 'Yes',
+                  status: 'Accepted'
+                }
+              })
+
+              await prisma.match.create({
+                data: {
+                  user1Id: swipe.userId,
+                  user2Id: member.id, // Create a match with the member
+                  studyGroupId: null,
+                  isStudyGroupMatch: false,
+                },
+              });
+
+            }
+          }
+        }
+      
+        // Step 3: Create the initial match with the study group
         await prisma.match.create({
           data: {
             user1Id: swipe.userId,
             studyGroupId: swipe.targetGroupId,
             isStudyGroupMatch: true,
           },
-        })
+        });
       }
 
       res.json(updatedRequest);

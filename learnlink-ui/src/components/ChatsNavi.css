@@ -1,16 +1,23 @@
 .messages-panel {
     display: flex;
     flex-direction: column;
-    flex-grow: 1;
-    overflow: hidden;
+
+    overflow-y: scroll;
     padding: 5px; /* Prevents overflow issues */
   }
   
   .ChatList {
-    flex-grow: 1;
-    overflow-y: auto; /* Enables scrolling when needed */
-    max-height: 100%;
-  }
+    overflow-y: scroll; /* Enables scrolling when needed */
+    flex:1;
+    margin-bottom: 70px;
+    }
+
+    .chat-list-name-pfp {
+      display: flex;
+      flex-direction: row;
+      gap:15px;
+      align-items: center;
+    }
 
   .blue-dot {
     width: 8px;

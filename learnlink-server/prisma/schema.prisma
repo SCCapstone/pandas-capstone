@@ -8,6 +8,7 @@ generator client {
   provider = "prisma-client-js"
 }
 
+
 datasource db {
   provider = "postgresql"
   url      = "postgresql://postgres:KzutHhFD5pYppDa6@uniformly-animating-catbird.data-1.use1.tembo.io:5432/postgres"
@@ -224,11 +225,13 @@ model Message {
 model Notification {
   id         Int      @id @default(autoincrement())
   user_id    Int
+  other_id   Int?
   type       NotificationType
   message    String
   read       Boolean  @default(false)
   created_at DateTime @default(now())
-
+  chatID     Int?
+  studyGroupID Int?
   user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
 }
 
