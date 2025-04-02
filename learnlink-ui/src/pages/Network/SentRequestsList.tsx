@@ -75,10 +75,11 @@ const SentRequestsList:React.FC<SentRequestsListProps> = ({ handleSelectUser }: 
                 })
             );
 
-            updatedRequests.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+            const sortedReqs =  updatedRequests.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+            const filteredReq = sortedReqs.filter((req: SwipeRequest) => req.status === 'Pending');
+            console.log("final requests", filteredReq);
 
-
-            setSentRequestsList(updatedRequests);
+            setSentRequestsList(filteredReq);
 
             console.log("finally",sentRequestsList);
         } catch (err) {
