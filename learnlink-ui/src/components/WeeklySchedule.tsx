@@ -54,6 +54,10 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ studyGroupId }) => {
     const [hoveredSlot, setHoveredSlot] = useState<{ day: string; timeSlot: string } | null>(null);
     const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
     const [alerts, setAlerts] = useState<{ id: number; alertText: string; alertSeverity: "error" | "warning" | "info" | "success"; visible: boolean }[]>([]);
+    const [isClick, setIsClick] = useState(true); // Flag to check if it's a click or drag
+    const [initialMousePosition, setInitialMousePosition] = useState<{ x: number, y: number } | null>(null);
+    const [isMouseDown, setIsMouseDown] = useState(false);
+    const [forceRender, setForceRender] = useState(false);
 
     // const [schedule, setSchedule] = useState({
     //     days: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
@@ -71,6 +75,7 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ studyGroupId }) => {
 
     const openEditModal = () => setModalOpen(true);
     const closeEditModal = () => setModalOpen(false);
+    
 
     function generateTimeSlots(startTime: string, endTime: string): string[] {
         const times: string[] = [];
@@ -283,44 +288,82 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ studyGroupId }) => {
     const handleMouseDown = (day: Day, timeSlot: string, e: React.MouseEvent) => {
         e.preventDefault();
         setDraggingDay(day);
-        setIsDragging(true);
+        setInitialMousePosition({ x: e.pageX, y: e.pageY });
+        setIsMouseDown(true)
+
+        setIsDragging(false);
+        setIsClick(true);  // Initially assume it's a click
         setStartTimeSlot(timeSlot);
         setEndTimeSlot(timeSlot);
+        // const handleMouseDown = (day: string, timeSlot: string, e: React.MouseEvent) => {
+        //     setDragging(true);
+        //     setIsClick(true);  // Initially assume it's a click
+        //     setStartSlot(timeSlot);
+        //     setDraggedSlots([timeSlot]); // Start with the clicked slot
+        // };
+        
     };
 
     const handleMouseMove = (day: Day, timeSlot: string, e: React.MouseEvent) => {
-        if (isDragging && draggingDay === day) {
-            setEndTimeSlot(timeSlot);
+        if (initialMousePosition) {
+            const distanceMoved = Math.sqrt(
+                Math.pow(e.pageX - initialMousePosition.x, 2) + Math.pow(e.pageY - initialMousePosition.y, 2)
+            );
+    
+            if (distanceMoved > 10 && !isDragging && draggingDay === day) {
+                setIsDragging(true);
+                setIsClick(false); // Transition to drag if movement exceeds threshold
+            }
+    
+            if (isMouseDown && isDragging && draggingDay === day) {
+                // Update endTimeSlot as the user moves across different slots
+                setEndTimeSlot(timeSlot);
+            }
         }
     };
 
     const handleMouseUp = () => {
         if (!isDragging || !draggingDay || !startTimeSlot || !endTimeSlot) return;
-
+setIsMouseDown(false);
         const startIndex = timeSlots.indexOf(startTimeSlot);
         const endIndex = timeSlots.indexOf(endTimeSlot);
+    
+        // Ensure start is less than end index to avoid out-of-order range
         const [start, end] = startIndex < endIndex ? [startIndex, endIndex] : [endIndex, startIndex];
-
+    
         setAvailability((prevState) => ({
             ...prevState,
             [draggingDay]: Array.from(new Set([...prevState[draggingDay], ...timeSlots.slice(start, end + 1)])),
         }));
-
+    
+        // Reset dragging state
         setIsDragging(false);
         setDraggingDay(null);
         setStartTimeSlot(null);
         setEndTimeSlot(null);
     };
-
+    
     const handleTimeSlotClick = (day: Day, timeSlot: string, e: React.MouseEvent) => {
-        if (isDragging) return;
+        e.stopPropagation(); // Prevents bubbling
 
-        setAvailability((prevState) => ({
-            ...prevState,
-            [day]: prevState[day].includes(timeSlot)
-                ? prevState[day].filter((slot) => slot !== timeSlot)
-                : [...prevState[day], timeSlot],
-        }));
+        setIsMouseDown(false);
+        if (!isDragging && isClick) {
+            // Use function form of setState to ensure we're always using the latest state
+            setAvailability(prevAvailability => {
+                const newAvailability = { ...prevAvailability };
+                const isSelected = newAvailability[day].includes(timeSlot);
+    
+                // Update availability by adding/removing the time slot
+                if (isSelected) {
+                    newAvailability[day] = newAvailability[day].filter(slot => slot !== timeSlot);
+                } else {
+                    newAvailability[day] = [...newAvailability[day], timeSlot];
+                }
+    
+                // Directly return updated availability without setForceRender
+                return newAvailability;
+            });
+        }
     };
 
     const getCellClass = (day: Day, timeSlot: string) => {
