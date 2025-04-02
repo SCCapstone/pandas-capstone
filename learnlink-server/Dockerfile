@@ -1,37 +1,32 @@
-# Step 1: Use the official Node.js Alpine image (lightweight)
-FROM node:18-alpine AS build
+# Use an official Node.js image (Debian-based for better Prisma compatibility)
+FROM node:18-bullseye AS build
 
-# Step 2: Set working directory inside the container
+# Set working directory
 WORKDIR /app
 
-# Step 3: Copy package.json and package-lock.json
+# Copy package.json and package-lock.json first to leverage Docker caching
 COPY package*.json ./
 
-# Step 4: Install dependencies
-RUN npm install
+# Install dependencies
+RUN npm install --omit=dev
 
-# Step 5: Install necessary Alpine packages
-RUN apk add --no-cache \
-  vips \
-  libheif \
-  jemalloc \
-  python3 make g++ \
-  openssl \
-  libc6-compat
+# Install Prisma CLI globally to ensure it's available
+RUN npm install -g prisma@5.4.2
 
-# Step 6: Copy the rest of the app code into the container
+# Copy the rest of the application code
 COPY . .
 
-# Step 7: Set environment variables (jemalloc memory allocator)
-ENV PRISMA_CLI_BINARY_TARGETS=linux-musl
+# Validate Prisma schema before generating client
+RUN npx prisma validate
 
-ENV LD_PRELOAD=/usr/lib/libjemalloc.so.2
+# Ensure Prisma uses the correct binary target
+ENV PRISMA_CLI_BINARY_TARGETS=debian-openssl-1.1.x
 
-# Step 8: Install Prisma Client (and generate Prisma client)
+# Generate Prisma Client
 RUN npx prisma generate
 
-# Step 9: Expose ports
+# Expose necessary ports
 EXPOSE 2020 80 443
 
-# Step 10: Start the app
+# Start the application
 CMD ["npm", "start"]
