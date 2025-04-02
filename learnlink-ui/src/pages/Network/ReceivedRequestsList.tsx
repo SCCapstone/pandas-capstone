@@ -283,7 +283,7 @@ const handleApproval = async (
             <div className='network-list-info'></div>
 
             {receivedRequestsList.map((request) => (
-              <ul key={request.id}   onClick={() => handleSelectUser(request.user.id ?? request.targetGroupId, !!request.targetGroupId)}>
+              <ul key={request.id}   onClick={() => handleSelectUser(request.user.id, false)}>
 
                 <div className='network-list-parent'>
                   {request.targetGroupId ? (
