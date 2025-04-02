@@ -10,57 +10,6 @@ import React, { useState, useEffect } from "react";
 import { useSearchParams } from 'react-router-dom';
 import JoinRequestsNotificationBadge from '../../components/JoinRequestsNotificationBadge';
 
-interface User {
-    id: number;
-    username: string;
-    firstName: string;
-    lastName: string;
-    age: number; // Add the age property
-    gender: string;
-    college: string;
-    coursework: string[];
-    profilePic: string;
-
-}
-
-interface SwipeRequest {
-    id: number;
-    userId: number;             // ID of the user making the request
-    targetUserId: number | null; // ID of the user they want to connect with (if applicable)
-    targetGroupId: number | null; // ID of the group they want to join (if applicable)
-    message: string;            // Message sent with the request
-    createdAt: string;          // Timestamp of when the request was made
-    user: User;                 // User details of the requester
-    targetGroup: Group;         // Group details (if applicable)
-    direction: 'Yes' | 'No';
-    targetUser?: User;          // User details of the target user (if applicable)
-    status: SwipeStatus;
-}
-
-// Enum for swipe status
-enum SwipeStatus {
-  Accepted = 'Accepted',
-  Denied = 'Denied',
-  Pending = 'Pending'
-}
-
-// Interface for a group object
-interface Group {
-  studyGroup: StudyGroup; // Contains details of the study group
-}
-
-// Interface defining a study group
-interface StudyGroup {
-  id: number;
-  name: string; // Name of the study group
-  description: string; // Description of the study group
-  profilePic?: string; // URL of the group's profile picture
-}
-
-
-const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
-
-
 const Network = () => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -69,22 +18,13 @@ const Network = () => {
 
   const inputtedActive = searchParams.get("active");
 
-
   useEffect(() => {
-    console.log('searchParams:', searchParams.toString());
-    console.log('inputtedActive:', inputtedActive);
-    if (inputtedActive === "matches") {
-      console.log("setting active tab to matches");
-      setActiveTab("matches");
-    } else if (inputtedActive === "rr") {
-      console.log("setting active tab to rr");
-      setActiveTab("receivedRequests");
+    if (inputtedActive) {
+      setActiveTab(inputtedActive);
     }
+  }, [inputtedActive]);
 
-    navigate(window.location.pathname, { replace: true });
-  }, [inputtedActive]); 
-  
-  // Set the active tab based on the query parameter
+  // Set the active tab based on the query parameter from the URL
   useEffect(() => {
     const queryParams = new URLSearchParams(currentLocation.search);
     const tab = queryParams.get("tab");
@@ -93,10 +33,23 @@ const Network = () => {
     }
   }, [currentLocation.search]);
 
-  const handleSelectUser = (userId: number) => {
-    navigate(`/user-profile/${userId}`);
+  // Function to handle tab changes
+  const handleTabChange = (tab: string) => {
+    setActiveTab(tab);
+    // Update the query parameter in the URL without reloading the page
+    setSearchParams({ active: tab });
   };
 
+  const handleSelectUser = (id: number | null, isStudyGroup: boolean) => {
+    if (!id) {
+      throw new Error("Invalid ID");
+    }
+    if (isStudyGroup) {
+      navigate(`/group-profile/${id}`);
+    } else {
+      navigate(`/user-profile/${id}`);
+    }
+  };
 
   return (
     <div className="NetworkPage">
@@ -106,24 +59,24 @@ const Network = () => {
         <div className="NetworkTabsContainer">
           <button
             className={`Tab ${activeTab === "matches" ? "active" : ""}`}
-            onClick={() => setActiveTab("matches")}
+            onClick={() => handleTabChange("matches")}
           >
             Connections
           </button>
 
           <button
             className={`Tab ${activeTab === "sentRequests" ? "active" : ""}`}
-            onClick={() => setActiveTab("sentRequests")}
+            onClick={() => handleTabChange("sentRequests")}
           >
-            Requests Sent
+            Requests Pending
           </button>
 
           <button
             className={`Tab ${activeTab === "receivedRequests" ? "active" : ""}`}
-            onClick={() => setActiveTab("receivedRequests")}
-          >            
-            Requests Recieved
-            <JoinRequestsNotificationBadge showDotOnly={true}/>
+            onClick={() => handleTabChange("receivedRequests")}
+          >
+            Requests Received
+            <JoinRequestsNotificationBadge showDotOnly={true} />
           </button>
         </div>
 

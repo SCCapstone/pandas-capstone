@@ -17,6 +17,8 @@ export interface User {
     name: string;
     description: string;
     profilePic?: string;
+    users: User[];
+    subject?: string;
   }
   
   export interface Group {

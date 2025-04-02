@@ -2,6 +2,7 @@
 
 import io from "socket.io-client";
 import axios from 'axios';
+import { Dispatch, SetStateAction } from "react";
 
 const REACT_APP_API_URL = process.env.REACT_APP_API_URL || "http://localhost:2000";
 
@@ -10,6 +11,7 @@ const socket = io(REACT_APP_API_URL, {
   reconnectionAttempts: 3, // Retry if connection fails
   timeout: 10000, // 10 seconds timeout
 });
+
 
 export const handleSendSystemMessage = (
   mss: string,
@@ -241,4 +243,8 @@ export const updateChatTimestamp = async (chatId: any) => {
     window.open(googleCalendarUrl, "_blank");
 
   }
+
+
+
+  
   

@@ -875,6 +875,99 @@ app.get('/api/swipe/user/pendingRequestCheck/:targetUser', authenticate, async (
     res.status(500).json({ error: 'Something went wrong' });
   }
 });
+// Fetches request staus between a user and another user
+app.get('/api/swipe/user/pendingRequestCheck/Group/:targetGroup', authenticate, async (req, res): Promise<any> => {
+  const { targetGroup } = req.params;
+  const currentUser = res.locals.userId
+
+  const currentUserId = parseInt(currentUser, 10);
+  const targetGroupId  = parseInt(targetGroup, 10);
+
+  // if (currentUserId == targetUserId) {
+  //   return null
+  // }
+
+  console.log('Fetching requests between user: ', currentUserId, ' and group: ', targetGroupId);
+
+
+  if (isNaN(currentUserId) || isNaN(targetGroupId)) {
+    return res.status(400).json({ error: 'Invalid user ID' });
+  }
+
+  try {
+
+    const match = await prisma.match.findMany({
+      where: {
+        OR: [
+          { user1Id: currentUserId, studyGroupId: targetGroupId },
+          { user2Id: currentUserId, studyGroupId: targetGroupId }
+        ]
+      }
+    });
+
+    console.log('match', match)
+    
+    if (match.length > 0) {
+      return res.status(200).json("Accepted");
+    }
+    
+    const sentRequests = await prisma.swipe.findMany({
+      where: {
+        AND: {
+          userId: currentUserId,
+          targetGroupId: targetGroupId
+        }
+      },
+      select: { 
+        id: true,
+        userId: true,
+        user: true,
+        targetUserId: true,
+        targetGroupId: true,
+        direction: true,
+        message: true,
+        status: true,
+        updatedAt: true
+      },
+    });
+
+    console.log(sentRequests)
+
+    const mostRecentRequest = sentRequests.sort((a, b) => {
+      // Compare updatedAt values (latest date first)
+      return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+    })[0];
+
+    console.log(mostRecentRequest); // This will be the most recent sentRequest
+
+    if(!mostRecentRequest) {
+      return res.status(200).json(null);
+    }
+
+    if (mostRecentRequest.status == "Accepted") {
+      // Check if match exists
+      if (mostRecentRequest.targetGroupId) {
+        const matchData = await prisma.match.findMany({
+          where: {
+            OR: [
+              { user1Id: mostRecentRequest.userId, studyGroupId: mostRecentRequest.targetGroupId },
+              { studyGroupId: mostRecentRequest.targetGroupId, user2Id: mostRecentRequest.userId },
+            ]
+          }
+        });
+        if (matchData) { return res.status(200).json(mostRecentRequest.status); }
+
+      }
+
+      return res.status(200).json(null);
+    }
+
+    return res.status(200).json(mostRecentRequest.status);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Something went wrong' });
+  }
+});
 
 //for deleting a request in the reject button in requests panel
 app.delete('/api/swipe/:requestId', async(req, res): Promise<any> =>{
@@ -2398,6 +2491,8 @@ app.post('/api/chats', async (req, res) : Promise<any> => {
     if (!recipient) {
       return res.status(404).json({ error: 'Recipient user not found' });
     }
+
+    const currentTime = new Date().toISOString();
     // Create a new chat linking both users
     const newChat = await prisma.chat.create({
       data: {
@@ -2408,9 +2503,16 @@ app.post('/api/chats', async (req, res) : Promise<any> => {
             { id: userId2 },
           ],
         },
+       
       },
     });
 
+     // Create the LastOpened records for both users
+     await prisma.lastOpened.createMany({
+      data: [
+        { chatId: newChat.id, userId: userId2, timestamp: new Date() },
+      ],
+    });
     res.status(201).json(newChat);
   } catch (error) {
     console.error("Error creating chat:", error);

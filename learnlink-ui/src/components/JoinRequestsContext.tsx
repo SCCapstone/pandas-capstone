@@ -1,6 +1,6 @@
 import React, { useEffect, useState, ReactNode, createContext, useContext } from 'react';
 import axios from 'axios';
-import { SwipeRequest, SwipeStatus } from '../pages/Network/types';
+import { SwipeRequest, SwipeStatus } from '../utils/types';
 
 // Define the type for the context value
 interface JoinRequestContextType {

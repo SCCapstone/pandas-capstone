@@ -7,24 +7,32 @@ import './publicProfile.css';
 import { formatEnum } from '../utils/format';
 import InviteMessagePanel from '../components/InviteMessagePanel';
 import { getLoggedInUserId } from '../utils/auth';
-import { useMatchButtonStatus, sendMatchRequestNotification } from '../utils/userServices'
+import { useMatchButtonStatusGroup, sendMatchRequestNotification } from '../utils/userServices'
 import CustomAlert from '../components/CustomAlert';
+import { StudyGroup } from '../utils/types'
+import { RiFontSize } from 'react-icons/ri';
 
 
 
-const PublicProfile: React.FC = () => {
+const PublicGroupProfile: React.FC = () => {
     const { id } = useParams<{ id: string }>();
-    const [user, setUser] = useState<any>(null);
+    const [studyGroup, setStudyGroup] = useState<StudyGroup | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [showInvitePanel, setShowInvitePanel] = useState(false);
     const loggedInUserId = getLoggedInUserId();
     const [alerts, setAlerts] = useState<{ id: number; alertText: string; alertSeverity: "error" | "warning" | "info" | "success"; visible: boolean }[]>([]);
     const alertVisible = alerts.some(alert => alert.visible);
     const numericId = useMemo(() => Number(id), [id]);
+    const [selectedMember, setSelectedMember] = useState<{ id: number } | null>(null);
     const [isLoading, setLoading] = useState<boolean>(true)
     const [notFound, setNotFound] = useState<boolean>(false)
 
-    const matchButton = useMatchButtonStatus(numericId);
+
+    const genericUserPfp = "https://learnlink-public.s3.us-east-2.amazonaws.com/AvatarPlaceholder.svg";
+    const genericStudyGroupPfp = "https://learnlink-pfps.s3.us-east-1.amazonaws.com/profile-pictures/generic_studygroup_pfp.svg";
+
+
+    const matchButton = useMatchButtonStatusGroup(numericId);
 
 
 
@@ -69,7 +77,7 @@ const PublicProfile: React.FC = () => {
                 return;
             }
 
-            const currentProfile = user;
+            const currentStudyGroup = studyGroup;
 
             await fetch(`${REACT_APP_API_URL}/api/swipe`, {
                 method: 'POST',
@@ -79,9 +87,9 @@ const PublicProfile: React.FC = () => {
                 },
                 body: JSON.stringify({
                     userId: loggedInUserId,
-                    targetId: currentProfile.id,
+                    targetId: currentStudyGroup?.id,
                     direction,
-                    isStudyGroup: !!currentProfile.chatID, // Check if it's a study group
+                    isStudyGroup: true,
                     message: message
                 }),
             });
@@ -99,17 +107,18 @@ const PublicProfile: React.FC = () => {
     };
 
     const handleMatchNotification = async () => {
-        await sendMatchRequestNotification(user)
+        await sendMatchRequestNotification(studyGroup)
     };
 
     const handleSendMessage = async (message: string) => {
-        handleSwipe("Yes", user.id, !!user.studyGroupId, message);
+        if (studyGroup)
+            handleSwipe("Yes", studyGroup.id, true, message);
         handleMatchButtonClick()
 
     };
 
     const handleInvite = () => {
-        // navigate(`/messaging?user=${currentProfile.id}`);
+        // navigate(`/messaging?user=${studyGroup.id}`);
         setShowInvitePanel(true);
 
     };
@@ -132,9 +141,9 @@ const PublicProfile: React.FC = () => {
     // }, [id]);
 
     useEffect(() => {
-        const fetchUser = async () => {
+        const fetchStudyGroup = async () => {
             try {
-                const response = await fetch(`${REACT_APP_API_URL}/api/users/profile/${id}`, {
+                const response = await fetch(`${REACT_APP_API_URL}/api/study-groups/${id}`, {
                     headers: {
                         Authorization: `Bearer ${localStorage.getItem('token')}`,
                     },
@@ -142,13 +151,13 @@ const PublicProfile: React.FC = () => {
                 if (!response.ok) {
                     setAlerts((prevAlerts) => [
                         ...prevAlerts,
-                        { id: Date.now(), alertText: 'Failed to fetch user', alertSeverity: "error", visible: true },
+                        { id: Date.now(), alertText: 'Failed to fetch study Group', alertSeverity: "error", visible: true },
                     ]);
-                    throw new Error('Failed to fetch user');
+                    throw new Error('Failed to fetch Study Group');
                 }
                 const data = await response.json();
-                setUser(data);
-                console.log(user);
+                setStudyGroup(data.studyGroup);
+                console.log('studygroup', data);
                 setLoading(false)
 
             } catch (err) {
@@ -167,16 +176,19 @@ const PublicProfile: React.FC = () => {
                         { id: Date.now(), alertText: 'An unknown error occurred', alertSeverity: "error", visible: true },
                     ]);
                     setNotFound(true)
-
                 }
             }
         };
 
-        fetchUser();
+        fetchStudyGroup();
     }, [id]);
 
     // if (error) {
     //     return <div>Error: {error}</div>;
+    // }
+
+    // if (!studyGroup) {
+    //     return <div>Loading...</div>;
     // }
 
     return (
@@ -209,50 +221,85 @@ const PublicProfile: React.FC = () => {
                         )}
                         <div className='whole-public-component'>
                             <div className="profile-card">
-                                {user ? (
-                                    <>
-                                        <div className='public-main-container'>
-                                            <div className='public-left-side'>
-                                                <img src={user.profilePic} alt={`${user.first_name} ${user.last_name}`} className='profile-pic' />
-                                                <div className='bio'>
-                                                    <h3>Bio:</h3>
-                                                    <p>{user.bio}</p>
+                                {studyGroup ? (
+                                    <>            <div className="group-container">
+
+                                        <h1>Group: {studyGroup.name}</h1>
+
+                                        <div className="group-info">
+
+
+                                            <div className="group-right">
+                                                {/* <GroupLogo/> */}
+                                                <img
+                                                    src={studyGroup.profilePic ? studyGroup.profilePic : genericStudyGroupPfp}
+                                                    className="group-pic"
+                                                />
+                                                <div className="group-description">
+                                                    <span className="bold-first-word">Bio: </span>
+                                                    <br></br>{studyGroup.description}
+                                                </div>
+                                                <div className='group-subject'>
+                                                    <span className="bold-first-word">Course: </span>{studyGroup.subject}
                                                 </div>
 
                                             </div>
-                                            <div className='public-right-side'>
-                                                <h1>{user.first_name} {user.last_name}</h1>
-                                                <h3>@{user.username}</h3>
-                                                <div className='profile-details-container'>
-                                                    <div className='public-profile-details'>
-                                                        <p><span className="bold-first-word">Age: </span>{user.age}</p>
-                                                        <p><span className="bold-first-word">College: </span>{user.college}</p>
-                                                        <p><span className="bold-first-word">Major: </span>{user.major}</p>
-                                                        <p><span className="bold-first-word">Gender: </span>{user.gender}</p>
-                                                    </div>
-                                                    <div className='public-profile-details'>
-                                                        <p><span className="bold-first-word">Grade: </span>{user.grade}</p>
-                                                        <p><span className="bold-first-word">Relevant Coursework: </span>{user.relevant_courses}</p>
-                                                        <p><span className="bold-first-word">Fav Study Method: </span>{user.study_method}</p>
-                                                        <p><span className="bold-first-word">Study Tags: </span>
-                                                            {user.studyHabitTags.length > 0 ? (
-                                                                user.studyHabitTags.map((tag: string, index: number) => (
-                                                                    <span key={index} className="tag">
-                                                                        {formatEnum(tag)}
-                                                                    </span>
-                                                                ))
-                                                            ) : (
-                                                                "No study tags specified."
-                                                            )}
-                                                        </p>
-                                                    </div>
+                                            <div className="group-left">
+                                                {/* <h1>Members:</h1> */}
+                                                <div className="member-cards">
+                                                    {studyGroup.users && studyGroup.users.length > 0 ? (
+                                                        studyGroup.users.map((member: any, index: number) => (
+                                                            <div key={index} className="member-card" onClick={() => setSelectedMember({ id: member.id })}>
+                                                                <div className="member-card-top">
+                                                                    <h1>{member.name}</h1>
+                                                                    <div className="member-card-top-left" >
+                                                                        <img
+                                                                            src={member.profilePic || genericUserPfp}
+                                                                            alt={`${member.firstName} ${member.lastName}`}
+                                                                            className="member-pic"
+                                                                        />
+                                                                    </div>
+                                                                    <div className="member-card-top-right">
+                                                                        <h1>{member.firstName} {member.lastName} </h1>
+                                                                        <h2>@{member.username}</h2>
+                                                                    </div>
+                                                                </div>
+                                                                <>
+                                                                    <p><span className="bold-first-word">Bio:</span></p>
+                                                                    <p>{member.bio}</p>
+
+                                                                    {/* <div className="swipe-profile-details">
+                                              <p><span className="bold-first-word">Age: </span>{member.age}</p>
+                                              <p><span className="bold-first-word">College: </span>{member.college}</p>
+                                              <p><span className="bold-first-word">Major: </span>{member.major}</p>
+                                              <p><span className="bold-first-word">Gender: </span>{member.gender}</p>
+                                              </div> */}
+                                                                    {/* 
+                                              <p><span className="bold-first-word">Grade: </span>{member.grade}</p>
+                                              <p><span className="bold-first-word">Relevant Coursework: </span>{member.relevant_courses}</p>
+                                              <p><span className="bold-first-word">Fav Study Method: </span>{member.study_method}</p>
+                                              */}
+                                                                    <p><span className="bold-first-word">Study Tags: <br></br></span>
+                                                                        {member.studyHabitTags.length > 0 ? (
+                                                                            member.studyHabitTags.map((tag: string, index: number) => (
+                                                                                <span key={index} className="member-tag">
+                                                                                    {formatEnum(tag)}
+                                                                                </span>
+                                                                            ))
+                                                                        ) : (
+                                                                            "No study tags specified."
+                                                                        )}
+                                                                    </p>
+                                                                </>
+                                                            </div>
+                                                        ))
+                                                    ) : (
+                                                        <p>No members yet.</p>
+                                                    )}
                                                 </div>
                                             </div>
-
-                                            {/* Render more profile details as needed */}
                                         </div>
-
-
+                                    </div>
                                         <div className="public-action-buttons" >
                                             <button className={`match-button-status-${matchButton.buttonText.toLowerCase()}`}
                                                 disabled={matchButton.isButtonDisabled}
@@ -286,4 +333,4 @@ const PublicProfile: React.FC = () => {
     );
 };
 
-export default PublicProfile;
+export default PublicGroupProfile;

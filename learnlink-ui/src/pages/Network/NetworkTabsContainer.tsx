@@ -21,7 +21,7 @@ const NetworkTabsContainer: React.FC<NetworkTabsContainerProps> = ({ activeTab, 
                 className={`Tab ${activeTab === "sentRequests" ? "active" : ""}`}
                 onClick={() => setActiveTab("sentRequests")}
             >
-                Requests Sent
+                Requests Pending
             </button>
 
             <button

@@ -131,11 +131,10 @@ const ChatsNavi: React.FC<ChatsNaviProps> = ({
   };
   
   const shouldHighlightChat = (chat: Chat) => {
-    //console.log("last updated by ::::",chat);
     if (chat.lastUpdatedById === currentUserId) return false; // Ignore updates made by the current user
   
     const lastOpenedTimestamp = lastOpenedTimes[chat.id]?.[currentUserId];
-    const chatUpdatedAt = new Date(chat.updatedAt).getTime();
+    const chatUpdatedAt = new Date(chat.updatedAt || chat.createdAt).getTime();
     const lastOpenedAt = lastOpenedTimestamp ? new Date(lastOpenedTimestamp).getTime() : 0;
   
     // Don't highlight the chat if the user was just in it
