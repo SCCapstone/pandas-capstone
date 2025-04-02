@@ -141,7 +141,7 @@ const PublicGroupProfile: React.FC = () => {
     // }, [id]);
 
     useEffect(() => {
-        const fetchUser = async () => {
+        const fetchStudyGroup = async () => {
             try {
                 const response = await fetch(`${REACT_APP_API_URL}/api/study-groups/${id}`, {
                     headers: {
@@ -180,7 +180,7 @@ const PublicGroupProfile: React.FC = () => {
             }
         };
 
-        fetchUser();
+        fetchStudyGroup();
     }, [id]);
 
     // if (error) {
@@ -232,7 +232,7 @@ const PublicGroupProfile: React.FC = () => {
                                             <div className="group-right">
                                                 {/* <GroupLogo/> */}
                                                 <img
-                                                    src={studyGroup.profilePic ? studyGroup.profilePic : 'https://learnlink-pfps.s3.us-east-1.amazonaws.com/profile-pictures/generic_studygroup_pfp.svg'}
+                                                    src={studyGroup.profilePic ? studyGroup.profilePic : genericStudyGroupPfp}
                                                     className="group-pic"
                                                 />
                                                 <div className="group-description">
@@ -254,7 +254,7 @@ const PublicGroupProfile: React.FC = () => {
                                                                     <h1>{member.name}</h1>
                                                                     <div className="member-card-top-left" >
                                                                         <img
-                                                                            src={member.profilePic || 'https://learnlink-public.s3.us-east-2.amazonaws.com/AvatarPlaceholder.svg'}
+                                                                            src={member.profilePic || genericUserPfp}
                                                                             alt={`${member.firstName} ${member.lastName}`}
                                                                             className="member-pic"
                                                                         />

@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { useEffect, useState, useMemo} from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import Navbar from '../components/Navbar';
 import CopyrightFooter from '../components/CopyrightFooter';
 import './LandingPage.css';
@@ -7,7 +7,7 @@ import './publicProfile.css';
 import { formatEnum } from '../utils/format';
 import InviteMessagePanel from '../components/InviteMessagePanel';
 import { getLoggedInUserId } from '../utils/auth';
-import {useMatchButtonStatus, sendMatchRequestNotification} from '../utils/userServices'
+import { useMatchButtonStatus, sendMatchRequestNotification } from '../utils/userServices'
 import CustomAlert from '../components/CustomAlert';
 
 
@@ -21,6 +21,8 @@ const PublicProfile: React.FC = () => {
     const [alerts, setAlerts] = useState<{ id: number; alertText: string; alertSeverity: "error" | "warning" | "info" | "success"; visible: boolean }[]>([]);
     const alertVisible = alerts.some(alert => alert.visible);
     const numericId = useMemo(() => Number(id), [id]);
+    const [isLoading, setLoading] = useState<boolean>(true)
+    const [notFound, setNotFound] = useState<boolean>(false)
 
     const matchButton = useMatchButtonStatus(numericId);
 
@@ -36,26 +38,26 @@ const PublicProfile: React.FC = () => {
         console.log("ID CHAGING")
         matchButton.refreshStatus();
         console.log(matchButton)
-      }, [id]);
-      
+    }, [id]);
+
     useEffect(() => {
         console.log("PublicProfile re-render:", matchButton);
-      }, [matchButton]);
+    }, [matchButton]);
 
-      // Example: after performing a match-related action, refresh the status
-      const handleMatchButtonClick = async () => {
+    // Example: after performing a match-related action, refresh the status
+    const handleMatchButtonClick = async () => {
         if (!matchButton.isButtonDisabled) {
             console.log("Match button clicked!");
-            
+
             // Send match notification
-            await handleMatchNotification(); 
-            
+            await handleMatchNotification();
+
             // Refresh button status after the action
             matchButton.refreshStatus();
         }
     };
 
-    const handleSwipe = async (direction: 'Yes' | 'No', targetId: number, isStudyGroup: boolean, message:string | undefined) => {
+    const handleSwipe = async (direction: 'Yes' | 'No', targetId: number, isStudyGroup: boolean, message: string | undefined) => {
         try {
             const token = localStorage.getItem('token');
             if (!token) {
@@ -63,36 +65,36 @@ const PublicProfile: React.FC = () => {
                 setAlerts((prevAlerts) => [
                     ...prevAlerts,
                     { id: Date.now(), alertText: 'Log in to swipe.', alertSeverity: "error", visible: true },
-                  ]);
+                ]);
                 return;
             }
 
-          const currentProfile = user;
-    
-          await fetch(`${REACT_APP_API_URL}/api/swipe`, {
-            method: 'POST',
-            headers: {
-              'Authorization': `Bearer ${token}`,
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              userId: loggedInUserId,
-              targetId: currentProfile.id,
-              direction,
-              isStudyGroup: !!currentProfile.chatID, // Check if it's a study group
-              message: message
-            }),
-          });
-    
-          setShowInvitePanel(false);
-    
+            const currentProfile = user;
+
+            await fetch(`${REACT_APP_API_URL}/api/swipe`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    userId: loggedInUserId,
+                    targetId: currentProfile.id,
+                    direction,
+                    isStudyGroup: !!currentProfile.chatID, // Check if it's a study group
+                    message: message
+                }),
+            });
+
+            setShowInvitePanel(false);
+
         } catch (error) {
-          console.error('Error swiping:', error);
-          setAlerts((prevAlerts) => [
-            ...prevAlerts,
-            { id: Date.now(), alertText: 'Error swiping. Please try again later. ', alertSeverity: "error", visible: true },
-          ]);
-          
+            console.error('Error swiping:', error);
+            setAlerts((prevAlerts) => [
+                ...prevAlerts,
+                { id: Date.now(), alertText: 'Error swiping. Please try again later. ', alertSeverity: "error", visible: true },
+            ]);
+
         }
     };
 
@@ -141,12 +143,13 @@ const PublicProfile: React.FC = () => {
                     setAlerts((prevAlerts) => [
                         ...prevAlerts,
                         { id: Date.now(), alertText: 'Failed to fetch user', alertSeverity: "error", visible: true },
-                      ]);
+                    ]);
                     throw new Error('Failed to fetch user');
                 }
                 const data = await response.json();
                 setUser(data);
                 console.log(user);
+                setLoading(false)
 
             } catch (err) {
                 if (err instanceof Error) {
@@ -154,13 +157,17 @@ const PublicProfile: React.FC = () => {
                     setAlerts((prevAlerts) => [
                         ...prevAlerts,
                         { id: Date.now(), alertText: err instanceof Error ? err.message : 'An unknown error occurred', alertSeverity: "error", visible: true },
-                      ]);
+                    ]);
+                    setNotFound(true)
+
                 } else {
                     setError('An unknown error occurred');
                     setAlerts((prevAlerts) => [
                         ...prevAlerts,
                         { id: Date.now(), alertText: 'An unknown error occurred', alertSeverity: "error", visible: true },
-                      ]);
+                    ]);
+                    setNotFound(true)
+
                 }
             }
         };
@@ -172,92 +179,100 @@ const PublicProfile: React.FC = () => {
     //     return <div>Error: {error}</div>;
     // }
 
-    if (!user) {
-        return <div>Loading...</div>;
-    }
-
     return (
         <div className="public-profile-page">
             <header>
                 <Navbar />
             </header>
             <div className="public-profile-container">
-                {alertVisible && (
-                    <div className='alert-container'>
-                        {alerts.map(alert => (
-                            <CustomAlert
-                                key={alert.id}
-                                text={alert.alertText || ''}
-                                severity={alert.alertSeverity || 'info' as "error" | "warning" | "info" | "success"}
-                                onClose={() => setAlerts(prevAlerts => prevAlerts.filter(a => a.id !== alert.id))}
-                            />
-                        ))}
+                {notFound ? (
+                    <div className="loading-container">
+                        <h1>404 Not Found</h1>
                     </div>
-                )}
-                <div className='whole-public-component'>
-                    <div className="profile-card">
-                        {user ? (
-                            <>
-                                <div className='public-main-container'>
-                                    <div className='public-left-side'>
-                                        <img src={user.profilePic} alt={`${user.first_name} ${user.last_name}`} className='profile-pic' />
-                                        <div className='bio'>
-                                            <h3>Bio:</h3>
-                                            <p>{user.bio}</p>
-                                        </div>
-
-                                    </div>
-                                    <div className='public-right-side'>
-                                        <h1>{user.first_name} {user.last_name}</h1>
-                                        <h3>@{user.username}</h3>
-                                        <div className='profile-details-container'>
-                                            <div className='public-profile-details'>
-                                                <p><span className="bold-first-word">Age: </span>{user.age}</p>
-                                                <p><span className="bold-first-word">College: </span>{user.college}</p>
-                                                <p><span className="bold-first-word">Major: </span>{user.major}</p>
-                                                <p><span className="bold-first-word">Gender: </span>{user.gender}</p>
-                                            </div>
-                                            <div className='public-profile-details'>
-                                                <p><span className="bold-first-word">Grade: </span>{user.grade}</p>
-                                                <p><span className="bold-first-word">Relevant Coursework: </span>{user.relevant_courses}</p>
-                                                <p><span className="bold-first-word">Fav Study Method: </span>{user.study_method}</p>
-                                                <p><span className="bold-first-word">Study Tags: </span>
-                                                    {user.studyHabitTags.length > 0 ? (
-                                                        user.studyHabitTags.map((tag: string, index: number) => (
-                                                            <span key={index} className="tag">
-                                                                {formatEnum(tag)}
-                                                            </span>
-                                                        ))
-                                                    ) : (
-                                                        "No study tags specified."
-                                                    )}
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* Render more profile details as needed */}
-                                </div>
-
-
-                                    <div className="public-action-buttons" >
-                                        <button className={`match-button-status-${matchButton.buttonText.toLowerCase()}`}
-                                        disabled={matchButton.isButtonDisabled}
-                                        onClick={handleInvite}
-                                        >
-                                            
-                                        {matchButton.buttonText}
-                                        </button>
-                                        
-                                    </div>
-                            </>
-                        ) : (
-                            <div className='public-info'>
-                                <p>No more profiles to public on!</p>
+                ) : (<>
+                    {isLoading ? (
+                        <div className="loading-container">
+                            Loading... <span className="loading-spinner"></span>
+                        </div>
+                    ) : (<>
+                        {alertVisible && (
+                            <div className='alert-container'>
+                                {alerts.map(alert => (
+                                    <CustomAlert
+                                        key={alert.id}
+                                        text={alert.alertText || ''}
+                                        severity={alert.alertSeverity || 'info' as "error" | "warning" | "info" | "success"}
+                                        onClose={() => setAlerts(prevAlerts => prevAlerts.filter(a => a.id !== alert.id))}
+                                    />
+                                ))}
                             </div>
                         )}
-                    </div>
-                </div>
+                        <div className='whole-public-component'>
+                            <div className="profile-card">
+                                {user ? (
+                                    <>
+                                        <div className='public-main-container'>
+                                            <div className='public-left-side'>
+                                                <img src={user.profilePic} alt={`${user.first_name} ${user.last_name}`} className='profile-pic' />
+                                                <div className='bio'>
+                                                    <h3>Bio:</h3>
+                                                    <p>{user.bio}</p>
+                                                </div>
+
+                                            </div>
+                                            <div className='public-right-side'>
+                                                <h1>{user.first_name} {user.last_name}</h1>
+                                                <h3>@{user.username}</h3>
+                                                <div className='profile-details-container'>
+                                                    <div className='public-profile-details'>
+                                                        <p><span className="bold-first-word">Age: </span>{user.age}</p>
+                                                        <p><span className="bold-first-word">College: </span>{user.college}</p>
+                                                        <p><span className="bold-first-word">Major: </span>{user.major}</p>
+                                                        <p><span className="bold-first-word">Gender: </span>{user.gender}</p>
+                                                    </div>
+                                                    <div className='public-profile-details'>
+                                                        <p><span className="bold-first-word">Grade: </span>{user.grade}</p>
+                                                        <p><span className="bold-first-word">Relevant Coursework: </span>{user.relevant_courses}</p>
+                                                        <p><span className="bold-first-word">Fav Study Method: </span>{user.study_method}</p>
+                                                        <p><span className="bold-first-word">Study Tags: </span>
+                                                            {user.studyHabitTags.length > 0 ? (
+                                                                user.studyHabitTags.map((tag: string, index: number) => (
+                                                                    <span key={index} className="tag">
+                                                                        {formatEnum(tag)}
+                                                                    </span>
+                                                                ))
+                                                            ) : (
+                                                                "No study tags specified."
+                                                            )}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* Render more profile details as needed */}
+                                        </div>
+
+
+                                        <div className="public-action-buttons" >
+                                            <button className={`match-button-status-${matchButton.buttonText.toLowerCase()}`}
+                                                disabled={matchButton.isButtonDisabled}
+                                                onClick={handleInvite}
+                                            >
+
+                                                {matchButton.buttonText}
+                                            </button>
+
+                                        </div>
+                                    </>
+                                ) : (
+                                    <div className='public-info'>
+                                        <p>No more profiles to public on!</p>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </>)}
+                </>)}
             </div>
             <footer>
                 <CopyrightFooter />
