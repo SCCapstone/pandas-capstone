@@ -24,11 +24,18 @@ import AdvancedSearch from './pages/advancedSearch';
 import Network from './pages/Network/Network';
 import Groups from './pages/groups'
 import Scheduler from './pages/resources/Scheduler'
+import JoinRequestNotifs from './components/JoinRequestsContext';
+import JoinRequestsNotificationBadge from './components/JoinRequestsNotificationBadge';
+import { getLoggedInUserId } from './utils/auth';
 
 function App() {
+  const currentUserId = getLoggedInUserId();
   return (
     <Router>
       <div className="App">
+        <JoinRequestNotifs currentUserId={currentUserId}>
+          <JoinRequestsNotificationBadge />
+        </JoinRequestNotifs>
         <Routes>
           {/* Public Routes */}
           <Route path="/" element={<Welcome />} />
@@ -38,14 +45,14 @@ function App() {
           <Route path="/forgotpassword" element={<ForgotPassword />} />
           <Route path="/resetpassword/:token" element={<ResetPasswordFromEmail />} />
 
-          
+
           {/* Private Routes */}
-          <Route element={<PrivateRoutes/>}>
+          <Route element={<PrivateRoutes />}>
             <Route path="/landingpage" element={<LandingPage />} />
             <Route path="/settings" element={<Settings />} />
-            <Route path="/messaging" element = {<Messaging/> }/>
-            <Route path="/groups" element = {<Groups/>}/>
-            <Route path="/profile" element = {<Profile/> }/>
+            <Route path="/messaging" element={<Messaging />} />
+            <Route path="/groups" element={<Groups />} />
+            <Route path="/profile" element={<Profile />} />
             <Route path="/resources" element={<Resources />} />
             <Route path="/resources/studyTips" element={<StudyTips />} />
             <Route path="/resources/externalResources" element={<ExternalResources />} />
@@ -64,7 +71,7 @@ function App() {
             <Route path="/user-profile/:id" element={<PublicProfile />} />
             <Route path="/advancedsearch" element={<AdvancedSearch />} />
           </Route>
-        </Routes> 
+        </Routes>
       </div>
     </Router>
   );
