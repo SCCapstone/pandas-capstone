@@ -100,7 +100,7 @@ const SentRequestsList:React.FC<SentRequestsListProps> = ({ handleSelectUser }: 
         Loading... <span className="loading-spinner"></span>
       </div>
     ) : sentRequestsList.length === 0 ? (
-      <p className="no-requests">No requests sent.</p>
+      <p className="no-requests">No pending requests.</p>
       ) : (
             <div className="network-list-container">
             {/* <h3>Your Matches</h3>
@@ -131,16 +131,23 @@ const SentRequestsList:React.FC<SentRequestsListProps> = ({ handleSelectUser }: 
 
                                     </div>
                                 ) : request.targetGroupId && request.targetGroup ? (
-                                    // Display target group details
-                                    <div className='network-list-container'>
-                                        <div className='network-list-info'>
-                                            <img
-                                                src={request.targetGroup.studyGroup.profilePic || 'https://learnlink-pfps.s3.us-east-1.amazonaws.com/profile-pictures/generic_studygroup_pfp.svg'}
-                                                alt={`${request.targetGroup.studyGroup.name}`}
-                                                className='network-profile-pic'
+                                        // Display target group details
+                                        <div className='network-list-parent'>
+                                        <div className='study-group-request'>
+                                                <p>
+                                                <strong>Study Group</strong>
+                                                    {/* <strong> {request.targetGroup?.studyGroup.name || 'Unnamed Study Group'}</strong> */}
+                                                </p>
+                                            </div>
+                                        <div className='network-list-container'>
+                                            <div className='network-list-info'>
+                                                <img
+                                                    src={request.targetGroup.studyGroup.profilePic || 'https://learnlink-pfps.s3.us-east-1.amazonaws.com/profile-pictures/generic_studygroup_pfp.svg'}
+                                                    alt={`${request.targetGroup.studyGroup.name}`}
+                                                    className='network-profile-pic'
                                             />
                                             <div className='network-bio'>
-                                                <h3>Group: {request.targetGroup.studyGroup.name}</h3>
+                                                <h3>{request.targetGroup.studyGroup.name}</h3>
                                                 <p>{request.targetGroup.studyGroup.description}</p>
                                             </div>
                                         </div>
@@ -149,6 +156,7 @@ const SentRequestsList:React.FC<SentRequestsListProps> = ({ handleSelectUser }: 
                                                 <button className='network-withdraw-button' onClick={() => handleDeleteRequest(request.id)}>Withdraw</button>
                                             ) : null}
                                             <button className={`status-${request.status.toLowerCase()}`}>{request.status}</button>
+                                        </div>
                                         </div>
                                     </div>
 

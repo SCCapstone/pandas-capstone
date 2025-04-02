@@ -82,9 +82,13 @@
   }
 
   .study-group-request {
-    background-color: var(--primary-300);
+    background-color: #71c5ef96;
     border-radius: 5px;
     margin-bottom: 15px;
+    padding-left: 10px;
+    padding-right: 10px;
+
+    width: fit-content;
   }
 
   .network-list-container {
@@ -267,4 +271,11 @@
 .study-group-request {
   display: flex;
   flex-direction: column;
+}
+
+.Group-List-Title {
+  background-color: var(--primary-300);
+  padding: 3px;
+  border-radius: 5px;
+  margin-top: 15px;
 }
