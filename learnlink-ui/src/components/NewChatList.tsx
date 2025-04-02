@@ -176,7 +176,7 @@ const NewChatList: React.FC<MatchesListProps> = ({ handleSelectUser, onClose}) =
 
     if (loading) return <div className="loading-container">Loading... <span className="loading-spinner"></span> </div>;
 
-    if(matchesList.length === 0) return <p className="no-requests">No connections yet.</p>
+    if(matchesList.length === 0) return <p className="no-requests">All matches have chats already, match with more people for new chats.</p>
 
   return (
     <div className="TabPanel">
