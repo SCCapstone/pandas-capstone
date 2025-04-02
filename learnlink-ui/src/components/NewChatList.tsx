@@ -1,6 +1,6 @@
 // src/pages/Network/MatchesList.tsx
 import React, { useState, useEffect } from 'react';
-import { Match, User } from '../utils/types';
+import { Match } from '../utils/types';
 import axios from 'axios';
 import CustomAlert from '../components/CustomAlert';
 import { getLoggedInUserId } from '../utils/auth';
@@ -8,6 +8,7 @@ import { set } from 'react-hook-form';
 import { useNavigate } from "react-router-dom";
 import '../components/NewChatList.css';
 import '../pages/Network/Network.css';
+import { updateChatTimestamp } from "../utils/messageUtils";
 
 
 interface MatchesListProps {
@@ -17,7 +18,7 @@ interface MatchesListProps {
 const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
 
 
-const NewChatList: React.FC<MatchesListProps> = ({ handleSelectUser, onClose }) => {
+const NewChatList: React.FC<MatchesListProps> = ({ handleSelectUser, onClose}) => {
   const [matchesList, setMatchesList] = useState<Match[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [alerts, setAlerts] = useState<{ id: number; alertText: string; alertSeverity: "error" | "warning" | "info" | "success"; visible: boolean }[]>([]);
@@ -133,6 +134,16 @@ const NewChatList: React.FC<MatchesListProps> = ({ handleSelectUser, onClose }) 
         if (response.status === 200 || response.status === 201) {
               // If chat was created successfully, update parent component
               console.log("response 200");
+            
+              const chatCheckResponse = await axios.get(`${REACT_APP_API_URL}/api/chats/check`, {
+                params: { userId1: userId, userId2: currentId },
+              });
+        
+              // Get the chat details
+              const chat = chatCheckResponse.data;
+        
+        
+        
               onClose(); // Close popup after navigation
               navigate(`/messaging?selectedChatId=${response.data.id}`);
               window.location.reload(); 
@@ -226,3 +237,4 @@ const NewChatList: React.FC<MatchesListProps> = ({ handleSelectUser, onClose }) 
 };
 
 export default NewChatList;
+

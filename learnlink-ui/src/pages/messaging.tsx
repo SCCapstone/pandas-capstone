@@ -109,7 +109,7 @@ const Messaging: React.FC = () => {
   
   const [unseenMessages, setUnseenMessages] = useState<{ [chatId: number]: boolean }>({});
 
-
+  const [lastOpenedTimes, setLastOpenedTimes] = useState<{[chatId: number]: { [userId: number]: string };}>({});
   const [updateMessage, setUpdateMessage] = useState<string>('');
   const [visibleMessage, setVisibleMessage] = useState("");
   const [selectedProfile, setSelectedProfile] = useState<{ id: number; name: string } | null>(null);
@@ -1194,7 +1194,10 @@ const handleGetChatUsername = async (userId: number) => {
                   <h3>Potential New Chats</h3>
                   <button className="matches-popup-close" onClick={closePopup}>×</button>
                 </div>
-                <NewChatList handleSelectUser={() => {}} onClose={closePopup} />
+                <NewChatList 
+                  handleSelectUser={() => {}} 
+                  onClose={closePopup} 
+                  />
               </div>
             </>
           )}

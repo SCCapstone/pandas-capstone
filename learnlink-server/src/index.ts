@@ -2491,6 +2491,8 @@ app.post('/api/chats', async (req, res) : Promise<any> => {
     if (!recipient) {
       return res.status(404).json({ error: 'Recipient user not found' });
     }
+
+    const currentTime = new Date().toISOString();
     // Create a new chat linking both users
     const newChat = await prisma.chat.create({
       data: {
@@ -2501,9 +2503,16 @@ app.post('/api/chats', async (req, res) : Promise<any> => {
             { id: userId2 },
           ],
         },
+       
       },
     });
 
+     // Create the LastOpened records for both users
+     await prisma.lastOpened.createMany({
+      data: [
+        { chatId: newChat.id, userId: userId2, timestamp: new Date() },
+      ],
+    });
     res.status(201).json(newChat);
   } catch (error) {
     console.error("Error creating chat:", error);
