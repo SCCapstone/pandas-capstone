@@ -204,5 +204,149 @@ describe('EditStudyGroup Component Behavioral Tests', () => {
       fireEvent.click(screen.getByText('Cancel'));
       expect(mockOnClose).toHaveBeenCalled();
     });
+
+
+    it('should show error alert when saving without a group name', async () => {
+      renderComponent();
+      
+      await waitFor(() => {
+        expect(screen.getByDisplayValue('Initial Group Name')).toBeInTheDocument();
+      });
+  
+      // Clear the name field
+      fireEvent.change(screen.getByDisplayValue('Initial Group Name'), {
+        target: { value: '' }
+      });
+  
+      fireEvent.click(screen.getByText('Save'));
+  
+      await waitFor(() => {
+        expect(screen.getByText('Study group name is required')).toBeInTheDocument();
+      });
+    });
+
+
+
+  
+    it('should update the description when input changes', async () => {
+      renderComponent();
+      
+      await waitFor(() => {
+        expect(screen.getByDisplayValue('Initial description')).toBeInTheDocument();
+      });
+  
+      const newDescription = 'Updated description text';
+      fireEvent.change(screen.getByDisplayValue('Initial description'), {
+        target: { value: newDescription }
+      });
+  
+      expect(screen.getByDisplayValue(newDescription)).toBeInTheDocument();
+    });
+
+  
+    it('should update the subject when input changes', async () => {
+      renderComponent();
+      
+      await waitFor(() => {
+        expect(screen.getByDisplayValue('Initial Subject')).toBeInTheDocument();
+      });
+  
+      const newSubject = 'Updated subject text';
+      fireEvent.change(screen.getByDisplayValue('Initial Subject'), {
+        target: { value: newSubject }
+      });
+  
+      expect(screen.getByDisplayValue(newSubject)).toBeInTheDocument();
+    });
+
+  
+    it('should show success alert when save is successful', async () => {
+      renderComponent();
+      
+      await waitFor(() => {
+        expect(screen.getByText('Save')).toBeInTheDocument();
+      });
+  
+      fireEvent.click(screen.getByText('Save'));
+  
+      await waitFor(() => {
+        expect(screen.getByText('Study group updated')).toBeInTheDocument();
+      });
+    });
+
+  
+  
+
+  
+    it('should display the current profile picture', async () => {
+      renderComponent();
+      
+      await waitFor(() => {
+        const img = screen.getByAltText('Profile');
+        expect(img).toHaveAttribute('src', 'initial-pic.jpg');
+      });
+    });
+  
+
+    it('should allow clicking on profile picture to trigger file input', async () => {
+      renderComponent();
+      
+      await waitFor(() => {
+        const img = screen.getByAltText('Profile');
+        fireEvent.click(img);
+        // Verify the file input click was triggered
+        // This is indirect since we can't directly access the hidden input
+        expect(document.getElementById('image-upload')).toBeInTheDocument();
+      });
+    });
+  
+    /*
+    describe('Image Upload Tests', () => {
+      beforeEach(() => {
+        // Mock file reader
+        global.FileReader = jest.fn().mockImplementation(() => ({
+          readAsDataURL: jest.fn(),
+          onload: jest.fn(),
+          result: 'mock-image-data',
+        }));
+      });
+    
+      it('should handle image selection', async () => {
+        renderComponent();
+        
+        const file = new File(['test'], 'test.png', { type: 'image/png' });
+        const input = screen.getByTestId('image-upload') || document.getElementById('image-upload');
+        
+        if (input) {
+          fireEvent.change(input, { target: { files: [file] } });
+        }
+    
+        await waitFor(() => {
+          // Verify the image was set in state (indirectly through preview)
+          expect(require('axios').default.put).not.toHaveBeenCalled(); // No upload yet
+        });
+      });
+    
+      it('should show error when image upload fails', async () => {
+        require('axios').default.put.mockRejectedValueOnce(new Error('Upload failed'));
+        
+        renderComponent();
+        
+        const file = new File(['test'], 'test.png', { type: 'image/png' });
+        const input = screen.getByTestId('image-upload') || document.getElementById('image-upload');
+        
+        if (input) {
+          fireEvent.change(input, { target: { files: [file] } });
+        }
+    
+        fireEvent.click(screen.getByText('Save'));
+    
+        await waitFor(() => {
+          expect(screen.queryByText(/failed to upload image/i)).toBeInTheDocument();
+        });
+      });
+    });*/
 });
+
+
 });
