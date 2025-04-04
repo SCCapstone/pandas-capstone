@@ -73,9 +73,9 @@
 .profile-side textarea
 {
   font-family: 'Inter';
-  font-size: 14px; /* Match font size */
+  font-size: 16px; /* Match font size */
   font-weight: normal;
-  line-height: 20px;
+  line-height: 30px;
   margin-bottom: 10px;
   color: #3B3C3D; /* Match text color */
   display: block;
@@ -86,10 +86,13 @@
 .profile-side input,
 .profile-side textarea,
 .profile-side select {
+
+  font-size: 16px;
+  color:#3B3C3D;
   width: 100%;
-  height: 35px; /* Similar to the input height in login form */
+  height: 50px; /* Similar to the input height in login form */
   margin-bottom: 10px;
-  padding: 5px; /* Match padding */
+  padding: 10px; /* Match padding */
   border: 1px solid #ccc;
   border-radius: 4px;
   box-sizing: border-box; /* Include padding and border in total height */
@@ -168,6 +171,7 @@
   margin-top: 15px;
   display: flex;
   flex-direction: row;
+  gap: 15px;
   justify-content: space-between;
 }
 

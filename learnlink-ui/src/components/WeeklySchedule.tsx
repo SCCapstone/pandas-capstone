@@ -150,6 +150,7 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ studyGroupId }) => {
                     const sortedDays = (data.scheduleDays || []).sort(
                         (a: string, b: string) => dayOrder.indexOf(a) - dayOrder.indexOf(b)
                     );
+                    
                     setDays(sortedDays || []);
                     setScheduleStartTime(data.scheduleStartTime || "9:00 AM");
                     setScheduleEndTime(data.scheduleEndTime || "5:00 PM");
