@@ -3,6 +3,9 @@ FROM node:18-bullseye AS builder
 
 WORKDIR /app
 
+ENV PRISMA_CLI_BINARY_TARGETS=debian-openssl-1.1.x,debian-openssl-3.0.x
+ENV OPENSSL_CONF=/etc/ssl/
+
 # Install system dependencies with retry logic
 RUN --mount=type=cache,target=/var/cache/apt \
     apt-get update || (rm -rf /var/lib/apt/lists/* && apt-get update) && \
@@ -15,7 +18,6 @@ RUN --mount=type=cache,target=/var/cache/apt \
     g++ \
     && rm -rf /var/lib/apt/lists/*
 
-# Rest of your Dockerfile remains the same...
 COPY package*.json ./
 COPY prisma ./prisma/
 RUN npm install
@@ -34,11 +36,11 @@ RUN apt-get update && apt-get install -y \
     libheif-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy from build stage
-COPY --from=build /app/node_modules ./node_modules
-COPY --from=build /app/package*.json ./
-COPY --from=build /app/dist ./dist
-COPY --from=build /app/prisma ./prisma
+# Copy from build stage (FIXED: using 'builder' instead of 'build')
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/package*.json ./
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/prisma ./prisma
 
 # Expose ports
 EXPOSE 2020 80 443
