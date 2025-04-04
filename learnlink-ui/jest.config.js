@@ -1,5 +1,6 @@
 module.exports = {
   preset: 'ts-jest/presets/default-esm',
+  setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
   testEnvironment: 'jsdom',
   transform: {
     '^.+\\.(ts|tsx)$': [
@@ -16,7 +17,7 @@ module.exports = {
     '^react-select$': '<rootDir>/node_modules/react-select/dist/react-select.js'
   },
   transformIgnorePatterns: [
-    'node_modules/(?!axios|react-select)'
+    '/node_modules/(?!axios)'
   ],
   extensionsToTreatAsEsm: ['.ts', '.tsx']
 };

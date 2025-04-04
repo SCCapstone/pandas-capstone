@@ -89,7 +89,6 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ setNotifCou
           console.log(chatCheckResponse.data);
           if (chatCheckResponse.data.exists) {
             console.log("A chat with this user already exists.");
-            setError("A chat with this user already exists.");
 
             navigate(`/messaging?selectedChatId=${chatCheckResponse.data.chatId}`);
             
