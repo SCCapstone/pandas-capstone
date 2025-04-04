@@ -64,6 +64,28 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ setNotifCou
     fetchNotifications();
   }, []);
 
+
+  const handleDeleteNotif = async(notif: Notification) => {
+    try{
+      const token = localStorage.getItem('token');
+      if (!token) return;
+      const response = await fetch(`${REACT_APP_API_URL}/api/notifications/delete/${notif.id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) return;
+
+      setNotifs((prevNotifs) => prevNotifs.filter((n) => n.id !== notif.id));
+      setNotifCount((prevCount) => prevCount - 1);
+    } catch (error) {
+      console.error('Error deleting notification:', error);
+    }
+  };
+
   const handleSelectNotif = async (notif: Notification) => {
     try {
       const token = localStorage.getItem('token');
@@ -73,7 +95,7 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ setNotifCou
         navigate(`/messaging?selectedChatId=${notif.chatID}`);
       }
       else if (notif.type === NotificationType.Match) {
-        navigate(`/network?active=rr`);
+        navigate('/network?tab=receivedRequests');
       }
       else if (notif.type === NotificationType.StudyGroup) {
         console.log("OTHER::: ", notif.other_id);
@@ -97,26 +119,13 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ setNotifCou
       }
     }
       
-      
-
-     
-
-      const response = await fetch(`${REACT_APP_API_URL}/api/notifications/delete/${notif.id}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) return;
-
-      setNotifs((prevNotifs) => prevNotifs.filter((n) => n.id !== notif.id));
-      setNotifCount((prevCount) => prevCount - 1);
-    } catch (error) {
-      console.error('Error deleting notification:', error);
-    }
+   handleDeleteNotif(notif);
+  } catch (error) {
+    console.error('Error selecting notification:', error);
+  }
   };
+
+
 
   const handleClearAll = async () => {
     try {
@@ -184,7 +193,7 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ setNotifCou
           <li key={notif.id} onClick={() => handleSelectNotif(notif)} className={notif.read ? 'read' : 'unread'}>
             <span className="notif-icon">{getNotificationIcon(notif.type)}</span>
             <p>{notif.message}</p>
-            <button className="DeleteButton"> <FaXmark /></button>
+            <button className="DeleteButton" onClick={(event: React.MouseEvent<HTMLButtonElement>) => { event.stopPropagation(); handleDeleteNotif(notif);}}> <FaXmark /></button>
           </li>
         ))}
       </ul>
