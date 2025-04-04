@@ -135,27 +135,51 @@ const Messaging: React.FC = () => {
     const scId = queryParams.get("selectedChatId");
     console.log("scIDDDD::::", scId);
   
+    // Update your fetchChatById function to ensure it properly initializes button messages
     const fetchChatById = async (chatId: number) => {
       const token = localStorage.getItem('token');
       try {
         const response = await axios.get(`${REACT_APP_API_URL}/api/chats/${chatId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        setSelectedChat(response.data);
+        
+        // Process button messages if they exist
+        const chatData = response.data;
+        
+        
+        setSelectedChat(chatData);
         setSelectedChatId(chatId);
-        // Optional: clear the query param after fetching
+        console.log('Loaded chat messages:', chatData.messages);
+        console.log(
+          'Button messages:', 
+          chatData.messages
+            .filter((m: Message) => m.isButton)
+            .map((m:Message) => ({
+              id: m.id,
+              content: m.content,
+              buttonData: m.buttonData || 'NO BUTTON DATA', // Show if buttonData is missing
+              hasButtonData: !!m.buttonData // Boolean flag for quick checking
+            }))
+        );
+        
+        // Check if this is a study group chat
+        
         navigate(window.location.pathname, { replace: true });
       } catch (error) {
         console.error('Error fetching selected chat:', error);
       }
     };
-  
-    if (scId) {
-      const parsedId = parseInt(scId, 10);
-      if (!isNaN(parsedId)) {
-        fetchChatById(parsedId);
+
+    const loadData = async () => {
+      if (scId) {
+        const parsedId = parseInt(scId, 10);
+        if (!isNaN(parsedId)) {
+          await fetchChatById(parsedId);
+        }
       }
-    }
+    };
+  
+    loadData();
   }, [currentLocation.search]);
   
 
@@ -221,7 +245,9 @@ const Messaging: React.FC = () => {
               users: chat.users || [], // Ensure users is always an array
             }));
 
+
             setChats(chatsWithMessages);
+
 
 
             // Ensure storing liked messages correctly
@@ -247,46 +273,11 @@ const Messaging: React.FC = () => {
   }, [isPanelVisible]);  // reloads when selected or tab changes, allows for updates to users
 
 
-  useEffect(() => {
-    const fetchChats = async () => {
-      console.log("selected chat id: ", selectedChatId);
-      const token = localStorage.getItem('token');
 
-    
-      
-      const getCurrentChat = async () => {
-        if (!selectedChatId){
-          return;
-        }
-        if (selectedChatId) {
-          try {
-            const response = await axios.get(`${REACT_APP_API_URL}/api/chats/${selectedChatId}`, {
-              headers: { Authorization: `Bearer ${token}` },
-            });
-            console.log("DATTTT::::", response.data);
-            setSelectedChat(response.data)
-            
-            
-          } catch (error) {
-            console.error('Error fetching selected chat:', error);
-          }
-        }
-      }
-      await getCurrentChat();
-      console.log("current chats complete");
-      // Clear search params
-      navigate(window.location.pathname, { replace: true });
-      };
-      fetchChats();
-      console.log("fetch chats complete");
-  }, []);
 
 
   useEffect(() => {
     const fetchData = async () => {
-
-
-
       const token = localStorage.getItem('token');
       console.log(token);
 
