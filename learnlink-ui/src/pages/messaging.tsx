@@ -13,7 +13,7 @@ import CustomAlert from '../components/CustomAlert';
 import NewChatList from "../components/NewChatList";
 import { unescape } from 'querystring';
 import GroupUserContainer from '../components/GroupUserContainer';
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import CreateStudyGroup from '../components/CreateStudyGroup';
 import PlusButtonProps from '../components/PlusButtonProps';
 import { handleSendSystemMessage, handleSendButtonMessage, openCalendarEvent } from "../utils/messageUtils";
@@ -74,6 +74,7 @@ const socket = io(REACT_APP_API_URL, {
 const Messaging: React.FC = () => {
   const [chats, setChats] = useState<Chat[]>([]);
   const [selectedChat, setSelectedChat] = useState<Chat | null>(null);
+  const [selectedChatId, setSelectedChatId] =  useState<number | null>(null);
   const [currentMessage, setCurrentMessage] = useState<string>('');
   const [users, setUsers] = useState<User[]>([]); // Store users
   const [error, setError] = useState<string | null>(null);
@@ -120,13 +121,45 @@ const Messaging: React.FC = () => {
   const genericStudyGroupPfp = "https://learnlink-pfps.s3.us-east-1.amazonaws.com/profile-pictures/generic_studygroup_pfp.svg";
 
   const navigate = useNavigate();
+  const currentLocation = useLocation();
 
-  const selectedChatId = searchParams.get("selectedChatId");
+  
   
 
 
   const [alerts, setAlerts] = useState<{ id: number; alertText: string; alertSeverity: "error" | "warning" | "info" | "success"; visible: boolean }[]>([]);
   const alertVisible = alerts.some(alert => alert.visible);
+
+  useEffect(() => {
+    const queryParams = new URLSearchParams(currentLocation.search);
+    const scId = queryParams.get("selectedChatId");
+    console.log("scIDDDD::::", scId);
+  
+    const fetchChatById = async (chatId: number) => {
+      const token = localStorage.getItem('token');
+      try {
+        const response = await axios.get(`${REACT_APP_API_URL}/api/chats/${chatId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setSelectedChat(response.data);
+        setSelectedChatId(chatId);
+        // Optional: clear the query param after fetching
+        navigate(window.location.pathname, { replace: true });
+      } catch (error) {
+        console.error('Error fetching selected chat:', error);
+      }
+    };
+  
+    if (scId) {
+      const parsedId = parseInt(scId, 10);
+      if (!isNaN(parsedId)) {
+        fetchChatById(parsedId);
+      }
+    }
+  }, [currentLocation.search]);
+  
+
+
   useEffect(() => {
     const fetchData = async () => {
       setLoadingChatList(true);
@@ -230,7 +263,7 @@ const Messaging: React.FC = () => {
             const response = await axios.get(`${REACT_APP_API_URL}/api/chats/${selectedChatId}`, {
               headers: { Authorization: `Bearer ${token}` },
             });
-            console.log(response.data);
+            console.log("DATTTT::::", response.data);
             setSelectedChat(response.data)
             
             
@@ -335,7 +368,7 @@ const Messaging: React.FC = () => {
     }
     fetchData();
 
-  }, [activeTab, selectedChat]);  // reloads when selected or tab changes, allows for updates to users
+  }, [activeTab, selectedChat, selectedChatId]);  // reloads when selected or tab changes, allows for updates to users
 
 
 

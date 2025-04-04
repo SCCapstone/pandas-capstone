@@ -65,6 +65,8 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ setNotifCou
   }, []);
 
 
+
+
   const handleDeleteNotif = async(notif: Notification) => {
     try{
       const token = localStorage.getItem('token');
@@ -90,43 +92,32 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ setNotifCou
     try {
       const token = localStorage.getItem('token');
       if (!token) return;
-
-      if (notif.type === NotificationType.Message){
+  
+      handleDeleteNotif(notif); // Remove notification from UI
+      await new Promise(resolve => setTimeout(resolve, 100)); // Allow state update before navigation
+  
+      if (notif.type === NotificationType.Message) {
         navigate(`/messaging?selectedChatId=${notif.chatID}`);
-      }
-      else if (notif.type === NotificationType.Match) {
+      } else if (notif.type === NotificationType.Match) {
         navigate('/network?tab=receivedRequests');
-      }
-      else if (notif.type === NotificationType.StudyGroup) {
-        console.log("OTHER::: ", notif.other_id);
-        if(notif.studyGroupID){
+      } else if (notif.type === NotificationType.StudyGroup) {
+        if (notif.studyGroupID) {
           navigate(`/groups?groupId=${notif.studyGroupID}&tab=false`);
-        }
-        
-        else if (notif.other_id) {
+        } else if (notif.other_id) {
           const chatCheckResponse = await axios.get(`${REACT_APP_API_URL}/api/chats/check`, {
             params: { userId1: notif.user_id, userId2: notif.other_id },
           });
-    
-          console.log(chatCheckResponse.data);
+  
           if (chatCheckResponse.data.exists) {
-            console.log("A chat with this user already exists.");
-
             navigate(`/messaging?selectedChatId=${chatCheckResponse.data.chatId}`);
-            
-            return; // Stop function execution
           }
+        }
       }
+    } catch (error) {
+      console.error('Error selecting notification:', error);
     }
-      
-   handleDeleteNotif(notif);
-  } catch (error) {
-    console.error('Error selecting notification:', error);
-  }
   };
-
-
-
+  
   const handleClearAll = async () => {
     try {
       setNotifs([]);
@@ -193,7 +184,7 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ setNotifCou
           <li key={notif.id} onClick={() => handleSelectNotif(notif)} className={notif.read ? 'read' : 'unread'}>
             <span className="notif-icon">{getNotificationIcon(notif.type)}</span>
             <p>{notif.message}</p>
-            <button className="DeleteButton" onClick={(event: React.MouseEvent<HTMLButtonElement>) => { event.stopPropagation(); handleDeleteNotif(notif);}}> <FaXmark /></button>
+            <button className="DeleteButton" onClick={(event: React.MouseEvent<HTMLButtonElement>) => { event.stopPropagation(); handleDeleteNotif(notif); }}> <FaXmark /></button>
           </li>
         ))}
       </ul>
