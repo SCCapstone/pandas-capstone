@@ -54,6 +54,10 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ studyGroupId }) => {
     const [hoveredSlot, setHoveredSlot] = useState<{ day: string; timeSlot: string } | null>(null);
     const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
     const [alerts, setAlerts] = useState<{ id: number; alertText: string; alertSeverity: "error" | "warning" | "info" | "success"; visible: boolean }[]>([]);
+    const [isClick, setIsClick] = useState(true); // Flag to check if it's a click or drag
+    const [initialMousePosition, setInitialMousePosition] = useState<{ x: number, y: number } | null>(null);
+    const [isMouseDown, setIsMouseDown] = useState(false);
+
 
     // const [schedule, setSchedule] = useState({
     //     days: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
@@ -69,8 +73,10 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ studyGroupId }) => {
     const [isModalOpen, setModalOpen] = useState(false);
     const [loading, setLoading] = useState(true)
 
+
     const openEditModal = () => setModalOpen(true);
     const closeEditModal = () => setModalOpen(false);
+
 
     function generateTimeSlots(startTime: string, endTime: string): string[] {
         const times: string[] = [];
@@ -283,29 +289,60 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ studyGroupId }) => {
     const handleMouseDown = (day: Day, timeSlot: string, e: React.MouseEvent) => {
         e.preventDefault();
         setDraggingDay(day);
-        setIsDragging(true);
+        setInitialMousePosition({ x: e.pageX, y: e.pageY });
+        setIsMouseDown(true)
+
+        setIsDragging(false);
+        setIsClick(true);  // Initially assume it's a click
         setStartTimeSlot(timeSlot);
         setEndTimeSlot(timeSlot);
+        // const handleMouseDown = (day: string, timeSlot: string, e: React.MouseEvent) => {
+        //     setDragging(true);
+        //     setIsClick(true);  // Initially assume it's a click
+        //     setStartSlot(timeSlot);
+        //     setDraggedSlots([timeSlot]); // Start with the clicked slot
+        // };
+
     };
 
     const handleMouseMove = (day: Day, timeSlot: string, e: React.MouseEvent) => {
-        if (isDragging && draggingDay === day) {
-            setEndTimeSlot(timeSlot);
+        if (initialMousePosition) {
+            const distanceMoved = Math.sqrt(
+                Math.pow(e.pageX - initialMousePosition.x, 2) + Math.pow(e.pageY - initialMousePosition.y, 2)
+            );
+
+            if (distanceMoved > 10 && !isDragging && draggingDay === day) {
+                setIsDragging(true);
+                setIsClick(false); // Transition to drag if movement exceeds threshold
+            }
+
+            if (isMouseDown && isDragging && draggingDay === day) {
+                // Update endTimeSlot as the user moves across different slots
+                setEndTimeSlot(timeSlot);
+            }
         }
     };
 
     const handleMouseUp = () => {
         if (!isDragging || !draggingDay || !startTimeSlot || !endTimeSlot) return;
-
+        setIsMouseDown(false);
         const startIndex = timeSlots.indexOf(startTimeSlot);
         const endIndex = timeSlots.indexOf(endTimeSlot);
+
+        // Ensure start is less than end index to avoid out-of-order range
         const [start, end] = startIndex < endIndex ? [startIndex, endIndex] : [endIndex, startIndex];
 
+            // If we are in deselect mode, prevent accidental removal when mouse leaves
+    if (start != end) {
         setAvailability((prevState) => ({
             ...prevState,
             [draggingDay]: Array.from(new Set([...prevState[draggingDay], ...timeSlots.slice(start, end + 1)])),
         }));
+    } else {
+       
+    }
 
+        // Reset dragging state
         setIsDragging(false);
         setDraggingDay(null);
         setStartTimeSlot(null);
@@ -313,15 +350,51 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ studyGroupId }) => {
     };
 
     const handleTimeSlotClick = (day: Day, timeSlot: string, e: React.MouseEvent) => {
-        if (isDragging) return;
+        console.log(`Clicked: ${day}, ${timeSlot}`);
 
-        setAvailability((prevState) => ({
-            ...prevState,
-            [day]: prevState[day].includes(timeSlot)
-                ? prevState[day].filter((slot) => slot !== timeSlot)
-                : [...prevState[day], timeSlot],
-        }));
+        e.stopPropagation(); // Prevents bubbling
+
+        setIsMouseDown(false);
+        if (!isDragging && isClick) {
+            setAvailability(prevAvailability => {
+                console.log("Updating availability...");
+
+                const newAvailability = structuredClone(prevAvailability);
+                const isSelected = newAvailability[day].includes(timeSlot);
+
+                if (isSelected) {
+                    console.log(`Removing ${timeSlot} from ${day}`);
+                    newAvailability[day] = newAvailability[day].filter((slot: string) => slot !== timeSlot);
+                } else {
+                    console.log(`Adding ${timeSlot} to ${day}`);
+                    newAvailability[day].push(timeSlot);
+                }
+
+                return newAvailability;
+            });
+            const isInRange =
+
+                startTimeSlot &&
+                endTimeSlot &&
+                timeSlots.indexOf(timeSlot) >= timeSlots.indexOf(startTimeSlot) &&
+                timeSlots.indexOf(timeSlot) <= timeSlots.indexOf(endTimeSlot);
+
+            console.log({
+                isDragging,
+                draggingDay,
+                startTimeSlot,
+                endTimeSlot,
+                currentTimeSlot: timeSlot,
+
+                isInRange
+            });
+
+        }
     };
+
+    useEffect(() => {
+        console.log("Availability updated:", availability);
+    }, [availability]);
 
     const getCellClass = (day: Day, timeSlot: string) => {
         // console.log("usersAvailable:")
@@ -344,8 +417,60 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ studyGroupId }) => {
         };
     };
 
-    const getCellAvailability = (day: Day, timeSlot: string) => {
+
+    const getCellGradient = (day: Day, timeSlot: string) => {
         // console.log("usersAvailable:")
+        // Count the number of users available at this time slot
+        const usersAvailable = users?.filter((user) => usersAvailability[user.id]?.[day]?.includes(timeSlot)).length || 0;
+        const totalUsers = users?.length || 1;
+        // console.log("totalUsers:", users?.length)
+
+        // console.log("usersAvailable: for timeslot", day, timeSlot, usersAvailable)
+
+        // Scale the opacity from transparent to semi-opaque to solid based on the number of users available
+        const opacity = usersAvailable / totalUsers;
+
+        // Return the appropriate class for the cell (semi-opaque to solid)
+        return {
+            backgroundColor: `rgba(0, 128, 0, ${opacity})`, // Green background with varying opacity
+            // backgroundColor: `rgb(0, 102, 140, ${opacity})`, // Blue background with varying opacity
+
+            color: opacity > 0.5 ? 'white' : 'black',  // Dark text when solid, light when transparent
+        };
+    };
+
+    const generateGradientWithOpacity = (totalUsers: number, color: string) => {
+        // Ensure at least two stops (start with 0% opacity and end with 100% opacity)
+        const numStops = totalUsers + 1;
+    
+        // Calculate the step between opacity levels (from 0 to 100)
+        const opacityStep = 100 / (numStops);  // Percentage steps between 0 and 100
+    
+        // Array to hold the gradient stops
+        const gradientStops = [];
+    
+        for (let i = 0; i < numStops; i++) {
+            const opacity = Math.floor(opacityStep * i);  // Opacity value at each step
+            const position = Math.floor((100 / numStops) * i);  // Position of each stop (from 0% to 100%)
+            const endPosition = Math.floor((100 / numStops) * (i+1));  // Position of each stop (from 0% to 100%)
+
+            
+            // Push both the starting and ending position for the opacity
+            gradientStops.push(`${color.replace('1)', `${opacity / 100})`)} ${position}%`);
+            gradientStops.push(`${color.replace('1)', `${opacity / 100})`)} ${endPosition}%`);
+        }
+    
+        // Combine all stops into a repeating linear gradient
+        const gradient = `repeating-linear-gradient(to right, ${gradientStops.join(', ')})`;
+    
+        console.log(gradient);  // Log the gradient for debugging
+    
+        return gradient;
+    };
+    
+    
+    const getCellAvailability = (day: Day, timeSlot: string) => {
+    // console.log("usersAvailable:")
         // users available at this time slot
         const usersAvailable = users?.filter((user) => usersAvailability[user.id]?.[day]?.includes(timeSlot));
         const countUsersAvailable = usersAvailable?.length;
@@ -394,24 +519,20 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ studyGroupId }) => {
                     <p>Click and drag to toggle. Save using button below.</p>
 
                     <table className="current-user-schedule-color-legend">
-                        <thead>
-                            <tr>
-                                <td>Unavailable</td>
-                                <td>Available</td>
-
-                            </tr>
-
-                        </thead>
 
                         <tbody>
                             <tr>
+                                <th>Unavailable</th>
                                 <td></td>
                                 <td
                                     style={{ background: "#00678c93" }
                                     }></td>
+                                <th>Available</th>
+
                             </tr>
                         </tbody>
                     </table>
+
                     {/* Editable Schedule Table (Current User's Availability) */}
                     <table className="schedule-table" onMouseUp={handleMouseUp} onMouseLeave={handleMouseUp}>
                         <thead>
@@ -436,19 +557,22 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ studyGroupId }) => {
                                         {isHalfHour && null} {/* Skip rendering the label on :30 rows */}
 
                                         {days.map((day) => {
-                                            const isSelected = availability[day].includes(timeSlot);
+                                            const isSelected = !!availability[day].includes(timeSlot);
+
                                             const isInRange =
                                                 isDragging &&
                                                 draggingDay === day &&
                                                 startTimeSlot &&
                                                 endTimeSlot &&
                                                 timeSlots.indexOf(timeSlot) >= timeSlots.indexOf(startTimeSlot) &&
-                                                timeSlots.indexOf(timeSlot) <= timeSlots.indexOf(endTimeSlot);
+                                                timeSlots.indexOf(timeSlot) <= timeSlots.indexOf(endTimeSlot) &&
+                                                (startTimeSlot != endTimeSlot);
 
                                             return (
                                                 <td
-                                                    key={`${day}-${timeSlot}`}
-                                                    className={`cell ${isSelected || isInRange ? "selected" : ""}`}
+                                                    key={`${day}-${timeSlot}-${availability[day].join()}`}  // Include availability state for uniqueness
+                                                    className={`cell ${isSelected || isInRange ? "selected" : ""
+                                                        }`}
                                                     onMouseDown={(e) => handleMouseDown(day, timeSlot, e)}
                                                     onMouseMove={(e) => handleMouseMove(day, timeSlot, e)}
                                                     onClick={(e) => handleTimeSlotClick(day, timeSlot, e)}
@@ -470,21 +594,19 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ studyGroupId }) => {
                     <h2>Group's Combined Availability</h2>
                     <p>Hover on timeslots to see whose available.</p>
                     <table className="current-user-schedule-color-legend">
-                        <thead>
-                            <tr>
-                                <td>0/{users?.length || 1} Available</td>
-                                <td>{users?.length || 1}/{users?.length || 1} Available</td>
-
-                            </tr>
-
-                        </thead>
 
                         <tbody>
                             <tr>
-                                <td></td>
+                                <th>0/{users?.length || 1} Available</th>
+
                                 <td
-                                    style={{ background: "rgba(0,128,0)" }
+                                    colSpan={2}
+                                    style={{ minWidth:"200px",
+                                    background: generateGradientWithOpacity(users?.length || 1, 'rgba(0, 128, 0,1)') }
                                     }></td>
+
+                                <th>{users?.length || 1}/{users?.length || 1} Available</th>
+
                             </tr>
                         </tbody>
                     </table>
