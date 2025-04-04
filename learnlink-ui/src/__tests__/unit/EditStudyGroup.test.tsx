@@ -41,7 +41,7 @@ jest.mock('../../components/CustomAlert', () => ({
   ),
 }));
 
-describe('EditStudyGroup Component', () => {
+describe('EditStudyGroup Component Unit Tests', () => {
   const mockOnClose = jest.fn();
   const mockUpdateChatName = jest.fn();
   const mockOnRemoveUser = jest.fn();

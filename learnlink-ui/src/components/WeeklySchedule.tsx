@@ -142,7 +142,16 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ studyGroupId }) => {
                     }
                     const data = await response.json();
                     // Assuming the response contains the schedule info
-                    setDays(data.scheduleDays || []);
+
+                    const dayOrder = ["Sun", "Mon", "Tues", "Wed", "Thur", "Fri", "Sat"];
+
+
+                    // Sort received days according to the correct order
+                    const sortedDays = (data.scheduleDays || []).sort(
+                        (a: string, b: string) => dayOrder.indexOf(a) - dayOrder.indexOf(b)
+                    );
+                    
+                    setDays(sortedDays || []);
                     setScheduleStartTime(data.scheduleStartTime || "9:00 AM");
                     setScheduleEndTime(data.scheduleEndTime || "5:00 PM");
                     setTimeSlots(generateTimeSlots(scheduleStartTime, scheduleEndTime))
@@ -350,14 +359,14 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ studyGroupId }) => {
     };
 
     const handleTimeSlotClick = (day: Day, timeSlot: string, e: React.MouseEvent) => {
-        console.log(`Clicked: ${day}, ${timeSlot}`);
+        // console.log(`Clicked: ${day}, ${timeSlot}`);
 
         e.stopPropagation(); // Prevents bubbling
 
         setIsMouseDown(false);
         if (!isDragging && isClick) {
             setAvailability(prevAvailability => {
-                console.log("Updating availability...");
+                // console.log("Updating availability...");
 
                 const newAvailability = structuredClone(prevAvailability);
                 const isSelected = newAvailability[day].includes(timeSlot);
@@ -379,22 +388,12 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ studyGroupId }) => {
                 timeSlots.indexOf(timeSlot) >= timeSlots.indexOf(startTimeSlot) &&
                 timeSlots.indexOf(timeSlot) <= timeSlots.indexOf(endTimeSlot);
 
-            console.log({
-                isDragging,
-                draggingDay,
-                startTimeSlot,
-                endTimeSlot,
-                currentTimeSlot: timeSlot,
-
-                isInRange
-            });
-
         }
     };
 
-    useEffect(() => {
-        console.log("Availability updated:", availability);
-    }, [availability]);
+    // useEffect(() => {
+    //     console.log("Availability updated:", availability);
+    // }, [availability]);
 
     const getCellClass = (day: Day, timeSlot: string) => {
         // console.log("usersAvailable:")
@@ -417,27 +416,6 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ studyGroupId }) => {
         };
     };
 
-
-    const getCellGradient = (day: Day, timeSlot: string) => {
-        // console.log("usersAvailable:")
-        // Count the number of users available at this time slot
-        const usersAvailable = users?.filter((user) => usersAvailability[user.id]?.[day]?.includes(timeSlot)).length || 0;
-        const totalUsers = users?.length || 1;
-        // console.log("totalUsers:", users?.length)
-
-        // console.log("usersAvailable: for timeslot", day, timeSlot, usersAvailable)
-
-        // Scale the opacity from transparent to semi-opaque to solid based on the number of users available
-        const opacity = usersAvailable / totalUsers;
-
-        // Return the appropriate class for the cell (semi-opaque to solid)
-        return {
-            backgroundColor: `rgba(0, 128, 0, ${opacity})`, // Green background with varying opacity
-            // backgroundColor: `rgb(0, 102, 140, ${opacity})`, // Blue background with varying opacity
-
-            color: opacity > 0.5 ? 'white' : 'black',  // Dark text when solid, light when transparent
-        };
-    };
 
     const generateGradientWithOpacity = (totalUsers: number, color: string) => {
         // Ensure at least two stops (start with 0% opacity and end with 100% opacity)
@@ -462,9 +440,7 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ studyGroupId }) => {
     
         // Combine all stops into a repeating linear gradient
         const gradient = `repeating-linear-gradient(to right, ${gradientStops.join(', ')})`;
-    
-        console.log(gradient);  // Log the gradient for debugging
-    
+        
         return gradient;
     };
     
@@ -592,7 +568,7 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ studyGroupId }) => {
 
                     {/* Merged Users' Availability Table */}
                     <h2>Group's Combined Availability</h2>
-                    <p>Hover on timeslots to see whose available.</p>
+                    <p>Hover on timeslots to see who is available.</p>
                     <table className="current-user-schedule-color-legend">
 
                         <tbody>

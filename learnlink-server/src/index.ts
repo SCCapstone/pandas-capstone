@@ -2288,6 +2288,9 @@ app.get('/api/chats/:chatId', authenticate, async (req, res): Promise<any> => {
           orderBy: {
             createdAt: 'asc',  // Order messages by their creation date
           },
+          include: {
+            buttonData: true, // Ensure button messages retain their data
+          },
         },
       },
     });

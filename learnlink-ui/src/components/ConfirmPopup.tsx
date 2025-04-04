@@ -23,7 +23,7 @@ const ConfirmPopup: React.FC<ConfirmPopupProps> = ({ message, onConfirm, onCance
     
     return (
         <div className="confirm-popup-overlay">
-            <div className="confirm-popup">
+            <div className="confirm-popup" data-testid="confirm-popup">
                 <div className='confirm-header'>
                     <RiErrorWarningFill className='warningIcon' />
                     <h1>Are you sure?</h1>

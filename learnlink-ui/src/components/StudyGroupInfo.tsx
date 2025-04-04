@@ -178,6 +178,7 @@ const StudyGroupInfo =(
       <div className='Button-Header'> 
         <button className='Chat-Button'
             onClick={() => {
+              console.log("chatID being passed:", chatID);
               navigate(`/messaging?selectedChatId=${chatID}`);
             }}
         >Chat</button>

@@ -1,32 +1,53 @@
-# Use an official Node.js image (Debian-based for better Prisma compatibility)
-FROM node:18-bullseye AS build
+# Stage 1: Build stage
+FROM node:18-bullseye AS builder
 
-# Set working directory
 WORKDIR /app
 
-# Copy package.json and package-lock.json first to leverage Docker caching
+ENV PRISMA_CLI_BINARY_TARGETS=debian-openssl-1.1.x,debian-openssl-3.0.x
+ENV OPENSSL_CONF=/etc/ssl/
+
+# Install system dependencies with retry logic
+RUN --mount=type=cache,target=/var/cache/apt \
+    apt-get update || (rm -rf /var/lib/apt/lists/* && apt-get update) && \
+    apt-get install -y --no-install-recommends \
+    libvips-dev \
+    libheif-dev \
+    libssl-dev \
+    python3 \
+    make \
+    g++ \
+    && rm -rf /var/lib/apt/lists/*
+
 COPY package*.json ./
-
-# Install dependencies
-RUN npm install --omit=dev
-
-# Install Prisma CLI globally to ensure it's available
-RUN npm install -g prisma@5.4.2
-
-# Copy the rest of the application code
+COPY prisma ./prisma/
+RUN npm install
 COPY . .
-
-# Validate Prisma schema before generating client
-RUN npx prisma validate
-
-# Ensure Prisma uses the correct binary target
-ENV PRISMA_CLI_BINARY_TARGETS=debian-openssl-1.1.x
-
-# Generate Prisma Client
 RUN npx prisma generate
+RUN npm run build
 
-# Expose necessary ports
+# Stage 2: Runtime stage
+FROM node:18-slim
+
+WORKDIR /app
+
+# Install runtime dependencies
+RUN apt-get update && apt-get install -y \
+    libvips-dev \
+    libheif-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy from build stage (FIXED: using 'builder' instead of 'build')
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/package*.json ./
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/prisma ./prisma
+
+# Expose ports
 EXPOSE 2020 80 443
 
+# Health check
+HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:2020/health || exit 1
+
 # Start the application
-CMD ["npm", "start"]
+CMD ["node", "dist/index.js"]

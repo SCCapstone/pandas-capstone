@@ -64,44 +64,13 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ setNotifCou
     fetchNotifications();
   }, []);
 
-  const handleSelectNotif = async (notif: Notification) => {
-    try {
+
+
+
+  const handleDeleteNotif = async(notif: Notification) => {
+    try{
       const token = localStorage.getItem('token');
       if (!token) return;
-
-      if (notif.type === NotificationType.Message){
-        navigate(`/messaging?selectedChatId=${notif.chatID}`);
-      }
-      else if (notif.type === NotificationType.Match) {
-        navigate(`/network?active=rr`);
-      }
-      else if (notif.type === NotificationType.StudyGroup) {
-        console.log("OTHER::: ", notif.other_id);
-        if(notif.studyGroupID){
-          navigate(`/groups?groupId=${notif.studyGroupID}&tab=false`);
-        }
-        
-        else if (notif.other_id) {
-          const chatCheckResponse = await axios.get(`${REACT_APP_API_URL}/api/chats/check`, {
-            params: { userId1: notif.user_id, userId2: notif.other_id },
-          });
-    
-          console.log(chatCheckResponse.data);
-          if (chatCheckResponse.data.exists) {
-            console.log("A chat with this user already exists.");
-            setError("A chat with this user already exists.");
-
-            navigate(`/messaging?selectedChatId=${chatCheckResponse.data.chatId}`);
-            
-            return; // Stop function execution
-          }
-      }
-    }
-      
-      
-
-     
-
       const response = await fetch(`${REACT_APP_API_URL}/api/notifications/delete/${notif.id}`, {
         method: 'DELETE',
         headers: {
@@ -119,6 +88,36 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ setNotifCou
     }
   };
 
+  const handleSelectNotif = async (notif: Notification) => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+  
+      handleDeleteNotif(notif); // Remove notification from UI
+      await new Promise(resolve => setTimeout(resolve, 100)); // Allow state update before navigation
+  
+      if (notif.type === NotificationType.Message) {
+        navigate(`/messaging?selectedChatId=${notif.chatID}`);
+      } else if (notif.type === NotificationType.Match) {
+        navigate('/network?tab=receivedRequests');
+      } else if (notif.type === NotificationType.StudyGroup) {
+        if (notif.studyGroupID) {
+          navigate(`/groups?groupId=${notif.studyGroupID}&tab=false`);
+        } else if (notif.other_id) {
+          const chatCheckResponse = await axios.get(`${REACT_APP_API_URL}/api/chats/check`, {
+            params: { userId1: notif.user_id, userId2: notif.other_id },
+          });
+  
+          if (chatCheckResponse.data.exists) {
+            navigate(`/messaging?selectedChatId=${chatCheckResponse.data.chatId}`);
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error selecting notification:', error);
+    }
+  };
+  
   const handleClearAll = async () => {
     try {
       setNotifs([]);
@@ -185,7 +184,7 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ setNotifCou
           <li key={notif.id} onClick={() => handleSelectNotif(notif)} className={notif.read ? 'read' : 'unread'}>
             <span className="notif-icon">{getNotificationIcon(notif.type)}</span>
             <p>{notif.message}</p>
-            <button className="DeleteButton"> <FaXmark /></button>
+            <button className="DeleteButton" onClick={(event: React.MouseEvent<HTMLButtonElement>) => { event.stopPropagation(); handleDeleteNotif(notif); }}> <FaXmark /></button>
           </li>
         ))}
       </ul>

@@ -4,7 +4,7 @@ UI_DIR = learnlink-ui
 CURRENT_DIR = $(shell pwd)
 
 # Commands
-START_SERVER = cd $(CURRENT_DIR)/$(SERVER_DIR) && npm start
+START_SERVER = cd $(CURRENT_DIR)/$(SERVER_DIR) && npm run dev
 START_UI = cd $(CURRENT_DIR)/$(UI_DIR) && npm start
 TEST_SERVER = cd $(CURRENT_DIR)/$(SERVER_DIR) && npm test 
 TEST_UI = cd $(CURRENT_DIR)/$(UI_DIR) && npm test 

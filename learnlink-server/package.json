@@ -2,10 +2,12 @@
   "name": "learnlink-server",
   "version": "1.0.0",
   "main": "./src/index.ts",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libjemalloc.so.1 npx nodemon"
-  },
+"scripts": {
+  "test": "echo \"Error: no test specified\" && exit 1",
+  "dev": "npx nodemon ./src/index.ts",
+  "build": "tsc",
+  "start": "npm run build && node ./dist/index.js"
+},
   "author": "",
   "license": "ISC",
   "description": "",

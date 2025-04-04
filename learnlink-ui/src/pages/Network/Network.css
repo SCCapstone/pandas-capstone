@@ -74,6 +74,34 @@
     flex:1;
   }
 
+  .sent-request-header {
+    border-radius: 5px;
+    margin-bottom: 15px;
+    padding-left: 10px;
+    padding-right: 10px;
+
+    /* width: fit-content; */
+  }
+  .sent-request-header p {
+    font-size: larger;
+    margin: 10px;
+    color: #001b25;
+    font-weight:400;
+    padding: 10px;
+    
+
+  }
+
+  .sent-request-header.users {
+    background-color: #71c5ef96;
+
+  }
+
+  .sent-request-header.study-groups {
+    background-color: #ffc022d2;
+
+  }
+
   .study-group-request p {
     font-size: medium;
     margin: 10px;

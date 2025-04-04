@@ -112,7 +112,7 @@ const Settings: React.FC = () => {
   
       const response = await fetch(`${REACT_APP_API_URL}/api/users/${userId}`, {
         method: 'DELETE',
-        headers: {
+        headers: { 
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
