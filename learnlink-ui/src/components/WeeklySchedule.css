@@ -58,10 +58,12 @@
 }
 
 .schedule-table thead, .merged-availability-table thead {
-    background: var(--primary-200);
+    /* background: var(--primary-200); */
     color: var(--text-200);
     text-transform: uppercase;
     font-weight: bold;
+    background: var(--primary-200);
+
 
 }
 
@@ -78,6 +80,10 @@
 .merged-availability-table th.empty-cell {
     background: white !important;
     border: none;
+}
+
+.current-user-schedule-color-legend th {
+    min-width: fit-content;
 }
 
 /* .schedule-table tbody tr:nth-child(odd),
@@ -122,6 +128,10 @@
 .cell.selected:hover {
     background: var(--accent-100);
 }
+.cell.deselected {
+    background-color: white;
+    transition: background-color 0.2s ease-in-out;
+  }
 
 .cell.solid {
     background-color: #00668C;
@@ -153,15 +163,14 @@
     border: none;
     /* border-radius: 8px; */
     overflow: hidden;
-    table-layout: fixed;
+    /* table-layout: fixed; */
 }
 .current-user-schedule-color-legend tbody{
     height: 50px;
     min-height: 50px;
-    border-collapse: collapse;
-    border: hidden;
+    /* border-collapse: collapse;
+    border: hidden; */
     margin: 20px auto;
-    border: 1px solid #3b3c3dd1;
     /* border-radius: 8px; */
     overflow: hidden;
     table-layout: fixed;
@@ -178,8 +187,17 @@
 
 .current-user-schedule-color-legend tbody td{
     border: 1px solid #3b3c3dd1;
-}
+    border-top: 1px solid #3b3c3dd1;
 
+    min-width: 100px;
+}
+.current-user-schedule-color-legend tbody th{
+    border: none !important;
+    min-width: 100px;
+    padding-left: 15px;
+    font-size: 15px;
+    font-weight: 400;
+}
 .schedule-table-title {
     display: flex;
     flex-direction: row;
