@@ -97,39 +97,55 @@ export default function PlusButton({ onSelect, studyGroupId, selectedChatId, onS
       
         onSendButtonMessage(buttonData);
         setIsOpen(false);
-      };
-      
+  };
+
+
+
+  return (
+    <div className="plus-button-container">
+      <button className="plus-button" onClick={() => setIsOpen(!isOpen)}>
+        <Plus size={30} color="White" />
+      </button>
+      <div className={`plus-menu ${isOpen ? "open" : ""}`}>
+  {options.map((option) => {
+    const isWeeklyScheduler = option.value === "weekly-scheduler";
+    const isDisabled = isWeeklyScheduler && !studyGroupId;
     
-
     return (
-        <div className="plus-button-container">
-            <button className="plus-button" onClick={() => setIsOpen(!isOpen)}>
-                <Plus size={30} color="White" />
-            </button>
-
-            <div className={`plus-menu ${isOpen ? "open" : ""}`}>
-                {options.map((option) => (
-                    <button
-                        className="plus-menu-buttons"
-                        key={option.value}
-                        onClick={() => handleSelect(option.value)}
-                    >
-                        {option.icon}
-                        {option.label}
-                    </button>
-                ))}
-            </div>
-            <CalendarEventPopup
-                  open={calendarModalOpen}
-                  onClose={() => {
-                    setCalendarModalOpen(false);
-                    setIsOpen(false)
-                }}
-                  onSubmit={(eventDetails) => {
-                    handleCalendarURL(eventDetails); // Implement this to open the calendar app
-                    setCalendarModalOpen(false);
-                  }}
-                />
-        </div>
+      <div 
+        key={option.value}
+        className="plus-menu-item-wrapper"
+        style={{ position: 'relative' }} // Needed for tooltip positioning
+      >
+        <button
+          className={`plus-menu-buttons ${isDisabled ? "disabled" : ""}`}
+          onClick={isDisabled ? undefined : () => handleSelect(option.value)}
+          disabled={isDisabled}
+          data-tooltip={isDisabled ? "This option is only available for study groups" : ""}
+        >
+          {option.icon}
+          {option.label}
+        </button>
+        {isDisabled && (
+          <div className="plus-button-disabled-tooltip">
+            This option is only <br></br>available for study groups
+          </div>
+        )}
+      </div>
     );
+  })}
+</div>
+      <CalendarEventPopup
+        open={calendarModalOpen}
+        onClose={() => {
+          setCalendarModalOpen(false);
+          setIsOpen(false)
+        }}
+        onSubmit={(eventDetails) => {
+          handleCalendarURL(eventDetails); // Implement this to open the calendar app
+          setCalendarModalOpen(false);
+        }}
+      />
+    </div>
+  );
 }

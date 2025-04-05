@@ -35,7 +35,6 @@
     backdrop-filter: blur(12px);
     border-radius: 12px;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-    overflow: hidden;
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
@@ -82,3 +81,97 @@
 .plus-menu button:hover {
     background: rgba(0, 0, 0, 0.05);
 }
+
+.plus-menu-item-wrapper {
+    width:100%;
+}
+
+
+/* Style for disabled items */
+.plus-menu-item-wrapper.disabled {
+    position: relative;
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+  
+  /* Tooltip styles */
+  .plus-menu-item-wrapper[data-tooltip]:hover::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #333;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    white-space: nowrap;
+    z-index: 10;
+    pointer-events: none;
+  }
+  
+  /* Disabled button styles */
+  .plus-menu-buttons.disabled {
+    pointer-events: none;
+    filter: grayscale(100%);
+  }
+
+  /* Container for the button + tooltip - needed for positioning */
+.plus-menu-item-wrapper {
+    position: relative;
+    display: inline-block;
+  }
+  
+  /* Tooltip styles */
+  .plus-button-disabled-tooltip {
+    /* Positioning */
+    width: 175px;
+    position: absolute;
+    bottom: calc(100% + 8px); /* Appears above the button with 8px gap */
+    left: 50%;
+    transform: translateX(-50%);
+    
+    /* Styling */
+    background-color: #333;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: normal;
+    white-space: nowrap;
+    
+    /* Initially hidden */
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+    
+    /* Arrow at bottom */
+    &::after {
+      content: "";
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      margin-left: -5px;
+      border-width: 5px;
+      border-style: solid;
+      border-color: #333 transparent transparent transparent;
+    }
+    
+    /* Shadow */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+  }
+  
+  /* Show tooltip when parent is hovered */
+  .plus-menu-item-wrapper:hover .plus-button-disabled-tooltip {
+    opacity: 1;
+    visibility: visible;
+  }
+  
+  /* Disabled button styling */
+  .plus-menu-buttons.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    filter: grayscale(80%);
+    position: relative;
+  }
