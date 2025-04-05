@@ -10,7 +10,7 @@ interface JoinRequestsNotificationProps {
 const JoinRequestsNotification: React.FC<JoinRequestsNotificationProps> = ({ showDotOnly = false }) => {
   const { joinRequestCount } = useJoinRequest(); // Use the hook to access join request count
   
-  if (joinRequestCount === 0) {
+  if (joinRequestCount < 1) {
     return null; // Don't show anything if no requests
   }
 
