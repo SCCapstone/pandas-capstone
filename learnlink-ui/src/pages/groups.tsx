@@ -207,6 +207,15 @@ import { handleSendSystemMessage,updateChatTimestamp} from "../utils/messageUtil
                   updateChatTimestamp(selectedGroup?.chatID);
               
               }
+              // ✅ Update the groups UI if the current user left the group
+              if (userId === currentUserId) {
+                setGroups(prevGroups => prevGroups.filter(group => group.id !== groupId));
+
+                // Optionally deselect the group if it’s open
+                if (selectedGroup?.id === groupId) {
+                  setSelectedGroup(null);
+                }
+              }
           } else {
               console.error('Failed to delete the user.');
           }
