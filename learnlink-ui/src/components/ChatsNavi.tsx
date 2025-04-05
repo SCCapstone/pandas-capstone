@@ -56,6 +56,7 @@ interface ChatsNaviProps {
   chatPfps: { [key: number]: string };
   loadingChatList: boolean;
   removeUser: (userId: number, groupId: number | null) => Promise<void>;
+  updateChats: (chatId: number) => void;
 }
 
 const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
@@ -70,6 +71,7 @@ const ChatsNavi: React.FC<ChatsNaviProps> = ({
   chatPfps,
   loadingChatList,
   removeUser,
+  updateChats,
 }) => {
   const [sortedChats, setSortedChats] = useState<Chat[]>([]);
   const [lastOpenedTimes, setLastOpenedTimes] = useState<{
@@ -229,6 +231,7 @@ const ChatsNavi: React.FC<ChatsNaviProps> = ({
                     setConfirmAction(() => () => {
                       removeUser(currentUserId, groupId);
                       setShowConfirmPopup(false);
+                      updateChats(chat.id);
                     });
                   } else {
                     setConfirmMessage('Are you sure you want to delete this chat?');
