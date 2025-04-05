@@ -481,7 +481,8 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ studyGroupId }) => {
                         {/* <p>{currStudyGroup.description}</p> */}
                     </div>
                 )}
-                <button onClick={openEditModal}>Edit Schedule</button>
+                <button onClick={openEditModal}>Edit Schedule Grid</button>
+
                 {/* Pass props to the modal */}
                 {currStudyGroup?.id && (
                     <EditScheduleModal
