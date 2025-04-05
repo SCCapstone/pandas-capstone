@@ -173,15 +173,13 @@ import { handleSendSystemMessage,updateChatTimestamp} from "../utils/messageUtil
 
     
 
-
-
     const updateChatName = (chatId: number, newName: string) => {
-    setGroupNames((prevGroupNames) => ({
-        ...prevGroupNames,
-        [chatId]: newName,
-    }));
+      setGroups(prev =>
+        prev.map(group =>
+          group.chatID === chatId ? { ...group, name: newName } : group
+        )
+      );
     };
-
 
     const removeUser = async (userId: number, groupId: number | null) => {
       if (!groupId) {

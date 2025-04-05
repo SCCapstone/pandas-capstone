@@ -65,6 +65,7 @@ const StudyGroupInfo =(
     onRemoveUser: (userId: number, groupId: number | null) => void; // Update type here
     updateUsers: (userId: number) => void;
     isItEdit: boolean;
+    
   }) => {
   const [studyGroup, setStudyGroup] = useState<StudyGroup | null>(null);
   const [name, setName] = useState('');
@@ -158,6 +159,11 @@ const StudyGroupInfo =(
       users={users}
       onRemoveUser={onRemoveUser}
       updateUsers={updateUsers}
+      onGroupUpdated={(newName: string) => {
+        setName(newName); // update local state
+        updateChatName(chatID, newName); // update parent (Groups page)
+        setIsEdit(false); // close edit mode
+      }}
     />
   ) : (
 

@@ -56,6 +56,7 @@ const EditStudyGroup =(
     users,
     onRemoveUser,
     updateUsers,
+    onGroupUpdated,
   }: {
     chatID: number;
     onClose: () => void ;
@@ -65,6 +66,8 @@ const EditStudyGroup =(
     users: User[] | null;
     onRemoveUser: (userId: number, groupId: number | null) => void; // Update type here
     updateUsers: (userId: number) => void;
+    onGroupUpdated: (newName: string) => void;
+
   }) => {
   const [studyGroup, setStudyGroup] = useState<StudyGroup | null>(null);
   const [name, setName] = useState('');
@@ -180,6 +183,8 @@ const EditStudyGroup =(
       console.log('Study group updated:', response.data);
       
       updateChatName(chatID, name);
+      onGroupUpdated(name);
+
 
       setAlerts((prevAlerts) => [
         ...prevAlerts,
