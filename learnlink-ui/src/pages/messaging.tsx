@@ -1273,7 +1273,7 @@ const handleGetChatUsername = async (userId: number) => {
                     <button
                       className="CreateStudyGroupButton"
                       onClick={() => {
-                        handleCreateStudyGroup(selectedChat.id);
+                        
                         setIsPanelVisible(true);
                       }}
                     >
@@ -1304,6 +1304,7 @@ const handleGetChatUsername = async (userId: number) => {
                       chatID={selectedChat.id}
                       onClose={() => setIsPanelVisible(false)}
                       updateChatName={updateChatName}
+                      handleCreateStudyGroup = {handleCreateStudyGroup}
                     />
                   </div>
                 )}
