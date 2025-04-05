@@ -88,7 +88,6 @@ const ChatsNavi: React.FC<ChatsNaviProps> = ({
     if (selectedChat) {
       handleChatClick(selectedChat);
     }
-    // Only run when selectedChat becomes defined and lastOpenedTimes is ready
   }, []);
 
   
