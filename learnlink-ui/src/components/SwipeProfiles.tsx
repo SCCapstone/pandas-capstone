@@ -273,7 +273,7 @@ const SwipeProfiles = ({ userId }: { userId: number }) => {
                   </div>
                 </div>
                 <div className="swipe-right-side">
-                <h1>{currentProfile.firstName} {currentProfile.lastName}</h1>
+                <h1>{currentProfile.firstName.trim()} {currentProfile.lastName.trim()}</h1>
                 <h3>@{currentProfile.username}</h3>                  
                 <div className="profile-details-container">
                     <div className="swipe-profile-details">
