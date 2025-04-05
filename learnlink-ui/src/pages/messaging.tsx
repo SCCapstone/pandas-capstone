@@ -16,7 +16,7 @@ import GroupUserContainer from '../components/GroupUserContainer';
 import { useNavigate, useLocation } from "react-router-dom";
 import CreateStudyGroup from '../components/CreateStudyGroup';
 import PlusButtonProps from '../components/PlusButtonProps';
-import { handleSendSystemMessage, handleSendButtonMessage, openCalendarEvent } from "../utils/messageUtils";
+import { handleSendSystemMessage, handleSendButtonMessage, openCalendarEvent, updateChatTimestamp } from "../utils/messageUtils";
 import { NullValueFields } from 'aws-sdk/clients/glue';
 import CalendarEventPopup from '../components/CalendarEventPopup'
 import { Console } from 'console';
@@ -175,6 +175,7 @@ const Messaging: React.FC = () => {
         const parsedId = parseInt(scId, 10);
         if (!isNaN(parsedId)) {
           await fetchChatById(parsedId);
+
         }
       }
     };

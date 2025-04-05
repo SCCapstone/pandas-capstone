@@ -84,6 +84,13 @@ const ChatsNavi: React.FC<ChatsNaviProps> = ({
     setSortedChats(sorted);
   }, [chats]);
 
+  useEffect(() => {
+    if (selectedChat) {
+      handleChatClick(selectedChat);
+    }
+    // Only run when selectedChat becomes defined and lastOpenedTimes is ready
+  }, []);
+
   
   useEffect(() => {
     const fetchLastOpened = async () => {

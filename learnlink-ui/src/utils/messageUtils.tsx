@@ -183,6 +183,8 @@ export const updateChatTimestamp = async (chatId: any) => {
     }
   };
 
+
+
   // Function to open a Calendar Event creation for a study group
   export const createCalendarEvent = (eventDetails: {
     title: string;
