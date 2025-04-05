@@ -171,13 +171,7 @@ import { handleSendSystemMessage,updateChatTimestamp} from "../utils/messageUtil
     };
 
 
-    const updateGroups= (groupId: number) => {
-      // updates the displayed chats to delete the chat from the UI
-      setGroups((prevGroups) => prevGroups.filter((group) => group.id !== groupId));
-      if (selectedGroup?.id === groupId) {
-        setSelectedGroup(null);
-      }
-    }
+    
 
 
 
@@ -201,20 +195,7 @@ import { handleSendSystemMessage,updateChatTimestamp} from "../utils/messageUtil
               // Update selectedGroupUsers state
               setSelectedGroupUsers(prevUsers => (prevUsers || []).filter(user => user.id !== userId));
   
-              // Update the groups state dynamically
-              setGroups(prevGroups =>
-                  prevGroups.map(group =>
-                      group.id === groupId
-                          ? { ...group, users: group.users.filter(user => user.id !== userId) }
-                          : group
-                  )
-              );
-  
               
-              // Update selectedGroup if needed
-              if (selectedGroup) {
-                  updateGroups(selectedGroup.id);
-              }
   
               // Send a system message when a user is removed
               const removedUser = selectedGroupUsers?.find(user => user.id === userId);

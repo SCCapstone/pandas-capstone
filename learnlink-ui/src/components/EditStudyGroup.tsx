@@ -177,17 +177,8 @@ const EditStudyGroup =(
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      
-
-
-
       console.log('Study group updated:', response.data);
       
-      
-      
-
-     
-
       updateChatName(chatID, name);
 
       setAlerts((prevAlerts) => [

@@ -50,11 +50,13 @@ export const handleSendSystemMessage = (
           }
         }
       );
-
       if (setSelectedChat) {
         setSelectedChat((prevSelectedChat: any) =>
           prevSelectedChat
-            ? { ...prevSelectedChat, messages: [...(prevSelectedChat.messages || []), messageData] }
+            ? {
+                ...prevSelectedChat,
+                messages: [...(prevSelectedChat.messages || []), messageData],
+              }
             : null
         );
       }
@@ -80,6 +82,7 @@ export const handleSendSystemMessage = (
       if (setUpdateMessage) {
         setUpdateMessage("");
       }
+
     } catch (error) {
       console.error("Error sending message:", error);
     }
