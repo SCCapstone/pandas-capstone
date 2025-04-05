@@ -171,7 +171,8 @@ const SwipeProfiles = ({ userId }: { userId: number }) => {
   return (
     <div className="whole-swipe-component">
       <div className='match-header-buttons'>
-        <button className='location'>Location (put in later)</button>
+        <div></div>
+        {/* <button className='location'>Location (put in later)</button> */}
         <button className='pendingRequests' onClick={handlePendingRequests}>Pending Requests</button>
       </div>
       {currentProfile ? (

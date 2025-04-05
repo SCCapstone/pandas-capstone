@@ -141,6 +141,7 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ studyGroupId }) => {
                         throw new Error('Failed to fetch schedule');
                     }
                     const data = await response.json();
+                    // console.log("recieved data resopnse)", data)
                     // Assuming the response contains the schedule info
 
                     const dayOrder = ["Sun", "Mon", "Tues", "Wed", "Thur", "Fri", "Sat"];
@@ -155,6 +156,8 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ studyGroupId }) => {
                     setScheduleStartTime(data.scheduleStartTime || "9:00 AM");
                     setScheduleEndTime(data.scheduleEndTime || "5:00 PM");
                     setTimeSlots(generateTimeSlots(scheduleStartTime, scheduleEndTime))
+
+                    // console.log(scheduleEndTime, timeSlots)
                 } catch (error) {
                     console.error('Error fetching schedule:', error);
                     setAlerts((prevAlerts) => [
@@ -168,7 +171,7 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ studyGroupId }) => {
 
             fetchSchedule();
         }
-    }, [isModalOpen, studyGroupId]);
+    }, [isModalOpen, studyGroupId, days]);
     // Fetch study group data and users' availability
     const getStudyGroup = async () => {
         const userId = getLoggedInUserId(); // Get the logged-in user ID
