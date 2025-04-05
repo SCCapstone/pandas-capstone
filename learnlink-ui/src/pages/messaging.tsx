@@ -1200,6 +1200,7 @@ const handleGetChatUsername = async (userId: number) => {
               chatNames={chatNames} 
               chatPfps={chatPfps}
               loadingChatList={loadingChatList}
+              removeUser={removeUser}
             />
           )}
 
