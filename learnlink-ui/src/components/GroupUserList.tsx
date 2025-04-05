@@ -69,6 +69,16 @@ const GroupUserList = (
     updateUsers(userId);
   };
 
+  const handleLeaveGroup = () => {
+    if (currentId !== null && groupId !== null) {
+      onRemoveUser(currentId, groupId);
+      updateUsers(currentId);
+      onClose?.(); // Close the popup after the user leaves the group
+    } else {
+      console.error('User ID or Group ID is not available');
+    }
+  };
+
 
   return (
     <div ref={panelRef} className="user-list-panel">
@@ -87,15 +97,8 @@ const GroupUserList = (
         )}
       </ul>
       <ul>
-        <button
-          onClick={() => {
-            if (currentId !== null) {
-              handleRemoveUser(currentId);
-              onClose?.();
-            } else {
-              console.error('Current user ID is not available');
-            }
-          }}
+      <button
+          onClick={handleLeaveGroup}
           className="leave-group-button"
         >
           Leave Study Group

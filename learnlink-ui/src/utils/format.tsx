@@ -7,6 +7,8 @@ const REACT_APP_API_KEY_DEPT_EDU = process.env.REACT_APP_API_KEY_DEPT_EDU;
 // ADD TO AMPLIFY
 
 export const formatEnum = (value: string): string => {
+  if (!value || typeof value !== 'string') return String(value ?? '');
+  
     return value
         .toLowerCase() // Convert all characters to lowercase
         .replace(/_/g, ' ') // Replace underscores with spaces

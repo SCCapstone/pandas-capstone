@@ -51,10 +51,13 @@ const CreateStudyGroup =(
     chatID, 
     onClose,
     updateChatName,
+    handleCreateStudyGroup
   }: {
     chatID: number;
     onClose: () => void ;
     updateChatName: (chatId: number, newName: string) => void;
+    handleCreateStudyGroup: (chatId: number) => Promise<void>
+
   }) => {
   const [studyGroup, setStudyGroup] = useState<StudyGroup | null>(null);
   const [name, setName] = useState('');
@@ -126,6 +129,9 @@ const CreateStudyGroup =(
   // Handle form submission to save the changes
   const handleSave = async () => {
     try {
+      // Call handleCreateStudyGroup before saving
+      const newStudyGroupID = await handleCreateStudyGroup(chatID);
+     
       const token = localStorage.getItem('token');
       if (!token) {
         // alert('You need to be logged in to save the study group.');

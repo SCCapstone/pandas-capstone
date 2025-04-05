@@ -1,6 +1,7 @@
 import './JoinRequests.css';
 import '../pages/messaging.css';
 import './components.css';
+import ConfirmPopup from './ConfirmPopup';
 import React, { useEffect, useState } from 'react';
 import { FaXmark } from "react-icons/fa6";
 import axios from 'axios';
@@ -54,6 +55,8 @@ interface ChatsNaviProps {
   chatNames: { [key: number]: string };
   chatPfps: { [key: number]: string };
   loadingChatList: boolean;
+  removeUser: (userId: number, groupId: number | null) => Promise<void>;
+  updateChats: (chatId: number) => void;
 }
 
 const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
@@ -67,11 +70,18 @@ const ChatsNavi: React.FC<ChatsNaviProps> = ({
   chatNames,
   chatPfps,
   loadingChatList,
+  removeUser,
+  updateChats,
 }) => {
   const [sortedChats, setSortedChats] = useState<Chat[]>([]);
   const [lastOpenedTimes, setLastOpenedTimes] = useState<{
     [chatId: number]: { [userId: number]: string };
   }>({});
+  const [hasStudyGroup, setHasStudyGroup] = useState(false);
+  const [showConfirmPopup, setShowConfirmPopup] = useState(false);
+  const [confirmAction, setConfirmAction] = useState<() => void>(() => () => {});
+  const [confirmMessage, setConfirmMessage] = useState('');
+
 
   // Sort chats by most recent update when chats change
   useEffect(() => {
@@ -114,6 +124,33 @@ const ChatsNavi: React.FC<ChatsNaviProps> = ({
     fetchLastOpened();
   }, [currentUserId]); // Only fetch when currentUserId changes
   
+  const checkStudyGroup = async (chatId: number): Promise<boolean> => {
+    try {
+      const response = await fetch(`${REACT_APP_API_URL}/api/study-groups/chat/${chatId}`);
+      const data = await response.json();
+  
+      return response.ok && !!data.studyGroupID;
+    } catch (error) {
+      console.error("Error checking study group:", error);
+      return false;
+    }
+  };
+
+  const getStudyGroupIdFromChatId = async (chatId: number): Promise<number | null> => {
+    try {
+      const response = await axios.get(`${REACT_APP_API_URL}/api/study-groups/chat/${chatId}`);
+      if (response.data && response.data.studyGroupID) {
+        return response.data.studyGroupID;
+      }
+      return null;
+    } catch (error) {
+      console.error("Error fetching study group ID from chat ID:", error);
+      return null;
+    }
+  };
+  
+  
+
   const handleChatClick = async (chat: Chat) => {
     setSelectedChat(chat);
     const currentUser = currentUserId;
@@ -135,6 +172,8 @@ const ChatsNavi: React.FC<ChatsNaviProps> = ({
       console.error('Error updating lastOpened:', error);
     }
   };
+
+
   
   const shouldHighlightChat = (chat: Chat) => {
     if (chat.lastUpdatedById === currentUserId) return false; // Ignore updates made by the current user
@@ -179,12 +218,45 @@ const ChatsNavi: React.FC<ChatsNaviProps> = ({
               </div>
               
               {/* Button to delete the chat */}
-              <button className="DeleteButton" onClick={() => handleDeleteChat(chat.id)}>
+              <button
+                className="DeleteButton"
+                onClick={async(e) => {
+                  e.stopPropagation();
+
+                  const isStudyGroup = await checkStudyGroup(chat.id);
+                  const groupId = await getStudyGroupIdFromChatId(chat.id);
+
+                  if (isStudyGroup) {
+                    setConfirmMessage('Are you sure you want to leave this study group?');
+                    setConfirmAction(() => () => {
+                      removeUser(currentUserId, groupId);
+                      setShowConfirmPopup(false);
+                      updateChats(chat.id);
+                    });
+                  } else {
+                    setConfirmMessage('Are you sure you want to delete this chat?');
+                    setConfirmAction(() => () => {
+                      handleDeleteChat(chat.id);
+                      setShowConfirmPopup(false);
+                    });
+                  }
+
+                  setShowConfirmPopup(true);
+                }}
+              >
                 <FaXmark />
               </button>
+
             </li>
           ))}
         </ul>
+      )}
+      {showConfirmPopup && (
+        <ConfirmPopup
+          message={confirmMessage}
+          onConfirm={() => confirmAction()}
+          onCancel={() => setShowConfirmPopup(false)}
+        />
       )}
     </div>
   );

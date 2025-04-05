@@ -1048,6 +1048,11 @@ const handleGetChatUsername = async (userId: number) => {
         if (userId === currentUserId) {
           mess = `${username} left the group.`;
           
+          const chatIdResponse = await axios.get(`${REACT_APP_API_URL}/api/study-groups/${groupId}/chat`);
+          const chatId = chatIdResponse.data.chatId;
+          updateChats(chatId);
+          
+          
         } else {
           mess = `${username} was removed from the group.`;
         }
@@ -1200,6 +1205,8 @@ const handleGetChatUsername = async (userId: number) => {
               chatNames={chatNames} 
               chatPfps={chatPfps}
               loadingChatList={loadingChatList}
+              removeUser={removeUser}
+              updateChats = {updateChats}
             />
           )}
 
@@ -1266,7 +1273,7 @@ const handleGetChatUsername = async (userId: number) => {
                     <button
                       className="CreateStudyGroupButton"
                       onClick={() => {
-                        handleCreateStudyGroup(selectedChat.id);
+                        
                         setIsPanelVisible(true);
                       }}
                     >
@@ -1297,6 +1304,7 @@ const handleGetChatUsername = async (userId: number) => {
                       chatID={selectedChat.id}
                       onClose={() => setIsPanelVisible(false)}
                       updateChatName={updateChatName}
+                      handleCreateStudyGroup = {handleCreateStudyGroup}
                     />
                   </div>
                 )}
