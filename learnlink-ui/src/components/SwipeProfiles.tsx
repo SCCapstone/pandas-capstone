@@ -281,10 +281,10 @@ const SwipeProfiles = ({ userId }: { userId: number }) => {
                       <p><span className="bold-first-word">Age: </span>{currentProfile.age}</p>
                       <p><span className="bold-first-word">College: </span>{currentProfile.college}</p>
                       <p><span className="bold-first-word">Major: </span>{currentProfile.major}</p>
-                      <p><span className="bold-first-word">Gender: </span>{currentProfile.gender}</p>
+                      <p><span className="bold-first-word">Gender: </span>{formatEnum(currentProfile.gender)}</p>
                     </div>
                     <div className="swipe-profile-details">
-                      <p><span className="bold-first-word">Grade: </span>{currentProfile.grade}</p>
+                      <p><span className="bold-first-word">Grade: </span>{formatEnum(currentProfile.grade)}</p>
                       <p><span className="bold-first-word">Relevant Coursework: </span>{currentProfile.relevant_courses}</p>
                       <p><span className="bold-first-word">Fav Study Method: </span>{currentProfile.study_method}</p>
                       <p><span className="bold-first-word">Study Tags: </span>
