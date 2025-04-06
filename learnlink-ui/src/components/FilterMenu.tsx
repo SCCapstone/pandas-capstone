@@ -127,7 +127,7 @@ const navigate = useNavigate();
     // Sync state with URL
     setSearchParams({
       query,
-      gender: selectedGenders.map(item => item.label).join(','),
+      gender: selectedGenders.map(item => item.value).join(','),
       college: selectedColleges.map(item => item.label).join(','),
       course: selectedCourses.map(item => item.label).join(','),
       ageRange: ageRange ? ageRange.join(',') : '',
