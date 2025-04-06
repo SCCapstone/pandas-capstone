@@ -8,7 +8,7 @@ import Select from 'react-select';
 import { profile } from 'console';
 import { set } from 'react-hook-form';
 import CustomAlert from '../components/CustomAlert';
-
+import ProfilePictureModal from '../components/ProfilePictureModal';
 
 const animatedComponents = makeAnimated();
 
@@ -16,8 +16,6 @@ const Profile: React.FC = () => {
   const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
   const { isLoading, colleges } = useColleges();
   
-
-
   const [formData, setFormData] = useState({
     first_name: '',
     last_name: '',
@@ -40,6 +38,10 @@ const Profile: React.FC = () => {
   const [enumOptions, setEnumOptions] = useState({ grade: [], gender: [], studyHabitTags: [] });
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [alerts, setAlerts] = useState<{ id: number; alertText: string; alertSeverity: "error" | "warning" | "info" | "success"; visible: boolean }[]>([]);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedEmoji, setSelectedEmoji] = useState<string | null>(null);
+  const [selectedEmojiURL, setSelectedEmojiURL] = useState<string | null>(null);
 
 
   // Fetch enum values on component mount
@@ -125,7 +127,7 @@ const Profile: React.FC = () => {
     formData.append('profilePic', image);
     const token = localStorage.getItem('token');
     if (token) {
-      const res = await fetch(`${REACT_APP_API_URL}/api/users/upload-pfp`, {
+      const res = await fetch(`${REACT_APP_API_URL}/api/users/save-emoji-pfp`, {
         method: 'POST',
         body: formData,
         headers: {
@@ -137,7 +139,7 @@ const Profile: React.FC = () => {
         console.error("Upload error:", data.error || "Unknown error");
         setAlerts((prevAlerts) => [
           ...prevAlerts,
-          { id: Date.now(), alertText: data.error || "Failed to upload image", alertSeverity: "error", visible: true },
+          { id: Date.now(), alertText: data.error || "Failed to save image", alertSeverity: "error", visible: true },
         ]);
         // alert(`Error: ${data.error || "Failed to upload image"}`);
         return;
@@ -146,27 +148,11 @@ const Profile: React.FC = () => {
     }
   };
 
-  
-  // const handleSelectChange = (newValue: MultiValue<{ value: string; label: string }>, actionMeta: ActionMeta<{ value: string; label: string }>) => {
-  //   // Update the formData state with the selected values
-  //   setFormData((prevData) => ({
-  //     ...prevData,
-  //     studyHabitTags: newValue ? newValue.map((option) => option.value) : [],
-  //   }));
-  // };
-
-  // // Handle Select component changes
-  // const handleSelectChange = (newValue: any, actionMeta: any) => {
-  //   setFormData((prevData) => ({
-  //     ...prevData,
-  //     studyHabitTags: newValue ? newValue.map((option: any) => option.value) : [],
-  //   }));
-  // };
-
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
-    handleUpload();
-    e.preventDefault();
+    e.preventDefault()
+    // handleUpload();
+    setImageUrl(imagePreview)
 
     // Convert age to a number if provided
     const dataToSend = {
@@ -223,42 +209,23 @@ const Profile: React.FC = () => {
 
   const [image, setImage] = useState<File | null>(null);
 
-  // Function to handle file selection
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files ? e.target.files[0] : null;
-    if (file) {
-      setImage(file); // Store the selected file
-    }
+
+  const handleEmojiSelect = (emoji: string, URL:string) => {
+    setSelectedEmoji(emoji);
+    setImagePreview(URL)
+    setFormData((prevData) => ({
+      ...prevData,
+      profilePic: URL, // Update profilePic with the URL from the upload
+    }));
+    setSelectedEmojiURL(URL)
+    setIsModalOpen(false); // Close modal after selection
   };
-  const [imagePreview, setImagePreview] = useState(null);
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const formData = new FormData();
-    
-    const file = e.target.files ? e.target.files[0] : null;
-    if (!file) return;  // If no file is selected, exit
-      setImage(file);  // Store the selected file for later use
 
-    formData.append("profilePic", file);  // Append the file to FormData with the field name 'profilePic'
-    try {
-      // Send the image to the backend
-      const response = await fetch(`${REACT_APP_API_URL}/api/upload-preview`, {
-        method: "POST",
-        body: formData,  // Send the FormData
-      });
-  
-      if (response.ok) {
-        const data = await response.json();
-        if (data.preview) {
-          setImagePreview(data.preview);  // Set the preview image
-        }
-      } else {
-        console.error("Failed to upload image:", response.statusText);
-      }
-    } catch (error) {
-      console.error("Error uploading image:", error);
-    }
-  };
+    setIsModalOpen(true)
+  }
+
 
   // Handle multi-select changes
   const handleSelectChange = (selectedOptions: any) => {
@@ -385,23 +352,17 @@ const Profile: React.FC = () => {
                       className='upload-button'
                         src={imagePreview}  // Display the preview returned by the backend
                         alt="Selected Profile"
-                        onClick={() => document.getElementById("image-upload")?.click()} // Allow re-selecting an image
+                        onClick={() => setIsModalOpen(true)} // Allow re-selecting an image
                       />
                     ) : (
                       <div>
-                        {/* <button
-                        className="upload-button"
-                        onClick={() => document.getElementById("image-upload")?.click()}
-                      >
-                        CLICK TO ADD PICTURE
-                      </button> */}
                       <img
                       className='upload-button'
                         src={formData?.profilePic || 'https://learnlink-public.s3.us-east-2.amazonaws.com/AvatarPlaceholder.svg'}
                         alt="Profile"
                         width="100"
                         height={100}
-                        onClick={() => document.getElementById("image-upload")?.click()}
+                        onClick={() => setIsModalOpen(true)}
 
                       />
                       </div>
@@ -409,16 +370,31 @@ const Profile: React.FC = () => {
 
                     {/* Hidden file input */}
                     <input
-                      id="image-upload"
-                      type="file"
+                      id="emoji-upload"
+                      type="button"
                       accept="image/*"
                       onChange={handleImageUpload}
                       style={{ display: "none" }}
                     />
+                    <ProfilePictureModal
+                      isOpen={isModalOpen}
+                      onRequestClose={() => setIsModalOpen(false)}
+                      onSelect={handleEmojiSelect}
+                    />
                     {/* <button onClick={handleUpload}>Upload</button> */}
 
                   </div>
-                  
+                  {/* <div className="emoji-selector">
+                    <button type="button" onClick={() => setIsModalOpen(true)}>
+                      {selectedEmoji ? (
+                        <span style={{ fontSize: '2rem' }}>{selectedEmoji}</span>
+                      ) : (
+                        'Choose Emoji'
+                      )}
+                    </button>
+                    {selectedEmoji && <input type="hidden" name="profilePic" value={selectedEmoji} />}
+                  </div> */}
+
 
 
                 </div>
