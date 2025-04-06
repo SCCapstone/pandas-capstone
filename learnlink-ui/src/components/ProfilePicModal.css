@@ -1,4 +1,4 @@
-.modal {
+.pfp-modal {
   position: fixed;
   top: 0;
   left: 0;
@@ -10,23 +10,28 @@
   justify-content: center;
   z-index: 1000;
 }
-
-.modal-content {
+.pfp-modal-content h3 {
+font-size: 30px;
+text-align: left;
+}
+.pfp-modal-content {
   background-color: #fff;
   padding: 24px;
   border-radius: 12px;
-  width: 90%;
-  max-width: 400px;
+  width: 80%;
+  max-width: 500px;
   max-height: 80vh;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
   position: relative;
-  overflow: scroll;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
 
 }
 
-.modal-close-button {
+.pfp-modal-close-button {
   position: absolute;
-  top: 2px;
+  top: 12px;
   right: 18px;
   background: none;
   border: none;
@@ -36,12 +41,17 @@
   background-color: none !important;
   color: rgb(86, 86, 86) !important;
 }
+.pfp-modal-close-button:hover {
+  color: rgb(165, 42, 42) !important;
+}
 
 .emoji-grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  gap: 12px;
+  gap: 15px;
   margin-top: 16px;
+  overflow: scroll;
+
 }
 
 .emoji-button:hover {
