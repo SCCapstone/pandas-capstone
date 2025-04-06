@@ -42,6 +42,7 @@ const Profile: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedEmoji, setSelectedEmoji] = useState<string | null>(null);
   const [selectedEmojiURL, setSelectedEmojiURL] = useState<string | null>(null);
+  const [isLoadingProfilePage, setIsLoadingProfilePage] = useState(true)
 
 
   // Fetch enum values on component mount
@@ -49,6 +50,7 @@ const Profile: React.FC = () => {
     const fetchData = async () => {
 
       try {
+        setIsLoadingProfilePage(true);
         // Fetch enum options
         const enumsResponse = await fetch(`${REACT_APP_API_URL}/api/enums`);
         const enumsData = await enumsResponse.json();
@@ -86,6 +88,7 @@ const Profile: React.FC = () => {
             profilePic: userData.profilePic || '',
           });
         }
+        setIsLoadingProfilePage(false);
         console.log('Form Data after set:', formData); // Debug log
 
       } catch (error) {
@@ -262,8 +265,13 @@ const Profile: React.FC = () => {
           ))}
         </div>
       )}
-
+      {isLoadingProfilePage ? (
+        <div className='main-loading-container'>
+          Loading... <span className="loading-spinner"></span>
+        </div>
+      ) : (
       <div className='main-container'>
+
         <header className="profile-header">
           <h1 className="profile-title">Update Profile</h1>
         </header>
@@ -468,6 +476,7 @@ const Profile: React.FC = () => {
           </form>
         </main>
       </div>
+    )};
       <footer>
         <CopyrightFooter />
       </footer>
