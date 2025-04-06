@@ -10,6 +10,7 @@ const emojiOptions = [
   { emoji: "📚", bgColor: "#FFE0B2", filename: "books.png", URL: `${baseUrl}books.png` },
   { emoji: "🧃", bgColor: "#A5D6A7", filename: "beverage-box.png", URL: `${baseUrl}beverage-box.png` },
   { emoji: "💻", bgColor: "#90CAF9", filename: "computer.png", URL: `${baseUrl}computer.png` },
+  { emoji: "🐓", bgColor: "#EF9A9A", filename: "rooster.png", URL: `${baseUrl}rooster.png`  },
   { emoji: "🌈", bgColor: "#FFD54F", filename: "rainbow.png", URL: `${baseUrl}rainbow.png` },
   { emoji: "🍄", bgColor: "#EF9A9A", filename: "mushroom.png", URL: `${baseUrl}mushroom.png` },
   { emoji: "✨", bgColor: "#FFF59D", filename: "sparkles.png", URL: `${baseUrl}sparkles.png` },
@@ -21,7 +22,8 @@ const emojiOptions = [
   { emoji: "📀", bgColor: "#CE93D8", filename: "cd.png", URL: `${baseUrl}cd.png` },
   { emoji: "🎮", bgColor: "#81D4FA", filename: "video_game.png", URL: `${baseUrl}video_game.png` },
   { emoji: "🫶", bgColor: "#FFCDD2", filename: "heart-hands.png", URL: `${baseUrl}heart-hands.png` },
-  { emoji: "🩵", bgColor: "#B2EBF2", filename: "water-wave.png", URL: `${baseUrl}water-wave.png` },
+  { emoji: "🌴", bgColor: "#B39DDB", filename: "palm-tree.png" , URL: `${baseUrl}palm-tree.png`},
+  { emoji: "🦄", bgColor: "#F8BBD0", filename: "unicorn.png", URL: `${baseUrl}unicorn.png` }, 
   { emoji: "🪩", bgColor: "#FFD180", filename: "mirror-ball.png", URL: `${baseUrl}mirror-ball.png` },
   { emoji: "🌊", bgColor: "#80DEEA", filename: "water-wave.png", URL: `${baseUrl}water-wave.png` },
   { emoji: "🍉", bgColor: "#FFAB91", filename: "watermelon.png", URL: `${baseUrl}watermelon.png` },
@@ -33,7 +35,9 @@ const emojiOptions = [
   { emoji: "🏀", bgColor: "#FFE082", filename: "basketball.png", URL: `${baseUrl}basketball.png` },
   { emoji: "🛹", bgColor: "#B2EBF2", filename: "skateboard.png", URL: `${baseUrl}skateboard.png` },
   { emoji: "🎸", bgColor: "#EF9A9A", filename: "guitar.png", URL: `${baseUrl}guitar.png` },
-  { emoji: "🐷", bgColor: "#F8BBD0", filename: "pig-face.png", URL: `${baseUrl}pig-face.png` }
+  { emoji: "🐷", bgColor: "#F8BBD0", filename: "pig-face.png", URL: `${baseUrl}pig-face.png` },
+  { emoji: "👥", bgColor: "#B0BEC5", filename: "busts-in-silhouette.png", URL: `${baseUrl}busts-in-silhouette.png` },
+  { emoji: "👤", bgColor: "#FFD54F", filename: "bust-in-silhouette.png", URL: `${baseUrl}bust-in-silhouette.png` },
 ];
 
 interface ProfilePicModalProps {

@@ -11,6 +11,7 @@ try {
 
 // Define emojis and background colors
 const emojisWithBackgrounds = [
+    { emoji: "🐓", bgColor: "#EF9A9A", filename: "rooster.png" },
     { emoji: "🌸", bgColor: "#F9D5E5", filename: "cherry_blossom.png" },
     { emoji: "☕", bgColor: "#D7CCC8", filename: "coffee.png" },
     { emoji: "🎧", bgColor: "#B39DDB", filename: "headphone.png" },
@@ -26,6 +27,8 @@ const emojisWithBackgrounds = [
     { emoji: "🧸", bgColor: "#D7CCC8", filename: "teddy-bear_1f9f8.png" },
     { emoji: "🪴", bgColor: "#C8E6C9", filename: "potted-plant.png" },
     { emoji: "📀", bgColor: "#CE93D8", filename: "cd.png" },
+    { emoji: "🌴", bgColor: "#B39DDB", filename: "palm-tree.png" },
+    { emoji: "🦄", bgColor: "#F8BBD0", filename: "unicorn.png" }, 
     { emoji: "🎮", bgColor: "#81D4FA", filename: "video_game.png" },
     { emoji: "🫶", bgColor: "#FFCDD2", filename: "heart-hands.png" },
     { emoji: "🩵", bgColor: "#B2EBF2", filename: "water-wave.png" },
@@ -40,7 +43,9 @@ const emojisWithBackgrounds = [
     { emoji: "🏀", bgColor: "#FFE082", filename: "basketball.png" },
     { emoji: "🛹", bgColor: "#B2EBF2", filename: "skateboard.png" },
     { emoji: "🎸", bgColor: "#EF9A9A", filename: "guitar.png" },
-    { emoji: "🐷", bgColor: "#F8BBD0", filename: "pig-face.png" }
+    { emoji: "🐷", bgColor: "#F8BBD0", filename: "pig-face.png" },
+    { emoji: "👥", bgColor: "#B0BEC5", filename: "busts-in-silhouette.png" },
+    { emoji: "👤", bgColor: "#FFD54F", filename: "bust-in-silhouette.png" },
   ];
 const SIZE = 400; // Final image size
 const EMOJI_SIZE = 200; // Size of the emoji within the circle
