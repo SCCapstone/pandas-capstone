@@ -52,6 +52,7 @@ const EditStudyGroup =(
     chatID, 
     onClose,
     updateChatName,
+    updatePFP,
     groupId,
     currentId,
     users,
@@ -62,12 +63,13 @@ const EditStudyGroup =(
     chatID: number;
     onClose: () => void ;
     updateChatName: (chatId: number, newName: string) => void;
+    updatePFP:  (chatId: number, newPFP: string) => void;
     groupId: number | null;
     currentId: number | null;
     users: User[] | null;
     onRemoveUser: (userId: number, groupId: number | null) => void; // Update type here
     updateUsers: (userId: number) => void;
-    onGroupUpdated: (newName: string) => void;
+    onGroupUpdated: (newName: string, newPFP: string) => void;
 
   }) => {
   const [studyGroup, setStudyGroup] = useState<StudyGroup | null>(null);
@@ -79,7 +81,7 @@ const EditStudyGroup =(
   const [profilePic, setProfilePic] = useState<string | null>(null);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [image, setImage] = useState<string | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [imagePreview, setImagePreview] = useState<string>('');
   const [alerts, setAlerts] = useState<{ id: number; alertText: string; alertSeverity: "error" | "warning" | "info" | "success"; visible: boolean }[]>([]);
   const alertVisible = alerts.some(alert => alert.visible);
   const [pfpModalOpen, setPfpModalOpen] = useState(false);
@@ -120,6 +122,7 @@ const EditStudyGroup =(
         const data = response.data;
         setStudyGroup(data);
         setName(data.name);
+        setImagePreview(data.profile_pic)
         setDescription(data.description);
         setSubject(data.subject);
         setIdealMatchFactor(data.ideal_match_factor ? { value: data.ideal_match_factor, label: formatEnum(data.ideal_match_factor) } : null);
@@ -192,7 +195,11 @@ const EditStudyGroup =(
       console.log('Study group updated:', response.data);
       
       updateChatName(chatID, name);
-      onGroupUpdated(name);
+      if(imagePreview){
+      updateChatName(chatID, imagePreview);
+      }
+
+      onGroupUpdated(name, imagePreview);
 
 
       setAlerts((prevAlerts) => [

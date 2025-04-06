@@ -157,6 +157,13 @@ import { handleSendSystemMessage,updateChatTimestamp} from "../utils/messageUtil
         console.log("fetch groups complete");
       }, []);
 
+      useEffect(()=> {
+        const printEdit = async() => {
+          console.log("PRINT EDIT",isEditMode)
+        }
+        printEdit();
+      }, [isEditMode])
+
     
 
 
@@ -168,6 +175,14 @@ import { handleSendSystemMessage,updateChatTimestamp} from "../utils/messageUtil
 
     const updateUsers = (userId: number) => {
     setSelectedGroupUsers(prevUsers => (prevUsers || []).filter(user => user.id !== userId));
+    };
+
+    const updatePFP = (chatId: number, newPFP: string) => {
+      setGroups(prev =>
+        prev.map(group =>
+          group.chatID === chatId ? { ...group, profile_pic: newPFP } : group
+        )
+      );
     };
 
 
@@ -276,6 +291,8 @@ import { handleSendSystemMessage,updateChatTimestamp} from "../utils/messageUtil
                                 setSelectedGroupUsers(group.users);
                               }}
                               >
+                             <img src={group.profile_pic? group.profile_pic : "https://learnlink-pfps.s3.us-east-1.amazonaws.com/profile-pictures/circle_busts-in-silhouette.png"} alt={`${group.name}`} className='groups-profile-pic' />
+
                             <span>{group.name}</span>
                             </li>
                         ))}
@@ -295,6 +312,7 @@ import { handleSendSystemMessage,updateChatTimestamp} from "../utils/messageUtil
                     <StudyGroupInfo
                       chatID={selectedGroup.chatID}
                       updateChatName={updateChatName}
+                      updatePFP={updatePFP}
                       groupId={currentGroupId}
                       currentId={currentUserId}
                       users={selectedGroupUsers.filter((user) => user.id !== currentUserId) ?? []}

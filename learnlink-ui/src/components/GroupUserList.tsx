@@ -17,6 +17,7 @@ interface User {
   id: number;        // Unique user ID
   firstName: string; // User's first name
   lastName: string;  // User's last name
+  profilePic?: string;
 }
 const GroupUserList = (
   {

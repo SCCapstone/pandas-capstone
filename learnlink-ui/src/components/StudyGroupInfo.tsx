@@ -50,6 +50,7 @@ const StudyGroupInfo =(
     {
     chatID, 
     updateChatName,
+    updatePFP,
     groupId,
     currentId,
     users,
@@ -59,6 +60,7 @@ const StudyGroupInfo =(
   }: {
     chatID: number;
     updateChatName: (chatId: number, newName: string) => void;
+    updatePFP: (chatId: number, newPFP: string) => void;
     groupId: number | null;
     currentId: number | null;
     users: User[] | null;
@@ -154,14 +156,16 @@ const StudyGroupInfo =(
       chatID={chatID}
       onClose={handleClose} 
       updateChatName={updateChatName}
+      updatePFP={updatePFP}
       groupId={groupId}
       currentId={currentId}
       users={users}
       onRemoveUser={onRemoveUser}
       updateUsers={updateUsers}
-      onGroupUpdated={(newName: string) => {
+      onGroupUpdated={(newName: string, newPFP: string) => {
         setName(newName); // update local state
         updateChatName(chatID, newName); // update parent (Groups page)
+        updatePFP(chatID, newPFP)
         setIsEdit(false); // close edit mode
       }}
     />
