@@ -87,7 +87,7 @@
 
   .GroupListItem {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start;
     align-items: center;
     padding: 20px 30px;
     border-bottom: 1px solid #ddd;
@@ -95,6 +95,7 @@
     padding: 15px;
     border-bottom: 1px solid #ccc;
     cursor: pointer;
+    gap:15px;
   }
 
   .GroupListItem:hover {
@@ -137,4 +138,8 @@
   @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
+  }
+
+  .groups-profile-pic {
+    max-height: 50px;
   }

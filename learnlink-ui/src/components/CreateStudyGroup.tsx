@@ -51,10 +51,14 @@ const CreateStudyGroup =(
     chatID, 
     onClose,
     updateChatName,
+    handleCreateStudyGroup,
+    setCurrentGroupId,
   }: {
     chatID: number;
     onClose: () => void ;
     updateChatName: (chatId: number, newName: string) => void;
+    handleCreateStudyGroup: ((chatId: number) => Promise<number | void>);
+    setCurrentGroupId: React.Dispatch<React.SetStateAction<number | null>>; 
   }) => {
   const [studyGroup, setStudyGroup] = useState<StudyGroup | null>(null);
   const [name, setName] = useState('');
@@ -70,62 +74,73 @@ const CreateStudyGroup =(
   const alertVisible = alerts.some(alert => alert.visible);
 
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
-  const [currentGroupId, setCurrentGroupId] =  useState<number | null>(null);
   const [selectedGroupUsers, setSelectedGroupUsers] = useState<User[] | null>(null);
 
   const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
 
 
+  const fetchStudyGroup = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        // alert('You need to be logged in to edit the study group.');
+        setAlerts((prevAlerts) => [
+          ...prevAlerts,
+          { id: Date.now(), alertText: 'You need to be logged in to create the study group.', alertSeverity: "error", visible: true },
+        ]);
+        return;
+      }
+      const enumsResponse = await fetch(`${REACT_APP_API_URL}/api/enums`);
+      const enumsData = await enumsResponse.json();
+      setEnumOptions({
+        studyHabitTags: enumsData.studyHabitTags,
+      });
+
+      const response = await axios.get(
+        `${REACT_APP_API_URL}/api/study-groups/chat/${chatID}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      console.log("Chat id::::: ", chatID);
+
+      // Set the form fields with the existing study group values
+      const data = response.data;
+      console.log("DATAtA:::", data);
+      setCurrentGroupId(data.studyGroupID);
+      setStudyGroup(data);
+      setName(data.name);
+      setDescription(data.description);
+      setSubject(data.subject);
+      setIdealMatchFactor(data.ideal_match_factor ? { value: data.ideal_match_factor, label: formatEnum(data.ideal_match_factor) } : null);
+      setProfilePic(data.profilePic);
+    } catch (error) {
+      console.error('Error fetching study group:', error);
+      // alert('Failed to load study group details.');
+      setAlerts((prevAlerts) => [
+        ...prevAlerts,
+        { id: Date.now(), alertText: "Failed to load study group details. Please try again later.", alertSeverity: "error", visible: true },
+      ]);
+    }
+  };
+
 
   // Fetch the study group details when the component is mounted
   useEffect(() => {
-    const fetchStudyGroup = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        if (!token) {
-          // alert('You need to be logged in to edit the study group.');
-          setAlerts((prevAlerts) => [
-            ...prevAlerts,
-            { id: Date.now(), alertText: 'You need to be logged in to create the study group.', alertSeverity: "error", visible: true },
-          ]);
-          return;
-        }
-        const enumsResponse = await fetch(`${REACT_APP_API_URL}/api/enums`);
-        const enumsData = await enumsResponse.json();
-        setEnumOptions({
-          studyHabitTags: enumsData.studyHabitTags,
-        });
-
-        const response = await axios.get(
-          `${REACT_APP_API_URL}/api/study-groups/chat/${chatID}`,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-        console.log("Chat id::::: ", chatID);
-
-        // Set the form fields with the existing study group values
-        const data = response.data;
-        setStudyGroup(data);
-        setName(data.name);
-        setDescription(data.description);
-        setSubject(data.subject);
-        setIdealMatchFactor(data.ideal_match_factor ? { value: data.ideal_match_factor, label: formatEnum(data.ideal_match_factor) } : null);
-        setProfilePic(data.profilePic);
-      } catch (error) {
-        console.error('Error fetching study group:', error);
-        // alert('Failed to load study group details.');
-        setAlerts((prevAlerts) => [
-          ...prevAlerts,
-          { id: Date.now(), alertText: "Failed to load study group details. Please try again later.", alertSeverity: "error", visible: true },
-        ]);
-      }
-    };
-
+    
     fetchStudyGroup();
   }, [chatID]);
 
   // Handle form submission to save the changes
   const handleSave = async () => {
     try {
+      // Call handleCreateStudyGroup before saving
+      const newStudyGroupID = await handleCreateStudyGroup(chatID);
+      console.log("NEW", newStudyGroupID);
+      await fetchStudyGroup();
+    
+     
+      
+      
+     
       const token = localStorage.getItem('token');
       if (!token) {
         // alert('You need to be logged in to save the study group.');
@@ -296,7 +311,7 @@ const CreateStudyGroup =(
                 
                 <img
                   className='upload-button'
-                  src={profilePic || 'https://learnlink-public.s3.us-east-2.amazonaws.com/AvatarPlaceholder.svg'}
+                  src={profilePic || 'https://learnlink-pfps.s3.us-east-1.amazonaws.com/profile-pictures/circle_busts-in-silhouette.png'}
                   alt="Profile"
                   width="100"
                   height={100}

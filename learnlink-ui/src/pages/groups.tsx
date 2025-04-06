@@ -157,6 +157,13 @@ import { handleSendSystemMessage,updateChatTimestamp} from "../utils/messageUtil
         console.log("fetch groups complete");
       }, []);
 
+      useEffect(()=> {
+        const printEdit = async() => {
+          console.log("PRINT EDIT",isEditMode)
+        }
+        printEdit();
+      }, [isEditMode])
+
     
 
 
@@ -170,24 +177,24 @@ import { handleSendSystemMessage,updateChatTimestamp} from "../utils/messageUtil
     setSelectedGroupUsers(prevUsers => (prevUsers || []).filter(user => user.id !== userId));
     };
 
-
-    const updateGroups= (groupId: number) => {
-      // updates the displayed chats to delete the chat from the UI
-      setGroups((prevGroups) => prevGroups.filter((group) => group.id !== groupId));
-      if (selectedGroup?.id === groupId) {
-        setSelectedGroup(null);
-      }
-    }
-
-
-
-    const updateChatName = (chatId: number, newName: string) => {
-    setGroupNames((prevGroupNames) => ({
-        ...prevGroupNames,
-        [chatId]: newName,
-    }));
+    const updatePFP = (chatId: number, newPFP: string) => {
+      setGroups(prev =>
+        prev.map(group =>
+          group.chatID === chatId ? { ...group, profile_pic: newPFP } : group
+        )
+      );
     };
 
+
+    
+
+    const updateChatName = (chatId: number, newName: string) => {
+      setGroups(prev =>
+        prev.map(group =>
+          group.chatID === chatId ? { ...group, name: newName } : group
+        )
+      );
+    };
 
     const removeUser = async (userId: number, groupId: number | null) => {
       if (!groupId) {
@@ -201,20 +208,7 @@ import { handleSendSystemMessage,updateChatTimestamp} from "../utils/messageUtil
               // Update selectedGroupUsers state
               setSelectedGroupUsers(prevUsers => (prevUsers || []).filter(user => user.id !== userId));
   
-              // Update the groups state dynamically
-              setGroups(prevGroups =>
-                  prevGroups.map(group =>
-                      group.id === groupId
-                          ? { ...group, users: group.users.filter(user => user.id !== userId) }
-                          : group
-                  )
-              );
-  
               
-              // Update selectedGroup if needed
-              if (selectedGroup) {
-                  updateGroups(selectedGroup.id);
-              }
   
               // Send a system message when a user is removed
               const removedUser = selectedGroupUsers?.find(user => user.id === userId);
@@ -227,6 +221,15 @@ import { handleSendSystemMessage,updateChatTimestamp} from "../utils/messageUtil
 
                   updateChatTimestamp(selectedGroup?.chatID);
               
+              }
+              // ✅ Update the groups UI if the current user left the group
+              if (userId === currentUserId) {
+                setGroups(prevGroups => prevGroups.filter(group => group.id !== groupId));
+
+                // Optionally deselect the group if it’s open
+                if (selectedGroup?.id === groupId) {
+                  setSelectedGroup(null);
+                }
               }
           } else {
               console.error('Failed to delete the user.');
@@ -288,6 +291,8 @@ import { handleSendSystemMessage,updateChatTimestamp} from "../utils/messageUtil
                                 setSelectedGroupUsers(group.users);
                               }}
                               >
+                             <img src={group.profile_pic? group.profile_pic : "https://learnlink-pfps.s3.us-east-1.amazonaws.com/profile-pictures/circle_busts-in-silhouette.png"} alt={`${group.name}`} className='groups-profile-pic' />
+
                             <span>{group.name}</span>
                             </li>
                         ))}
@@ -307,6 +312,7 @@ import { handleSendSystemMessage,updateChatTimestamp} from "../utils/messageUtil
                     <StudyGroupInfo
                       chatID={selectedGroup.chatID}
                       updateChatName={updateChatName}
+                      updatePFP={updatePFP}
                       groupId={currentGroupId}
                       currentId={currentUserId}
                       users={selectedGroupUsers.filter((user) => user.id !== currentUserId) ?? []}

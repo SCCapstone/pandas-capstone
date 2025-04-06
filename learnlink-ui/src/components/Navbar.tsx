@@ -12,7 +12,9 @@ import { set } from 'react-hook-form';
 import ReactSlider from 'react-slider'
 import { useEffect } from 'react';
 import NotificationDropdown from './NotificationDropdown';
+import JoinRequestNotifs from './JoinRequestsContext';
 import JoinRequestsNotificationBadge from './JoinRequestsNotificationBadge';
+import { getLoggedInUserId } from '../utils/auth';
 
 
 
@@ -323,8 +325,13 @@ const Navbar: React.FC = () => {
       <nav className="nav-links">
         <a href="/swiping">Match</a>
         <a href="/profile">Profile</a>
-        <div className='link-w-notif'>         <a href="/network">Network</a>
-          <JoinRequestsNotificationBadge /></div>
+        <div className='link-w-notif'>         
+          <a href="/network">Network</a>
+          <JoinRequestNotifs currentUserId={getLoggedInUserId()} >
+
+          <JoinRequestsNotificationBadge />
+          </JoinRequestNotifs>
+          </div>
         <a href="/messaging" onClick={handleMessaging}>Messaging</a>
         <a href="/groups" onClick={handleGroups}>Groups</a>
         <a href="/resources/studyTips">Resources</a>

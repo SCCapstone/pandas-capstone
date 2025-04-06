@@ -50,11 +50,13 @@ export const handleSendSystemMessage = (
           }
         }
       );
-
       if (setSelectedChat) {
         setSelectedChat((prevSelectedChat: any) =>
           prevSelectedChat
-            ? { ...prevSelectedChat, messages: [...(prevSelectedChat.messages || []), messageData] }
+            ? {
+                ...prevSelectedChat,
+                messages: [...(prevSelectedChat.messages || []), messageData],
+              }
             : null
         );
       }
@@ -80,6 +82,7 @@ export const handleSendSystemMessage = (
       if (setUpdateMessage) {
         setUpdateMessage("");
       }
+
     } catch (error) {
       console.error("Error sending message:", error);
     }
@@ -179,6 +182,8 @@ export const updateChatTimestamp = async (chatId: any) => {
       console.error("Failed to update chat timestamp:", error);
     }
   };
+
+
 
   // Function to open a Calendar Event creation for a study group
   export const createCalendarEvent = (eventDetails: {

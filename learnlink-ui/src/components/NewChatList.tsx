@@ -211,7 +211,7 @@ const NewChatList: React.FC<MatchesListProps> = ({ handleSelectUser, onClose}) =
                   <div className='network-list-container'>
                       <div className='network-list-info'>
                           <img
-                              src={friend.profilePic || 'https://learnlink-public.s3.us-east-2.amazonaws.com/AvatarPlaceholder.svg'}
+                              src={friend.profilePic || 'https://learnlink-pfps.s3.us-east-1.amazonaws.com/profile-pictures/circle_bust-in-silhouette.png'}
                               alt={`${friend.firstName} ${friend.lastName}`}
                               className='network-profile-pic'
                           />

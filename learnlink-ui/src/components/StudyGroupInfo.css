@@ -34,31 +34,31 @@
 }
 
 .Edit-Button {
-  background-color: #00b3ff; /* Blue */
+  background-color: #6aafd7; /* Blue */
   color: white;
 }
 
 .Chat-Button {
-  background-color: #e73990; /* Blue */
+  background-color: #00668C; /* Blue */
   color: white;
 }
 
 .Availability-Button {
-  background-color: #28a745; /* Green */
+  background-color: #FEAD2B; /* Green */
   color: white;
 }
 
 .Edit-Button:hover {
-  background-color: #0018b3;
+  background-color: #3d7ea3;
 }
 
 .Chat-Button:hover {
-  background-color: #b30071;
+  background-color: #002e3f;
 }
 
 
 .Availability-Button:hover {
-  background-color: #218838;
+  background-color: #8c5a09;
 }
 
 

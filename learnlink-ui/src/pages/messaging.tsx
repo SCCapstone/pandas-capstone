@@ -16,7 +16,7 @@ import GroupUserContainer from '../components/GroupUserContainer';
 import { useNavigate, useLocation } from "react-router-dom";
 import CreateStudyGroup from '../components/CreateStudyGroup';
 import PlusButtonProps from '../components/PlusButtonProps';
-import { handleSendSystemMessage, handleSendButtonMessage, openCalendarEvent } from "../utils/messageUtils";
+import { handleSendSystemMessage, handleSendButtonMessage, openCalendarEvent, updateChatTimestamp } from "../utils/messageUtils";
 import { NullValueFields } from 'aws-sdk/clients/glue';
 import CalendarEventPopup from '../components/CalendarEventPopup'
 import { Console } from 'console';
@@ -117,8 +117,8 @@ const Messaging: React.FC = () => {
   const [loadingChatList, setLoadingChatList] = useState(true);
   const [currentGroupId, setCurrentGroupId] = useState<number | null>(null);
   const [calendarModalOpen, setCalendarModalOpen] = useState(false);
-  const genericUserPfp = "https://learnlink-public.s3.us-east-2.amazonaws.com/AvatarPlaceholder.svg";
-  const genericStudyGroupPfp = "https://learnlink-pfps.s3.us-east-1.amazonaws.com/profile-pictures/generic_studygroup_pfp.svg";
+  const genericUserPfp = "https://learnlink-pfps.s3.us-east-1.amazonaws.com/profile-pictures/circle_bust-in-silhouette.png";
+  const genericStudyGroupPfp = "https://learnlink-pfps.s3.us-east-1.amazonaws.com/profile-pictures/circle_busts-in-silhouette.png";
 
   const navigate = useNavigate();
   const currentLocation = useLocation();
@@ -175,6 +175,7 @@ const Messaging: React.FC = () => {
         const parsedId = parseInt(scId, 10);
         if (!isNaN(parsedId)) {
           await fetchChatById(parsedId);
+
         }
       }
     };
@@ -818,7 +819,7 @@ useEffect(() => {
   
 
   // Creates new study groups
-  const handleCreateStudyGroup = async (chatId: number) => {
+  const handleCreateStudyGroup = async (chatId: number) : Promise<number | void> => {
     try {
       const token = localStorage.getItem('token');
       if (!token) {
@@ -896,6 +897,7 @@ useEffect(() => {
       if (!error) {
         setHasStudyGroup(true);
       }
+      return newStudyGroupID;
 
     } catch (error) {
       console.error('Error creating study group:', error);
@@ -1047,6 +1049,11 @@ const handleGetChatUsername = async (userId: number) => {
         if (userId === currentUserId) {
           mess = `${username} left the group.`;
           
+          const chatIdResponse = await axios.get(`${REACT_APP_API_URL}/api/study-groups/${groupId}/chat`);
+          const chatId = chatIdResponse.data.chatId;
+          updateChats(chatId);
+          
+          
         } else {
           mess = `${username} was removed from the group.`;
         }
@@ -1057,7 +1064,6 @@ const handleGetChatUsername = async (userId: number) => {
         console.log("update message " ,  mess);
         if (selectedChat){
           handleSendSystemMessage(mess, selectedChat.id, setSelectedChat, setChats, setUpdateMessage);
-          updateChats(selectedChat.id);
         }
         
 
@@ -1200,6 +1206,8 @@ const handleGetChatUsername = async (userId: number) => {
               chatNames={chatNames} 
               chatPfps={chatPfps}
               loadingChatList={loadingChatList}
+              removeUser={removeUser}
+              updateChats = {updateChats}
             />
           )}
 
@@ -1256,8 +1264,11 @@ const handleGetChatUsername = async (userId: number) => {
                   {hasStudyGroup ? (
                     <button
                       className="EditStudyGroupButton"
+
                       onClick={() => {
-                        navigate(`/groups?groupId=${currentGroupId}&tab=true`);
+                        if (currentGroupId) {
+                          navigate(`/groups?groupId=${currentGroupId}&tab=true`);
+                        }
                       }}
                     >
                       Edit Study Group
@@ -1266,7 +1277,7 @@ const handleGetChatUsername = async (userId: number) => {
                     <button
                       className="CreateStudyGroupButton"
                       onClick={() => {
-                        handleCreateStudyGroup(selectedChat.id);
+                        
                         setIsPanelVisible(true);
                       }}
                     >
@@ -1297,6 +1308,8 @@ const handleGetChatUsername = async (userId: number) => {
                       chatID={selectedChat.id}
                       onClose={() => setIsPanelVisible(false)}
                       updateChatName={updateChatName}
+                      handleCreateStudyGroup = {handleCreateStudyGroup}
+                      setCurrentGroupId={(id:any) => setCurrentGroupId(id)}
                     />
                   </div>
                 )}

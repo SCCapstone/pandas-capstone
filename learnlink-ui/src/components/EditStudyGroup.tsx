@@ -10,6 +10,7 @@ import GroupUserList from '../components/GroupUserList';
 import { StylesConfig, ControlProps, CSSObjectWithLabel } from 'react-select';
 import CustomAlert from './CustomAlert';
 import GroupUserContainer from './GroupUserContainer';
+import ProfilePictureModal from './ProfilePictureModal';
 
 
 
@@ -51,20 +52,25 @@ const EditStudyGroup =(
     chatID, 
     onClose,
     updateChatName,
+    updatePFP,
     groupId,
     currentId,
     users,
     onRemoveUser,
     updateUsers,
+    onGroupUpdated,
   }: {
     chatID: number;
     onClose: () => void ;
     updateChatName: (chatId: number, newName: string) => void;
+    updatePFP:  (chatId: number, newPFP: string) => void;
     groupId: number | null;
     currentId: number | null;
     users: User[] | null;
     onRemoveUser: (userId: number, groupId: number | null) => void; // Update type here
     updateUsers: (userId: number) => void;
+    onGroupUpdated: (newName: string, newPFP: string) => void;
+
   }) => {
   const [studyGroup, setStudyGroup] = useState<StudyGroup | null>(null);
   const [name, setName] = useState('');
@@ -74,10 +80,11 @@ const EditStudyGroup =(
   const [enumOptions, setEnumOptions] = useState({ studyHabitTags: [] });
   const [profilePic, setProfilePic] = useState<string | null>(null);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
-  const [image, setImage] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState(null);
+  const [image, setImage] = useState<string | null>(null);
+  const [imagePreview, setImagePreview] = useState<string>('');
   const [alerts, setAlerts] = useState<{ id: number; alertText: string; alertSeverity: "error" | "warning" | "info" | "success"; visible: boolean }[]>([]);
   const alertVisible = alerts.some(alert => alert.visible);
+  const [pfpModalOpen, setPfpModalOpen] = useState(false);
 
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
   const [currentGroupId, setCurrentGroupId] =  useState<number | null>(null);
@@ -115,6 +122,7 @@ const EditStudyGroup =(
         const data = response.data;
         setStudyGroup(data);
         setName(data.name);
+        setImagePreview(data.profile_pic? data.profile_pic : "https://learnlink-pfps.s3.us-east-1.amazonaws.com/profile-pictures/circle_busts-in-silhouette.png")
         setDescription(data.description);
         setSubject(data.subject);
         setIdealMatchFactor(data.ideal_match_factor ? { value: data.ideal_match_factor, label: formatEnum(data.ideal_match_factor) } : null);
@@ -132,6 +140,17 @@ const EditStudyGroup =(
     fetchStudyGroup();
   }, [chatID]);
 
+  useEffect(() => {
+    console.log('Updated imagePreview:', imagePreview);
+  }, [imagePreview]);  // Only run this effect when imagePreview changes
+
+
+  const handleEmojiSelect = (emoji: string, URL:string) => {
+    console.log("PASSED URL", URL)
+    setImagePreview(URL)  
+    setPfpModalOpen(false); // Close modal after selection
+  };
+
   // Handle form submission to save the changes
   const handleSave = async () => {
     try {
@@ -145,13 +164,9 @@ const EditStudyGroup =(
         return;
       }
       
-    
-      await handleUpload();
+      const updatedStudyGroup = { name, description, subject, chatID, ideal_match_factor, profile_pic: imagePreview };
 
-      console.log(imageUrl);
-    
-      
-      const updatedStudyGroup = { name, description, subject, chatID, ideal_match_factor, imageUrl };
+      console.log(updatedStudyGroup)
 
       if (name==='' || name === null) {
         // alert('Please enter a study group name.');
@@ -177,18 +192,15 @@ const EditStudyGroup =(
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      
-
-
-
       console.log('Study group updated:', response.data);
       
-      
-      
-
-     
-
       updateChatName(chatID, name);
+      if(imagePreview){
+      updateChatName(chatID, imagePreview);
+      }
+
+      onGroupUpdated(name, imagePreview);
+
 
       setAlerts((prevAlerts) => [
         ...prevAlerts,
@@ -209,44 +221,17 @@ const EditStudyGroup =(
 
   const handleUpload = async () => {
     console.log('Uploading image...'); // Debug log
-    if (!image) return;
-    console.log(image);
+    setImageUrl(imagePreview)
+    if (!imageUrl) return;
+    console.log(imageUrl);
   
     const formData = new FormData();
-    formData.append('profilePic', image);
+    formData.append('profilePic', imageUrl);
     formData.append('chatID', chatID.toString());
     const token = localStorage.getItem('token');
     if (!token) {
       console.error("No token found in localStorage");
       return;
-    }
-  
-    try {
-      console.log("Sending request to API...");
-      const res = await fetch(`${REACT_APP_API_URL}/api/study-group/upload-pfp`, {
-        method: 'POST',
-        body: formData,
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-  
-      // Check if the response is OK
-      if (!res.ok) {
-        const data = await res.json();
-        console.error("API Error:", data.error || "Unknown error");
-        setAlerts((prevAlerts) => [
-          ...prevAlerts,
-          { id: Date.now(), alertText: ` ${data.error || "Failed to upload image"}`, alertSeverity: "error", visible: true },
-        ]);
-        return;
-      }
-  
-      const data = await res.json();
-      console.log("api call success:", data);  // Log the successful response
-      setImageUrl(data.profilePic);
-    } catch (error) {
-      console.error("API call failed:", error);
     }
   };
   
@@ -254,40 +239,10 @@ const EditStudyGroup =(
   // Handle form submission
     
     // Function to handle file selection
-    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      const file = e.target.files ? e.target.files[0] : null;
-      if (file) {
-        setImage(file); // Store the selected file
-      }
-    };
+  
   
     const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-      const formData = new FormData();
-      
-      const file = e.target.files ? e.target.files[0] : null;
-      if (!file) return;  // If no file is selected, exit
-        setImage(file);  // Store the selected file for later use
-  
-      formData.append("profilePic", file);  // Append the file to FormData with the field name 'profilePic'
-      try {
-        // Send the image to the backend
-        const response = await fetch(`${REACT_APP_API_URL}/api/upload-preview`, {
-          method: "POST",
-          body: formData,  // Send the FormData
-        });
-        
-    
-        if (response.ok) {
-          const data = await response.json();
-          if (data.preview) {
-            setImagePreview(data.preview);  // Set the preview image
-          }
-        } else {
-          console.error("Failed to upload image:", response.statusText);
-        }
-      } catch (error) {
-        console.error("Error uploading image:", error);
-      }
+      setPfpModalOpen(true)
     };
   
 
@@ -322,18 +277,18 @@ const EditStudyGroup =(
                 className='upload-button'
                 src={imagePreview}  // Display the preview returned by the backend
                 alt="Selected Profile"
-                onClick={() => document.getElementById("image-upload")?.click()} // Allow re-selecting an image
+                onClick={() => setPfpModalOpen(true)} // Allow re-selecting an image
               />
             ) : (
               <div>
                 
                 <img
                   className='upload-button'
-                  src={profilePic || 'https://learnlink-public.s3.us-east-2.amazonaws.com/AvatarPlaceholder.svg'}
+                  src={profilePic || 'https://learnlink-pfps.s3.us-east-1.amazonaws.com/profile-pictures/circle_busts-in-silhouette.png'}
                   alt="Profile"
                   width="100"
                   height={100}
-                  onClick={() => document.getElementById("image-upload")?.click()}
+                  onClick={() => setPfpModalOpen(true)}
 
                 />
               </div>
@@ -341,15 +296,20 @@ const EditStudyGroup =(
 
             {/* Hidden file input */}
             <input
-              id="image-upload"
-              type="file"
+              id="emoji-pfp-upload"
+              type="button"
               accept="image/*"
               onChange={handleImageUpload}
               style={{ display: "none" }}
             />
-            {/* <button onClick={handleUpload}>Upload</button> */}
+          {/* <button onClick={handleUpload}>Upload</button> */}
+          <ProfilePictureModal
+            isOpen={pfpModalOpen}
+            onRequestClose={() => setPfpModalOpen(false)}
+            onSelect={handleEmojiSelect}
+          />
 
-          </div>
+        </div>
         <div>
           <div>
           <label>Study Group Name:</label>

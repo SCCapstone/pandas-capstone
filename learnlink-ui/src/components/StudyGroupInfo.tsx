@@ -50,6 +50,7 @@ const StudyGroupInfo =(
     {
     chatID, 
     updateChatName,
+    updatePFP,
     groupId,
     currentId,
     users,
@@ -59,12 +60,14 @@ const StudyGroupInfo =(
   }: {
     chatID: number;
     updateChatName: (chatId: number, newName: string) => void;
+    updatePFP: (chatId: number, newPFP: string) => void;
     groupId: number | null;
     currentId: number | null;
     users: User[] | null;
     onRemoveUser: (userId: number, groupId: number | null) => void; // Update type here
     updateUsers: (userId: number) => void;
     isItEdit: boolean;
+    
   }) => {
   const [studyGroup, setStudyGroup] = useState<StudyGroup | null>(null);
   const [name, setName] = useState('');
@@ -153,11 +156,18 @@ const StudyGroupInfo =(
       chatID={chatID}
       onClose={handleClose} 
       updateChatName={updateChatName}
+      updatePFP={updatePFP}
       groupId={groupId}
       currentId={currentId}
       users={users}
       onRemoveUser={onRemoveUser}
       updateUsers={updateUsers}
+      onGroupUpdated={(newName: string, newPFP: string) => {
+        setName(newName); // update local state
+        updateChatName(chatID, newName); // update parent (Groups page)
+        updatePFP(chatID, newPFP)
+        setIsEdit(false); // close edit mode
+      }}
     />
   ) : (
 
@@ -195,7 +205,7 @@ const StudyGroupInfo =(
         <div className="study-group-profile-picture">
             <img
                 className='profile-pic'
-                src={profilePic || 'https://learnlink-public.s3.us-east-2.amazonaws.com/AvatarPlaceholder.svg'}
+                src={profilePic || 'https://learnlink-pfps.s3.us-east-1.amazonaws.com/profile-pictures/circle_busts-in-silhouette.png'}
                 alt="Profile"
                 width="100"
                 height={100}

@@ -171,7 +171,8 @@ const SwipeProfiles = ({ userId }: { userId: number }) => {
   return (
     <div className="whole-swipe-component">
       <div className='match-header-buttons'>
-        <button className='location'>Location (put in later)</button>
+        <div></div>
+        {/* <button className='location'>Location (put in later)</button> */}
         <button className='pendingRequests' onClick={handlePendingRequests}>Pending Requests</button>
       </div>
       {currentProfile ? (
@@ -179,7 +180,7 @@ const SwipeProfiles = ({ userId }: { userId: number }) => {
           {currentProfile.chatID ? (
             <div className="group-container">
 
-            <h1 className='group-title'>Group: {currentProfile.name}</h1>
+            <h1 className='study-group-title'>Group: {currentProfile.name}</h1>
 
             <div className="group-info">
               
@@ -187,7 +188,7 @@ const SwipeProfiles = ({ userId }: { userId: number }) => {
               <div className="group-right">
                 {/* <GroupLogo/> */}
                   <img
-                    src={currentProfile.profilePic || 'https://learnlink-pfps.s3.us-east-1.amazonaws.com/profile-pictures/generic_studygroup_pfp.svg'}
+                    src={currentProfile.profilePic || 'https://learnlink-pfps.s3.us-east-1.amazonaws.com/profile-pictures/circle_busts-in-silhouette.png'}
                     className="group-pic"
                   />
                 <div className="group-description">
@@ -209,7 +210,7 @@ const SwipeProfiles = ({ userId }: { userId: number }) => {
                             <h1>{member.name}</h1>
                             <div className="member-card-top-left" >
                               <img
-                                src={member.profilePic || 'https://learnlink-public.s3.us-east-2.amazonaws.com/AvatarPlaceholder.svg'}
+                                src={member.profilePic || 'https://learnlink-pfps.s3.us-east-1.amazonaws.com/profile-pictures/circle_bust-in-silhouette.png'}
                                 alt={`${member.firstName} ${member.lastName}`}
                                 className="member-pic"
                               />
@@ -273,17 +274,17 @@ const SwipeProfiles = ({ userId }: { userId: number }) => {
                   </div>
                 </div>
                 <div className="swipe-right-side">
-                <h1>{currentProfile.firstName} {currentProfile.lastName}</h1>
+                <h1>{currentProfile.firstName.trim()} {currentProfile.lastName.trim()}</h1>
                 <h3>@{currentProfile.username}</h3>                  
                 <div className="profile-details-container">
                     <div className="swipe-profile-details">
                       <p><span className="bold-first-word">Age: </span>{currentProfile.age}</p>
                       <p><span className="bold-first-word">College: </span>{currentProfile.college}</p>
                       <p><span className="bold-first-word">Major: </span>{currentProfile.major}</p>
-                      <p><span className="bold-first-word">Gender: </span>{currentProfile.gender}</p>
+                      <p><span className="bold-first-word">Gender: </span>{formatEnum(currentProfile.gender)}</p>
                     </div>
                     <div className="swipe-profile-details">
-                      <p><span className="bold-first-word">Grade: </span>{currentProfile.grade}</p>
+                      <p><span className="bold-first-word">Grade: </span>{formatEnum(currentProfile.grade)}</p>
                       <p><span className="bold-first-word">Relevant Coursework: </span>{currentProfile.relevant_courses}</p>
                       <p><span className="bold-first-word">Fav Study Method: </span>{currentProfile.study_method}</p>
                       <p><span className="bold-first-word">Study Tags: </span>

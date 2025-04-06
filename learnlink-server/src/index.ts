@@ -477,7 +477,7 @@ app.get('/api/study-groups/:groupId/schedule', authenticate, async (req: Request
 // Fetch user profile data
 app.get('/api/users/profile/:userId', authenticate, async (req, res):Promise<any> => {
   const userId = parseInt(req.params.userId);
-  const placeholderImage = "https://learnlink-public.s3.us-east-2.amazonaws.com/AvatarPlaceholder.svg";
+  const placeholderImage = "https://learnlink-pfps.s3.us-east-1.amazonaws.com/profile-pictures/circle_bust-in-silhouette.png";
 
 
   if (!userId) {
@@ -525,7 +525,7 @@ app.get('/api/users/profile/:userId', authenticate, async (req, res):Promise<any
 
 // Update user profile
 app.put('/api/users/update', async (req, res): Promise<any> => {
-  const { first_name, last_name, username, age, college, major, grade, relevant_courses, study_method, gender, bio, studyHabitTags, ideal_match_factor } = req.body;
+  const { first_name, last_name, username, age, college, major, grade, relevant_courses, study_method, gender, bio, studyHabitTags, ideal_match_factor, profilePic } = req.body;
   console.log('Received data:', req.body); // Log incoming data for debugging
 
 
@@ -559,7 +559,8 @@ app.put('/api/users/update', async (req, res): Promise<any> => {
         gender: gender || undefined,
         bio: bio || undefined,
         studyHabitTags: studyHabitTags || undefined,
-        ideal_match_factor: ideal_match_factor || undefined
+        ideal_match_factor: ideal_match_factor || undefined,
+        profilePic:  profilePic || undefined,
       },
     });
 
@@ -1215,8 +1216,8 @@ app.get('/api/profiles/:userId', async (req, res): Promise<any> => {
 
   try {
 
-    const placeholderImage = "https://learnlink-public.s3.us-east-2.amazonaws.com/AvatarPlaceholder.svg";
-    const sgPlaceholderImage = 'https://learnlink-pfps.s3.us-east-1.amazonaws.com/profile-pictures/generic_studygroup_pfp.svg'
+    const placeholderImage = "https://learnlink-pfps.s3.us-east-1.amazonaws.com/profile-pictures/circle_bust-in-silhouette.png";
+    const sgPlaceholderImage = 'https://learnlink-pfps.s3.us-east-1.amazonaws.com/profile-pictures/circle_busts-in-silhouette.png'
     // Fetch the current user's data to use for matching
     const currentUser = await prisma.user.findUnique({
       where: { id: userId },
@@ -1925,7 +1926,7 @@ app.get('/api/study-groups/:groupId', async (req, res): Promise<any> => {
 app.get('/api/users/search', authenticate, async (req, res): Promise<any> => {
   const { query, gender, college, ageRange, course } = req.query;
   console.log('Received search query:', req.query);
-  const placeholderImage = "https://learnlink-public.s3.us-east-2.amazonaws.com/AvatarPlaceholder.svg";
+  const placeholderImage = "https://learnlink-pfps.s3.us-east-1.amazonaws.com/profile-pictures/circle_bust-in-silhouette.png";
 
   // if (!query) {
   //   return res.status(400).json({ error: 'Query parameter is required' });

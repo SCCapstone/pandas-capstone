@@ -77,10 +77,10 @@ const PopupProfile: React.FC<PopupProfileProps> = ({ id, onClose }) => {
               <p><span className="bold-first-word">Age: </span>{user.age}</p>
               <p><span className="bold-first-word">College: </span>{user.college}</p>
               <p><span className="bold-first-word">Major: </span>{user.major}</p>
-              <p><span className="bold-first-word">Gender: </span>{user.gender}</p>
+              <p><span className="bold-first-word">Gender: </span>{formatEnum(user.gender)}</p>
             </div>
             <div className='popup-profile-details'>
-              <p><span className="bold-first-word">Grade: </span>{user.grade}</p>
+              <p><span className="bold-first-word">Grade: </span>{formatEnum(user.grade)}</p>
               <p><span className="bold-first-word">Relevant Coursework: </span>{user.relevant_courses}</p>
               <p><span className="bold-first-word">Fav Study Method: </span>{user.study_method}</p>
               <p><span className="bold-first-word">Study Tags: </span>

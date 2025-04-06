@@ -251,7 +251,7 @@ const EditScheduleModal: React.FC<EditScheduleModalProps> = ({ isOpen, onClose, 
             </div>
             <div className="modal-buttons">
               <button onClick={handleSave}>Save</button>
-              <button onClick={onClose}>Close</button>
+              <button className="modal-close" onClick={onClose}>Cancel</button>
             </div>
           </>
         )}

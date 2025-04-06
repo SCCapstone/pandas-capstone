@@ -94,7 +94,7 @@ model User {
   study_method        String?
   bio                 String?
   gender              Gender?
-  profilePic          String?
+  profilePic          String?       @default("https://learnlink-pfps.s3.us-east-1.amazonaws.com/profile-pictures/circle_bust-in-silhouette.png")
   studyHabitTags      StudyTags[]       // Array of tags for study habits
 
 
@@ -140,7 +140,7 @@ model StudyGroup {
   chat         Chat?    @relation("StudyGroupChat") // Optional, if you want a relation with the Chat model
   ideal_match_factor  StudyTags?
 
-  profilePic   String?  // Optional field to store a profile picture
+  profilePic   String?  @default("https://learnlink-pfps.s3.us-east-1.amazonaws.com/profile-pictures/circle_busts-in-silhouette.png")
 
   availability Availability[]
 

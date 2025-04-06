@@ -141,6 +141,7 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ studyGroupId }) => {
                         throw new Error('Failed to fetch schedule');
                     }
                     const data = await response.json();
+                    // console.log("recieved data resopnse)", data)
                     // Assuming the response contains the schedule info
 
                     const dayOrder = ["Sun", "Mon", "Tues", "Wed", "Thur", "Fri", "Sat"];
@@ -155,6 +156,8 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ studyGroupId }) => {
                     setScheduleStartTime(data.scheduleStartTime || "9:00 AM");
                     setScheduleEndTime(data.scheduleEndTime || "5:00 PM");
                     setTimeSlots(generateTimeSlots(scheduleStartTime, scheduleEndTime))
+
+                    // console.log(scheduleEndTime, timeSlots)
                 } catch (error) {
                     console.error('Error fetching schedule:', error);
                     setAlerts((prevAlerts) => [
@@ -168,7 +171,7 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ studyGroupId }) => {
 
             fetchSchedule();
         }
-    }, [isModalOpen, studyGroupId]);
+    }, [isModalOpen, studyGroupId, days]);
     // Fetch study group data and users' availability
     const getStudyGroup = async () => {
         const userId = getLoggedInUserId(); // Get the logged-in user ID
@@ -478,7 +481,8 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ studyGroupId }) => {
                         {/* <p>{currStudyGroup.description}</p> */}
                     </div>
                 )}
-                <button onClick={openEditModal}>Edit Schedule</button>
+                <button onClick={openEditModal}>Edit Schedule Grid</button>
+
                 {/* Pass props to the modal */}
                 {currStudyGroup?.id && (
                     <EditScheduleModal
@@ -688,7 +692,7 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ studyGroupId }) => {
                                             <li
                                                 key={user.id}>
                                                 <img
-                                                    src={user.profilePic || 'https://learnlink-public.s3.us-east-2.amazonaws.com/AvatarPlaceholder.svg'}
+                                                    src={user.profilePic || 'https://learnlink-pfps.s3.us-east-1.amazonaws.com/profile-pictures/circle_bust-in-silhouette.png'}
                                                     alt={`${user.firstName} ${user.lastName}`}
                                                     className="tooltip-pfp"
                                                 ></img>
@@ -708,7 +712,7 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ studyGroupId }) => {
                                             <li
                                                 key={user.id}>
                                                 <img
-                                                    src={user.profilePic || 'https://learnlink-public.s3.us-east-2.amazonaws.com/AvatarPlaceholder.svg'}
+                                                    src={user.profilePic || 'https://learnlink-pfps.s3.us-east-1.amazonaws.com/profile-pictures/circle_bust-in-silhouette.png'}
                                                     alt={`${user.firstName} ${user.lastName}`}
                                                     className="tooltip-pfp"
                                                 ></img>
