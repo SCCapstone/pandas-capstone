@@ -23,6 +23,14 @@
   overflow-y: scroll;
 }
 
+.main-loading-container {
+  flex:1;
+  align-items: center;
+  align-content: center;
+  justify-content: center;
+  text-align: center;
+}
+
 .form-container {
   width: 100%;
   display: flex;
