@@ -35,10 +35,10 @@ const ResetPasswordFromEmail: React.FC = () => {
                 return true;
             } else {
                 setError("Passwords do not match");
-                setAlerts((prevAlerts) => [
-                    ...prevAlerts,
-                    { id: Date.now(), alertText: 'Passwords do not match', alertSeverity: "error", visible: true },
-                ]);
+                // setAlerts((prevAlerts) => [
+                //     ...prevAlerts,
+                //     { id: Date.now(), alertText: 'Passwords do not match', alertSeverity: "error", visible: true },
+                // ]);
                 setDisabled(true);
                 return false;
             }
