@@ -120,9 +120,10 @@ const EditStudyGroup =(
 
         // Set the form fields with the existing study group values
         const data = response.data;
+        console.log(data)
         setStudyGroup(data);
         setName(data.name);
-        setImagePreview(data.profile_pic? data.profile_pic : "https://learnlink-pfps.s3.us-east-1.amazonaws.com/profile-pictures/circle_busts-in-silhouette.png")
+        setImagePreview(data.profilePic? data.profilePic : "https://learnlink-pfps.s3.us-east-1.amazonaws.com/profile-pictures/circle_busts-in-silhouette.png")
         setDescription(data.description);
         setSubject(data.subject);
         setIdealMatchFactor(data.ideal_match_factor ? { value: data.ideal_match_factor, label: formatEnum(data.ideal_match_factor) } : null);
@@ -284,7 +285,7 @@ const EditStudyGroup =(
                 
                 <img
                   className='upload-button'
-                  src={profilePic || 'https://learnlink-pfps.s3.us-east-1.amazonaws.com/profile-pictures/circle_busts-in-silhouette.png'}
+                  src={profilePic? profilePic : 'https://learnlink-pfps.s3.us-east-1.amazonaws.com/profile-pictures/circle_busts-in-silhouette.png'}
                   alt="Profile"
                   width="100"
                   height={100}
