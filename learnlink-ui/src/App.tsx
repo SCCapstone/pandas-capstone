@@ -28,6 +28,7 @@ import JoinRequestNotifs from './components/JoinRequestsContext';
 import JoinRequestsNotificationBadge from './components/JoinRequestsNotificationBadge';
 import { getLoggedInUserId } from './utils/auth';
 import PublicGroupProfile from './pages/publicGroupProfile';
+import Navbar from './components/Navbar';
 
 function App() {
   const currentUserId = getLoggedInUserId();
