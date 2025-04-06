@@ -692,7 +692,7 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ studyGroupId }) => {
                                             <li
                                                 key={user.id}>
                                                 <img
-                                                    src={user.profilePic || 'https://learnlink-public.s3.us-east-2.amazonaws.com/AvatarPlaceholder.svg'}
+                                                    src={user.profilePic || 'https://learnlink-pfps.s3.us-east-1.amazonaws.com/profile-pictures/circle_bust-in-silhouette.png'}
                                                     alt={`${user.firstName} ${user.lastName}`}
                                                     className="tooltip-pfp"
                                                 ></img>
@@ -712,7 +712,7 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ studyGroupId }) => {
                                             <li
                                                 key={user.id}>
                                                 <img
-                                                    src={user.profilePic || 'https://learnlink-public.s3.us-east-2.amazonaws.com/AvatarPlaceholder.svg'}
+                                                    src={user.profilePic || 'https://learnlink-pfps.s3.us-east-1.amazonaws.com/profile-pictures/circle_bust-in-silhouette.png'}
                                                     alt={`${user.firstName} ${user.lastName}`}
                                                     className="tooltip-pfp"
                                                 ></img>

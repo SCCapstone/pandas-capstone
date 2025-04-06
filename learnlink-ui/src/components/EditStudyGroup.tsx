@@ -122,7 +122,7 @@ const EditStudyGroup =(
         const data = response.data;
         setStudyGroup(data);
         setName(data.name);
-        setImagePreview(data.profile_pic)
+        setImagePreview(data.profile_pic? data.profile_pic : "https://learnlink-pfps.s3.us-east-1.amazonaws.com/profile-pictures/circle_busts-in-silhouette.png")
         setDescription(data.description);
         setSubject(data.subject);
         setIdealMatchFactor(data.ideal_match_factor ? { value: data.ideal_match_factor, label: formatEnum(data.ideal_match_factor) } : null);
@@ -284,7 +284,7 @@ const EditStudyGroup =(
                 
                 <img
                   className='upload-button'
-                  src={profilePic || 'https://learnlink-public.s3.us-east-2.amazonaws.com/AvatarPlaceholder.svg'}
+                  src={profilePic || 'https://learnlink-pfps.s3.us-east-1.amazonaws.com/profile-pictures/circle_busts-in-silhouette.png'}
                   alt="Profile"
                   width="100"
                   height={100}

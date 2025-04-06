@@ -188,7 +188,7 @@ const SwipeProfiles = ({ userId }: { userId: number }) => {
               <div className="group-right">
                 {/* <GroupLogo/> */}
                   <img
-                    src={currentProfile.profilePic || 'https://learnlink-pfps.s3.us-east-1.amazonaws.com/profile-pictures/generic_studygroup_pfp.svg'}
+                    src={currentProfile.profilePic || 'https://learnlink-pfps.s3.us-east-1.amazonaws.com/profile-pictures/circle_busts-in-silhouette.png'}
                     className="group-pic"
                   />
                 <div className="group-description">
@@ -210,7 +210,7 @@ const SwipeProfiles = ({ userId }: { userId: number }) => {
                             <h1>{member.name}</h1>
                             <div className="member-card-top-left" >
                               <img
-                                src={member.profilePic || 'https://learnlink-public.s3.us-east-2.amazonaws.com/AvatarPlaceholder.svg'}
+                                src={member.profilePic || 'https://learnlink-pfps.s3.us-east-1.amazonaws.com/profile-pictures/circle_bust-in-silhouette.png'}
                                 alt={`${member.firstName} ${member.lastName}`}
                                 className="member-pic"
                               />

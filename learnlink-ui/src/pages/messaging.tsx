@@ -117,8 +117,8 @@ const Messaging: React.FC = () => {
   const [loadingChatList, setLoadingChatList] = useState(true);
   const [currentGroupId, setCurrentGroupId] = useState<number | null>(null);
   const [calendarModalOpen, setCalendarModalOpen] = useState(false);
-  const genericUserPfp = "https://learnlink-public.s3.us-east-2.amazonaws.com/AvatarPlaceholder.svg";
-  const genericStudyGroupPfp = "https://learnlink-pfps.s3.us-east-1.amazonaws.com/profile-pictures/generic_studygroup_pfp.svg";
+  const genericUserPfp = "https://learnlink-pfps.s3.us-east-1.amazonaws.com/profile-pictures/circle_bust-in-silhouette.png";
+  const genericStudyGroupPfp = "https://learnlink-pfps.s3.us-east-1.amazonaws.com/profile-pictures/circle_busts-in-silhouette.png";
 
   const navigate = useNavigate();
   const currentLocation = useLocation();
