@@ -819,7 +819,7 @@ useEffect(() => {
   
 
   // Creates new study groups
-  const handleCreateStudyGroup = async (chatId: number) => {
+  const handleCreateStudyGroup = async (chatId: number) : Promise<number | void> => {
     try {
       const token = localStorage.getItem('token');
       if (!token) {
@@ -897,6 +897,7 @@ useEffect(() => {
       if (!error) {
         setHasStudyGroup(true);
       }
+      return newStudyGroupID;
 
     } catch (error) {
       console.error('Error creating study group:', error);
@@ -1263,8 +1264,11 @@ const handleGetChatUsername = async (userId: number) => {
                   {hasStudyGroup ? (
                     <button
                       className="EditStudyGroupButton"
+
                       onClick={() => {
-                        navigate(`/groups?groupId=${currentGroupId}&tab=true`);
+                        if (currentGroupId) {
+                          navigate(`/groups?groupId=${currentGroupId}&tab=true`);
+                        }
                       }}
                     >
                       Edit Study Group
@@ -1305,6 +1309,7 @@ const handleGetChatUsername = async (userId: number) => {
                       onClose={() => setIsPanelVisible(false)}
                       updateChatName={updateChatName}
                       handleCreateStudyGroup = {handleCreateStudyGroup}
+                      setCurrentGroupId={(id:any) => setCurrentGroupId(id)}
                     />
                   </div>
                 )}
