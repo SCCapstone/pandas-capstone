@@ -180,7 +180,7 @@ const SwipeProfiles = ({ userId }: { userId: number }) => {
           {currentProfile.chatID ? (
             <div className="group-container">
 
-            <h1 className='group-title'>Group: {currentProfile.name}</h1>
+            <h1 className='study-group-title'>Group: {currentProfile.name}</h1>
 
             <div className="group-info">
               
