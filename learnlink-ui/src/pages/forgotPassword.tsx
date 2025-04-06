@@ -5,12 +5,16 @@ import CopyrightFooter from '../components/CopyrightFooter';
 import {useNavigate} from 'react-router-dom';
 import React, {useState} from 'react';
 import ResendEmail from '../components/ResendEmail';
+import CustomAlert from '../components/CustomAlert';
 
 const ForgotPassword: React.FC = () => {
     const [email, setEmail] = useState<string>('');
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
     const [success, setSuccess] = useState<string | null>(null);
+    const [alerts, setAlerts] = useState<{ id: number; alertText: string; alertSeverity: "error" | "warning" | "info" | "success"; visible: boolean }[]>([]);
+    const alertVisible = alerts.some(alert => alert.visible);
+
     const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -24,12 +28,21 @@ const ForgotPassword: React.FC = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        console.log(email)
         if(!email) {
             setError('Enter your email');
+            setAlerts((prevAlerts) => [
+                ...prevAlerts,
+                { id: Date.now(), alertText: 'Email field cannot be blank', alertSeverity: "error", visible: true },
+            ]);
             return;
         }
 
         if (!validateEmail(email)) {
+            setAlerts((prevAlerts) => [
+                ...prevAlerts,
+                { id: Date.now(), alertText: 'Enter a valid email address', alertSeverity: "error", visible: true },
+            ]);
             setError('Enter a valid email address');
             return;
         }
@@ -48,9 +61,17 @@ const ForgotPassword: React.FC = () => {
             });
 
             if(!response.ok){
+                setAlerts((prevAlerts) => [
+                    ...prevAlerts,
+                    { id: Date.now(), alertText: 'Failed to send reset link.', alertSeverity: "error", visible: true },
+                ]);
                 const errorData = await response.json();
                 throw new Error(errorData.message || "Failed to send reset link");
             }
+            setAlerts((prevAlerts) => [
+                ...prevAlerts,
+                { id: Date.now(), alertText: 'Password reset link sent! Check Your Email.', alertSeverity: "success", visible: true },
+            ]);
 
             setSuccess('Password reset link sent! Check Your Email.');
             setEmail('');
@@ -69,6 +90,18 @@ const ForgotPassword: React.FC = () => {
                 <Logo />
             </div>
             <div className="forgotPassword">
+            {alertVisible && (
+                    <div className='alert-container'>
+                        {alerts.map(alert => (
+                            <CustomAlert
+                                key={alert.id}
+                                text={alert.alertText || ''}
+                                severity={alert.alertSeverity || 'info' as "error" | "warning" | "info" | "success"}
+                                onClose={() => setAlerts(prevAlerts => prevAlerts.filter(a => a.id !== alert.id))}
+                            />
+                        ))}
+                    </div>
+                )}
                 <div className="forgotPassword-container">
                     <h1>Forgot Password</h1>
                     <form className="container1" onSubmit={handleSubmit}>
@@ -82,6 +115,8 @@ const ForgotPassword: React.FC = () => {
                         {error && <p className="error">{error}</p>}
                         {success && <p className="success">{success}</p>}
                         <ResendEmail email={email} />
+                        <p style={{ fontStyle: 'italic' }}>* Email may take up to 15 minutes to arrive.</p>
+
 
                         {/* <button className="send" disabled={loading} type="submit">{loading ? 'Sending...' : 'Send Reset Link'}</button> */}
                     </form>
