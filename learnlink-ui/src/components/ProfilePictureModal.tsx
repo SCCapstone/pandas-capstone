@@ -54,9 +54,9 @@ const ProfilePictureModal: React.FC<ProfilePicModalProps> = ({ isOpen, onRequest
   };
 
   return (
-    <div className="modal" onClick={onRequestClose}>
-      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        <button className="modal-close-button" onClick={onRequestClose}>
+    <div className="pfp-modal" onClick={onRequestClose}>
+      <div className="pfp-modal-content" onClick={(e) => e.stopPropagation()}>
+        <button className="pfp-modal-close-button" onClick={onRequestClose}>
           &times;
         </button>
         <h3>Pick your profile picture</h3>

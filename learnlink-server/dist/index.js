@@ -393,7 +393,7 @@ app.get('/api/study-groups/:groupId/schedule', authenticate, (req, res) => __awa
 // Fetch user profile data
 app.get('/api/users/profile/:userId', authenticate, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const userId = parseInt(req.params.userId);
-    const placeholderImage = "https://learnlink-public.s3.us-east-2.amazonaws.com/AvatarPlaceholder.svg";
+    const placeholderImage = "https://learnlink-pfps.s3.us-east-1.amazonaws.com/profile-pictures/circle_bust-in-silhouette.png";
     if (!userId) {
         return res.status(401).json({ message: 'User not authenticated' });
     }
@@ -433,7 +433,7 @@ app.get('/api/users/profile/:userId', authenticate, (req, res) => __awaiter(void
 // Update user profile
 app.put('/api/users/update', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
-    const { first_name, last_name, username, age, college, major, grade, relevant_courses, study_method, gender, bio, studyHabitTags, ideal_match_factor } = req.body;
+    const { first_name, last_name, username, age, college, major, grade, relevant_courses, study_method, gender, bio, studyHabitTags, ideal_match_factor, profilePic } = req.body;
     console.log('Received data:', req.body); // Log incoming data for debugging
     // Get the token from the request headers
     const token = (_a = req.headers.authorization) === null || _a === void 0 ? void 0 : _a.split(' ')[1]; // Expecting the token to be in the format "Bearer <token>"
@@ -461,7 +461,8 @@ app.put('/api/users/update', (req, res) => __awaiter(void 0, void 0, void 0, fun
                 gender: gender || undefined,
                 bio: bio || undefined,
                 studyHabitTags: studyHabitTags || undefined,
-                ideal_match_factor: ideal_match_factor || undefined
+                ideal_match_factor: ideal_match_factor || undefined,
+                profilePic: profilePic || undefined,
             },
         });
         // Send back the updated user information
@@ -1008,8 +1009,8 @@ app.get('/api/profiles', authenticate, (req, res) => __awaiter(void 0, void 0, v
 app.get('/api/profiles/:userId', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const userId = parseInt(req.params.userId);
     try {
-        const placeholderImage = "https://learnlink-public.s3.us-east-2.amazonaws.com/AvatarPlaceholder.svg";
-        const sgPlaceholderImage = 'https://learnlink-pfps.s3.us-east-1.amazonaws.com/profile-pictures/generic_studygroup_pfp.svg';
+        const placeholderImage = "https://learnlink-pfps.s3.us-east-1.amazonaws.com/profile-pictures/circle_bust-in-silhouette.png";
+        const sgPlaceholderImage = 'https://learnlink-pfps.s3.us-east-1.amazonaws.com/profile-pictures/circle_busts-in-silhouette.png';
         // Fetch the current user's data to use for matching
         const currentUser = yield prisma.user.findUnique({
             where: { id: userId },
@@ -1627,7 +1628,7 @@ app.get('/api/study-groups/:groupId', (req, res) => __awaiter(void 0, void 0, vo
 app.get('/api/users/search', authenticate, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { query, gender, college, ageRange, course } = req.query;
     console.log('Received search query:', req.query);
-    const placeholderImage = "https://learnlink-public.s3.us-east-2.amazonaws.com/AvatarPlaceholder.svg";
+    const placeholderImage = "https://learnlink-pfps.s3.us-east-1.amazonaws.com/profile-pictures/circle_bust-in-silhouette.png";
     // if (!query) {
     //   return res.status(400).json({ error: 'Query parameter is required' });
     // }
