@@ -44,10 +44,11 @@ describe("Login Behavioral Tests", () => {
         fireEvent.click(screen.getByTestId("testbutton"));
     
         await waitFor(() => {
-            // Target the error inside the alert box specifically
-            expect(screen.getByText("Invalid username or password.")).toBeInTheDocument();
+            // Now explicitly check the error message inside the alert box
+            expect(screen.getByRole("alert")).toHaveTextContent("Invalid username or password.");
         });
-    });    
+    });
+    
 
     test("Successfully logs in and navigates to landing page", async () => {
         // Mocking a successful login response with a fake token
