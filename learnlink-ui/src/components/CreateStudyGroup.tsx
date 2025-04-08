@@ -10,9 +10,7 @@ import GroupUserList from '../components/GroupUserList';
 import { StylesConfig, ControlProps, CSSObjectWithLabel } from 'react-select';
 import CustomAlert from './CustomAlert';
 import GroupUserContainer from './GroupUserContainer';
-
-
-
+import ProfilePictureModal from './ProfilePictureModal';
 
 const animatedComponents = makeAnimated();
 
@@ -69,12 +67,14 @@ const CreateStudyGroup =(
   const [profilePic, setProfilePic] = useState<string | null>(null);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [image, setImage] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [alerts, setAlerts] = useState<{ id: number; alertText: string; alertSeverity: "error" | "warning" | "info" | "success"; visible: boolean }[]>([]);
   const alertVisible = alerts.some(alert => alert.visible);
 
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
   const [selectedGroupUsers, setSelectedGroupUsers] = useState<User[] | null>(null);
+  const [pfpModalOpen, setPfpModalOpen] = useState(false);
+  
 
   const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
 
@@ -121,6 +121,12 @@ const CreateStudyGroup =(
       ]);
     }
   };
+  const handleEmojiSelect = (emoji: string, URL:string) => {
+    console.log("PASSED URL", URL)
+    setImagePreview(URL)
+    setImageUrl(URL)  
+    setPfpModalOpen(false); // Close modal after selection
+  };
 
 
   // Fetch the study group details when the component is mounted
@@ -137,10 +143,6 @@ const CreateStudyGroup =(
       console.log("NEW", newStudyGroupID);
       await fetchStudyGroup();
     
-     
-      
-      
-     
       const token = localStorage.getItem('token');
       if (!token) {
         // alert('You need to be logged in to save the study group.');
@@ -151,7 +153,7 @@ const CreateStudyGroup =(
         return;
       }
 
-      const updatedStudyGroup = { name, description, subject, chatID, ideal_match_factor };
+      const updatedStudyGroup = { name, description, subject, chatID, ideal_match_factor, profile_pic: imageUrl };
 
       if (name==='' || name === null) {
         // alert('Please enter a study group name.');
@@ -176,8 +178,6 @@ const CreateStudyGroup =(
         updatedStudyGroup,
         { headers: { Authorization: `Bearer ${token}` } }
       );
-
-      handleUpload();
 
 
 
@@ -245,31 +245,7 @@ const CreateStudyGroup =(
     };
   
     const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-      const formData = new FormData();
-      
-      const file = e.target.files ? e.target.files[0] : null;
-      if (!file) return;  // If no file is selected, exit
-        setImage(file);  // Store the selected file for later use
-  
-      formData.append("profilePic", file);  // Append the file to FormData with the field name 'profilePic'
-      try {
-        // Send the image to the backend
-        const response = await fetch(`${REACT_APP_API_URL}/api/upload-preview`, {
-          method: "POST",
-          body: formData,  // Send the FormData
-        });
-    
-        if (response.ok) {
-          const data = await response.json();
-          if (data.preview) {
-            setImagePreview(data.preview);  // Set the preview image
-          }
-        } else {
-          console.error("Failed to upload image:", response.statusText);
-        }
-      } catch (error) {
-        console.error("Error uploading image:", error);
-      }
+      setPfpModalOpen(true)
     };
   
 
@@ -304,7 +280,7 @@ const CreateStudyGroup =(
                 className='upload-button'
                 src={imagePreview}  // Display the preview returned by the backend
                 alt="Selected Profile"
-                onClick={() => document.getElementById("image-upload")?.click()} // Allow re-selecting an image
+                onClick={() => setPfpModalOpen(true)} // Allow re-selecting an image
               />
             ) : (
               <div>
@@ -315,7 +291,7 @@ const CreateStudyGroup =(
                   alt="Profile"
                   width="100"
                   height={100}
-                  onClick={() => document.getElementById("image-upload")?.click()}
+                  onClick={() => setPfpModalOpen(true)}
 
                 />
               </div>
@@ -330,6 +306,11 @@ const CreateStudyGroup =(
               style={{ display: "none" }}
             />
             {/* <button onClick={handleUpload}>Upload</button> */}
+            <ProfilePictureModal
+            isOpen={pfpModalOpen}
+            onRequestClose={() => setPfpModalOpen(false)}
+            onSelect={handleEmojiSelect}
+          />
 
           </div>
         <div>

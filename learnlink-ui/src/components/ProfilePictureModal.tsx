@@ -31,7 +31,7 @@ const emojiOptions = [
   { emoji: "🌟", bgColor: "#FFE082", filename: "glowing-star_1f31f.png", URL: `${baseUrl}glowing-star_1f31f.png` },
   { emoji: "🛼", bgColor: "#F8BBD0", filename: "roller-skate.png", URL: `${baseUrl}roller-skate.png` },
   { emoji: "🐟", bgColor: "#81D4FA", filename: "fish.png", URL: `${baseUrl}fish.png` },
-  { emoji: "🥤", bgColor: "#A7FFEB", filename: "beverage-box.png", URL: `${baseUrl}beverage-box.png` },
+  { emoji: "🥤", bgColor: "#A7FFEB", filename: "cup-with-straw.png", URL: `${baseUrl}cup-with-straw.png` },
   { emoji: "🏀", bgColor: "#FFE082", filename: "basketball.png", URL: `${baseUrl}basketball.png` },
   { emoji: "🛹", bgColor: "#B2EBF2", filename: "skateboard.png", URL: `${baseUrl}skateboard.png` },
   { emoji: "🎸", bgColor: "#EF9A9A", filename: "guitar.png", URL: `${baseUrl}guitar.png` },

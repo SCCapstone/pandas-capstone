@@ -122,7 +122,7 @@ const EditStudyGroup =(
         const data = response.data;
         console.log(data)
         setStudyGroup(data);
-        setName(data.name);
+        setName(data.name); 
         setImagePreview(data.profilePic? data.profilePic : "https://learnlink-pfps.s3.us-east-1.amazonaws.com/profile-pictures/circle_busts-in-silhouette.png")
         setDescription(data.description);
         setSubject(data.subject);
