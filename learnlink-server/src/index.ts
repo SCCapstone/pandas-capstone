@@ -255,7 +255,7 @@ app.post('/api/login', async (req, res): Promise<any> => {
     );
 
     // Send back the token
-    res.status(200).json({ token });
+    res.status(200).json({ token, userId: user.id });
 
   } catch (error) {
     console.error('Error during login:', error);

@@ -15,6 +15,9 @@ import NotificationDropdown from './NotificationDropdown';
 import JoinRequestNotifs from './JoinRequestsContext';
 import JoinRequestsNotificationBadge from './JoinRequestsNotificationBadge';
 import { getLoggedInUserId } from '../utils/auth';
+import { useJoinRequest } from '../components/JoinRequestsContext'; // Correct path to the file
+
+
 
 
 
@@ -60,7 +63,7 @@ const Navbar: React.FC = () => {
   const [courseInputValue, setCourseInputValue] = useState(""); // State to track the input value
   const [searchParams, setSearchParams] = useSearchParams();
   const [isNotificationDropdownVisible, setIsNotificationDropdownVisible] = useState(false);
-
+  const { joinRequestCount } = useJoinRequest();
 
 
   const { grade, gender, studyHabitTags } = useEnums();
@@ -325,13 +328,10 @@ const Navbar: React.FC = () => {
       <nav className="nav-links">
         <a href="/swiping">Match</a>
         <a href="/profile">Profile</a>
-        <div className='link-w-notif'>         
+        <div className='link-w-notif'>
           <a href="/network">Network</a>
-          <JoinRequestNotifs currentUserId={getLoggedInUserId()} >
-
-          <JoinRequestsNotificationBadge />
-          </JoinRequestNotifs>
-          </div>
+            <JoinRequestsNotificationBadge />
+        </div>
         <a href="/messaging" onClick={handleMessaging}>Messaging</a>
         <a href="/groups" onClick={handleGroups}>Groups</a>
         <a href="/resources/studyTips">Resources</a>

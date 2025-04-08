@@ -1,68 +1,100 @@
-import React, { useEffect, useState, ReactNode, createContext, useContext } from 'react';
+import React, { useEffect, useState, ReactNode, createContext, useContext, useCallback } from 'react';
 import axios from 'axios';
 import { SwipeRequest, SwipeStatus } from '../utils/types';
 
-// Define the type for the context value
 interface JoinRequestContextType {
   joinRequestCount: number;
-  setJoinRequestCount: React.Dispatch<React.SetStateAction<number>>;
+  updateRequestCount: (change: number) => void; // Add this
+  refetchRequests: () => Promise<void>;
+  loading: boolean;
 }
 
-// Create the context
+
 const JoinRequestContext = createContext<JoinRequestContextType | undefined>(undefined);
 const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
 
-// Props interface for the component
 interface JoinRequestNotifsProps {
-  currentUserId: number | null;
+  notifCurrentUserId: number | null;
   children?: ReactNode;
 }
 
-// JoinRequests component that provides context to its children
-const JoinRequestNotifs: React.FC<JoinRequestNotifsProps> = ({ currentUserId, children }) => {
+const JoinRequestNotifs: React.FC<JoinRequestNotifsProps> = ({ notifCurrentUserId, children }) => {
   const [joinRequestCount, setJoinRequestCount] = useState<number>(0);
   const [loadingRequests, setLoadingRequests] = useState<boolean>(true);
 
-  // Fetch the initial count of join requests
-  useEffect(() => {
-    const fetchJoinRequestCount = async () => {
-      setLoadingRequests(true);
-      try {
-        const requestResponse = await axios.get(`${REACT_APP_API_URL}/api/swipe/${currentUserId}`);
+  const updateRequestCount = useCallback((change: number) => {
+    setJoinRequestCount(prev => Math.max(0, prev + change));
+  }, []);
 
-        // Filter swipes to only include those with direction === "Yes"
-        let requestData = requestResponse.data.filter((req: SwipeRequest) => req.direction === 'Yes' && req.status === SwipeStatus.Pending);
-
-        // Eliminate duplicates by using a Set to track unique request keys
-        const uniqueRequestsMap = new Map();
-        requestData.forEach((req: SwipeRequest) => {
-          const uniqueKey = `${req.userId}-${req.targetGroupId || req.targetUserId}`;
-          if (!uniqueRequestsMap.has(uniqueKey)) {
-            uniqueRequestsMap.set(uniqueKey, req);
-          }
-        });
-        const uniqueRequests = Array.from(uniqueRequestsMap.values());
-        setJoinRequestCount(uniqueRequests.length);
-      } catch (err) {
-        console.error('Error fetching requests:', err);
-      } finally {
-        setLoadingRequests(false); // Stop loading
-      }
-    };
-
-    if (currentUserId) {
-      fetchJoinRequestCount();
+  // Memoized fetch function with cancellation
+  const fetchJoinRequestCount = useCallback(async () => {
+    if (!notifCurrentUserId) {
+      setJoinRequestCount(0);
+      setLoadingRequests(false);
+      return;
     }
-  }, [currentUserId]);
+    setLoadingRequests(true);
+
+    try {
+      console.log("FETCHING REQ COUNT", joinRequestCount);
+      const requestResponse = await axios.get(`${REACT_APP_API_URL}/api/swipe/${notifCurrentUserId}`, {
+      });
+
+      // Filter and process requests
+      let requestData = requestResponse.data.filter((req: SwipeRequest) => 
+        req.direction === 'Yes' && req.status === SwipeStatus.Pending);
+
+      const uniqueRequestsMap = new Map();
+      requestData.forEach((req: SwipeRequest) => {
+        const uniqueKey = `${req.userId}-${req.targetGroupId || req.targetUserId}`;
+        if (!uniqueRequestsMap.has(uniqueKey)) {
+          uniqueRequestsMap.set(uniqueKey, req);
+        }
+      });
+
+      const uniqueRequests = Array.from(uniqueRequestsMap.values());
+      setJoinRequestCount(uniqueRequests.length);
+    } catch (err) {
+      if (!axios.isCancel(err)) {
+        console.error('Error fetching requests:', err);
+      }
+    } finally {
+      setLoadingRequests(false);
+    }
+  }, [notifCurrentUserId]);
+
+  useEffect(() => {
+    // Initial fetch when component mounts or userId changes
+    fetchJoinRequestCount();
+
+  }, [fetchJoinRequestCount]);
+
+  // Optional: Add polling if needed
+  useEffect(() => {
+    if (!notifCurrentUserId) return;
+
+    const intervalId = setInterval(fetchJoinRequestCount, 30000); // Poll every 30 seconds
+
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, [notifCurrentUserId, fetchJoinRequestCount]);
 
   return (
-    <JoinRequestContext.Provider value={{ joinRequestCount, setJoinRequestCount }}>
+    <JoinRequestContext.Provider 
+      value={{ 
+        joinRequestCount,
+        updateRequestCount, // Expose the update function
+        refetchRequests: fetchJoinRequestCount,
+        loading: loadingRequests,
+      }}
+    >
       {children}
     </JoinRequestContext.Provider>
   );
 };
 
-// Custom hook to access the join request context
+
 export const useJoinRequest = () => {
   const context = useContext(JoinRequestContext);
   if (!context) {
