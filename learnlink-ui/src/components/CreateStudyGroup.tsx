@@ -358,11 +358,13 @@ const CreateStudyGroup =(
             isMulti={false}
             styles={selectStyles}
           />
-          </div>
-          
+        </div>
 
-        <button className='save-create-button' onClick={handleSave}>Save</button>
-        <button className='cancel-create-button' onClick={onClose}>Cancel</button>
+        <div className='create-study-group-buttons'>
+          <button className='save-create-button' onClick={handleSave}>Save</button>
+          <button className='cancel-create-button' onClick={onClose}>Cancel</button>
+        </div>
+
       </form>
     </div>
   );
