@@ -25,7 +25,7 @@ const ReceivedRequestsList: React.FC<ReceivedRequestsListProps> = ({ handleSelec
     const [loadingApproval, setLoadingApproval] = useState<number | null>(null); // Tracks which request is being approved
     const [receivedRequestsList, setRecievedRequestsList] = useState<SwipeRequest[]>([]);
     const currentUserId = getLoggedInUserId();
-    const { joinRequestCount, setJoinRequestCount } = useJoinRequest(); // Get joinRequestCount and the setter function
+    const { refetchJoinRequestCount } = useJoinRequest();
 
     
 
@@ -225,7 +225,7 @@ const handleApproval = async (
     }
     finally {
       setLoadingApproval(null); // Reset loading state
-      setJoinRequestCount((prevCount) => prevCount - 1);
+      await refetchJoinRequestCount(); // live update from backend
 
     }
   };
@@ -236,7 +236,7 @@ const handleApproval = async (
     updateSwipeStatus(requestId, SwipeStatus.Denied);  // Pass the enum value
     // handleDeleteRequest(requestId);
     handleRequestsChange(requestId);
-    setJoinRequestCount((prevCount) => prevCount - 1);
+    await refetchJoinRequestCount(); // live update from backend
 
   };
 

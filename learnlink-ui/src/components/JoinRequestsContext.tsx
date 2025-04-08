@@ -6,6 +6,8 @@ import { SwipeRequest, SwipeStatus } from '../utils/types';
 interface JoinRequestContextType {
   joinRequestCount: number;
   setJoinRequestCount: React.Dispatch<React.SetStateAction<number>>;
+  refetchJoinRequestCount: () => Promise<void>;
+  loading: boolean;
 }
 
 // Create the context
@@ -24,9 +26,11 @@ const JoinRequestNotifs: React.FC<JoinRequestNotifsProps> = ({ currentUserId, ch
   const [loadingRequests, setLoadingRequests] = useState<boolean>(true);
 
   // Fetch the initial count of join requests
-  useEffect(() => {
     const fetchJoinRequestCount = async () => {
       setLoadingRequests(true);
+      if (!currentUserId) {
+        return;
+      }
       try {
         const requestResponse = await axios.get(`${REACT_APP_API_URL}/api/swipe/${currentUserId}`);
 
@@ -50,14 +54,17 @@ const JoinRequestNotifs: React.FC<JoinRequestNotifsProps> = ({ currentUserId, ch
       }
     };
 
+  useEffect(() => {
+
     if (currentUserId) {
       fetchJoinRequestCount();
     }
-  }, [currentUserId]);
+  }, [currentUserId, setJoinRequestCount]);
 
   return (
-    <JoinRequestContext.Provider value={{ joinRequestCount, setJoinRequestCount }}>
-      {children}
+    <JoinRequestContext.Provider 
+    value={{ joinRequestCount, setJoinRequestCount, refetchJoinRequestCount: fetchJoinRequestCount, loading: loadingRequests }}>
+    {children}
     </JoinRequestContext.Provider>
   );
 };

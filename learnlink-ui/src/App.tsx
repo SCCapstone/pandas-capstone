@@ -29,19 +29,35 @@ import JoinRequestsNotificationBadge from './components/JoinRequestsNotification
 import { getLoggedInUserId } from './utils/auth';
 import PublicGroupProfile from './pages/publicGroupProfile';
 import Navbar from './components/Navbar';
+import React, { useState, useEffect } from 'react';
 
-function App() {
-  const currentUserId = getLoggedInUserId();
+
+const App: React.FC = () => {
+  const [currentUserId, setCurrentUserId] = useState<number | null>(null);
+  const [loginCurrentUserId, setLoginCurrentUserId] = useState<number | null>(null);
+  const tokenUserId = getLoggedInUserId(); // Use a utility to decode the JWT and extract userId
+
+  // Detect changes to currentUserId and do something when it's set
+  useEffect(() => {
+    if ( !tokenUserId) {
+      setCurrentUserId(loginCurrentUserId)
+    } else {
+      setCurrentUserId(tokenUserId)
+    }
+  }, [loginCurrentUserId, currentUserId]);
+
   return (
     <Router>
+      <JoinRequestNotifs currentUserId={currentUserId}>
+
       <div className="App">
-        <JoinRequestNotifs currentUserId={currentUserId}>
+      {false && <Navbar />}
 
         <Routes>
           {/* Public Routes */}
           <Route path="/" element={<Welcome />} />
           <Route path="/welcome" element={<Welcome />} />
-          <Route path="/login" element={<Login />} />
+          <Route path="/login" element={<Login onLogin={setLoginCurrentUserId}/>} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/forgotpassword" element={<ForgotPassword />} />
           <Route path="/resetpassword/:token" element={<ResetPasswordFromEmail />} />
@@ -74,9 +90,10 @@ function App() {
             <Route path="/advancedsearch" element={<AdvancedSearch />} />
           </Route>
         </Routes>
-        </JoinRequestNotifs>
 
       </div>
+      </JoinRequestNotifs>
+
     </Router>
   );
 }

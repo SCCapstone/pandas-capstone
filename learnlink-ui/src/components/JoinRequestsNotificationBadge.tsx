@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useJoinRequest } from './JoinRequestsContext'; // Correct path to the file
 import './JoinRequestsNotificationBadge.css';
 
@@ -8,8 +8,20 @@ interface JoinRequestsNotificationProps {
 }
 
 const JoinRequestsNotification: React.FC<JoinRequestsNotificationProps> = ({ showDotOnly = false }) => {
-  const { joinRequestCount } = useJoinRequest(); // Use the hook to access join request count
-  
+  const { joinRequestCount, loading, refetchJoinRequestCount } = useJoinRequest(); // Access joinRequestCount, loading, and refetch
+
+  useEffect(() => {
+    const fetchData = async () => {
+      await refetchJoinRequestCount(); // Fetch the join request count when the component mounts
+    };
+
+    fetchData(); // Call the fetchData function to fetch data
+  }, [refetchJoinRequestCount]);
+
+  // if (loading) {
+  //   return <div className="loading-spinner"></div>; // Display loading indicator while fetching
+  // }
+
   if (joinRequestCount < 1) {
     return null; // Don't show anything if no requests
   }
