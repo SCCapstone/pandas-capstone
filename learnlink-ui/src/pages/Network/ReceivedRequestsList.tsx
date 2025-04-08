@@ -199,18 +199,22 @@ const handleApproval = async (
       if (axios.isAxiosError(err) && err.response?.status === 405) {
         console.log("Caught 405 error in catch block");
         setError("This study group is full. You cannot approve this request.");
+        console.log(error)
         handleDenial(requestId);
 
         // handleDeleteRequest(requestId);
         handleRequestsChange(requestId);
-      }
-      if (axios.isAxiosError(err)) {
+      } else if (axios.isAxiosError(err)) {
         if (err.response) {
           // API responded with an error
           setError(err.response.data.message || "An error occurred while processing the request.");
+          console.log(error)
+
         } else if (err.request) {
           // No response received
           setError("No response from server. Please check your network.");
+          console.log(error)
+
         }
       } else if (err instanceof Error) {
         // General JavaScript error
