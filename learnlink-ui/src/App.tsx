@@ -33,66 +33,68 @@ import React, { useState, useEffect } from 'react';
 
 
 const App: React.FC = () => {
-  const [currentUserId, setCurrentUserId] = useState<number | null>(null);
-  const [loginCurrentUserId, setLoginCurrentUserId] = useState<number | null>(null);
-  const tokenUserId = getLoggedInUserId(); // Use a utility to decode the JWT and extract userId
+  const [notifCurrentUserId, setNotifCurrentUserId] = useState<number | null>(null);
 
-  // Detect changes to currentUserId and do something when it's set
   useEffect(() => {
-    if ( !tokenUserId) {
-      setCurrentUserId(loginCurrentUserId)
-    } else {
-      setCurrentUserId(tokenUserId)
+    const userIdFromToken = getLoggedInUserId();
+    if (userIdFromToken) {
+      setNotifCurrentUserId(userIdFromToken);
     }
-  }, [loginCurrentUserId, currentUserId]);
+  }, []);
+
+  const handleLogin = (userId: number) => {
+    setNotifCurrentUserId(userId);
+  };
+
 
   return (
     <Router>
-      <JoinRequestNotifs currentUserId={currentUserId}>
 
       <div className="App">
-      {false && <Navbar />}
+        {notifCurrentUserId !== undefined && (
+          <JoinRequestNotifs notifCurrentUserId={notifCurrentUserId}>
+            <Routes>
 
-        <Routes>
-          {/* Public Routes */}
-          <Route path="/" element={<Welcome />} />
-          <Route path="/welcome" element={<Welcome />} />
-          <Route path="/login" element={<Login onLogin={setLoginCurrentUserId}/>} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/forgotpassword" element={<ForgotPassword />} />
-          <Route path="/resetpassword/:token" element={<ResetPasswordFromEmail />} />
+              {/* Public Routes */}
+              <Route path="/" element={<Welcome />} />
+              <Route path="/welcome" element={<Welcome />} />
+              <Route path="/login" element={<Login onLogin={handleLogin} />} />
+              <Route path="/signup" element={<Signup />} />
+              <Route path="/forgotpassword" element={<ForgotPassword />} />
+              <Route path="/resetpassword/:token" element={<ResetPasswordFromEmail />} />
 
 
-          {/* Private Routes */}
-          <Route element={<PrivateRoutes />}>
-            <Route path="/landingpage" element={<LandingPage />} />
-            <Route path="/settings" element={<Settings />} />
-            <Route path="/messaging" element={<Messaging />} />
-            <Route path="/groups" element={<Groups />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/resources" element={<Resources />} />
-            <Route path="/resources/studyTips" element={<StudyTips />} />
-            <Route path="/resources/externalResources" element={<ExternalResources />} />
-            <Route path="/resources/gradeCalculator" element={<GradeCalculator />} />
-            <Route
-              path="/studyGroup/:studyGroupId/schedule"
-              element={<Scheduler />}
-            />            <Route path="/resetpassword" element={<ResetPassword />} />
-            <Route element={<MatchRoute />}>
-              <Route path="/swiping" element={<Swiping />} />
-            </Route>
-            <Route path="/network" element={<Network />} />
-            <Route path="/updateEmail" element={<UpdateEmail />} />
-            <Route path="/changepassword" element={<ChangePassword />} />
-            <Route path="/accountDetails" element={<AccountDetails />} />
-            <Route path="/user-profile/:id" element={<PublicProfile />} />
-            <Route path="/group-profile/:id" element={<PublicGroupProfile />} />
-            <Route path="/advancedsearch" element={<AdvancedSearch />} />
-          </Route>
-        </Routes>
+              {/* Private Routes */}
+              <Route element={<PrivateRoutes />}>
+                <Route path="/landingpage" element={<LandingPage />} />
+                <Route path="/settings" element={<Settings />} />
+                <Route path="/messaging" element={<Messaging />} />
+                <Route path="/groups" element={<Groups />} />
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/resources" element={<Resources />} />
+                <Route path="/resources/studyTips" element={<StudyTips />} />
+                <Route path="/resources/externalResources" element={<ExternalResources />} />
+                <Route path="/resources/gradeCalculator" element={<GradeCalculator />} />
+                <Route
+                  path="/studyGroup/:studyGroupId/schedule"
+                  element={<Scheduler />}
+                />            <Route path="/resetpassword" element={<ResetPassword />} />
+                <Route element={<MatchRoute />}>
+                  <Route path="/swiping" element={<Swiping />} />
+                </Route>
+                <Route path="/network" element={<Network />} />
+                <Route path="/updateEmail" element={<UpdateEmail />} />
+                <Route path="/changepassword" element={<ChangePassword />} />
+                <Route path="/accountDetails" element={<AccountDetails />} />
+                <Route path="/user-profile/:id" element={<PublicProfile />} />
+                <Route path="/group-profile/:id" element={<PublicGroupProfile />} />
+                <Route path="/advancedsearch" element={<AdvancedSearch />} />
+              </Route>
+            </Routes>
+          </JoinRequestNotifs>
+        )}
 
       </div>
-      </JoinRequestNotifs>
 
     </Router>
   );

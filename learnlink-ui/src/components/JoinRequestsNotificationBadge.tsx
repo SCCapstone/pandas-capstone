@@ -8,15 +8,15 @@ interface JoinRequestsNotificationProps {
 }
 
 const JoinRequestsNotification: React.FC<JoinRequestsNotificationProps> = ({ showDotOnly = false }) => {
-  const { joinRequestCount, loading, refetchJoinRequestCount } = useJoinRequest(); // Access joinRequestCount, loading, and refetch
+  const { joinRequestCount, loading, refetchRequests } = useJoinRequest(); // Access joinRequestCount, loading, and refetch
 
   useEffect(() => {
     const fetchData = async () => {
-      await refetchJoinRequestCount(); // Fetch the join request count when the component mounts
+      await refetchRequests(); // Fetch the join request count when the component mounts
     };
 
     fetchData(); // Call the fetchData function to fetch data
-  }, [refetchJoinRequestCount]);
+  }, [refetchRequests]);
 
   // if (loading) {
   //   return <div className="loading-spinner"></div>; // Display loading indicator while fetching
