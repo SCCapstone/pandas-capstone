@@ -1856,6 +1856,25 @@ app.delete('/api/study-groups/:groupId/users/:userId', async (req, res): Promise
       });
     }
 
+    await prisma.match.deleteMany({
+      where: {
+        OR: [      
+          { user1Id: parseInt(userId,10), studyGroupId: parseInt(groupId,10) },
+          { user2Id: parseInt(userId,10), studyGroupId: parseInt(groupId,10) },
+        ]
+      }
+    });
+
+    await prisma.swipe.updateMany({
+      where: {
+          userId: parseInt(userId,10),
+          targetGroupId: parseInt(groupId,10)
+      },
+      data: {
+        status: "Denied"
+      }
+  });
+
     return res.status(200).json({ message: 'User removed successfully from study group and chat' });
   } catch (error) {
     console.error('Error deleting user from study group:', error);
