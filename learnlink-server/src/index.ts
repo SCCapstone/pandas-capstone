@@ -584,13 +584,18 @@ app.post('/api/update-email', authenticate, async (req, res):Promise<any> => {
     });
 
     if (!user) {
-      return res.status(404).json({ error: 'User not found' });
+      return res.status(450).json({ error: 'User not found' });
     }
 
     // Check if the old email matches the current email
     if (user.email !== oldEmail) {
-      return res.status(400).json({ error: 'Old email does not match current email' });
+      return res.status(451).json({ error: 'Old email does not match current email' });
     }
+
+    if (newEmail == oldEmail) {
+      return res.status(452).json({ error: 'New email matches current email ' });
+    }
+
 
         // Check if username or email already exists
       // Check if email already exists
@@ -599,14 +604,14 @@ app.post('/api/update-email', authenticate, async (req, res):Promise<any> => {
       });
   
       if (emailExists) {
-        return res.status(400).json({ error: "There is already an account attached to this email." });
+        return res.status(453).json({ error: "There is already an account attached to this email." });
       }
   
       const domainParts = newEmail.split("@")[1]?.split(".");
       const lastExtension = domainParts ? domainParts.pop() : "";
   
       if (lastExtension !== "edu") {
-        return res.status(400).json({ error: "Please use a valid .edu email." });
+        return res.status(454).json({ error: "Please use a valid .edu email." });
       }
   
 
