@@ -68,7 +68,7 @@ export const welcomeEmailTemplate = (username: string) =>`
         <p>Your account has been successfully created, and you're all set to start connecting and collaborating.</p>
         <h3>Happy learning!</h3>
         <p>Best regards, <br />The LearnLink Team </p>
-        <a href="${FRONTEND_URL}">https://learnlink.site</a>
+        <a href="${FRONTEND_URL}">${FRONTEND_URL}</a>
       </div>
     </div>
   </body>
@@ -131,7 +131,7 @@ export const passwordResetEmailTemplate = (username: string, resetLink: string) 
         <a href="${resetLink}">Reset Password</a>
         <p>If you didn't request a password reset, please ignore this email.</p>
         <p>Best regards, <br />The LearnLink Team </p>
-        <a href="${FRONTEND_URL}">https://learnlink.site</a>
+        <a href="${FRONTEND_URL}">${FRONTEND_URL}</a>
       </div>
     </div>
   </body>

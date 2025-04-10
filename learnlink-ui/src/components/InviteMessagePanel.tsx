@@ -34,7 +34,7 @@ const InviteMessagePanel: React.FC<InviteMessagePanelProps> = ({ open, onClose, 
           placeholder="Write a message..."
           value={message}
           onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setMessage(e.target.value)}
-          style={{ width: "85%", padding: "20px", fontSize: "16px", fontFamily:'Inter' }}
+          style={{ width: "85%", padding: "20px", fontSize: "16px", fontFamily:'Inter', minWidth: "85%",maxWidth:"300px", maxHeight: "50vh" }}
         />
       </DialogContent>
       <DialogActions sx={{ justifyContent: "space-between", marginLeft: "15px", marginRight: "15px", marginBottom: "10px" }}>
