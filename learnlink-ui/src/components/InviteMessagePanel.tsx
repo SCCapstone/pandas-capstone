@@ -8,9 +8,10 @@ interface InviteMessagePanelProps {
   open: boolean;
   onClose: () => void;
   onConfirm: (message: string) => void;
+  targetName: string;
 }
 
-const InviteMessagePanel: React.FC<InviteMessagePanelProps> = ({ open, onClose, onConfirm }) => {
+const InviteMessagePanel: React.FC<InviteMessagePanelProps> = ({ open, onClose, onConfirm, targetName }) => {
   const [message, setMessage] = useState("");
 
   const handleConfirm = () => {
@@ -26,7 +27,7 @@ const InviteMessagePanel: React.FC<InviteMessagePanelProps> = ({ open, onClose, 
       maxWidth="md" // Adjust this to "lg" if you need it even bigger
       sx={{ "& .MuiDialog-paper": { width: "400px", height: "auto" } }}
     >
-      <DialogTitle>Send a message</DialogTitle>
+      <DialogTitle>Send a message to {targetName}</DialogTitle>
       <DialogContent>
         <TextareaAutosize
           minRows={3}

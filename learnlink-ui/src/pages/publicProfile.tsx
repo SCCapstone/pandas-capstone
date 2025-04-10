@@ -281,6 +281,11 @@ const PublicProfile: React.FC = () => {
                 open={showInvitePanel}
                 onClose={() => setShowInvitePanel(false)}
                 onConfirm={handleSendMessage}
+                targetName={
+                    user
+                      ? user.name
+                      : ""
+                  }  
             />
         </div>
     );

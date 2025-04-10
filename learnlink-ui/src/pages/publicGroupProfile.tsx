@@ -328,6 +328,11 @@ const PublicGroupProfile: React.FC = () => {
                 open={showInvitePanel}
                 onClose={() => setShowInvitePanel(false)}
                 onConfirm={handleSendMessage}
+                targetName={
+                    studyGroup ? 
+                    studyGroup.name
+                    : ""
+                }
             />
         </div>
     );
