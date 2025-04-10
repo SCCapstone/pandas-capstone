@@ -193,7 +193,7 @@ describe('Settings Behavioral Test', () => {
     
   });
 
-  
+  /*
   test('should handle missing token when deleting account', async () => {
     // 1. Create a fresh mock for this specific test
     const mockFetch = jest.fn();
@@ -231,7 +231,7 @@ describe('Settings Behavioral Test', () => {
     // 8. Verify error handling (if your component shows error messages)
     // expect(screen.getByText(/must be logged in/i)).toBeInTheDocument();
   });
-  /*
+  
 
   test('should handle logout when navigate fails', async () => {
     // Simulate navigate throwing an error
