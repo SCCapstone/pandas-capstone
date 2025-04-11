@@ -2789,20 +2789,17 @@ io.on("connection", (socket) => {
 
       // Get all user IDs in the chat
       const chatUsers = newMessage.chat.users.map(user => user.id);
+      /*chatUsers.forEach(userId => {
+        io.to(`user_${userId}`).emit('newMessage', newMessage);
+      });*/
+      console.log('[Server] Created message in DB:', newMessage);
 
-      // Broadcast message to users in this chat, skip broadcasting for system messages
-      if (!data.system) {
-        /*chatUsers.forEach(userId => {
-          io.to(`user_${userId}`).emit('newMessage', newMessage);
-        });*/
-        console.log('[Server] Created message in DB:', newMessage);
-
-        console.log('[Server] Chat users in this chat:', chatUsers);
-        chatUsers.forEach(userId => {
-          console.log(`[Server] Emitting to room user_${userId}`);
-          io.to(`user_${userId}`).emit('newMessage', newMessage);
-        });
-      }
+      console.log('[Server] Chat users in this chat:', chatUsers);
+      chatUsers.forEach(userId => {
+        console.log(`[Server] Emitting to room user_${userId}`);
+        io.to(`user_${userId}`).emit('newMessage', newMessage);
+      });
+    
 
      
 
