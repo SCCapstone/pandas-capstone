@@ -1030,44 +1030,51 @@ const handleGetChatUsername = async (userId: number) => {
       console.error('Group ID is missing.');
       return;
     }
+  
     try {
+      const chatIdResponse = await axios.get(`${REACT_APP_API_URL}/api/study-groups/${groupId}/chat`).catch(() => null);
+      const chatId = chatIdResponse?.data?.chatId;
       const response = await axios.delete(`${REACT_APP_API_URL}/api/study-groups/${groupId}/users/${userId}`);
-      
+  
       if (response.status === 200) {
-        // Log the updated users state to ensure it reflects the change
-        //setSelectedChatUsers(prevUsers => (prevUsers || []).filter(user => user.id !== userId));
-
-        setSelectedChatUsers((prevUsers) => (prevUsers|| []).filter(user => user.id !== userId));
+        // Remove user from chat UI
+        setSelectedChatUsers((prevUsers) => (prevUsers || []).filter(user => user.id !== userId));
+  
+        // Clear selected chat if it matches the removed user
         if (selectedChat?.id === userId) {
           setSelectedChat(null);
         }
-
-        // add left/removed from chat message here
+  
         const username = chatUsernames[userId] || "Unknown";
-        let mess = "";
-        // console.log(username);
-        if (userId === currentUserId) {
-          mess = `${username} left the group.`;
-          
-          const chatIdResponse = await axios.get(`${REACT_APP_API_URL}/api/study-groups/${groupId}/chat`);
-          const chatId = chatIdResponse.data.chatId;
-          updateChats(chatId);
-          
-          
+        const mess = userId === currentUserId
+          ? `${username} left the group.`
+          : `${username} was removed from the group.`;
+  
+        // Check if the group still exists
+        const groupCheck = await axios.get(`${REACT_APP_API_URL}/api/study-groups/${groupId}`).catch(() => null);
+  
+        if (groupCheck?.status === 200) {
+          // Get the chat ID associated with the group
+          const chatIdResponse = await axios.get(`${REACT_APP_API_URL}/api/study-groups/${groupId}/chat`).catch(() => null);
+          const chatId = chatIdResponse?.data?.chatId;
+  
+          if (chatId) {
+            updateChats(chatId);
+          }
+  
+          setUpdateMessage(mess);
+  
+          // Send system message if a chat is selected
+          if (selectedChat) {
+            handleSendSystemMessage(mess, selectedChat.id, setSelectedChat, setChats, setUpdateMessage);
+          }
         } else {
-          mess = `${username} was removed from the group.`;
+          // Group no longer exists, so clear the selected chat
+          setSelectedChat(null);
+          if (chatId) {
+            setChats(prevChats => prevChats.filter(chat => chat.id !== chatId));
+          }        
         }
-        setUpdateMessage(mess);
-
-        
-
-        console.log("update message " ,  mess);
-        if (selectedChat){
-          handleSendSystemMessage(mess, selectedChat.id, setSelectedChat, setChats, setUpdateMessage);
-        }
-        
-
-        
       } else {
         console.error('Failed to delete the user.');
       }
@@ -1075,7 +1082,6 @@ const handleGetChatUsername = async (userId: number) => {
       console.error('Error deleting user:', error);
     }
   };
-  
   
 
   const openProfilePopup = (profile: { id: number; name: string }) => {
