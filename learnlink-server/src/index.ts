@@ -2707,11 +2707,19 @@ app.get('/socket-io', (req, res) => {
 });
 
 
+
 // Real-time WebSocket chat functionality
-// Real-time WebSocket chat functionality
-// Real-time WebSocket chat functionality
+const userChats = new Map();
 io.on("connection", (socket) => {
+  
   console.log("User connected");
+  console.log("[Server] New socket connected:", socket.id);
+  userChats.set(socket.id, new Set());
+
+  socket.on("joinUserRoom", (userId) => {
+    socket.join(`user_${userId}`);
+    console.log(`[Server] Socket ${socket.id} joined room user_${userId}`);
+  });
 
   socket.on('message', async (data, callback) => {
     try {
@@ -2784,10 +2792,19 @@ io.on("connection", (socket) => {
 
       // Broadcast message to users in this chat, skip broadcasting for system messages
       if (!data.system) {
+        /*chatUsers.forEach(userId => {
+          io.to(`user_${userId}`).emit('newMessage', newMessage);
+        });*/
+        console.log('[Server] Created message in DB:', newMessage);
+
+        console.log('[Server] Chat users in this chat:', chatUsers);
         chatUsers.forEach(userId => {
+          console.log(`[Server] Emitting to room user_${userId}`);
           io.to(`user_${userId}`).emit('newMessage', newMessage);
         });
       }
+
+     
 
       console.log('Broadcasting message to chat users:', chatUsers);
 
@@ -2795,42 +2812,73 @@ io.on("connection", (socket) => {
       callback({ success: true, message: 'Message sent from server successfully!' });
       callback({ success: true, message: newMessage, updatedChat });
 
+      callback({ success: true, message: newMessage, updatedChat });
+      console.log('[Server] Sent message to client via callback');
+
+
     } catch (error) {
       console.error('Error handling message:', error);
       callback({ success: false, error });
     }
   });
+  
+    socket.on('joinChat', async (chatId, userId) => {
+      try {
+        if (!chatId || !userId) {
+          throw new Error('Missing chatId or userId');
+        }
 
-  socket.on("joinChat", async ({ chatId, userId }) => {
-    try {
-      if (!chatId) {
-        console.error("Chat ID is required");
-        return; // Early exit if chatId is not provided
+        // Leave previous chats
+        userChats.forEach(chat => {
+          socket.leave(`chat_${chat}`);
+        });
+        userChats.clear();
+
+        // Join new chat
+        const chats = userChats.get(socket.id) || new Set();
+        chats.add(chatId);
+        userChats.set(socket.id, chats);
+        socket.join(`chat_${chatId}`);
+
+        // Update last opened timestamp
+        await prisma.lastOpened.upsert({
+          where: {
+            chatId_userId: {  // Using the composite unique key
+              chatId: chatId,
+              userId: userId
+            }
+          },
+          create: {
+            chatId: chatId,
+            userId: userId,
+            timestamp: new Date()
+          },
+          update: {
+            timestamp: new Date()
+          }
+        });
+
+        // Notify others in chat
+        socket.to(`chat_${chatId}`).emit('userJoined', { userId, chatId });
+
+      } catch (error) {
+        console.error('Error joining chat:', error);
       }
+    });
 
-      socket.join(`chat_${chatId}`);
-      console.log(`User ${userId} joined chat ${chatId}`);
+    socket.on('leaveChat', (chatId, userId) => {
+      socket.leave(`chat_${chatId}`);
+      userChats.delete(chatId);
+      console.log(`User ${userId} left chat ${chatId}`);
+    });
 
-      // Fetch updated chat users
-      const chat = await prisma.chat.findUnique({
-        where: { id: chatId },
-        include: { users: true },
-      });
-
-      if (chat) {
-        io.to(`chat_${chatId}`).emit("chatUpdated", chat.users);
-      } else {
-        console.error("Chat not found");
-      }
-    } catch (error) {
-      console.error("Error joining chat:", error);
-    }
-  });
 
   socket.on('disconnect', () => {
     console.log('A user disconnected:', socket.id);
   });
+
 });
+
 
 
 

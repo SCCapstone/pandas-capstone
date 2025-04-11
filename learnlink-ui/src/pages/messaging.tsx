@@ -20,6 +20,8 @@ import { handleSendSystemMessage, handleSendButtonMessage, openCalendarEvent, up
 import { NullValueFields } from 'aws-sdk/clients/glue';
 import CalendarEventPopup from '../components/CalendarEventPopup'
 import { Console } from 'console';
+import { useCallback } from 'react';
+
 
 interface Chat {
   id: number;
@@ -65,9 +67,9 @@ interface User {
 const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
 
 const socket = io(REACT_APP_API_URL, {
-  transports: ["websocket"], // Ensure WebSocket is explicitly used
-  reconnectionAttempts: 3,  // Retry if connection fails
-  timeout: 10000 // 10 seconds timeout
+  transports: ["websocket"],
+  reconnectionAttempts: 3,
+  timeout: 10000
 });
 
 
@@ -109,7 +111,7 @@ const Messaging: React.FC = () => {
   const [groupId, setGroupId] = useState<number | null>(null);
   
   const [unseenMessages, setUnseenMessages] = useState<{ [chatId: number]: boolean }>({});
-
+  
   const [lastOpenedTimes, setLastOpenedTimes] = useState<{[chatId: number]: { [userId: number]: string };}>({});
   const [updateMessage, setUpdateMessage] = useState<string>('');
   const [visibleMessage, setVisibleMessage] = useState("");
@@ -119,7 +121,6 @@ const Messaging: React.FC = () => {
   const [calendarModalOpen, setCalendarModalOpen] = useState(false);
   const genericUserPfp = "https://learnlink-pfps.s3.us-east-1.amazonaws.com/profile-pictures/circle_bust-in-silhouette.png";
   const genericStudyGroupPfp = "https://learnlink-pfps.s3.us-east-1.amazonaws.com/profile-pictures/circle_busts-in-silhouette.png";
-
   const navigate = useNavigate();
   const currentLocation = useLocation();
 
@@ -129,6 +130,20 @@ const Messaging: React.FC = () => {
 
   const [alerts, setAlerts] = useState<{ id: number; alertText: string; alertSeverity: "error" | "warning" | "info" | "success"; visible: boolean }[]>([]);
   const alertVisible = alerts.some(alert => alert.visible);
+
+
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      socket.connect();
+    }
+    
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
+
 
   useEffect(() => {
     const queryParams = new URLSearchParams(currentLocation.search);
@@ -362,30 +377,49 @@ const Messaging: React.FC = () => {
 
   }, [activeTab, selectedChat, selectedChatId]);  // reloads when selected or tab changes, allows for updates to users
 
-
+  useEffect(() => {
+    if (socket && currentUserId) {
+      console.log("[Socket] Emitting joinUserRoom for", currentUserId);
+      socket.emit('joinUserRoom', currentUserId);
+    }
+  }, [socket, currentUserId]);
 
   useEffect(() => {
-    if (selectedChat) {
+    if (selectedChat && currentUserId) {
+      // Leave previous chat if any
+      if (selectedChatId) {
+        socket.emit('leaveChat', selectedChatId, currentUserId);
+      }
+      
+      // Join new chat
       socket.emit('joinChat', selectedChat.id, currentUserId);
+      setSelectedChatId(selectedChat.id);
     }
+  
+    return () => {
+      if (selectedChatId && currentUserId) {
+        socket.emit('leaveChat', selectedChatId, currentUserId);
+      }
+    };
   }, [selectedChat, currentUserId]);
 
   useEffect(() => {
-    socket.on("chatUpdated", (updatedUsers) => {
-        setChats((prevChats) =>
-            prevChats.map((chat) =>
-                chat.id === selectedChat?.id
-                    ? { ...chat, users: updatedUsers, messages: [...chat.messages] } // Preserve messages
-                    : chat
-            )
-        );
-    });
+
+    const handleChatUpdated = (updatedUsers:any) => {
+      setChats((prevChats) =>
+        prevChats.map((chat) =>
+            chat.id === selectedChat?.id
+                ? { ...chat, users: updatedUsers, messages: [...chat.messages] } // Preserve messages
+                : chat
+        )
+    );
+    };
+    socket.on("chatUpdated", handleChatUpdated);
 
     return () => {
-        socket.off("chatUpdated");
+        socket.off("chatUpdated", handleChatUpdated);
     };
 }, [selectedChat]);
-
 
   // Used for editing study groups
   useEffect(() => {
@@ -432,35 +466,52 @@ useEffect(() => {
       });
     }
   }, [selectedChat, activeTab]);
-  
-  // Web socket functionality for sending and receiving messages
+
   useEffect(() => {
-
-    socket.on('connect', () => {
-      console.log('Connected to server');
-    });
-    
-    socket.on('newMessage', (message) => {
-      console.log('New message received:', message);
-    
-      setChats((prevChats) => {
-        return prevChats.map((chat) =>
-          chat.id === message.chatId
-            ? { ...chat, messages: [...chat.messages, message]}
-            : chat
-        );
-      });
-      console.log("changing chats!!");
-
-    });
-    
-    return () => {
-      socket.off('connect');
-      socket.off('newMessage');
-    };
-  }, [selectedChat]); // Runs when messages update
+    const handleNewMessage = (message: Message) => {
+      console.log('[Client] Received newMessage from server:', message);
   
-
+      // Prevent updating the state if the message was sent by the current user
+      if (message.userId === currentUserId) {
+        console.log('[Client] Ignored own message:', message);
+        return;
+      }
+  
+      // Update chats
+      setChats(prevChats => {
+        return prevChats.map(chat =>
+          chat.id === message.chatId
+            ? { 
+                ...chat, 
+                messages: [...chat.messages, message],
+                updatedAt: new Date().toISOString(),
+                lastUpdatedById: message.userId || null
+              }
+            : chat
+        ).sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+      });
+  
+      // If this is the selected chat, update it
+      if (selectedChat?.id === message.chatId) {
+        console.log("[Client] selectedChat.id:", selectedChat?.id, "message.chatId:", message.chatId);
+  
+        setSelectedChat(prev =>
+          prev ? { ...prev, messages: [...prev.messages, message] } : null
+        );
+      }
+    };
+  
+    // Attach the event listener
+    socket.on('newMessage', handleNewMessage);
+    console.log("[Client] handleNewMessage event listener attached");
+  
+    return () => {
+      // Cleanup the event listener on unmount
+      socket.off('newMessage', handleNewMessage);
+    };
+  }, [selectedChat, currentUserId]); // Ensure this depends on `selectedChat` and `currentUserId`
+  
+  
 
   useEffect(() => {
     const fetchChatNames = async () => {
@@ -566,7 +617,7 @@ useEffect(() => {
           system: false,
           isButton: false
         };
-  
+        console.log("[Client] Emitting newMessage to server...!!!");
         // sends the message via a websocket to the other user
         socket.emit(
           'message',
@@ -576,11 +627,12 @@ useEffect(() => {
             userId: currentUserId,
             token,
           },
-          (response: { success: boolean; message?: string; error?: string }) => {
+          (response: { success: boolean; message?: string; updatedChat?: any; error?: string }) => {
             if (response.success) {
-              console.log('Message sent successfully:', response.message);
+              console.log('[Client] Message send success. Full message:', response.message);
+              console.log('[Client] Updated chat from server:', response.updatedChat);
             } else {
-              console.log('Message send failed:', response.error);
+              console.error('[Client] Message send failed:', response.error);
             }
           }
         );
@@ -1411,6 +1463,7 @@ const handleGetChatUsername = async (userId: number) => {
                               {/* Show heart if message was double-clicked */}
                               {heartedMessages[message.id] && <div className="Heart">❤️</div>}
                             </div>
+                            
                           
                             {message.userId !== currentUserId ? (
   !message.system && isLastInCluster ? (
