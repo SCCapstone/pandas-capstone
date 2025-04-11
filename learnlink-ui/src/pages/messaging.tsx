@@ -472,7 +472,7 @@ useEffect(() => {
       console.log('[Client] Received newMessage from server:', message);
   
       // Prevent updating the state if the message was sent by the current user
-      if (message.userId === currentUserId) {
+      if (message.userId === currentUserId || message.system === true) {
         console.log('[Client] Ignored own message:', message);
         return;
       }
@@ -1093,9 +1093,11 @@ const handleGetChatUsername = async (userId: number) => {
         setSelectedChatUsers((prevUsers) => (prevUsers || []).filter(user => user.id !== userId));
   
         // Clear selected chat if it matches the removed user
-        if (selectedChat?.id === userId) {
+        
+        if (userId === currentUserId) {
           setSelectedChat(null);
         }
+
   
         const username = chatUsernames[userId] || "Unknown";
         const mess = userId === currentUserId
@@ -1104,15 +1106,12 @@ const handleGetChatUsername = async (userId: number) => {
   
         // Check if the group still exists
         const groupCheck = await axios.get(`${REACT_APP_API_URL}/api/study-groups/${groupId}`).catch(() => null);
+        console.log("GROUP CHECKKKKK", groupCheck);
   
         if (groupCheck?.status === 200) {
           // Get the chat ID associated with the group
           const chatIdResponse = await axios.get(`${REACT_APP_API_URL}/api/study-groups/${groupId}/chat`).catch(() => null);
           const chatId = chatIdResponse?.data?.chatId;
-  
-          if (chatId) {
-            updateChats(chatId);
-          }
   
           setUpdateMessage(mess);
   
