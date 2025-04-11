@@ -2547,14 +2547,24 @@ app.post('/api/chats', async (req, res) : Promise<any> => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
-
-app.put("/api/study-groups/chats/:chatId", async (req, res) => {
+app.put("/api/study-groups/chats/:chatId", async (req, res):Promise<any> => {
   try {
     const { chatId } = req.params;
+    const chatIdInt = parseInt(chatId);
 
+    // Check if the chat exists
+    const existingChat = await prisma.chat.findUnique({
+      where: { id: chatIdInt },
+    });
+
+    if (!existingChat) {
+      return res.status(404).json({ message: "Chat not found" });
+    }
+
+    // Proceed with the update
     const updatedChat = await prisma.chat.update({
-      where: { id: parseInt(chatId) }, // Ensure chatId is an integer if necessary
-      data: { updatedAt: new Date() , lastUpdatedById: null},
+      where: { id: chatIdInt },
+      data: { updatedAt: new Date(), lastUpdatedById: null },
     });
 
     res.status(200).json({ message: "Chat updated successfully", chat: updatedChat });
@@ -2563,6 +2573,7 @@ app.put("/api/study-groups/chats/:chatId", async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 });
+
 
 
 app.post('/api/chats/:userId', authenticate, async (req: Request, res: Response): Promise<any> => {
