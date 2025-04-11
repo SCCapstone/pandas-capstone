@@ -18,9 +18,7 @@ import CreateStudyGroup from '../components/CreateStudyGroup';
 import PlusButtonProps from '../components/PlusButtonProps';
 import { handleSendSystemMessage, handleSendButtonMessage, openCalendarEvent, updateChatTimestamp } from "../utils/messageUtils";
 import { NullValueFields } from 'aws-sdk/clients/glue';
-import CalendarEventPopup from '../components/CalendarEventPopup'
-import { Console } from 'console';
-import { useCallback } from 'react';
+import CalendarEventPopup from '../components/CalendarEventPopup';
 
 
 interface Chat {
@@ -91,11 +89,9 @@ const Messaging: React.FC = () => {
   const [heartedMessages, setHeartedMessages] = useState<{ [key: number]: boolean }>({});
   const [studyGroupNames, setStudyGroupNames] = useState<{ [key: number]: string }>({});
   const [studyGroupPfps, setStudyGroupPfps] = useState<{ [key: number]: string }>({});
-
   const [chatNames, setChatNames] = useState<{ [key: number]: string }>({});
   const [chatPfps, setChatPfps] = useState<{ [key: number]: string }>({});
   const [isPopupOpen, setIsPopupOpen] = useState(false);
-
   //for matching stuff ie chats tab and requests tab
   const [showMessagesPanel, setShowMessagesPanel] = useState(false);
   const [showRequestsPanel, setShowRequestsPanel] = useState(false);
@@ -106,15 +102,10 @@ const Messaging: React.FC = () => {
   // for displaying names above messages sent
   const [msgUsernames, setMsgUsernames] = useState<{ [key: number]: string }>({});
   const [msgPfps, setMsgPfps] = useState<{ [key: number]: string }>({});
-
   const [chatUsernames, setChatUsernames] = useState<{ [key: number]: string }>({});
   const [groupId, setGroupId] = useState<number | null>(null);
-  
-  const [unseenMessages, setUnseenMessages] = useState<{ [chatId: number]: boolean }>({});
-  
   const [lastOpenedTimes, setLastOpenedTimes] = useState<{[chatId: number]: { [userId: number]: string };}>({});
   const [updateMessage, setUpdateMessage] = useState<string>('');
-  const [visibleMessage, setVisibleMessage] = useState("");
   const [selectedProfile, setSelectedProfile] = useState<{ id: number; name: string } | null>(null);
   const [loadingChatList, setLoadingChatList] = useState(true);
   const [currentGroupId, setCurrentGroupId] = useState<number | null>(null);
@@ -123,34 +114,23 @@ const Messaging: React.FC = () => {
   const genericStudyGroupPfp = "https://learnlink-pfps.s3.us-east-1.amazonaws.com/profile-pictures/circle_busts-in-silhouette.png";
   const navigate = useNavigate();
   const currentLocation = useLocation();
-
-  
-  
-
-
   const [alerts, setAlerts] = useState<{ id: number; alertText: string; alertSeverity: "error" | "warning" | "info" | "success"; visible: boolean }[]>([]);
   const alertVisible = alerts.some(alert => alert.visible);
 
 
 
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      socket.connect();
-    }
-    
-    return () => {
-      socket.disconnect();
-    };
-  }, []);
+
+  /******* USE EFFECTS ******/
 
 
+  // Used for navigating between pages
   useEffect(() => {
+    // Extract query parameters from the current URL
     const queryParams = new URLSearchParams(currentLocation.search);
     const scId = queryParams.get("selectedChatId");
-    console.log("scIDDDD::::", scId);
+    //console.log("scIDDDD::::", scId);
   
-    // Update your fetchChatById function to ensure it properly initializes button messages
+    // Function to fetch chat details by ID from the backend
     const fetchChatById = async (chatId: number) => {
       const token = localStorage.getItem('token');
       try {
@@ -161,52 +141,56 @@ const Messaging: React.FC = () => {
         // Process button messages if they exist
         const chatData = response.data;
         
-        
+        // Save chat data and ID to state
         setSelectedChat(chatData);
         setSelectedChatId(chatId);
-        console.log('Loaded chat messages:', chatData.messages);
-        console.log(
-          'Button messages:', 
-          chatData.messages
-            .filter((m: Message) => m.isButton)
-            .map((m:Message) => ({
-              id: m.id,
-              content: m.content,
-              buttonData: m.buttonData || 'NO BUTTON DATA', // Show if buttonData is missing
-              hasButtonData: !!m.buttonData // Boolean flag for quick checking
-            }))
-        );
         
-        // Check if this is a study group chat
-        
+
+        // Clear the URL query params (so reloads don't re-fetch unnecessarily)
         navigate(window.location.pathname, { replace: true });
       } catch (error) {
         console.error('Error fetching selected chat:', error);
       }
     };
 
+    // Wrapper to parse the chat ID and fetch data
     const loadData = async () => {
       if (scId) {
         const parsedId = parseInt(scId, 10);
         if (!isNaN(parsedId)) {
-          await fetchChatById(parsedId);
+          await fetchChatById(parsedId); // Only fetch if the ID is a valid number
 
         }
       }
     };
   
+    // Start the loading process when the component mounts or the URL search changes
     loadData();
-  }, [currentLocation.search]);
+  }, [currentLocation.search]); // Re-run this effect if the URL query changes
   
 
 
+
+  /*
+  This effect handles the initial loading of data when the chat panel becomes visible. 
+    It:
+          Sets up the UI state (e.g., sets active tab to "messages")
+          Retrieves the current user ID
+          Syncs any study group chat data
+          Loads users and chat messages from the server
+          Tracks which messages the user has liked (hearted)
+  */
   useEffect(() => {
     const fetchData = async () => {
-      setLoadingChatList(true);
+      setLoadingChatList(true); // Start loading state
 
-      handleChatsSwitch();
+      // Prep UI state
+      setActiveTab('messages');
+      setShowMessagesPanel(true);
+
       const token = localStorage.getItem('token');
-      console.log(token);
+    
+      // --- Step 1: Fetch Current User ---
       const getCurrentUser = async () => {
         if (token) {
           try {
@@ -220,6 +204,8 @@ const Messaging: React.FC = () => {
         }
       }
       await getCurrentUser();
+
+      // --- Step 2: Sync Study Group Chats ---
       const syncStudyGroupChats = async () => {
         try {
           // Fetch the user's study groups or chats (assumed from user context or current user API)
@@ -243,23 +229,26 @@ const Messaging: React.FC = () => {
       // Call the sync function first
       await syncStudyGroupChats();
 
+
+      // --- Step 3: Fetch Users and Chats ---
       const syncUserChats = async () => {
 
-        // Proceed with fetching users and chats after sync
+        // Proceed with fetching users
         axios.get(`${REACT_APP_API_URL}/api/users`)
           .then((userResponse) => setUsers(userResponse.data))
           .catch((error) => console.error('Error fetching users:', error));
 
-        // Proceed with fetching chats after sync
-        axios.get(`${REACT_APP_API_URL}/api/chats`, {
-          headers: { Authorization: `Bearer ${token}` },
-        })
-          .then((chatResponse) => {
-            const chatsWithMessages = chatResponse.data.map((chat: Chat) => ({
-              ...chat,
-              messages: chat.messages || [], // Ensure messages is always an array
-              users: chat.users || [], // Ensure users is always an array
-            }));
+        // Proceed with fetching chats
+          axios.get(`${REACT_APP_API_URL}/api/chats`, {
+            headers: { Authorization: `Bearer ${token}` },
+          })
+            .then((chatResponse) => {
+               // Ensure message and user arrays are defined
+              const chatsWithMessages = chatResponse.data.map((chat: Chat) => ({
+                ...chat,
+                messages: chat.messages || [], // Ensure messages is always an array
+                users: chat.users || [], // Ensure users is always an array
+              }));
 
 
             setChats(chatsWithMessages);
@@ -281,22 +270,27 @@ const Messaging: React.FC = () => {
 
       await syncUserChats();
 
-      setLoadingChatList(false);
+      setLoadingChatList(false); // End loading state
 
     }
-    fetchData();
+    fetchData();  // Invoke the async function
 
-  }, [isPanelVisible]);  // reloads when selected or tab changes, allows for updates to users
-
-
+  }, [isPanelVisible]);  // Re-run when panel is toggled (e.g., user opens chat UI)
 
 
 
+ /*
+  This effect is similar to the first one but specifically handles changes in selected chat state.
+    It ensures that:
+        The current user is up to date
+        Study group chats are synced
+        The latest chat and user data is fetched (to reflect any new interactions or updates)
+*/
   useEffect(() => {
     const fetchData = async () => {
       const token = localStorage.getItem('token');
-      console.log(token);
-
+     
+      // --- Step 1: Get Current User ---
       const getCurrentUser = async () => {
         if (token) {
           try {
@@ -310,6 +304,8 @@ const Messaging: React.FC = () => {
         }
       }
       await getCurrentUser();
+
+      // --- Step 2: Sync Study Group Chats ---
       const syncStudyGroupChats = async () => {
         try {
           // Fetch the user's study groups or chats (assumed from user context or current user API)
@@ -333,14 +329,15 @@ const Messaging: React.FC = () => {
       // Call the sync function first
       await syncStudyGroupChats();
 
+      // --- Step 3: Fetch Users and Chats ---
       const syncUserChats = async () => {
 
-        // Proceed with fetching users and chats after sync
+        // Proceed with fetching users
         axios.get(`${REACT_APP_API_URL}/api/users`)
           .then((userResponse) => setUsers(userResponse.data))
           .catch((error) => console.error('Error fetching users:', error));
 
-        // Proceed with fetching chats after sync
+        // Proceed with fetching chats
         axios.get(`${REACT_APP_API_URL}/api/chats`, {
           headers: { Authorization: `Bearer ${token}` },
         })
@@ -373,145 +370,74 @@ const Messaging: React.FC = () => {
       setLoadingChatList(false);
 
     }
-    fetchData();
+    fetchData(); // Invoke the function
 
-  }, [activeTab, selectedChat, selectedChatId]);  // reloads when selected or tab changes, allows for updates to users
+  }, [activeTab, selectedChat, selectedChatId]);  // reloads when selected chat or tab changes, allows for updates to users
 
-  useEffect(() => {
-    if (socket && currentUserId) {
-      console.log("[Socket] Emitting joinUserRoom for", currentUserId);
-      socket.emit('joinUserRoom', currentUserId);
-    }
-  }, [socket, currentUserId]);
-
-  useEffect(() => {
-    if (selectedChat && currentUserId) {
-      // Leave previous chat if any
-      if (selectedChatId) {
-        socket.emit('leaveChat', selectedChatId, currentUserId);
-      }
-      
-      // Join new chat
-      socket.emit('joinChat', selectedChat.id, currentUserId);
-      setSelectedChatId(selectedChat.id);
-    }
-  
-    return () => {
-      if (selectedChatId && currentUserId) {
-        socket.emit('leaveChat', selectedChatId, currentUserId);
-      }
-    };
-  }, [selectedChat, currentUserId]);
-
-  useEffect(() => {
-
-    const handleChatUpdated = (updatedUsers:any) => {
-      setChats((prevChats) =>
-        prevChats.map((chat) =>
-            chat.id === selectedChat?.id
-                ? { ...chat, users: updatedUsers, messages: [...chat.messages] } // Preserve messages
-                : chat
-        )
-    );
-    };
-    socket.on("chatUpdated", handleChatUpdated);
-
-    return () => {
-        socket.off("chatUpdated", handleChatUpdated);
-    };
-}, [selectedChat]);
 
   // Used for editing study groups
+  // When a user is selected for editing a study group, 
+  // this hook finds their corresponding user object and 
+  // sets up the UI for editing (e.g., showing a group name input field).
+
   useEffect(() => {
     if (selectedUserId) {
-
+      // Convert selectedUserId to a number and find the corresponding user object
       const matchedUser = users.find(user => user.id === Number(selectedUserId)); // Convert to number
       if (matchedUser) {
-        setSelectedUser(matchedUser);
-        console.log(matchedUser);
-        setShowGroupNameInput(true);
+        setSelectedUser(matchedUser);  // Update selected user in state
+        console.log(matchedUser);      // Log user details (likely for debugging)
+        setShowGroupNameInput(true);   // Show input for renaming the group
       }
     }
   }, [selectedUserId, users]);
 
-  // Checks if a chat is a study group
+
+  // Triggers a check when the selected chat changes to determine if it's a study group, 
+  // affecting how the chat is displayed or what features are enabled.
+
   useEffect(() => {
     if (selectedChat) {
-      checkStudyGroup();
+      checkStudyGroup(); // Triggers a function to determine if the chat qualifies as a study group
     }
   }, [selectedChat]);  
 
 
-// Used for retrieving the usernames of users in a chat
-useEffect(() => {
-  if (selectedChat?.users) {
-    selectedChat.users.forEach((user) => {
-      if (user.id !== undefined) { 
-        handleGetChatUsername(user.id); // Only call handleGetChatUsername for non-system users
-      }
+  // Used for retrieving the usernames of users in a chat
+  // Fetches the display names for all users in a selected chat whenever the chat or active tab changes. 
+  // This helps keep the chat UI personalized and informative.
+
+  useEffect(() => {
+    if (selectedChat?.users) {
+      selectedChat.users.forEach((user) => {
+        if (user.id !== undefined) { 
+          handleGetChatUsername(user.id); // Retrieve display name for each user (excluding system)
+        }
+          
         
-      
-    });
-  }
-}, [selectedChat, activeTab]);
+      });
+    }
+  }, [selectedChat, activeTab]);
 
 
-  //Used for retrieving the user names of a chat and the users within
+  // Used for retrieving the user names of a chat and the users within
+  // Fetches usernames for users who have sent messages in the current chat.
+  // Complements the previous hook by ensuring user attribution is accurate even if not all users are in the users list.
+
   useEffect(() => {
     if (selectedChat?.messages) {
       selectedChat.messages.forEach((message) => {
-        if (message.system !== true && message.userId !== undefined) { // Check if the userId is not -1 (system message)
-          handleGetMessageUsername(message.userId);
+        if (message.system !== true && message.userId !== undefined)
+        { 
+          handleGetMessageUsername(message.userId); // Fetch sender username (skip system messages)
         }
       });
     }
   }, [selectedChat, activeTab]);
 
-  useEffect(() => {
-    const handleNewMessage = (message: Message) => {
-      console.log('[Client] Received newMessage from server:', message);
-  
-      // Prevent updating the state if the message was sent by the current user
-      if (message.userId === currentUserId || message.system === true) {
-        console.log('[Client] Ignored own message:', message);
-        return;
-      }
-  
-      // Update chats
-      setChats(prevChats => {
-        return prevChats.map(chat =>
-          chat.id === message.chatId
-            ? { 
-                ...chat, 
-                messages: [...chat.messages, message],
-                updatedAt: new Date().toISOString(),
-                lastUpdatedById: message.userId || null
-              }
-            : chat
-        ).sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
-      });
-  
-      // If this is the selected chat, update it
-      if (selectedChat?.id === message.chatId) {
-        console.log("[Client] selectedChat.id:", selectedChat?.id, "message.chatId:", message.chatId);
-  
-        setSelectedChat(prev =>
-          prev ? { ...prev, messages: [...prev.messages, message] } : null
-        );
-      }
-    };
-  
-    // Attach the event listener
-    socket.on('newMessage', handleNewMessage);
-    console.log("[Client] handleNewMessage event listener attached");
-  
-    return () => {
-      // Cleanup the event listener on unmount
-      socket.off('newMessage', handleNewMessage);
-    };
-  }, [selectedChat, currentUserId]); // Ensure this depends on `selectedChat` and `currentUserId`
-  
-  
+
+  // When the list of chats changes, this hook retrieves chat display names and profile pictures and stores them in state. 
+  // Optimized with Promise.all for concurrent fetching.
 
   useEffect(() => {
     const fetchChatNames = async () => {
@@ -543,7 +469,7 @@ useEffect(() => {
     const fetchChatPfps = async() => {
       const newChatPfps: { [key: number]: string } = { ...chatPfps };
       
-      // Use Promise.all to fetch all chat names concurrently
+      // Use Promise.all to fetch all chat pfps concurrently
       const fetchPromises = chats.map(async (chat) => {
         if (!newChatPfps[chat.id]) { // Only fetch if not already in state
           try {
@@ -559,7 +485,7 @@ useEffect(() => {
         }
       });
   
-      // Wait for all chat names to be fetched
+      // Wait for all chat pfps to be fetched
       await Promise.all(fetchPromises);
       console.log('Chat pfps:', newChatPfps);
   
@@ -570,6 +496,10 @@ useEffect(() => {
     fetchChatPfps();
   }, [chats]); // Runs only when `chats` change
   
+
+  // Ensures the chat window scrolls smoothly to the latest message whenever new messages arrive, 
+  // keeping the user focused on the most recent conversation.
+
   useEffect(() => {
     if (selectedChat?.messages?.length && chatWindowRef.current) {
       requestAnimationFrame(() => {
@@ -580,15 +510,158 @@ useEffect(() => {
       });
     }
   }, [selectedChat?.messages]); // Runs every time messages change
+
+
+
+
+
+
+/***** SOCKET USE EFFECTS ******/
+
+/*
+  These useEffect hooks manage the lifecycle and behavior of chats using WebSocket (via socket)
+    They: 
+      Establishing and tearing down socket connections
+      Handling user presence in chat rooms
+      Managing chat joins/leaves when switching conversations
+      Listening to real-time chat updates and messages
+    This modular separation ensures clean logic and proper resource management 
+      like cleanup of listeners and disconnecting sockets when needed.
+*/
+
+// Establishes a socket connection when the component mounts if the user is authenticated, 
+// and ensures the socket disconnects when the component unmounts.
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    // Connect to the socket server if a token exists
+    if (token) {
+      socket.connect();
+    }
+    // Disconnect from socket on component unmount
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
+
+
+  // Notifies the server that the current user has joined their personal room 
+  // Runs whenever socket or currentUserId changes.
+
+  useEffect(() => {
+    if (socket && currentUserId) {
+      console.log("[Socket] Emitting joinUserRoom for", currentUserId);
+      socket.emit('joinUserRoom', currentUserId);
+    }
+  }, [socket, currentUserId]);
+
+
+  // Handles room transitions when the user switches between chats. 
+  // Ensures the user leaves the previous chat before joining a new one, 
+  // and cleans up on unmount.
+
+  useEffect(() => {
+    if (selectedChat && currentUserId) {
+      // Leave the previous chat room if applicable
+      if (selectedChatId) {
+        socket.emit('leaveChat', selectedChatId, currentUserId);
+      }
+      
+      // Join the newly selected chat room
+      socket.emit('joinChat', selectedChat.id, currentUserId);
+      setSelectedChatId(selectedChat.id);
+    }
+    // On component unmount or dependency change, leave the chat
+    return () => {
+      if (selectedChatId && currentUserId) {
+        socket.emit('leaveChat', selectedChatId, currentUserId);
+      }
+    };
+  }, [selectedChat, currentUserId]);
+
+
+  // Listens for changes to the active chat’s participant list and updates the local state accordingly. 
+  // This keeps the user list in sync with the server.
+
+  useEffect(() => {
+    const handleChatUpdated = (updatedUsers:any) => {
+      setChats((prevChats) =>
+        prevChats.map((chat) =>
+            chat.id === selectedChat?.id
+                ? { ...chat, users: updatedUsers, messages: [...chat.messages] } // Preserve messages
+                : chat
+        )
+    );
+    };
+
+    // Listen for updates from the server about user list changes in a chat
+    socket.on("chatUpdated", handleChatUpdated);
+
+    // Remove listener on unmount
+    return () => {
+        socket.off("chatUpdated", handleChatUpdated);
+    };
+  }, [selectedChat]);
+
+
+  // Handles incoming messages from the server and updates the appropriate chat. 
+  // Messages from the current user or system are ignored. 
+  // Ensures both the chat list and the active chat window stay updated.
+
+  useEffect(() => {
+    const handleNewMessage = (message: Message) => {
+      console.log('[Client] Received newMessage from server:', message);
+
+      // Ignore own messages or system messages -- prevents duplicates
+      if (message.userId === currentUserId || message.system === true) {
+        return;
+      }
+
+      // Update chats list with new message and re-sort by updated time
+      setChats(prevChats => {
+        return prevChats.map(chat =>
+          chat.id === message.chatId
+            ? { 
+                ...chat, 
+                messages: [...chat.messages, message],
+                updatedAt: new Date().toISOString(),
+                lastUpdatedById: message.userId || null
+              }
+            : chat
+        ).sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+      });
+
+      // Also update the currently viewed chat if it's the same one
+      if (selectedChat?.id === message.chatId) {
+        console.log("[Client] selectedChat.id:", selectedChat?.id, "message.chatId:", message.chatId);
+
+        setSelectedChat(prev =>
+          prev ? { ...prev, messages: [...prev.messages, message] } : null
+        );
+      }
+    };
+
+    // Attach listener for new messages
+    socket.on('newMessage', handleNewMessage);
+    console.log("[Client] handleNewMessage event listener attached");
+
+    // Detach on cleanup
+    return () => {
+      socket.off('newMessage', handleNewMessage);
+    };
+  }, [selectedChat, currentUserId]); 
+
+
+
+  
   
 
-  // Switches from the Requests tab to the Chats tab
-  const handleChatsSwitch = () => {
-    setActiveTab('messages');
-    setShowRequestsPanel(false);
-    setShowMessagesPanel(true);
-  };
-  
+
+
+  /********* FUNCTIONS *********/
+
+
+
   // Function to open the new chat popup
   const openPopup = () => {
     setIsPopupOpen(true);
@@ -600,25 +673,40 @@ useEffect(() => {
   };
  
 
+  /*
+    This function handles sending a new message from the user to a selected chat. 
+      It:
+        Creates the message data object.
 
-  // sends messages between users
+        Emits the message via WebSocket to the backend server.
+
+        Optimistically updates the local chat and message state to reflect the new message.
+
+        Triggers push notifications for all other users in the chat (except the sender), 
+        with different messaging depending on whether it's a group chat or private conversation.
+  */
+
   const handleSendMessage = async () => {
-    // Authorization
+    // Get token for authenticated requests
     const token = localStorage.getItem('token');
+
+    // Proceed only if message isn't empty and a chat is selected
     if (currentMessage.trim() && selectedChat) {
       try {
+        // Construct message object for local state
         const messageData: Message = {
           id: Date.now(), // Use a unique ID generator
           content: currentMessage.trim(),
           createdAt: new Date().toISOString(),
-          userId: currentUserId || 0, // Add a fallback for currentUserId
+          userId: currentUserId || 0, // Fallback in case currentUserId is undefined
           chatId: selectedChat.id,
           liked: false,
           system: false,
           isButton: false
         };
         console.log("[Client] Emitting newMessage to server...!!!");
-        // sends the message via a websocket to the other user
+        
+        // Send the message to server via WebSocket
         socket.emit(
           'message',
           {
@@ -636,6 +724,8 @@ useEffect(() => {
             }
           }
         );
+
+        // Clear input field
         setCurrentMessage('');
         
         
@@ -646,13 +736,14 @@ useEffect(() => {
             : null
         );
 
+        // Update the chats list with new message and re-sort by updatedAt
         setChats((prevChats) => {
           const updatedChats = prevChats.map((chat) =>
             chat.id === selectedChat.id
               ? {
                   ...chat,
                   messages: [...(chat.messages || []), messageData],
-                  updatedAt: new Date().toISOString(), // Convert Date to string here
+                  updatedAt: new Date().toISOString(), // Set new update time
                   lastUpdatedById: currentUserId,
                 }
               : chat
@@ -664,12 +755,14 @@ useEffect(() => {
         });
         
 
-  
+        // Clear the message field again (redundant but safe)
         setCurrentMessage('');
 
-    // Notifications for messaging - Done
+
+    // ================== Notification Handling ==================
     console.log('Sending notification request to backend...');
 
+    // Derive sender name from chat user list
     let senderName = "Unknown Sender";
     if (selectedChat.users && currentUserId) {
       const sender = selectedChat.users.find((user) => user.id === currentUserId);
@@ -680,12 +773,13 @@ useEffect(() => {
 
     console.log('Sender name for notification:', senderName);
 
-    // Get all recipients (exclude the sender)
+    // Filter recipients to exclude the sender
     const recipients = selectedChat.users.filter((user) => user.id !== currentUserId);
 
     if (recipients.length > 0) {
       
       const isGroupChat = selectedChat.users.length > 2;
+      // Retrieve chat name for group notification
       const chatName = await getChatName(selectedChat);
 
       // Create the notification message
@@ -728,11 +822,19 @@ useEffect(() => {
   };
     
 
+
   // Used to access the study group name or chat name for displaying properly on the UI
+  // This function determines the display name for a chat. If the chat is a study group, it fetches the group name from the backend. 
+  // Otherwise, for one-on-one chats, it constructs the name using the other user's first and last name.
+  // - If the chat is part of a study group, it fetches the group name from the backend.
+  // - If it's a private (non-group) chat, it returns the full name of the other user.
+  // - Caches study group names in state to avoid redundant network requests.
+
   const getChatName = async (chat: Chat) => {
-    // getting the study group name
     try {
+      // Attempt to get the study group name from the backend using the chat ID
       const response = await axios.get(`${REACT_APP_API_URL}/api/study-groups/chat/${chat.id}`);
+      // If a name is returned, store it in state for future reference and return it
       if (response.data.name) {
         setStudyGroupNames((prev) => ({ ...prev, [chat.id]: response.data.name }));
         return response.data.name;
@@ -741,7 +843,7 @@ useEffect(() => {
       console.error("Error fetching study group name:", error);
     }
     
-    // not a study group option
+    // If no group name was found, return the name of the other user in a 1-on-1 chat
     if (currentUserId) {
       const otherUser = chat.users?.find((user) => user.id !== currentUserId);
       console.log('Other user:', otherUser);
@@ -749,13 +851,23 @@ useEffect(() => {
           return `${otherUser.firstName} ${otherUser.lastName}`;
       }
     }
+    // Default to empty string if name cannot be resolved
     return " ";
   };
 
+
+  /*
+    This function determines the profile picture (PFP) to display for a chat. 
+    It checks if the chat is part of a study group and returns the study group's profile picture if available. 
+    For private chats, it returns the other user's profile picture or a generic fallback.
+    - For study groups, it returns the group's profile picture if available.
+    - For private chats, it returns the profile picture of the other user.
+    - Falls back to generic images if no custom pictures are found.
+  */
     // Used to access the study group name or chat name for displaying properly on the UI
   const getChatPfp = async (chat: Chat) => {
-    // getting the study group name
     try {
+      // Attempt to get study group profile picture info using the chat ID
       const response = await axios.get(`${REACT_APP_API_URL}/api/study-groups/chat/${chat.id}`);
       console.log("PFP TEST", response)
       // setStudyGroupPfps((prev) => ({
@@ -763,6 +875,7 @@ useEffect(() => {
       //   [chat.id]: response.data.profilePic ? response.data.profilePic : genericStudyGroupPfp
       // }));
 
+      // If the chat is linked to a study group, return its custom profile picture or the generic one
       if (response.data.studyGroupID !== null) {
         return response.data.profilePic ? response.data.profilePic : genericStudyGroupPfp;
       }
@@ -772,7 +885,7 @@ useEffect(() => {
       console.error("Error fetching study group name:", error);
     }
 
-    // not a study group option
+    // If not a study group, return the other user's profile picture for private chats
     if (currentUserId) {
       const otherUser = chat.users?.find((user) => user.id !== currentUserId);
       console.log('Other user PFPPFP:', otherUser);
@@ -781,17 +894,21 @@ useEffect(() => {
         return `${otherUser.profilePic ?  otherUser.profilePic : genericUserPfp}`;
       }
     }
+    // Default to empty string if no image can be determined
     return " ";
   };
   
   
+  // Deletes a chat based on its chat ID.
+  // - Verifies if the user is authenticated via token.
+  // - Sends a DELETE request to the backend to remove the chat.
+  // - Calls a local function to update the UI state after deletion.
 
-
-  // Deletes a chat when clicking on the X 
   const handleDeleteChat = async (chatId: number) => {
     try {
-      //Authorization
+      // Retrieve the token from local storage
       const token = localStorage.getItem('token');
+      // If no token is found, show an alert and exit the function
       if (!token) {
         // alert('You need to be logged in to delete a chat.');
         setAlerts((prevAlerts) => [
@@ -801,25 +918,34 @@ useEffect(() => {
         return;
       }
 
-      // deletes the chat from the database
+      // Send a DELETE request to the backend API to delete the chat
       await axios.delete(`${REACT_APP_API_URL}/api/chats/${chatId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
+      // Update the local chat state after successful deletion
       updateChats(chatId);
     } catch (error) {
       console.error('Error deleting chat:', error);
+      // Log server response if available
       if (axios.isAxiosError(error) && error.response) {
         console.error('Server responded with:', error.response.data);
       }
     }
   };
 
-  // Retrieves the users for the user list, such that users can view the users in a study group
+
+  // Retrieves the users for the user panel based on the chat ID.
+  // - Verifies user authentication via token.
+  // - Fetches the study group associated with the given chat.
+  // - Then fetches and filters the list of users in the study group.
+  // - Updates the UI to display these users (excluding the current user)
+
   const handleGetUsers = async (chatId: number) => {
     try {
-      //Authorization
+      // Get the authentication token from local storage
       const token = localStorage.getItem('token');
+      // If token is missing, display an error alert and exit
       if (!token) {
         // alert('You need to be logged in to view users.');
         setAlerts((prevAlerts) => [
@@ -829,7 +955,7 @@ useEffect(() => {
         return;
       }
   
-      //gets the study group linked with that chat
+      // Step 1: Get the study group ID associated with the provided chat ID
       const response = await axios.get(
         `${REACT_APP_API_URL}/api/study-groups/chat/${chatId}`,
         { headers: { Authorization: `Bearer ${token}` } }
@@ -837,30 +963,29 @@ useEffect(() => {
       
   
       const data = response.data;
-      //console.log ('data', data);
       const groupId = data.studyGroupID;
       setGroupId(data.studyGroupID);
-      //console.log( 'id', groupId);
+     
 
-      // gets the users associated with that study group thats linked to the chat
+      // Step 2: Get the users associated with the retrieved study group ID
       const res = await axios.get(
         `${REACT_APP_API_URL}/api/study-groups/${groupId}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       
       const dat = res.data;
-      //console.log('Users in study group:', dat.studyGroup.users);
-      
-      //setSelectedChatUsers(dat.studyGroup.users); // Store user data for the selected chat
+     
+      // Filter out the current user from the list of users
       setSelectedChatUsers(
         dat.studyGroup.users.filter((user: User) => user.id !== currentUserId)
       );
       
-
-      setIsUserPanelVisible(true); // Open the panel to show users
+      // Open the user panel to show the list of group members
+      setIsUserPanelVisible(true);
     } catch (error) {
       console.error('Error fetching users:', error);
       // alert('Failed to load users.');
+      // Display a failure alert if anything goes wrong
       setAlerts((prevAlerts) => [
         ...prevAlerts,
         { id: Date.now(), alertText: 'Failed to load users', alertSeverity: 'error', visible: true },
@@ -1465,28 +1590,28 @@ const handleGetChatUsername = async (userId: number) => {
                             
                           
                             {message.userId !== currentUserId ? (
-  !message.system && isLastInCluster ? (
-    <div
-      className={`profilePic ${
-        message.userId === currentUserId ? "MyProfilePic" : ""
-      }`}
-    >
-      {message.userId !== undefined && msgPfps[message.userId] ? (
-        <img
-          src={msgPfps[message.userId]}
-          className="message-pfp"
-          alt=""
-          height={"40px"}
-        />
-      ) : (
-        "Loading..."
-      )}
-    </div>
-  ) : (
-    <div className="pfp-placeholder"></div> // Keeps spacing consistent
-  )
-) : <div className='MyProfilePic'>
-  </div>}
+                              !message.system && isLastInCluster ? (
+                                <div
+                                  className={`profilePic ${
+                                    message.userId === currentUserId ? "MyProfilePic" : ""
+                                  }`}
+                                >
+                                  {message.userId !== undefined && msgPfps[message.userId] ? (
+                                    <img
+                                      src={msgPfps[message.userId]}
+                                      className="message-pfp"
+                                      alt=""
+                                      height={"40px"}
+                                    />
+                                  ) : (
+                                    "Loading..."
+                                  )}
+                                </div>
+                              ) : (
+                                <div className="pfp-placeholder"></div> // Keeps spacing consistent
+                              )
+                            ) : <div className='MyProfilePic'>
+                              </div>}
                           </div>
                         )
                       })
@@ -1507,9 +1632,7 @@ const handleGetChatUsername = async (userId: number) => {
                   onSelect={handlePlusSelect}
                   studyGroupId={currentGroupId}
                   selectedChatId={selectedChat.id}
-                  onSendButtonMessage={handleButtonMessage} // 👈 Pass function to handle button messages
-
-
+                  onSendButtonMessage={handleButtonMessage}
                 />
                 <input
                   type="text"
