@@ -1074,6 +1074,7 @@ const handleGetChatUsername = async (userId: number) => {
           if (chatId) {
             setChats(prevChats => prevChats.filter(chat => chat.id !== chatId));
           }        
+          setIsUserPanelVisible(false);
         }
       } else {
         console.error('Failed to delete the user.');
