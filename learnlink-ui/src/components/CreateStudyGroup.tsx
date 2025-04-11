@@ -315,23 +315,26 @@ const CreateStudyGroup =(
           </div>
         <div>
           <div>
-          <label>Study Group Name:</label>
+          <label htmlFor="study-group-name">Study Group Name:</label>
           <input
+            id="study-group-name"
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
         </div>
-          <label>Bio:</label>
+          <label htmlFor="bio">Bio:</label>
           <input
+            id="bio"
             type="text"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
           />
         </div>
         <div>
-          <label>Relevant Course:</label>
+          <label htmlFor="course">Relevant Course:</label>
           <input
+            id="course"
             type="text"
             value={subject}
             onChange={(e) => setSubject(e.target.value)}
