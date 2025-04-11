@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { on } from 'events';
 import { selectStyles, formatEnum } from '../utils/format';
+import { updateChatTimestamp } from '../utils/messageUtils';
 import Select from 'react-select';
 import makeAnimated from 'react-select/animated';
 import GroupUserList from '../components/GroupUserList';
@@ -180,12 +181,10 @@ const CreateStudyGroup =(
       );
 
 
-
       console.log('Study group updated:', response.data);
-      
-      
-
+      updateChatTimestamp(chatID);
       updateChatName(chatID, name);
+
 
       setAlerts((prevAlerts) => [
         ...prevAlerts,
