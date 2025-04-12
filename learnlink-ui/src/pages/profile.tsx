@@ -323,6 +323,7 @@ const Profile: React.FC = () => {
                   Relevant Course:
                   <input
                     type="text"
+                    maxLength={10}
                     name="relevant_courses"
                     value={formData.relevant_courses.join(', ')} // Convert array to string for display
                     onChange={(e) => {
@@ -408,15 +409,15 @@ const Profile: React.FC = () => {
                 </div>
                 <div className="update-profile-name">
                   <label>
-                    First Name <input type="text" name="first_name" value={formData.first_name} onChange={handleChange} />
+                    First Name <input type="text" name="first_name"  maxLength={25} value={formData.first_name} onChange={handleChange} />
                   </label>
                   <label>
-                    Last Name <input type="text" name="last_name" value={formData.last_name} onChange={handleChange} />
+                    Last Name <input type="text" name="last_name" maxLength={25} value={formData.last_name} onChange={handleChange} />
                   </label>
                 </div>
                 
                 <label>
-                  Bio:<br /><textarea name="bio" value={formData.bio} onChange={handleChange} />
+                  Bio:<br /><textarea name="bio" maxLength={250} value={formData.bio} onChange={handleChange} />
                 </label>
                 <label>
                   Study Habit Tags:<br />
