@@ -208,51 +208,76 @@ const PublicProfile: React.FC = () => {
                             </div>
                         )}
                         <div className='whole-public-component'>
-                            <div className="profile-card">
                                 {user ? (
-                                    <>
-                                        <div className='public-main-container'>
-                                            <div className='public-left-side'>
-                                                <img src={user.profilePic} alt={`${user.first_name} ${user.last_name}`} className='profile-pic' />
-                                                <div className='bio'>
-                                                    <h3>Bio:</h3>
-                                                    <p>{user.bio}</p>
-                                                </div>
+                                        <div className="profile-card">
+                                            <div className="profile-header">
+                                                <div className="profile-avatar">
+                                                    <img src={user.profilePic} alt={`${user.first_name} ${user.last_name}`} />
 
-                                            </div>
-                                            <div className='public-right-side'>
-                                                <h1>{user.first_name} {user.last_name}</h1>
-                                                <h3>@{user.username}</h3>
-                                                <div className='profile-details-container'>
-                                                    <div className='public-profile-details'>
-                                                        <p><span className="bold-first-word">Age: </span>{user.age}</p>
-                                                        <p><span className="bold-first-word">College: </span>{user.college}</p>
-                                                        <p><span className="bold-first-word">Major: </span>{user.major}</p>
-                                                        <p><span className="bold-first-word">Gender: </span>{formatEnum(user.gender)}</p>
-                                                    </div>
-                                                    <div className='public-profile-details'>
-                                                        <p><span className="bold-first-word">Grade: </span>{formatEnum(user.grade)}</p>
-                                                        <p><span className="bold-first-word">Relevant Coursework: </span>{user.relevant_courses}</p>
-                                                        <p><span className="bold-first-word">Fav Study Method: </span>{user.study_method}</p>
-                                                        <p><span className="bold-first-word">Study Tags: </span>
-                                                            {user.studyHabitTags.length > 0 ? (
-                                                                user.studyHabitTags.map((tag: string, index: number) => (
-                                                                    <span key={index} className="tag">
-                                                                        {formatEnum(tag)}
-                                                                    </span>
-                                                                ))
-                                                            ) : (
-                                                                "No study tags specified."
-                                                            )}
-                                                        </p>
-                                                    </div>
+                                                </div>
+                                                <div className="profile-info">
+                                                    <h2>{`${user.first_name} ${user.last_name}`}</h2>
+                                                    <p className="username">@{user.username}</p>
                                                 </div>
                                             </div>
+                                            {user.bio ? (
+                                                <><div className="bio-section">
+                                                    <div className="bio-header">
+                                                        <span className="bio-icon">📚</span>
+                                                        <span>About Me</span>
+                                                    </div>
+                                                    <p className="bio-text">
+                                                        {user.bio}
+                                                    </p>
+                                                </div>
+                                                </>
+                                            ) : null}
 
-                                            {/* Render more profile details as needed */}
+
+
+                                            <div className="profile-details">
+                                                <div className="detail-item">
+                                                    <span className="detail-label">Age</span>
+                                                    <span className="detail-value">{user.age}</span>
+                                                </div>
+                                                <div className="detail-item">
+                                                    <span className="detail-label">Grade</span>
+                                                    <span className="detail-value">{formatEnum(user.grade)}</span>
+                                                </div>
+                                                <div className="detail-item">
+                                                    <span className="detail-label">College</span>
+                                                    <span className="detail-value">{user.college}</span>
+                                                </div>
+                                                <div className="detail-item">
+                                                    <span className="detail-label">Major</span>
+                                                    <span className="detail-value">{user.major}</span>
+                                                </div>
+                                                <div className="detail-item">
+                                                    <span className="detail-label">Gender</span>
+                                                    <span className="detail-value">{formatEnum(user.gender)}</span>
+                                                </div>
+                                                <div className="detail-item">
+                                                    <span className="detail-label">Relevant Coursework</span>
+                                                    <span className="detail-value">{user.relevant_courses}</span>
+                                                </div>
+                                                <div className="detail-item">
+                                                    <span className="detail-label">Fav Study Method</span>
+                                                    <span className="detail-value">{user.study_method}</span>
+                                                </div>
+                                    </div>
+                                    <div className='tags-buttons'>
+                                        <div className="profile-tags">
+                                            {user.studyHabitTags.length > 0 ? (
+                                                user.studyHabitTags.map((tag: string, index: number) => (
+                                                    <span key={index} className={`tag ${tag}`}>
+                                                        {formatEnum(tag)}
+                                                    </span>
+                                                ))
+                                            ) : (
+                                                "No study tags specified."
+                                            )}
+
                                         </div>
-
-
                                         <div className="public-action-buttons" >
                                             <button className={`match-button-status-${matchButton.buttonText.toLowerCase()}`}
                                                 disabled={matchButton.isButtonDisabled}
@@ -263,13 +288,13 @@ const PublicProfile: React.FC = () => {
                                             </button>
 
                                         </div>
-                                    </>
-                                ) : (
-                                    <div className='public-info'>
-                                        <p>No more profiles to public on!</p>
                                     </div>
-                                )}
-                            </div>
+                                </div>
+                            ) : (
+                                <div className='public-info'>
+                                    <p>No more profiles to public on!</p>
+                                </div>
+                            )}
                         </div>
                     </>)}
                 </>)}
@@ -283,9 +308,9 @@ const PublicProfile: React.FC = () => {
                 onConfirm={handleSendMessage}
                 targetName={
                     user
-                      ? user.name
-                      : ""
-                  }  
+                        ? user.name
+                        : ""
+                }
             />
         </div>
     );

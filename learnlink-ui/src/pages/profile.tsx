@@ -327,10 +327,17 @@ const Profile: React.FC = () => {
                     name="relevant_courses"
                     value={formData.relevant_courses.join(', ')} // Convert array to string for display
                     onChange={(e) => {
-                      const coursesArray = e.target.value.split(',').map((course) => course.trim());
+                      const coursesArray = e.target.value
+                        .split(',')
+                        .map((course) => {
+                          const trimmed = course.trim().toUpperCase();
+                          // Add space between letters and numbers
+                          const formatted = trimmed.replace(/^([A-Z]+)\s*([0-9]+[A-Z]*)$/, '$1 $2');
+                          return formatted;
+                        });
                       setFormData((prevData) => ({
                         ...prevData,
-                        relevant_courses: coursesArray, // Store as an array
+                        relevant_courses: coursesArray,
                       }));
                     }}
                   />

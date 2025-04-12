@@ -1983,7 +1983,7 @@ app.get('/api/users/search', authenticate, async (req, res): Promise<any> => {
 
     // Add course filter if provided
     if (typeof course === 'string' && course.length > 0) {
-      const courseArray = course.split(',').map((item) => item.trim())
+      const courseArray = course.split(',').map((item) => item.trim().toUpperCase())
       console.log('courseArray:', courseArray);
       filters.push({
         relevant_courses: {
