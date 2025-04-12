@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { on } from 'events';
 import { selectStyles, formatEnum } from '../utils/format';
+import { updateChatTimestamp } from '../utils/messageUtils';
 import Select from 'react-select';
 import makeAnimated from 'react-select/animated';
 import GroupUserList from '../components/GroupUserList';
@@ -180,12 +181,10 @@ const CreateStudyGroup =(
       );
 
 
-
       console.log('Study group updated:', response.data);
-      
-      
-
+      updateChatTimestamp(chatID);
       updateChatName(chatID, name);
+
 
       setAlerts((prevAlerts) => [
         ...prevAlerts,
@@ -315,23 +314,26 @@ const CreateStudyGroup =(
           </div>
         <div>
           <div>
-          <label>Study Group Name:</label>
+          <label htmlFor="study-group-name">Study Group Name:</label>
           <input
+            id="study-group-name"
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
         </div>
-          <label>Bio:</label>
+          <label htmlFor="bio">Bio:</label>
           <input
+            id="bio"
             type="text"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
           />
         </div>
         <div>
-          <label>Relevant Course:</label>
+          <label htmlFor="course">Relevant Course:</label>
           <input
+            id="course"
             type="text"
             value={subject}
             onChange={(e) => setSubject(e.target.value)}

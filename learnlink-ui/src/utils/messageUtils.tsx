@@ -176,6 +176,9 @@ export const handleSendButtonMessage = (
 
 export const updateChatTimestamp = async (chatId: any) => {
     try {
+      if(!chatId){
+        return;
+      }
       await axios.put(`${REACT_APP_API_URL}/api/study-groups/chats/${chatId}`);
       console.log(`Chat ${chatId} updated time successfully`);
     } catch (error) {

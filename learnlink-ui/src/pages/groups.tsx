@@ -16,6 +16,7 @@ import CustomAlert from '../components/CustomAlert';
 import { unescape } from 'querystring';
 import { useNavigate } from "react-router-dom";
 import { handleSendSystemMessage,updateChatTimestamp} from "../utils/messageUtils";
+import { group } from 'console';
 
 
   interface User {
@@ -195,51 +196,63 @@ import { handleSendSystemMessage,updateChatTimestamp} from "../utils/messageUtil
         )
       );
     };
-
     const removeUser = async (userId: number, groupId: number | null) => {
       if (!groupId) {
-          console.error('Group ID is missing.');
-          return;
+        console.error('Group ID is missing.');
+        return;
+      }
+      if (!userId) {
+        console.error('User ID is missing.');
+        return;
       }
       try {
-          const response = await axios.delete(`${REACT_APP_API_URL}/api/study-groups/${groupId}/users/${userId}`);
-          
-          if (response.status === 200) {
-              // Update selectedGroupUsers state
-              setSelectedGroupUsers(prevUsers => (prevUsers || []).filter(user => user.id !== userId));
-  
-              
-  
-              // Send a system message when a user is removed
-              const removedUser = selectedGroupUsers?.find(user => user.id === userId);
-              if (removedUser ) {
-                  let mess = userId === currentUserId
-                      ? `${removedUser.firstName} ${removedUser.lastName}  left the group.`
-                      : `${removedUser.firstName} ${removedUser.lastName}  was removed from the group.`;
-                  
-                  handleSendSystemMessage(mess, selectedGroup?.chatID);
-
-                  updateChatTimestamp(selectedGroup?.chatID);
-              
-              }
-              // ✅ Update the groups UI if the current user left the group
-              if (userId === currentUserId) {
-                setGroups(prevGroups => prevGroups.filter(group => group.id !== groupId));
-
-                // Optionally deselect the group if it’s open
-                if (selectedGroup?.id === groupId) {
-                  setSelectedGroup(null);
-                }
-              }
-          } else {
-              console.error('Failed to delete the user.');
+        const response = await axios.delete(`${REACT_APP_API_URL}/api/study-groups/${groupId}/users/${userId}`);
+    
+        if (response.status === 200) {
+          // Update selectedGroupUsers state
+          setSelectedGroupUsers(prevUsers => (prevUsers || []).filter(user => user.id !== userId));
+    
+          // ✅ Update the groups UI if the current user left the group
+          if (userId === currentUserId) {
+            setGroups(prevGroups => prevGroups.filter(group => group.id !== groupId));
+    
+            // Optionally deselect the group if it’s open
+            if (selectedGroup?.id === groupId) {
+              setSelectedGroup(null);
+            }
           }
+    
+          // Check if the group still exists after user removal
+          const groupCheck = await axios.get(`${REACT_APP_API_URL}/api/study-groups/${groupId}`).catch(() => null);
+    
+          if (!(groupCheck?.status === 200)) {
+            setGroups(prevGroups => prevGroups.filter(group => group.id !== groupId));
+    
+            // Optionally deselect the group if it’s open
+            if (selectedGroup?.id === groupId) {
+              setSelectedGroup(null);
+            }
+          }
+          if (groupCheck?.status === 200) {
+            const removedUser = selectedGroupUsers?.find(user => user.id === userId);
+            if (removedUser) {
+              let mess =
+                userId === currentUserId
+                  ? `${removedUser.firstName} ${removedUser.lastName} left the group.`
+                  : `${removedUser.firstName} ${removedUser.lastName} was removed from the group.`;
+    
+              handleSendSystemMessage(mess, selectedGroup?.chatID);
+              updateChatTimestamp(selectedGroup?.chatID);
+            }
+          }
+        } else {
+          console.error('Failed to delete the user.');
+        }
       } catch (error) {
-          console.error('Error deleting user:', error);
+        console.error('Error deleting user:', error);
       }
-  };
-  
-  
+    };
+    
     return (
         <div className="Groups">
           <div>

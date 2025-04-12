@@ -193,7 +193,7 @@ const StudyGroupInfo =(
             }}
         >Chat</button>
         <Link to={`/studyGroup/${groupId}/schedule`}>
-        <button className='Availability-Button'> Availability </button>
+        <button className='Availability-Button' data-testid = 'avail-button'> Availability </button>
       </Link>
         <button className='Edit-Button' onClick={handleEdit}> Edit </button>
 

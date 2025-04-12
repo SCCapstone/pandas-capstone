@@ -194,7 +194,7 @@ const ChatsNavi: React.FC<ChatsNaviProps> = ({
       {/* List of chats */}
       {loadingChatList ? (
         <div className="loading-container">
-          Loading... <span className="loading-spinner"></span>
+          Loading... <span className="loading-spinner" data-testid="loading-spinner"></span>
         </div>
       ) : (
         <ul className="ChatList">
@@ -220,11 +220,13 @@ const ChatsNavi: React.FC<ChatsNaviProps> = ({
               {/* Button to delete the chat */}
               <button
                 className="DeleteButton"
+                data-testid={`delete-chat-${chat.id}`}
                 onClick={async(e) => {
                   e.stopPropagation();
 
                   const isStudyGroup = await checkStudyGroup(chat.id);
                   const groupId = await getStudyGroupIdFromChatId(chat.id);
+                  console.log("IS GROUP::", isStudyGroup);
 
                   if (isStudyGroup) {
                     setConfirmMessage('Are you sure you want to leave this study group?');
@@ -233,7 +235,7 @@ const ChatsNavi: React.FC<ChatsNaviProps> = ({
                       setShowConfirmPopup(false);
                       updateChats(chat.id);
                     });
-                  } else {
+                  } else if (!isStudyGroup) {
                     setConfirmMessage('Are you sure you want to delete this chat?');
                     setConfirmAction(() => () => {
                       handleDeleteChat(chat.id);
@@ -256,10 +258,22 @@ const ChatsNavi: React.FC<ChatsNaviProps> = ({
           message={confirmMessage}
           onConfirm={() => confirmAction()}
           onCancel={() => setShowConfirmPopup(false)}
+          datatestid="confirm-popup"
         />
       )}
     </div>
   );
+};
+
+export const checkStudyGroup = async (chatId: number): Promise<boolean> => {
+  try {
+    const response = await fetch(`${REACT_APP_API_URL}/api/study-groups/chat/${chatId}`);
+    const data = await response.json();
+    return response.ok && !!data.studyGroupID;
+  } catch (error) {
+    console.error("Error checking study group:", error);
+    return false;
+  }
 };
 
 export default ChatsNavi;

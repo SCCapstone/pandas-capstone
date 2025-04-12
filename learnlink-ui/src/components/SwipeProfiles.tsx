@@ -49,6 +49,8 @@ const SwipeProfiles = ({ userId }: { userId: number }) => {
     fetchProfiles();
   }, [userId]);
 
+  
+
   const handleMessaging = () => {
     navigate(`/messaging?user=${currentProfile.id}`);
     
@@ -336,9 +338,11 @@ const SwipeProfiles = ({ userId }: { userId: number }) => {
         onClose={() => setShowInvitePanel(false)} 
         onConfirm={handleSendMessage} 
         targetName={
-          currentProfile.name
-            ? currentProfile.name
-            : currentProfile.firstName + ' ' + currentProfile.lastName
+          currentProfile?.name || 
+          (currentProfile?.firstName && currentProfile?.lastName 
+            ? `${currentProfile.firstName} ${currentProfile.lastName}` 
+            : 'Unknown'
+          )
         }      
         />
       {selectedMember && (
