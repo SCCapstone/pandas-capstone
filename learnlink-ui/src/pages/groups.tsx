@@ -317,7 +317,9 @@ import { group } from 'console';
               {/* Display message if no group is selected */}
               {!selectedGroup ? (
                 <div className="NoGroupSelected">
-                  Please select a group
+                  {groups.length === 0
+                    ? "No groups found. Go to the Match page to join one or chat with someone to create one."
+                    : "Please select a group"}
                 </div>
               ) : (
                 selectedGroupUsers && (
