@@ -68,13 +68,56 @@ const CalendarEventPopup: React.FC<CalendarEventPopupProps> = ({ open, onClose, 
       ]);
       return;
     }
+      // Validate date format
+  const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+  if (!dateRegex.test(date) || isNaN(new Date(date).getTime())) {
+    setAlerts((prevAlerts) => [
+      ...prevAlerts,
+      {
+        id: Date.now(),
+        alertText: "Invalid date format. Please use YYYY-MM-DD.",
+        alertSeverity: "error",
+        visible: true,
+      },
+    ]);
+    return;
+  }
+
+  // Validate time format
+  const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
+  if (!timeRegex.test(startTime) || !timeRegex.test(endTime)) {
+    setAlerts((prevAlerts) => [
+      ...prevAlerts,
+      {
+        id: Date.now(),
+        alertText: "Invalid time format. Please use HH:MM in 24-hour format.",
+        alertSeverity: "error",
+        visible: true,
+      },
+    ]);
+    return;
+  }
 
     const today = getTodayDate();
     if (date < today) {
       setAlerts((prevAlerts) => [
         ...prevAlerts,
         { id: Date.now(), alertText: "Event date cannot be in the past.", alertSeverity: "error", visible: true },
-      ]);      return
+      ]);      
+      return
+    }
+
+    if (startTime >= endTime) {
+      setAlerts((prevAlerts) => [
+        ...prevAlerts,
+        {
+          id: Date.now(),
+          alertText: "End time must be after start time.",
+          alertSeverity: "error",
+          visible: true,
+        },
+      ]);
+      return;
     }
 
     onSubmit(eventData);
