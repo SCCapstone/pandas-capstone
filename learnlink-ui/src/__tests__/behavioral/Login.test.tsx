@@ -30,7 +30,7 @@ describe("Login Behavioral Tests", () => {
     
         render(
             <MemoryRouter>
-                <Login />
+                <Login onLogin={jest.fn()}/>
             </MemoryRouter>
         );
     
@@ -59,7 +59,7 @@ describe("Login Behavioral Tests", () => {
 
         render(
             <MemoryRouter>
-                <Login />
+                <Login onLogin={jest.fn()}/>
             </MemoryRouter>
         );
 
