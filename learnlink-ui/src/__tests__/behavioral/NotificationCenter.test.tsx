@@ -1,6 +1,8 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import React, { JSX } from 'react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import NotificationDropdown from '../../components/NotificationDropdown';
-import { MemoryRouter } from 'react-router-dom';
+import '@testing-library/jest-dom';
+import { MemoryRouter, Route, Routes } from 'react-router-dom';
 
 jest.mock('axios', () => ({
   __esModule: true,
@@ -11,22 +13,51 @@ jest.mock('axios', () => ({
   },
 }));
 
-describe('NotificationDropdown Component', () => {
-  it('renders correctly and fetches notifications', async () => {
-    render(
-      <MemoryRouter>
-        <NotificationDropdown setNotifCount={() => {}} />
+// Utility function to set up the test environment
+const renderWithRouter = (ui: JSX.Element) => {
+    return render(
+      <MemoryRouter initialEntries={['/']}>
+        <Routes>
+          <Route path="/" element={ui} />
+          {/* You can add other routes if necessary */}
+        </Routes>
       </MemoryRouter>
     );
+  };
+  
 
+describe('NotificationDropdown Component Unit Tests', () => {
+  const mockNotifications = [
+    {
+      id: 1,
+      message: 'New match found!',
+      createdAt: '2025-04-12T10:00:00Z',
+      isRead: false,
+    },
+    {
+      id: 2,
+      message: 'Your group has been updated.',
+      createdAt: '2025-04-11T14:30:00Z',
+      isRead: true,
+    },
+  ];
+
+  let setNotifCountMock: jest.Mock;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    setNotifCountMock = jest.fn();
+    Storage.prototype.getItem = jest.fn(() => 'mock-token'); // simulate valid token
   });
 
-  it('displays error when fetching notifications fails', async () => {
-    render(
-      <MemoryRouter>
-        <NotificationDropdown setNotifCount={() => {}} />
-      </MemoryRouter>
-    );
+  it('should show a loading state while fetching notifications', () => {
+    renderWithRouter(<NotificationDropdown setNotifCount={setNotifCountMock} />);
 
-  });
+    // Check for loading text
+    expect(screen.getByTestId('loading-text')).toBeInTheDocument();
+});
+
+  
+
+
 });

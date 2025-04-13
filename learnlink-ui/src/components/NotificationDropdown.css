@@ -58,7 +58,7 @@
     flex-shrink: 0;
 }
 
-#none {
+#none, #loading-text {
     color: #00668C;
     font-size: 14px;
     padding: 8px;
