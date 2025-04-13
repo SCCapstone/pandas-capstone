@@ -77,7 +77,18 @@ describe('NotificationDropdown Component Unit Tests', () => {
         expect(await screen.findByText(/Clear All/i)).toBeInTheDocument();
       });
 
-  
+    it('should display "No new notifications" when the list is empty', async () => {
+        // override fetch to return an empty array
+        (global.fetch as jest.Mock).mockImplementationOnce(() =>
+            Promise.resolve({
+            ok: true,
+            json: () => Promise.resolve([]),
+            })
+        );
+
+        renderWithRouter(<NotificationDropdown setNotifCount={setNotifCountMock} />);
+        expect(await screen.findByText(/No new notifications/i)).toBeInTheDocument();
+    });
 
 
 });
