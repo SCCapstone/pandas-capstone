@@ -31,6 +31,7 @@ jest.mock('axios', () => ({
     getLoggedInUserId: jest.fn(),
   }));
 
+
 // Mock react-router-dom hooks
 jest.mock('react-router-dom', () => ({
     ...jest.requireActual('react-router-dom'),
@@ -106,7 +107,11 @@ describe('NewChatList Component Unit Tests', () => {
         if (key === 'token') return 'test-token';
         return null;
       });
-        
+
+       // Mock the auth utility
+        const auth = require('../../utils/auth');
+        auth.getLoggedInUserId.mockImplementation(() => 5);
+
   });
 
   const renderComponent = () => {
