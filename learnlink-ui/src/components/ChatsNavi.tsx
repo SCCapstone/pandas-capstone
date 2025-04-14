@@ -74,38 +74,42 @@ const ChatsNavi: React.FC<ChatsNaviProps> = ({
   updateChats,
 }) => {
   const [sortedChats, setSortedChats] = useState<Chat[]>([]);
-  const [lastOpenedTimes, setLastOpenedTimes] = useState<{
-    [chatId: number]: { [userId: number]: string };
-  }>({});
+  const [lastOpenedTimes, setLastOpenedTimes] = useState<{[chatId: number]: { [userId: number]: string };}>({});
   const [hasStudyGroup, setHasStudyGroup] = useState(false);
   const [showConfirmPopup, setShowConfirmPopup] = useState(false);
   const [confirmAction, setConfirmAction] = useState<() => void>(() => () => {});
   const [confirmMessage, setConfirmMessage] = useState('');
 
+  /********** USE EFFECTS **********/
 
   // Sort chats by most recent update when chats change
+  // Sorts the list of chats in descending order based on updatedAt or createdAt whenever the chats array changes.
   useEffect(() => {
+    // Create a shallow copy of chats and sort them by the most recent timestamp
     const sorted = [...chats].sort((a, b) => {
       const dateA = new Date(a.updatedAt || a.createdAt).getTime();
       const dateB = new Date(b.updatedAt || b.createdAt).getTime();
       return dateB - dateA; // Most recently updated chat at the top
     });
-
+    // Update the state with the sorted list
     setSortedChats(sorted);
   }, [chats]);
 
+  // Automatically handles the selected chat (if any) when the component first mounts.
   useEffect(() => {
+    // If there is a selected chat on initial render, trigger its click handler
     if (selectedChat) {
       handleChatClick(selectedChat);
     }
   }, []);
 
-  
+  // Fetches the last time each chat was opened by the current user and stores it in state.
   useEffect(() => {
     const fetchLastOpened = async () => {
       if (!currentUserId) return;
       try {
         const response = await axios.get(`${REACT_APP_API_URL}/api/chats/lastOpened/${currentUserId}`);
+        // Format the API response into a nested object: { [chatId]: { [userId]: timestamp } }
         const formattedData = response.data.data.reduce(
           (acc: { [chatId: number]: { [userId: number]: string } }, entry: any) => {
             const { chatId, userId, timestamp } = entry;
@@ -115,20 +119,30 @@ const ChatsNavi: React.FC<ChatsNaviProps> = ({
           },
           {}
         );
+        // Save to state
         setLastOpenedTimes(formattedData);
       } catch (error) {
         console.error('Error fetching lastOpened times:', error);
       }
     };
-  
+
+    // Trigger the fetch when the current user ID changes
     fetchLastOpened();
   }, [currentUserId]); // Only fetch when currentUserId changes
   
+
+
+  /********* FUNCTIONS *********/
+
+
+
+
+  // Checks whether a given chat is associated with a study group by calling the API.
   const checkStudyGroup = async (chatId: number): Promise<boolean> => {
     try {
       const response = await fetch(`${REACT_APP_API_URL}/api/study-groups/chat/${chatId}`);
       const data = await response.json();
-  
+      // Return true if the response is OK and contains a valid study group ID
       return response.ok && !!data.studyGroupID;
     } catch (error) {
       console.error("Error checking study group:", error);
@@ -136,9 +150,11 @@ const ChatsNavi: React.FC<ChatsNaviProps> = ({
     }
   };
 
+  // Fetches the study group ID associated with a specific chat, if one exists.
   const getStudyGroupIdFromChatId = async (chatId: number): Promise<number | null> => {
     try {
       const response = await axios.get(`${REACT_APP_API_URL}/api/study-groups/chat/${chatId}`);
+      // Return the ID if present, otherwise return null
       if (response.data && response.data.studyGroupID) {
         return response.data.studyGroupID;
       }
@@ -150,18 +166,20 @@ const ChatsNavi: React.FC<ChatsNaviProps> = ({
   };
   
   
-
+  // Handles selecting a chat and updates the lastOpened time for the current user both locally and in the backend.
   const handleChatClick = async (chat: Chat) => {
+    // Set the selected chat in state
     setSelectedChat(chat);
     const currentUser = currentUserId;
     const lastOpenedTimestamp = new Date().toISOString();
-  
-    // Optimistically update UI before the request
+    
+    // Optimistically update local state with the current timestamp
     setLastOpenedTimes((prev) => ({
       ...prev,
       [chat.id]: { ...prev[chat.id], [currentUser]: lastOpenedTimestamp },
     }));
   
+    // Send the timestamp to the backend
     try {
       await axios.post(`${REACT_APP_API_URL}/api/chats/updateLastOpened`, {
         chatId: chat.id,
@@ -174,17 +192,20 @@ const ChatsNavi: React.FC<ChatsNaviProps> = ({
   };
 
 
-  
+  // Determines whether a chat should be visually highlighted (e.g., to indicate new activity since it was last opened).
   const shouldHighlightChat = (chat: Chat) => {
-    if (chat.lastUpdatedById === currentUserId) return false; // Ignore updates made by the current user
+    // Don't highlight if the last update was made by the current user
+    if (chat.lastUpdatedById === currentUserId) return false;
   
+    // Retrieve timestamps
     const lastOpenedTimestamp = lastOpenedTimes[chat.id]?.[currentUserId];
     const chatUpdatedAt = new Date(chat.updatedAt || chat.createdAt).getTime();
     const lastOpenedAt = lastOpenedTimestamp ? new Date(lastOpenedTimestamp).getTime() : 0;
   
-    // Don't highlight the chat if the user was just in it
+    // Don't highlight the chat if it is currently open
     if (selectedChat?.id === chat.id) return false;
   
+    // Highlight if the chat was updated after the user last opened it
     return chatUpdatedAt > lastOpenedAt;
   };
   
@@ -263,17 +284,6 @@ const ChatsNavi: React.FC<ChatsNaviProps> = ({
       )}
     </div>
   );
-};
-
-export const checkStudyGroup = async (chatId: number): Promise<boolean> => {
-  try {
-    const response = await fetch(`${REACT_APP_API_URL}/api/study-groups/chat/${chatId}`);
-    const data = await response.json();
-    return response.ok && !!data.studyGroupID;
-  } catch (error) {
-    console.error("Error checking study group:", error);
-    return false;
-  }
 };
 
 export default ChatsNavi;

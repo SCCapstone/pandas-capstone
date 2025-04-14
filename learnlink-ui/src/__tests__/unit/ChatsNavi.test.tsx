@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import ChatsNavi, { checkStudyGroup } from '../../components/ChatsNavi';
+import ChatsNavi from '../../components/ChatsNavi';
 import { act } from 'react';
 
 
