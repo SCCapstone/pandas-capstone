@@ -59,14 +59,12 @@ import { group } from 'console';
     chatId: number;
     liked: boolean;
     system: boolean;
-    
   }
 
   const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
 
 
   const Groups: React.FC = () => {
-
     const [groups, setGroups] = useState<Group[]>([]);
     const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
     const [currentGroupId, setCurrentGroupId] =  useState<number | null>(null);
@@ -74,10 +72,8 @@ import { group } from 'console';
     const [currentUserId, setCurrentUserId] = useState<number | null>(null);
     const [loadingGroups, setLoadingGroups] = useState<boolean>(true);
     const [groupNames, setGroupNames] = useState<{ [key: number]: string }>({});
-
     const [alerts, setAlerts] = useState<{ id: number; alertText: string; alertSeverity: "error" | "warning" | "info" | "success"; visible: boolean }[]>([]);
     const alertVisible = alerts.some(alert => alert.visible);
-  
     const [chats, setChats] = useState<Chat[]>([]);
     const [isUserPanelVisible, setIsUserPanelVisible] = useState(false);
     const [isPanelVisible, setIsPanelVisible] = useState(false);
@@ -90,12 +86,22 @@ import { group } from 'console';
     const navigate = useNavigate();
 
 
+    /********** USE EFFECTS **********/
+
+
+
+
+    /*
+      On initial render, fetch the current group, current user, and all study groups from the API. 
+      Sets up various UI states based on the data.
+    */
+
     useEffect(() => {
       const fetchGroups = async () => {
         const token = localStorage.getItem('token');
 
         console.log("groups selected group id: ",selectedGroupId);
-        
+        // Fetch currently selected group info
         const getCurrentGroup = async () => {
           if (!selectedGroupId){
             return;
@@ -117,7 +123,7 @@ import { group } from 'console';
         }
 
         await getCurrentGroup();
-      
+        // Fetch current logged-in user
         const getCurrentUser = async () => {
             if (token) {
               try {
@@ -132,6 +138,8 @@ import { group } from 'console';
           }
         await getCurrentUser();
         console.log("currentUserId: ", currentUserId);
+
+        // Fetch all study groups
         const getGroups = async () => {
             if (token) {
                 try {
@@ -153,30 +161,48 @@ import { group } from 'console';
 
         // Clear search params
         navigate(window.location.pathname, { replace: true });
-        };
-        fetchGroups();
-        console.log("fetch groups complete");
-      }, []);
-
-      useEffect(()=> {
-        const printEdit = async() => {
-          console.log("PRINT EDIT",isEditMode)
-        }
-        printEdit();
-      }, [isEditMode])
-
-    
+      };
+      fetchGroups();
+      console.log("fetch groups complete");
+    }, []);
 
 
-      useEffect(() => {
-        console.log("Updated selected group users:", selectedGroupUsers);
-      }, [selectedGroupUsers]);
+    /*
+      Logs whether edit mode is enabled when isEditMode changes.
+    */
+
+    useEffect(()=> {
+      const printEdit = async() => {
+        console.log("PRINT EDIT",isEditMode)
+      }
+      printEdit();
+    }, [isEditMode])
+
+  
+    /*
+      Logs updated user list when selectedGroupUsers changes.
+    */
+
+    useEffect(() => {
+      console.log("Updated selected group users:", selectedGroupUsers);
+    }, [selectedGroupUsers]);
 
 
+
+    /********** FUNCTIONS **********/
+
+    /*
+      Removes a user from selectedGroupUsers state.  
+    */
 
     const updateUsers = (userId: number) => {
-    setSelectedGroupUsers(prevUsers => (prevUsers || []).filter(user => user.id !== userId));
+      setSelectedGroupUsers(prevUsers => (prevUsers || []).filter(user => user.id !== userId));
     };
+
+
+    /*
+      Updates the profile picture for a specific group (matched by chatID).
+    */
 
     const updatePFP = (chatId: number, newPFP: string) => {
       setGroups(prev =>
@@ -187,7 +213,9 @@ import { group } from 'console';
     };
 
 
-    
+    /*
+      Updates the name of a group chat.
+    */
 
     const updateChatName = (chatId: number, newName: string) => {
       setGroups(prev =>
@@ -196,6 +224,17 @@ import { group } from 'console';
         )
       );
     };
+
+
+    /**
+     * Removes a user from a study group. 
+     * Updates group state and UI accordingly. 
+     * Also sends a system message if applicable.
+     * @param userId 
+     * @param groupId 
+     * @returns 
+     */
+    
     const removeUser = async (userId: number, groupId: number | null) => {
       if (!groupId) {
         console.error('Group ID is missing.');
@@ -209,10 +248,10 @@ import { group } from 'console';
         const response = await axios.delete(`${REACT_APP_API_URL}/api/study-groups/${groupId}/users/${userId}`);
     
         if (response.status === 200) {
-          // Update selectedGroupUsers state
+          /// Remove from UI
           setSelectedGroupUsers(prevUsers => (prevUsers || []).filter(user => user.id !== userId));
     
-          // ✅ Update the groups UI if the current user left the group
+          // If current user left
           if (userId === currentUserId) {
             setGroups(prevGroups => prevGroups.filter(group => group.id !== groupId));
     
@@ -222,9 +261,10 @@ import { group } from 'console';
             }
           }
     
-          // Check if the group still exists after user removal
+          // Verify if group still exists
           const groupCheck = await axios.get(`${REACT_APP_API_URL}/api/study-groups/${groupId}`).catch(() => null);
-    
+          
+          
           if (!(groupCheck?.status === 200)) {
             setGroups(prevGroups => prevGroups.filter(group => group.id !== groupId));
     
@@ -233,6 +273,8 @@ import { group } from 'console';
               setSelectedGroup(null);
             }
           }
+
+          // If group is still valid, send system message
           if (groupCheck?.status === 200) {
             const removedUser = selectedGroupUsers?.find(user => user.id === userId);
             if (removedUser) {
@@ -347,3 +389,4 @@ import { group } from 'console';
 };
 
 export default Groups;
+
