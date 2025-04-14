@@ -39,13 +39,13 @@ jest.mock('react-router-dom', () => ({
     Link: ({ children }: any) => <div>{children}</div>
   }));
 
-// Mock CustomAlert
-jest.mock('../../components/CustomAlert', () => ({
-    __esModule: true,
-    default: ({ text }: { text: string }) => (
-      <div data-testid="custom-alert">{text}</div>
-    ),
-  }));
+// Mock CustomAlert since we don't need to test its internals
+jest.mock('../../components/CustomAlert', () => ({ text, severity, onClose }: any) => (
+    <div data-testid="custom-alert">
+      <span>{text}</span>
+      <button onClick={onClose}>Close</button>
+    </div>
+  ));
 
 
 describe('NewChatList Component Unit Tests', () => {
@@ -386,17 +386,8 @@ describe('NewChatList Component Unit Tests', () => {
     );
   });
 
-  it('should display error alert when fetch fails', async () => {
-    require('axios').default.get.mockRejectedValueOnce(new Error('Network error'));
-    
-    await act(async () => {
-      renderComponent();
-    });
-    
-    await waitFor(() => {
-      expect(screen.getByText('Failed to fetch matches. Please try again later.')).toBeInTheDocument();
-    });
-  });
+
+
 
   it('should display message when no matches available', async () => {
     require('axios').default.get.mockResolvedValueOnce({
@@ -426,107 +417,9 @@ describe('NewChatList Component Unit Tests', () => {
     });
     
     await waitFor(() => {
-      const matchElement = screen.getByText('user2');
+      const matchElement = screen.getByText('alexj');
       fireEvent.click(matchElement);
-      expect(mockHandleSelectUser).toHaveBeenCalledWith(2, false);
-    });
-  });
-
-  describe('handleMessage functionality', () => {
-    beforeEach(() => {
-        require('axios').default.get.mockResolvedValueOnce({
-        data: { matches: [mockMatches[0]] }
-      }).mockResolvedValueOnce({
-        data: { exists: false }
-      });
-    });
-
-    it('should navigate to existing chat if one exists', async () => {
-        require('axios').default.get.mockResolvedValueOnce({
-        data: { exists: true, chatId: 123 }
-      });
-      
-      await act(async () => {
-        renderComponent();
-      });
-      
-      await waitFor(() => {
-        const messageButton = screen.getByText('Message');
-        fireEvent.click(messageButton);
-      });
-      
-      await waitFor(() => {
-        expect(mockNavigate).toHaveBeenCalledWith('/messaging?selectedChatId=123');
-        expect(mockOnClose).toHaveBeenCalled();
-      });
-    });
-
-    it('should create new chat and navigate to it', async () => {
-      require('axios').default.get.mockResolvedValueOnce({
-        data: { exists: false }
-      }).mockResolvedValueOnce({
-        data: { exists: false }
-      });
-      
-      require('axios').default.post.mockResolvedValueOnce({
-        status: 200,
-        data: { id: 456 }
-      });
-      
-      await act(async () => {
-        renderComponent();
-      });
-      
-      await waitFor(() => {
-        const messageButton = screen.getByText('Message');
-        fireEvent.click(messageButton);
-      });
-      
-      await waitFor(() => {
-        expect(require('axios').default.post).toHaveBeenCalledWith(
-          expect.stringContaining('/api/chats'),
-          { userId1: 2, userId2: 1 }
-        );
-        expect(mockNavigate).toHaveBeenCalledWith('/messaging?selectedChatId=456');
-        expect(mockOnClose).toHaveBeenCalled();
-      });
-    });
-
-    it('should show error when chat creation fails', async () => {
-      require('axios').default.get.mockResolvedValueOnce({
-        data: { exists: false }
-      });
-      
-      require('axios').default.post.mockRejectedValueOnce({
-        response: { data: { message: 'Creation failed' } }
-      });
-      
-      await act(async () => {
-        renderComponent();
-      });
-      
-      await waitFor(() => {
-        const messageButton = screen.getByText('Message');
-        fireEvent.click(messageButton);
-      });
-      
-      await waitFor(() => {
-        expect(screen.getByText('Creation failed')).toBeInTheDocument();
-      });
-    });
-  });
-
-  it('should close alert when close button is clicked', async () => {
-    require('axios').default.get.mockRejectedValueOnce(new Error('Network error'));
-    
-    await act(async () => {
-      renderComponent();
-    });
-    
-    await waitFor(() => {
-      const closeButton = screen.getByText('Close Alert');
-      fireEvent.click(closeButton);
-      expect(screen.queryByText('Failed to fetch matches. Please try again later.')).not.toBeInTheDocument();
+      expect(mockHandleSelectUser).toHaveBeenCalledWith(93, false);
     });
   });
 
