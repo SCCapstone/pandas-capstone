@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import ResendEmail from '../../components/ResendEmail';
 
-// Mock CustomAlert since we don't need to test its internals
+// Mock CustomAlert
 jest.mock('../../components/CustomAlert', () => ({ text, severity, onClose }: any) => (
   <div data-testid="custom-alert">
     <span>{text}</span>

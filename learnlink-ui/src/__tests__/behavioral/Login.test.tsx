@@ -44,7 +44,7 @@ describe("Login Behavioral Tests", () => {
         fireEvent.click(screen.getByTestId("testbutton"));
     
         await waitFor(() => {
-            // Now explicitly check the error message inside the alert box
+            // check the error message inside the alert box
             expect(screen.getByRole("alert")).toHaveTextContent("Invalid username or password.");
         });
     });
@@ -78,5 +78,3 @@ describe("Login Behavioral Tests", () => {
         });
     });
 });
-
-/* Test cases has 2 fails and 10 passes/Needs fixing */
