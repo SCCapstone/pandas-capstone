@@ -79,11 +79,15 @@ const CreateStudyGroup =(
 
   const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
 
-
+  /*
+    Fetches study group data based on the current chat, 
+    including enum values for form options and the study group’s current configuration.
+  */
   const fetchStudyGroup = async () => {
     try {
       const token = localStorage.getItem('token');
       if (!token) {
+        // Show an alert if the user isn't logged in
         // alert('You need to be logged in to edit the study group.');
         setAlerts((prevAlerts) => [
           ...prevAlerts,
@@ -91,19 +95,22 @@ const CreateStudyGroup =(
         ]);
         return;
       }
+
+      // Fetch enum options for dropdowns like study habits
       const enumsResponse = await fetch(`${REACT_APP_API_URL}/api/enums`);
       const enumsData = await enumsResponse.json();
       setEnumOptions({
         studyHabitTags: enumsData.studyHabitTags,
       });
 
+      // Fetch the study group data for this chat
       const response = await axios.get(
         `${REACT_APP_API_URL}/api/study-groups/chat/${chatID}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       console.log("Chat id::::: ", chatID);
 
-      // Set the form fields with the existing study group values
+      // Update state with the retrieved study group details
       const data = response.data;
       console.log("DATAtA:::", data);
       setCurrentGroupId(data.studyGroupID);
@@ -122,28 +129,34 @@ const CreateStudyGroup =(
       ]);
     }
   };
+
+
+  // Triggered when a user selects an emoji-based profile picture. 
+  // Updates the preview and selected image URL and closes the modal.
   const handleEmojiSelect = (emoji: string, URL:string) => {
-    console.log("PASSED URL", URL)
-    setImagePreview(URL)
-    setImageUrl(URL)  
-    setPfpModalOpen(false); // Close modal after selection
+    console.log("PASSED URL", URL);
+    // Update image preview and actual image URL
+    setImagePreview(URL);
+    setImageUrl(URL);
+    // Close the modal
+    setPfpModalOpen(false); 
   };
 
 
-  // Fetch the study group details when the component is mounted
+  // Triggers the fetchStudyGroup function when chatID changes (i.e., when a new chat is selected).
   useEffect(() => {
-    
     fetchStudyGroup();
   }, [chatID]);
 
-  // Handle form submission to save the changes
+  // Handles the form submission to save a study group's data, including validations and backend updates.
   const handleSave = async () => {
     try {
-      // Call handleCreateStudyGroup before saving
+      // First, create the study group if it doesn't exist
       const newStudyGroupID = await handleCreateStudyGroup(chatID);
       console.log("NEW", newStudyGroupID);
       await fetchStudyGroup();
     
+      // Refresh the form with updated study group data
       const token = localStorage.getItem('token');
       if (!token) {
         // alert('You need to be logged in to save the study group.');
@@ -154,8 +167,10 @@ const CreateStudyGroup =(
         return;
       }
 
+      // Prepare updated study group object
       const updatedStudyGroup = { name, description, subject, chatID, ideal_match_factor, profile_pic: imageUrl };
 
+      // Input validation
       if (name==='' || name === null) {
         // alert('Please enter a study group name.');
         setAlerts((prevAlerts) => [
@@ -174,6 +189,7 @@ const CreateStudyGroup =(
         return;
       }
 
+      // Send update to the server
       const response = await axios.put(
         `${REACT_APP_API_URL}/api/study-groups/chat/${chatID}`,
         updatedStudyGroup,
@@ -182,16 +198,18 @@ const CreateStudyGroup =(
 
 
       console.log('Study group updated:', response.data);
+      // Update chat metadata (like name and timestamp)
       updateChatTimestamp(chatID);
       updateChatName(chatID, name);
 
-
+      // Show success alert
       setAlerts((prevAlerts) => [
         ...prevAlerts,
         { id: Date.now(), alertText: 'Study group updated', alertSeverity: "success", visible: true },
       ]);
       
       // alert('Study group updated successfully!');
+      // Close the modal/form
       onClose();
     } catch (error) {
       console.error('Error saving study group:', error);
@@ -202,54 +220,12 @@ const CreateStudyGroup =(
       ]);
     }
   };
+ 
 
-  const handleUpload = async () => {
-    console.log('Uploading image...'); // Debug log
-    if (!image) return;
-
-    const formData = new FormData();
-    formData.append('profilePic', image);
-    formData.append('chatID', chatID.toString());
-    const token = localStorage.getItem('token');
-    if (token) {
-      const res = await fetch(`${REACT_APP_API_URL}/api/study-group/upload-pfp`, {
-        method: 'POST',
-        body: formData,
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-      const data = await res.json();
-      if (res.ok) setImageUrl(data.profilePic);
-      if (!res.ok) {
-        console.error("Upload error:", data.error || "Unknown error");
-        // alert(`Error: ${data.error || "Failed to upload image"}`);
-        setAlerts((prevAlerts) => [
-          ...prevAlerts,
-          { id: Date.now(), alertText: ` ${data.error || "Failed to upload image"}`, alertSeverity: "error", visible: true },
-        ]);
-        return;
-      }
-    }
+  // Used to show the modal for choosing or uploading an image.
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPfpModalOpen(true); // Open modal for image upload/selection
   };
-
-  // Handle form submission
-    
-    // Function to handle file selection
-    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      const file = e.target.files ? e.target.files[0] : null;
-      if (file) {
-        setImage(file); // Store the selected file
-      }
-    };
-  
-    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-      setPfpModalOpen(true)
-    };
-  
-
-    
-
 
 
   if (!studyGroup) return <div>Loading...</div>; // Show loading message while fetching the study group data
@@ -304,7 +280,6 @@ const CreateStudyGroup =(
               onChange={handleImageUpload}
               style={{ display: "none" }}
             />
-            {/* <button onClick={handleUpload}>Upload</button> */}
             <ProfilePictureModal
             isOpen={pfpModalOpen}
             onRequestClose={() => setPfpModalOpen(false)}
