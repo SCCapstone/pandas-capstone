@@ -80,7 +80,7 @@ import { group } from 'console';
     const [selectedGroupUsers, setSelectedGroupUsers] = useState<User[] | null>(null);
     const [isEditMode, setIsEditMode] = useState<boolean>(false);
     const hasStudyGroup = Boolean(selectedGroup);
-    const searchParams = new URLSearchParams(window.location.search);
+    const [searchParams] = useSearchParams();
     const selectedGroupId = searchParams.get("groupId");
     const tab = searchParams.get("tab");
     const navigate = useNavigate();
@@ -160,7 +160,7 @@ import { group } from 'console';
         console.log("current groups complete");
 
         // Clear search params
-        navigate(window.location.pathname, { replace: true });
+        navigate('/groups', { replace: true });
       };
       fetchGroups();
       console.log("fetch groups complete");
