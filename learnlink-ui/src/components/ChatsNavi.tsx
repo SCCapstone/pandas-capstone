@@ -285,5 +285,16 @@ const ChatsNavi: React.FC<ChatsNaviProps> = ({
     </div>
   );
 };
+export const checkStudyGroup = async (chatId: number): Promise<boolean> => {
+  try {
+    const response = await fetch(`${REACT_APP_API_URL}/api/study-groups/chat/${chatId}`);
+    const data = await response.json();
+    return response.ok && !!data.studyGroupID;
+  } catch (error) {
+    console.error("Error checking study group:", error);
+    return false;
+  }
+};
 
 export default ChatsNavi;
+
