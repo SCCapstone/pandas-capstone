@@ -25,6 +25,12 @@ const animatedComponents = makeAnimated();
 // const location = useLocation(); // ✅ Correct way to use location in React
 
 
+interface NavbarIconProps {
+  'data-testid': string;
+  className?: string;
+  onClick: () => void;
+}
+
 interface User {
   id: number;
   username: string;
@@ -325,7 +331,7 @@ const Navbar: React.FC = () => {
       <FaBars className="hamburger" onClick={() => setIsNavOpen(true)} />
 
       {/* Normal Navigation Links*/}
-      <nav className="nav-links">
+      <nav className="nav-links" data-testid="nav-links">
         <a href="/swiping">Match</a>
         <a href="/profile">Profile</a>
         <div className='link-w-notif'>
@@ -364,7 +370,7 @@ const Navbar: React.FC = () => {
 
 
       {/* Full-Screen Menu */}
-      <div className={`fullscreen-menu ${isNavOpen ? "show" : ""}`}>
+      <div className={`fullscreen-menu ${isNavOpen ? "show" : ""}`}  data-testid="mobile-menu">
         <FaTimes className="close-icon" onClick={() => setIsNavOpen(false)} />
         <a href="/swiping">Match</a>
         <a href="/profile">Profile</a>
@@ -382,8 +388,8 @@ const Navbar: React.FC = () => {
       {isNotificationDropdownVisible && (
         <NotificationDropdown setNotifCount={setNotifCount} /> // Pass setNotifCount as a prop
       )}
-      <FaCog className="icon" onClick={handleSettings} />
-      <FaUserCircle className="icon profile-icon" onClick={handleAccountDetails} />
+      <FaCog className="icon" onClick={handleSettings}   data-testid="settings-icon"/>
+      <FaUserCircle className="icon profile-icon" onClick={handleAccountDetails} data-testid="user-icon" />
     </div>
     </header>
   );
