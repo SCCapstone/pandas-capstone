@@ -995,12 +995,16 @@ const Messaging: React.FC = () => {
   };
   
 
-  // Creates new study groups
+
+  /*
+    Is responsible for creating a new study group based on the currently selected chat and linking it to that chat.
+  */
+
   const handleCreateStudyGroup = async (chatId: number) : Promise<number | void> => {
     try {
       const token = localStorage.getItem('token');
       if (!token) {
-        // alert('You need to be logged in to create a study group.');
+        // Show error alert if user is not logged in
         setAlerts((prevAlerts) => [
           ...prevAlerts,
           { id: Date.now(), alertText: 'You need to be logged in to create a study group.', alertSeverity: 'error', visible: true },
@@ -1008,18 +1012,8 @@ const Messaging: React.FC = () => {
         return;
       }
 
-      // const updatedChatsResponse= axios.get(`${REACT_APP_API_URL}/api/chats`, {
-      //   headers: { Authorization: `Bearer ${token}` },
-      // });
-      // const updatedChats = (await updatedChatsResponse).data;
-  
-      // const chat = chats.find((chat: any) => chat.id === chatId);
-      // if (!chat) {
-      //   alert('Chat not found.');
-      //   return;
-      // }
-
       if (!selectedChat) {
+        // Show error alert if no chat is selected
         alert('No chat selected.');
         setAlerts((prevAlerts) => [
           ...prevAlerts,
@@ -1030,13 +1024,14 @@ const Messaging: React.FC = () => {
 
       console.log("Chat object:", selectedChat);
 
+      // Fetch up-to-date chat details from the server
       const chatResponse = await axios.get(`${REACT_APP_API_URL}/api/chats/${chatId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
       console.log("mew Chat object:", chatResponse.data);
 
-
+      // Prepare the payload for creating a study group
       const studyGroupPayload = {
         name: chatResponse.data.name,
         subject: '',
@@ -1047,16 +1042,19 @@ const Messaging: React.FC = () => {
 
       console.log('Creating study group with payload:', studyGroupPayload);
 
+      // Send request to create the new study group
       const response = await axios.post(
         `${REACT_APP_API_URL}/api/study-groups`,
         studyGroupPayload,
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
+      // Retrieve the new study group ID from the response
       let newStudyGroupID = response.data.studyGroup.id
 
       console.log('new study group ID', newStudyGroupID);
 
+      // Update the existing chat to associate it with the new study group
       const updateChatPayload = {
         chatName: '',
         studyGroupId: newStudyGroupID, // Pass only the study group ID
@@ -1071,12 +1069,16 @@ const Messaging: React.FC = () => {
       console.log( 'fetching details for chat:', chatId);
       console.log('Chat updated with study group ID:', chatUpdateResponse.data);
 
+      // Update state to reflect that a study group has been created
       if (!error) {
         setHasStudyGroup(true);
       }
+
+      // Return the ID of the newly created study group
       return newStudyGroupID;
 
     } catch (error) {
+      // Handle and log any errors during the process
       console.error('Error creating study group:', error);
       if (axios.isAxiosError(error) && error.response) {
         console.error('Server responded with:', error.response.data);
@@ -1084,20 +1086,29 @@ const Messaging: React.FC = () => {
     }
   };
 
+
   // Checks if a chat has a linked study group
+  /*
+  This function checks whether the currently selected chat is already linked to a study group. 
+  It makes a GET request to the API using the chat's ID, and then updates relevant state variables to reflect
+  whether the chat has an associated study group.
+  */
+
   const checkStudyGroup = async () => {
     console.log('Checking study group for chat:', selectedChat);
+    // If no chat is selected, assume no study group
     if(!selectedChat) {
       return setHasStudyGroup(false);
     }
     try {
+      // Call backend API to check if a study group exists for the selected chat
       const response = await fetch(`${REACT_APP_API_URL}/api/study-groups/chat/${selectedChat.id}`); // Fetching chat details by chat ID
       const data = await response.json();
       console.log('Study group check result:', data);
       setCurrentGroupId(data.studyGroupID);
 
   
-      // Check if studyGroupID is returned (i.e., chat is linked to a study group)
+      // If response is successful and study group ID exists, set state accordingly
       if (response.ok && data.studyGroupID) {
         setHasStudyGroup(true); // There is a study group linked
         console.log('setStudyGroupCheck:', hasStudyGroup);
@@ -1105,14 +1116,22 @@ const Messaging: React.FC = () => {
         setHasStudyGroup(false); // No study group linked to this chat
       }
     } catch (error) {
+      // In case of error, assume no group and log
       console.error("Error checking study group:", error);
       setHasStudyGroup(false); // Assume no study group if there's an error
     }
   };
 
-  // Handle double click to like a message
-  const handleDoubleClick = async (messageId: number) => {
 
+  // Handle double click to like a message
+  /*
+    This function handles a double-click event on a message to toggle its "liked" state (i.e., heart/unheart). 
+    It first checks if the user is logged in, then sends a PATCH request to update the like status. 
+    On success, it updates local state to reflect the new like status visually.
+  */
+
+  const handleDoubleClick = async (messageId: number) => {
+    // Show alert if user is not logged in
     const token = localStorage.getItem('token');
       if (!token) {
         // alert('Please log in again.');
@@ -1124,18 +1143,21 @@ const Messaging: React.FC = () => {
       }
 
     try {
+      // Send PATCH request to toggle like status of the message
       const response = await fetch(`${REACT_APP_API_URL}/api/messages/${messageId}/like`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' , Authorization: `Bearer ${token}`},
         body: JSON.stringify({ liked: !heartedMessages[messageId] }), // Toggle liked
       });
   
+      // Handle non-OK responses
       if (!response.ok) {
         const errorData = await response.json();
         console.error('API Error:', errorData);
         throw new Error('Failed to update like status');
       }
   
+      // Update UI state to reflect like change
       setHeartedMessages((prev) => ({
         ...prev,
         [messageId]: !prev[messageId], // Toggle heart UI
@@ -1146,62 +1168,106 @@ const Messaging: React.FC = () => {
     
   };
 
- // Used for retrieving names for putting names above sent messages
-const handleGetMessageUsername = async (userId: number) => {
-  // Check if the userId is the SYSTEM_USER_ID and skip if true
-  if (userId === undefined) return;
 
-  try {
-    const response = await axios.get(`${REACT_APP_API_URL}/api/users/${userId}`);
-    const username = response.data.firstName + " " + response.data.lastName;
-    const pfp = response.data.profilePic || genericUserPfp;
-    setMsgUsernames((prev) => ({ ...prev, [userId]: username }));
-    setMsgPfps((prev) => ({ ...prev, [userId]: pfp }));
-    //console.log(username);
-  } catch (error) {
-    console.error("Error fetching username:", error);
-  }
-};
+  // Used for retrieving names for putting names above sent messages
+  /*
+    This function retrieves a user's full name and profile picture using their user ID. 
+    It's used to display the sender's name and picture above messages in the chat. 
+    The result is stored in msgUsernames and msgPfps state maps for fast access.
+  */
 
-// Used for retrieving names for putting names above sent messages
-const handleGetChatUsername = async (userId: number) => {
-  // Check if the userId is the SYSTEM_USER_ID and skip if true
-  if (userId === undefined) return;
-  console.log("fetching username for user" , userId);
+  const handleGetMessageUsername = async (userId: number) => {
+    // Ignore if userId is undefined (e.g., system messages or missing data)
+    if (userId === undefined) return;
 
-  try {
-    const response = await axios.get(`${REACT_APP_API_URL}/api/users/${userId}`);
-    const username = response.data.firstName + " " + response.data.lastName;
-    setChatUsernames((prev) => ({ ...prev, [userId]: username }));
-    //console.log(username);
-  } catch (error) {
-    console.error("Error fetching username:", error);
-  }
-};
+    try {
+      // Call the backend to fetch user info
+      const response = await axios.get(`${REACT_APP_API_URL}/api/users/${userId}`);
+      // Combine first and last name
+      const username = response.data.firstName + " " + response.data.lastName;
+      // Use profilePic if available, otherwise fall back to generic one
+      const pfp = response.data.profilePic || genericUserPfp;
+      // Update state maps for message sender display
+      setMsgUsernames((prev) => ({ ...prev, [userId]: username }));
+      setMsgPfps((prev) => ({ ...prev, [userId]: pfp }));
+      //console.log(username);
+    } catch (error) {
+      console.error("Error fetching username:", error);
+    }
+  };
 
-  // passed into editstudygroup component, ensures the name is updated when updated
+
+  /*
+    This function retrieves a user's full name based on their ID—but it is specifically used in the chat UI context 
+    (e.g., for participants shown in the chat header or list). The username is stored in chatUsernames state.
+  */
+
+  const handleGetChatUsername = async (userId: number) => {
+    // Ignore if userId is undefined
+    if (userId === undefined) return;
+    console.log("fetching username for user" , userId);
+
+    try {
+      // Request user info from backend
+      const response = await axios.get(`${REACT_APP_API_URL}/api/users/${userId}`);
+      // Combine first and last name into full username
+      const username = response.data.firstName + " " + response.data.lastName;
+      // Update chat usernames map in state
+      setChatUsernames((prev) => ({ ...prev, [userId]: username }));
+      //console.log(username);
+    } catch (error) {
+      console.error("Error fetching username:", error);
+    }
+  };
+
+
+  /*
+    This function updates the display name of a chat. 
+    It's used to reflect name changes in the UI after a user edits a study group or chat.
+  */
+
   const updateChatName = (chatId: number, newName: string) => {
+    // Update the name for the specific chat ID in the chatNames state map
     setChatNames((prevChatNames) => ({
       ...prevChatNames,
       [chatId]: newName,
     }));
   };
 
+
+  /*
+    Removes a user from the list of selected users in the current chat.
+    This is useful when modifying a study group or managing participants.
+  */
+
   const updateUsers = (userId: number) => {
+    // Removes a user from the selectedChatUsers list by filtering them out
     setSelectedChatUsers(prevUsers => (prevUsers || []).filter(user => user.id !== userId));
   };
   
+
+  /*
+    Removes a chat from the list of chats in the UI. 
+    If the currently selected chat is being removed, it clears the selection.
+  */
+
   const updateChats = (chatId: number) => {
     // updates the displayed chats to delete the chat from the UI
     setChats((prevChats) => prevChats.filter((chat) => chat.id !== chatId));
+    // If the deleted chat was selected, clear the selected chat
     if (selectedChat?.id === chatId) {
       setSelectedChat(null);
     }
   }
 
 
-
   //deletes a user from a study group
+  /*
+    This function removes a user from a study group both on the server and in the UI. 
+    It handles updating the list of chat participants, sends a system message indicating the user left or was removed, 
+    and performs cleanup if the group is deleted as a result.
+  */
+
   const removeUser = async (userId: number, groupId: number | null) => {
     if (!groupId) {
       console.error('Group ID is missing.');
@@ -1209,32 +1275,33 @@ const handleGetChatUsername = async (userId: number) => {
     }
   
     try {
+      // Attempt to fetch the associated chat ID for the study group (if available)
       const chatIdResponse = await axios.get(`${REACT_APP_API_URL}/api/study-groups/${groupId}/chat`).catch(() => null);
       const chatId = chatIdResponse?.data?.chatId;
+      // Make a DELETE request to remove the user from the study group
       const response = await axios.delete(`${REACT_APP_API_URL}/api/study-groups/${groupId}/users/${userId}`);
   
       if (response.status === 200) {
         // Remove user from chat UI
         setSelectedChatUsers((prevUsers) => (prevUsers || []).filter(user => user.id !== userId));
   
-        // Clear selected chat if it matches the removed user
-        
+        // Clear selected chat if current user matches the removed user
         if (userId === currentUserId) {
           setSelectedChat(null);
         }
 
-  
+        // Create an appropriate system message
         const username = chatUsernames[userId] || "Unknown";
         const mess = userId === currentUserId
           ? `${username} left the group.`
           : `${username} was removed from the group.`;
   
-        // Check if the group still exists
+        // Check if the group still exists after the user is removed
         const groupCheck = await axios.get(`${REACT_APP_API_URL}/api/study-groups/${groupId}`).catch(() => null);
         console.log("GROUP CHECKKKKK", groupCheck);
   
         if (groupCheck?.status === 200) {
-          // Get the chat ID associated with the group
+          // Group still exists — update the message and optionally send a system notification
           const chatIdResponse = await axios.get(`${REACT_APP_API_URL}/api/study-groups/${groupId}/chat`).catch(() => null);
           const chatId = chatIdResponse?.data?.chatId;
   
@@ -1245,7 +1312,7 @@ const handleGetChatUsername = async (userId: number) => {
             handleSendSystemMessage(mess, selectedChat.id, setSelectedChat, setChats, setUpdateMessage);
           }
         } else {
-          // Group no longer exists, so clear the selected chat
+          // Group no longer exists — clear chat and UI
           setSelectedChat(null);
           if (chatId) {
             setChats(prevChats => prevChats.filter(chat => chat.id !== chatId));
@@ -1261,36 +1328,41 @@ const handleGetChatUsername = async (userId: number) => {
   };
   
 
-  const openProfilePopup = (profile: { id: number; name: string }) => {
-    setSelectedProfile(profile);
-  };
+  /*
+    Triggers message sending when the user presses the Enter key inside the input field.
+  */
 
-  const closeProfilePopup = () => {
-    setSelectedProfile(null);
-  };
-
-  //sends the message 
   const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Enter') {
-      handleSendMessage();
+      handleSendMessage(); // Call the message sending function
     }
   };
 
+
+  // Placeholder for "+" button logic (e.g., open menu, attachment panel, etc.)
   const handlePlusSelect = () => {
     return
   }
+
+
+  /*
+    Handles actions triggered by dynamic buttons inside chat messages (e.g., open calendar, scheduler).
+    The button's action prop encodes an action type and optional URL, separated by a comma.
+  */
 
   const handleButtonClick = (action: string | undefined, studyGroupId: number | undefined | null) => {
     if (action == undefined) {
       console.log("no button action")
       return
     }
+    // Split the action string into an action type and an optional event URL
       const [actionType, eventURL] = action.split(',');
       console.log("Action Type:", actionType);
       console.log("Event URL:", eventURL);
 
     switch (actionType) {
       case "weekly-scheduler":
+        // Open the weekly scheduler modal if a study group is linked
         if (studyGroupId) {
           openWeeklyScheduler(studyGroupId);
         } else {
@@ -1299,7 +1371,8 @@ const handleGetChatUsername = async (userId: number) => {
         break;
   
       case "calendar-event":
-          openCalendarEvent(eventURL);
+        // Open a calendar event modal or redirect
+        openCalendarEvent(eventURL);
 
         break;
   
@@ -1308,37 +1381,62 @@ const handleGetChatUsername = async (userId: number) => {
     }
   };
 
+
+  /*
+    Sends a special button-type message to the current chat using helper handleSendButtonMessage.
+    Ensures a chat is selected before dispatching the message.
+  */
+
   const handleButtonMessage = (buttonData: { action: string; studyGroupId?: number | undefined; label: string }) => {
     console.log('inHandlebuttonmessage')
     if (!selectedChat?.id) return; // Ensure a chat is selected
     console.log('inHandlebuttonmessage twooo')
 
+    // Delegate to external function that creates and dispatches the button message
     handleSendButtonMessage(buttonData, selectedChat.id, currentUserId, setSelectedChat, setChats, setUpdateMessage); // Now we call it here ✅
 };
+
+
   
   // Function to open the Weekly Scheduler for a study group
+  /*
+    Navigates to the Weekly Scheduler page for a specific study group using React Router’s navigate function.
+  */
+
   const openWeeklyScheduler = (studyGroupId: number) => {
     console.log(`Opening Weekly Scheduler for study group ID: ${studyGroupId}`);
     // <Link to={`/studyGroup/${groupId}/schedule`}>
     //         <button className='Availability-Button'> Availability </button>
     //       </Link>
     // Add logic to open the weekly scheduler modal/page
+
+    // Redirect the user to the scheduler route for the given study group
     navigate(`/studyGroup/${studyGroupId}/schedule`);
   };
+
+
+  /*
+    Constructs a Google Calendar event creation URL with pre-filled info 
+    (title, details, location, time) and opens it in a new tab.
+  */
 
   const openGoogleCalendar = (studyGroupId: number) => {
     const title = encodeURIComponent("Study Group Meeting");
     const details = encodeURIComponent("Join the study session for our course!");
     const location = encodeURIComponent("Online / Library");
     
+    // Format start time: now in YYYYMMDDTHHMMSSZ
     const startTime = new Date().toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+    // Format end time: one hour from now
     const endTime = new Date(new Date().getTime() + 60 * 60 * 1000)
       .toISOString()
       .replace(/[-:]/g, "")
       .split(".")[0] + "Z";
   
+    // Construct the Google Calendar event URL
     const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&details=${details}&location=${location}&dates=${startTime}/${endTime}`;
     
+    // Open the Google Calendar event creation page in a new browser tab
     window.open(url, "_blank");
   };
   
@@ -1416,11 +1514,6 @@ const handleGetChatUsername = async (userId: number) => {
               </div>
             </>
           )}
-
-      
-       
-
-
         <div className="ChatSection">
           {selectedChat ? (
             <>
