@@ -6,6 +6,7 @@ import LandingPage from './pages/LandingPage';
 import Settings from './pages/settings';
 import Messaging from './pages/messaging';
 import Profile from './pages/profile';
+import WebsiteMilestone from './pages/WebsiteMilestone';
 import Resources from './pages/resources/resources';
 import StudyTips from './pages/resources/studyTips';
 import ExternalResources from './pages/resources/externalResources';
@@ -30,6 +31,7 @@ import { getLoggedInUserId } from './utils/auth';
 import PublicGroupProfile from './pages/publicGroupProfile';
 import Navbar from './components/Navbar';
 import React, { useState, useEffect } from 'react';
+
 
 
 const App: React.FC = () => {
@@ -60,6 +62,7 @@ const App: React.FC = () => {
               <Route path="/welcome" element={<Welcome />} />
               <Route path="/login" element={<Login onLogin={handleLogin} />} />
               <Route path="/signup" element={<Signup />} />
+              <Route path="/websitemilestone" element={<WebsiteMilestone/>}/>
               <Route path="/forgotpassword" element={<ForgotPassword />} />
               <Route path="/resetpassword/:token" element={<ResetPasswordFromEmail />} />
 
