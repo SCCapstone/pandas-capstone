@@ -12,11 +12,15 @@ interface ConfirmPopupProps {
 }
 
 const ConfirmPopup: React.FC<ConfirmPopupProps> = ({ message, onConfirm, onCancel, confirmText = "Confirm", cancelText = "Cancel" , datatestid}) => {
+    // Handles the click event for confirming an action. 
+    // It prevents the event from bubbling up and then calls the provided onConfirm callback.
     const handleConfirm = (event: React.MouseEvent<HTMLButtonElement>) => {
         event.stopPropagation();  // Stops event propagation
         onConfirm(event);         // Executes the provided onConfirm handler
     };
 
+    // Handles the click event for cancelling an action. 
+    // It prevents the event from bubbling up and then calls the provided onCancel callback.
     const handleCancel = (event: React.MouseEvent<HTMLButtonElement>) => {
         event.stopPropagation();  // Stops event propagation
         onCancel(event);          // Executes the provided onCancel handler
