@@ -50,6 +50,7 @@ const NewChatList: React.FC<MatchesListProps> = ({ handleSelectUser, onClose}) =
             (match: { isStudyGroupMatch: boolean }) => match.isStudyGroupMatch !== true
           );
 
+          console.log("MATCHES", filteredMatches);
           console.log(filteredMatches);
             
           // Filter out duplicates by checking unique pairs (user1Id, user2Id)
@@ -71,6 +72,7 @@ const NewChatList: React.FC<MatchesListProps> = ({ handleSelectUser, onClose}) =
           const matchesWithoutChats = await Promise.all(
               uniqueMatches.map(async (match:any) => {
               const friendId = match.user1Id === currentUserId ? match.user2Id : match.user1Id;
+               
               try {
                   const chatCheckResponse = await axios.get(`${REACT_APP_API_URL}/api/chats/check`, {
                   params: { userId1: currentUserId, userId2: friendId },
@@ -179,7 +181,7 @@ const NewChatList: React.FC<MatchesListProps> = ({ handleSelectUser, onClose}) =
     
   };
   // If the component is still loading, show a loading spinner
-  if (loading) return <div className="loading-container">Loading... <span className="loading-spinner"></span> </div>;
+  if (loading) return <div className="loading-container">Loading... <span className="loading-spinner" data-testid ='loading-spinner'></span> </div>;
 
   // If there are no matches, display a message
   if(matchesList.length === 0) return <p className="no-requests">All matches have chats already, match with more people for new chats.</p>
