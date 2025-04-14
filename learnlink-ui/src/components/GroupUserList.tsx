@@ -4,19 +4,16 @@ import './GroupUserContainer.css'
 import React, { useEffect, useState , useRef} from 'react';
 import axios from 'axios';
 import { on } from 'events';
-
-// Defining the structure of a StudyGroup object
 interface StudyGroup {
-  name: string;   // Name of the study group
-  chatID: number; // Unique identifier for the group's chat
-  users: User[];    // List of users in the group
+  name: string;
+  chatID: number; 
+  users: User[];   
 }
 
-// Defining the structure of a User object
 interface User {
-  id: number;        // Unique user ID
-  firstName: string; // User's first name
-  lastName: string;  // User's last name
+  id: number;     
+  firstName: string; 
+  lastName: string;  
   profilePic?: string;
 }
 const GroupUserList = (
@@ -40,16 +37,23 @@ const GroupUserList = (
   isPopup: boolean; 
 }) => {
   
+  /**
+   * The GroupUserList component displays a list of users in a study group. 
+   * It allows the current user to remove others, leave the group, and optionally render as a popup panel. 
+   * When in popup mode, clicking outside the panel closes it. 
+   * It also makes use of React refs and event listeners to handle UI interactions.
+   */
+
   const panelRef = useRef<HTMLDivElement>(null);
 
 
+  // Close popup if user clicks outside the panel (only when in popup mode)
   useEffect(() => {
-
     if (!isPopup) return; 
 
     const handleClickOutside = (event: MouseEvent) => {
       if (panelRef.current && !panelRef.current.contains(event.target as Node)) {
-        onClose?.();
+        onClose?.(); // Close popup
       }
     };
 
@@ -60,6 +64,7 @@ const GroupUserList = (
   }, [isPopup, onClose]);
 
 
+  // Handles removing a user from the group (triggered by clicking 'X')
   const handleRemoveUser = (userId: number) => {
     console.log(groupId);
     if (groupId !== null) {
@@ -70,10 +75,12 @@ const GroupUserList = (
     updateUsers(userId);
   };
 
+
+  // Handles current user leaving the group
   const handleLeaveGroup = () => {
     if (currentId !== null && groupId !== null) {
-      onRemoveUser(currentId, groupId);
-      updateUsers(currentId);
+      onRemoveUser(currentId, groupId); // Remove self from group
+      updateUsers(currentId); // Refresh UI
       onClose?.(); // Close the popup after the user leaves the group
     } else {
       console.error('User ID or Group ID is not available');
