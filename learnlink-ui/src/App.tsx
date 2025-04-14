@@ -6,7 +6,7 @@ import LandingPage from './pages/LandingPage';
 import Settings from './pages/settings';
 import Messaging from './pages/messaging';
 import Profile from './pages/profile';
-import WebsiteMilestone from './pages/WebsiteMilestone';
+import WebsiteMilestone from './WebsiteMilestone/WebsiteMilestone';
 import Resources from './pages/resources/resources';
 import StudyTips from './pages/resources/studyTips';
 import ExternalResources from './pages/resources/externalResources';
