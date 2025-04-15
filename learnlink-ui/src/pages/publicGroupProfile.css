@@ -1,0 +1,84 @@
+.public-group-container{
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.public-member-cards {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 20px;
+
+}
+
+.public-member-card {
+  background: #fff;
+  padding: 8px;
+  border-radius: 8px;
+  text-align: left;
+  width: 350px;
+  box-shadow: 0px 2px 7px rgba(0, 0, 0, 0.2);
+  display:flex;
+  flex-direction: column;
+}
+
+.public-member-card:hover {
+  background-color: #f5f5f5;
+  cursor: pointer;
+}
+
+.public-member-card h1 {
+  font-size: 15px;
+  font-weight: bold;
+  color: #333;
+  margin: 0 0 5px 0;
+
+}
+
+.public-member-card h2 {
+  font-size: 13px;
+  font-weight: bold;
+  color: #004c72;
+  margin: 0 0 0 0;
+}
+
+.public-member-card h3 {
+  font-size: 15px;
+  font-weight: bold;
+  color: #000;
+}
+
+.public-member-card p {
+  font-size: 13px;
+  font-weight: normal;
+  color: #000;
+  margin: 5px;
+}
+
+
+.public-member-pic {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.public-member-card-top {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.public-member-card-top-left {
+  width: 20%;
+}
+.public-member-card-top-right {
+  width: 80%;
+}
+
+.member.tag {
+  font-size: 11px;
+}

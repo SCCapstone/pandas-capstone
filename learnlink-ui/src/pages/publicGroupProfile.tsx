@@ -11,6 +11,8 @@ import { useMatchButtonStatusGroup, sendMatchRequestNotification } from '../util
 import CustomAlert from '../components/CustomAlert';
 import { StudyGroup } from '../utils/types'
 import { RiFontSize } from 'react-icons/ri';
+import "./publicGroupProfile.css"
+import PopupProfile from '../components/PopupProfile';
 
 
 
@@ -199,7 +201,8 @@ const PublicGroupProfile: React.FC = () => {
             <div className="public-profile-container">
                 {notFound ? (
                     <div className="loading-container">
-                        <h1>404 Not Found</h1>
+                        <h1>404</h1>
+                        <p>Group Profile not found</p>
                     </div>
                 ) : (<>
                     {isLoading ? (
@@ -222,84 +225,89 @@ const PublicGroupProfile: React.FC = () => {
                         <div className='whole-public-component'>
                             <div className="profile-card">
                                 {studyGroup ? (
-                                    <>            <div className="group-container">
+                                    <>            
+                                        <div className="public-group-container">
+                                            <div className="profile-header">
+                                                <div className="profile-avatar">
+                                                    <img src={studyGroup.profilePic} alt={`${studyGroup.name}`} />
 
-                                        <h1>Group: {studyGroup.name}</h1>
-
-                                        <div className="group-info">
-
-
-                                            <div className="group-right">
-                                                {/* <GroupLogo/> */}
-                                                <img
-                                                    src={studyGroup.profilePic ? studyGroup.profilePic : genericStudyGroupPfp}
-                                                    className="group-pic"
-                                                />
-                                                <div className="group-description">
-                                                    <span className="bold-first-word">Bio: </span>
-                                                    <br></br>{studyGroup.description}
                                                 </div>
-                                                <div className='group-subject'>
-                                                    <span className="bold-first-word">Course: </span>{studyGroup.subject}
+                                                <div className="profile-info">
+                                                    <h2>{`${studyGroup.name}`}</h2>
+                                                    <p className="username">Study Group</p>
                                                 </div>
-
                                             </div>
-                                            <div className="group-left">
-                                                {/* <h1>Members:</h1> */}
-                                                <div className="member-cards">
-                                                    {studyGroup.users && studyGroup.users.length > 0 ? (
-                                                        studyGroup.users.map((member: any, index: number) => (
-                                                            <div key={index} className="member-card" onClick={() => setSelectedMember({ id: member.id })}>
-                                                                <div className="member-card-top">
-                                                                    <h1>{member.name}</h1>
-                                                                    <div className="member-card-top-left" >
-                                                                        <img
-                                                                            src={member.profilePic || genericUserPfp}
-                                                                            alt={`${member.firstName} ${member.lastName}`}
-                                                                            className="member-pic"
-                                                                        />
-                                                                    </div>
-                                                                    <div className="member-card-top-right">
-                                                                        <h1>{member.firstName} {member.lastName} </h1>
-                                                                        <h2>@{member.username}</h2>
-                                                                    </div>
-                                                                </div>
-                                                                <>
-                                                                    <p><span className="bold-first-word">Bio:</span></p>
-                                                                    <p>{member.bio}</p>
+                                            {studyGroup.description ? (
+                                                <><div className="bio-section">
+                                                    <div className="bio-header">
+                                                        <span className="bio-icon">📚</span>
+                                                        <span>About {studyGroup.name}</span>
+                                                    </div>
+                                                            <p className="bio-text">
+                                                                {studyGroup.description}
+                                                            </p>
+                                                        </div>
+                                                        </>
+                                                    ) : null}
 
-                                                                    {/* <div className="swipe-profile-details">
-                                              <p><span className="bold-first-word">Age: </span>{member.age}</p>
-                                              <p><span className="bold-first-word">College: </span>{member.college}</p>
-                                              <p><span className="bold-first-word">Major: </span>{member.major}</p>
-                                              <p><span className="bold-first-word">Gender: </span>{member.gender}</p>
-                                              </div> */}
-                                                                    {/* 
-                                              <p><span className="bold-first-word">Grade: </span>{member.grade}</p>
-                                              <p><span className="bold-first-word">Relevant Coursework: </span>{member.relevant_courses}</p>
-                                              <p><span className="bold-first-word">Fav Study Method: </span>{member.study_method}</p>
-                                              */}
-                                                                    <p><span className="bold-first-word">Study Tags: <br></br></span>
-                                                                        {member.studyHabitTags.length > 0 ? (
-                                                                            member.studyHabitTags.map((tag: string, index: number) => (
-                                                                                <span key={index} className="member-tag">
-                                                                                    {formatEnum(tag)}
-                                                                                </span>
-                                                                            ))
-                                                                        ) : (
-                                                                            "No study tags specified."
-                                                                        )}
-                                                                    </p>
-                                                                </>
+                                                    {studyGroup.subject ? (
+                                                        <><div className="bio-section">
+                                                            <div className="bio-header">
+                                                                <span className="bio-icon">📓</span>
+                                                                <span>Subject</span>
                                                             </div>
-                                                        ))
-                                                    ) : (
-                                                        <p>No members yet.</p>
-                                                    )}
+                                                            <p className="bio-text">
+                                                                {studyGroup.subject}
+                                                            </p>
+                                                        </div>
+                                                        </>
+                                                    ) : null}
+
+
+
+                                                    <div className="public-group-info">
+                                                        <h3>Members</h3>
+
+                                                        <div className="public-member-cards">
+                                                            {studyGroup.users && studyGroup.users.length > 0 ? (
+                                                                studyGroup.users.map((member: any, index: number) => (
+                                                                    <div key={index} className="public-member-card" onClick={() => setSelectedMember({ id: member.id })}>
+                                                                        <div className="public-member-card-top">
+                                                                            <h1>{member.name}</h1>
+                                                                        <div className="public-member-card-top-left" >
+                                                                            <img
+                                                                                src={member.profilePic || genericUserPfp}
+                                                                                alt={`${member.firstName} ${member.lastName}`}
+                                                                                className="public-member-pic"
+                                                                            />
+                                                                        </div>
+                                                                        <div className="public-member-card-top-right">
+                                                                            <h1>{member.firstName} {member.lastName} </h1>
+                                                                            <h2>@{member.username}</h2>
+                                                                        </div>
+                                                                    </div>
+                                                                    <>
+                                                                        {/* <p><span className="bold-first-word">Study Tags: <br></br></span></p> */}
+                                                                        <p>
+                                                                            {member.studyHabitTags.length > 0 ? (
+                                                                                member.studyHabitTags.map((tag: string, index: number) => (
+                                                                                    <span key={index} className={`member tag ${tag}`}>
+                                                                                        {formatEnum(tag)}
+                                                                                    </span>
+                                                                                ))
+                                                                            ) : (
+                                                                                "No study tags specified."
+                                                                            )}
+                                                                        </p>
+                                                                    </>
+                                                                </div>
+                                                            ))
+                                                        ) : (
+                                                            <p>No members yet.</p>
+                                                        )}
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    </div>
                                         <div className="public-action-buttons" >
                                             <button className={`match-button-status-${matchButton.buttonText.toLowerCase()}`}
                                                 disabled={matchButton.isButtonDisabled}
@@ -329,11 +337,17 @@ const PublicGroupProfile: React.FC = () => {
                 onClose={() => setShowInvitePanel(false)}
                 onConfirm={handleSendMessage}
                 targetName={
-                    studyGroup ? 
-                    studyGroup.name
-                    : ""
+                    studyGroup ?
+                        studyGroup.name
+                        : ""
                 }
             />
+            {selectedMember && (
+                <PopupProfile
+                    id={selectedMember.id}
+                    onClose={() => setSelectedMember(null)}
+                />
+            )}
         </div>
     );
 };

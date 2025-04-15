@@ -187,7 +187,8 @@ const PublicProfile: React.FC = () => {
             <div className="public-profile-container">
                 {notFound ? (
                     <div className="loading-container">
-                        <h1>404 Not Found</h1>
+                        <h1>404</h1>
+                        <p>Page Not Found</p>
                     </div>
                 ) : (<>
                     {isLoading ? (
