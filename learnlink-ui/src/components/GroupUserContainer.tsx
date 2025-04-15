@@ -49,7 +49,7 @@ const GroupUserContainer = ({
      * It is also designed to support updating and removing users from the group.
      */
   return (
-    <div>
+    <div >
 
       {/* Popup Mode */}
       {isPopup ? (

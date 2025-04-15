@@ -9,9 +9,9 @@ interface PlusButtonProps {
     studyGroupId: number | null;
     selectedChatId: number | null;
     onSendButtonMessage: (buttonData: { action: string; studyGroupId?: number; label: string }) => void; // 👈 Pass this function from Messaging.tsx
-}
+  }
 
-export default function PlusButton({ onSelect, studyGroupId, selectedChatId, onSendButtonMessage }: PlusButtonProps) {
+export default function PlusButton({ onSelect, studyGroupId, selectedChatId, onSendButtonMessage}: PlusButtonProps) {
     const [isOpen, setIsOpen] = useState(false);
     const [calendarModalOpen, setCalendarModalOpen] = useState(false);
     const [calendarEventURL, setCalendarEventURL] = useState<string | null>(null);
@@ -102,8 +102,8 @@ export default function PlusButton({ onSelect, studyGroupId, selectedChatId, onS
 
 
   return (
-    <div className="plus-button-container">
-      <button className="plus-button" onClick={() => setIsOpen(!isOpen)}>
+    <div className="plus-button-container"  data-testid="plus-button-c" >
+      <button className="plus-button" onClick={() => setIsOpen(!isOpen)} data-testid="plus-button" aria-label="Open menu">
         <Plus size={30} color="White" />
       </button>
       <div className={`plus-menu ${isOpen ? "open" : ""}`}>
