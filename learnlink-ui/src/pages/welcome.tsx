@@ -75,7 +75,7 @@ function Welcome() {
                 <div className="aboutSection">
                     <h2>Meet the Team</h2>
                     <ul>
-                        <li><a href="https://linkedin.com/in/your-linkedin" target="_blank" rel="noopener noreferrer">Natalie Crawford</a></li>
+                        <li><a href="https://www.linkedin.com/in/natalie-crawford-b85137221/" target="_blank" rel="noopener noreferrer">Natalie Crawford</a></li>
                         {/* Add teammates here */}
                     </ul>
                 </div>
