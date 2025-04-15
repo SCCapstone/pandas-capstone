@@ -1459,6 +1459,7 @@ const Messaging: React.FC = () => {
               text={alert.alertText || ''}
               severity={alert.alertSeverity || 'info' as "error" | "warning" | "info" | "success"}
               onClose={() => setAlerts(prevAlerts => prevAlerts.filter(a => a.id !== alert.id))}
+              data-testid="custom-alert" 
             />
           ))}
         </div>
@@ -1719,7 +1720,7 @@ const Messaging: React.FC = () => {
                   <div className="NoChatSelected">Please select a chat</div> // Show message if no chat is selected
                 )}
               </div>
-              <div className="ChatInput">
+              <div className="ChatInput" data-testid="chat-input">
 
                 <PlusButtonProps
                   onSelect={handlePlusSelect}
