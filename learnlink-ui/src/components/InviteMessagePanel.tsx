@@ -8,9 +8,10 @@ interface InviteMessagePanelProps {
   open: boolean;
   onClose: () => void;
   onConfirm: (message: string) => void;
+  targetName: string;
 }
 
-const InviteMessagePanel: React.FC<InviteMessagePanelProps> = ({ open, onClose, onConfirm }) => {
+const InviteMessagePanel: React.FC<InviteMessagePanelProps> = ({ open, onClose, onConfirm, targetName }) => {
   const [message, setMessage] = useState("");
 
   const handleConfirm = () => {
@@ -26,14 +27,14 @@ const InviteMessagePanel: React.FC<InviteMessagePanelProps> = ({ open, onClose, 
       maxWidth="md" // Adjust this to "lg" if you need it even bigger
       sx={{ "& .MuiDialog-paper": { width: "400px", height: "auto" } }}
     >
-      <DialogTitle>Send a message</DialogTitle>
+      <DialogTitle>Send a message to {targetName}</DialogTitle>
       <DialogContent>
         <TextareaAutosize
           minRows={3}
           placeholder="Write a message..."
           value={message}
           onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setMessage(e.target.value)}
-          style={{ width: "85%", padding: "20px", fontSize: "16px", fontFamily:'Inter' }}
+          style={{ width: "85%", padding: "20px", fontSize: "16px", fontFamily:'Inter', minWidth: "85%",maxWidth:"300px", maxHeight: "50vh" }}
         />
       </DialogContent>
       <DialogActions sx={{ justifyContent: "space-between", marginLeft: "15px", marginRight: "15px", marginBottom: "10px" }}>

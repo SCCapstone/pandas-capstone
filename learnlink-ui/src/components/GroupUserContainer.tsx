@@ -42,11 +42,14 @@ const GroupUserContainer = ({
     isPopup: boolean; 
     }) => {
 
-      useEffect(()=>{
-        console.log("group id:::: ", groupId);
-      }, []);
+    /**
+     * The GroupUserContainer component is a wrapper component that conditionally renders a list of users in a study group,
+     * either as a popup or as an inline section depending on the isPopup prop.
+     * It leverages a child component called GroupUserList to actually display the users. 
+     * It is also designed to support updating and removing users from the group.
+     */
   return (
-    <div>
+    <div >
 
       {/* Popup Mode */}
       {isPopup ? (

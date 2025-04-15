@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField } from "@mui/material";
-
+import CustomAlert from '../components/CustomAlert';
+import './CalendarEventPopup.css'
 
 interface CalendarEventPopupProps {
   open: boolean;
@@ -16,6 +17,9 @@ interface CalendarEventPopupProps {
 }
 
 const CalendarEventPopup: React.FC<CalendarEventPopupProps> = ({ open, onClose, onSubmit }) => {
+  const [alerts, setAlerts] = useState<{ id: number; alertText: string; alertSeverity: "error" | "warning" | "info" | "success"; visible: boolean }[]>([]);
+    const alertVisible = alerts.some(alert => alert.visible);
+  
   // Function to get today's date in YYYY-MM-DD format
   const getTodayDate = () => {
     const today = new Date();
@@ -58,16 +62,82 @@ const CalendarEventPopup: React.FC<CalendarEventPopupProps> = ({ open, onClose, 
     const { title, date, startTime, endTime, location } = eventData;
 
     if (!title || !date || !startTime || !endTime || !location) {
-      alert("Please fill out all required fields.");
+      setAlerts((prevAlerts) => [
+        ...prevAlerts,
+        { id: Date.now(), alertText: "Please fill out all required fields.", alertSeverity: "error", visible: true },
+      ]);
+      return;
+    }
+      // Validate date format
+  const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+  if (!dateRegex.test(date) || isNaN(new Date(date).getTime())) {
+    setAlerts((prevAlerts) => [
+      ...prevAlerts,
+      {
+        id: Date.now(),
+        alertText: "Invalid date format. Please use YYYY-MM-DD.",
+        alertSeverity: "error",
+        visible: true,
+      },
+    ]);
+    return;
+  }
+
+  // Validate time format
+  const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
+  if (!timeRegex.test(startTime) || !timeRegex.test(endTime)) {
+    setAlerts((prevAlerts) => [
+      ...prevAlerts,
+      {
+        id: Date.now(),
+        alertText: "Invalid time format. Please use HH:MM in 24-hour format.",
+        alertSeverity: "error",
+        visible: true,
+      },
+    ]);
+    return;
+  }
+
+    const today = getTodayDate();
+    if (date < today) {
+      setAlerts((prevAlerts) => [
+        ...prevAlerts,
+        { id: Date.now(), alertText: "Event date cannot be in the past.", alertSeverity: "error", visible: true },
+      ]);      
+      return
+    }
+
+    if (startTime >= endTime) {
+      setAlerts((prevAlerts) => [
+        ...prevAlerts,
+        {
+          id: Date.now(),
+          alertText: "End time must be after start time.",
+          alertSeverity: "error",
+          visible: true,
+        },
+      ]);
       return;
     }
 
     onSubmit(eventData);
+    setAlerts([])
     onClose(); // Close the modal after submitting
   };
 
   return (
     <Dialog open={open} onClose={onClose}>
+      <div className="diaglog-err">
+        {alerts.map(alert => (
+        <CustomAlert
+          key={alert.id}
+          text={alert.alertText || ''}
+          severity={alert.alertSeverity || 'info' as "error" | "warning" | "info" | "success"}
+          onClose={() => setAlerts(prevAlerts => prevAlerts.filter(a => a.id !== alert.id))}
+        />
+      ))}
+      </div>
+      
       <DialogTitle>Create Calendar Event</DialogTitle>
       <DialogContent>
         <TextField

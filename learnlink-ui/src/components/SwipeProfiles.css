@@ -1,5 +1,36 @@
-.whole-swipe-component {
-  overflow-y: scroll;
+
+.group-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+
+}
+
+
+.swipe-profile-card {
+  flex:1;
+  width: 100%;
+  padding-left: 60px;
+  padding-right: 60px;
+  padding-top: 40px;
+  padding-bottom: 20px;
+
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.09);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  box-sizing: border-box;
+  overflow-y: auto; /* or remove this line */
+
+}
+
+.whole-component {
+  justify-content: center;
+  align-items: center;
 }
 .swipe-main-container {
     width: 100%;
@@ -7,7 +38,7 @@
     flex-direction: row;
     justify-content: flex-start;
     gap: 3rem;
-    overflow-y: scroll;
+    /* overflow-y: scroll; */
     /* background-color: tomato; */
 }
 
@@ -28,10 +59,10 @@
   
   .swipe-main-container p {
     padding-left: 0;
-    font-size: 1.25rem;
+    /* font-size: 1.25rem;
     font-weight: 300;
     text-align: left;
-    color: black;
+    color: black; */
   
   }
 
@@ -117,7 +148,11 @@
     cursor: pointer;
     font-size: 15px;
     height: 50px;
-    margin-bottom: 20px;
+    /* margin-bottom: 20px; */
+}
+.swipe-action-buttons button, .swipe-buttons-container button {
+      margin-bottom: 20px;
+
 }
 
 .swipe-info {
@@ -155,7 +190,7 @@
   flex-direction: column;
   justify-content: flex-start;
   gap: 1rem;
-  overflow-y: scroll;
+  /* overflow-y: scroll; */
   margin-bottom: 20px;
 }
 
@@ -165,7 +200,7 @@
   flex-direction: row;
   justify-content: flex-start;
   gap: 3rem;
-  overflow-y: scroll;
+  /* overflow-y: scroll; */
 }
 
 .group-left {
@@ -183,7 +218,7 @@
   flex-direction: column;
   justify-content: flex-start;
   gap: 1rem;
-  overflow-y: scroll;
+  /* overflow-y: scroll; */
 }
 
 .study-group-title {
@@ -297,8 +332,8 @@
 
 .match-header-buttons {
   margin-top: 20px;
-  margin-bottom: 20px;
-  padding-bottom: 10px;
+  /* margin-bottom: 20px; */
+  padding-bottom: 20px;
   display: flex;
   justify-content: space-between;
   gap: 20px;
@@ -328,7 +363,6 @@
     width: 100%;
     align-items: center;
     flex-direction: column;
-    text-align: center;
   }
 
   .profile-pic {
@@ -339,8 +373,11 @@
   .profile-info {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    text-align: center;
+    text-align: left;
+  }
+
+  .username {
+    text-align: left;
   }
 
   .bio {
@@ -348,7 +385,6 @@
     align-items: center;
     flex-wrap: wrap;
     text-align: left;
-    justify-content: center;
   }
 
   .bio h3 {

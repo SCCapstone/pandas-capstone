@@ -15,12 +15,21 @@ import NotificationDropdown from './NotificationDropdown';
 import JoinRequestNotifs from './JoinRequestsContext';
 import JoinRequestsNotificationBadge from './JoinRequestsNotificationBadge';
 import { getLoggedInUserId } from '../utils/auth';
+import { useJoinRequest } from '../components/JoinRequestsContext'; // Correct path to the file
+
+
 
 
 
 const animatedComponents = makeAnimated();
 // const location = useLocation(); // ✅ Correct way to use location in React
 
+
+interface NavbarIconProps {
+  'data-testid': string;
+  className?: string;
+  onClick: () => void;
+}
 
 interface User {
   id: number;
@@ -60,7 +69,7 @@ const Navbar: React.FC = () => {
   const [courseInputValue, setCourseInputValue] = useState(""); // State to track the input value
   const [searchParams, setSearchParams] = useSearchParams();
   const [isNotificationDropdownVisible, setIsNotificationDropdownVisible] = useState(false);
-
+  const { joinRequestCount } = useJoinRequest();
 
 
   const { grade, gender, studyHabitTags } = useEnums();
@@ -322,16 +331,13 @@ const Navbar: React.FC = () => {
       <FaBars className="hamburger" onClick={() => setIsNavOpen(true)} />
 
       {/* Normal Navigation Links*/}
-      <nav className="nav-links">
+      <nav className="nav-links" data-testid="nav-links">
         <a href="/swiping">Match</a>
         <a href="/profile">Profile</a>
-        <div className='link-w-notif'>         
+        <div className='link-w-notif'>
           <a href="/network">Network</a>
-          <JoinRequestNotifs currentUserId={getLoggedInUserId()} >
-
-          <JoinRequestsNotificationBadge />
-          </JoinRequestNotifs>
-          </div>
+            <JoinRequestsNotificationBadge />
+        </div>
         <a href="/messaging" onClick={handleMessaging}>Messaging</a>
         <a href="/groups" onClick={handleGroups}>Groups</a>
         <a href="/resources/studyTips">Resources</a>
@@ -364,7 +370,7 @@ const Navbar: React.FC = () => {
 
 
       {/* Full-Screen Menu */}
-      <div className={`fullscreen-menu ${isNavOpen ? "show" : ""}`}>
+      <div className={`fullscreen-menu ${isNavOpen ? "show" : ""}`}  data-testid="mobile-menu">
         <FaTimes className="close-icon" onClick={() => setIsNavOpen(false)} />
         <a href="/swiping">Match</a>
         <a href="/profile">Profile</a>
@@ -382,8 +388,8 @@ const Navbar: React.FC = () => {
       {isNotificationDropdownVisible && (
         <NotificationDropdown setNotifCount={setNotifCount} /> // Pass setNotifCount as a prop
       )}
-      <FaCog className="icon" onClick={handleSettings} />
-      <FaUserCircle className="icon profile-icon" onClick={handleAccountDetails} />
+      <FaCog className="icon" onClick={handleSettings}   data-testid="settings-icon"/>
+      <FaUserCircle className="icon profile-icon" onClick={handleAccountDetails} data-testid="user-icon" />
     </div>
     </header>
   );

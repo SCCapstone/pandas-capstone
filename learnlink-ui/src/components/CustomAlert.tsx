@@ -7,7 +7,6 @@ interface CustomAlertProps {
     text: string;
     severity: "error" | "warning" | "info" | "success";
     onClose: () => void;
-
 }
 
 const CustomAlert: React.FC<CustomAlertProps> = ({ text, severity, onClose }) => {
@@ -16,7 +15,7 @@ const CustomAlert: React.FC<CustomAlertProps> = ({ text, severity, onClose }) =>
     if (!visible) return null;
 
     return (
-        <Alert className={`customAlert ${severity}`} severity={severity}>
+        <Alert className={`customAlert ${severity}`} severity={severity} data-testid="custom-alert" >
             <div className='alertInfo'>
                 <h1>
                     {severity === "error" ? "Error: " : severity === "warning" ? "Warning: " : severity === "info" ? "Info: " : "Success: "}

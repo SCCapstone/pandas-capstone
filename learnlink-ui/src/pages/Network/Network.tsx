@@ -76,7 +76,7 @@ const Network = () => {
             onClick={() => handleTabChange("receivedRequests")}
           >
             Requests Received
-            <JoinRequestsNotificationBadge showDotOnly={true} />
+            <JoinRequestsNotificationBadge showDotOnly={true}/>
           </button>
         </div>
 

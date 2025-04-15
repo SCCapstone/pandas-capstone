@@ -22,11 +22,28 @@ const UpdateEmail: React.FC = () => {
     setNewEmail(e.target.value);
   };
 
+  const validateEmail = (): boolean => {
+  
+    if (oldEmail === newEmail) {
+      setAlerts((prevAlerts) => [
+        ...prevAlerts,
+        { id: Date.now(), alertText: 'New email must be different than old email', alertSeverity: "error", visible: true },
+    ]);
+      return false;
+    }
+  
+    return true;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     setLoading(true);
     setError('');
+
+    // if (!validateEmail()) {
+    //   return;
+    // }
 
     try {
       const response = await fetch(`${REACT_APP_API_URL}/api/update-email`, {
@@ -42,19 +59,72 @@ const UpdateEmail: React.FC = () => {
       });
 
       const data = await response.json();
+      console.log(data.err)
 
       if (!response.ok) {
-        setError(data.error || 'An error occurred');
-        setAlerts((prevAlerts) => [
-          ...prevAlerts,
-          { id: Date.now(), alertText: 'An error occurred', alertSeverity: "error", visible: true },
-      ]);
-      } else {
-        // Successfully updated email, handle success (e.g., navigate to another page or show a success message)
-        // alert('Email updated successfully');
-        setAlerts((prevAlerts) => [
-          ...prevAlerts,
-          { id: Date.now(), alertText: 'Email updated successfully', alertSeverity: "success", visible: true },
+        switch (response.status) {
+
+          case 451:
+            setAlerts((prevAlerts) => [
+              ...prevAlerts,
+              {
+                id: Date.now(),
+                alertText: data.error || "Something went wrong.",
+                alertSeverity: "error",
+                visible: true,
+              },
+            ]);
+            break;
+
+          case 452:
+            setAlerts((prevAlerts) => [
+              ...prevAlerts,
+              {
+                id: Date.now(),
+                alertText: data.error || "Something went wrong.",
+                alertSeverity: "warning",
+                visible: true,
+              },
+            ]);
+            break;
+
+          case 453:
+            setAlerts((prevAlerts) => [
+              ...prevAlerts,
+              {
+                id: Date.now(),
+                alertText: data.error || "Something went wrong.",
+                alertSeverity: "error",
+                visible: true,
+              },
+            ]);
+            break;
+
+          case 454:
+            setAlerts((prevAlerts) => [
+              ...prevAlerts,
+              {
+                id: Date.now(),
+                alertText: data.error || "Something went wrong.",
+                alertSeverity: "error",
+                visible: true,
+              },
+            ]);
+            break;
+
+          default:
+            setError(data.error || 'An error occurred');
+            setAlerts((prevAlerts) => [
+              ...prevAlerts,
+              { id: Date.now(), alertText: 'An error occurred', alertSeverity: "error", visible: true },
+            ]);
+        }
+    } else {
+      // Successfully updated email, handle success (e.g., navigate to another page or show a success message)
+      // alert('Email updated successfully');
+      setAlerts((prevAlerts) => [
+        ...prevAlerts,
+        { id: Date.now(), alertText: 'Email updated successfully', alertSeverity: "success", visible: true },
       ]);
       }
     } catch (err) {

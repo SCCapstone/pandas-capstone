@@ -81,7 +81,6 @@ const StudyGroupInfo =(
   const [imagePreview, setImagePreview] = useState(null);
   const [alerts, setAlerts] = useState<{ id: number; alertText: string; alertSeverity: "error" | "warning" | "info" | "success"; visible: boolean }[]>([]);
   const alertVisible = alerts.some(alert => alert.visible);
-
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
   const [currentGroupId, setCurrentGroupId] =  useState<number | null>(null);
   const [selectedGroupUsers, setSelectedGroupUsers] = useState<User[] | null>(null);
@@ -89,8 +88,20 @@ const StudyGroupInfo =(
   const navigate = useNavigate();
   
 
+  /**
+   * The StudyGroupInfo component displays details about a specific study group including its name, 
+   * subject, description, profile picture, and list of members. 
+   * It also supports toggling to an edit mode using the EditStudyGroup component, displaying alerts, 
+   * and providing navigation to the group’s chat and availability pages. 
+   * It fetches group data from an API on mount and manages both view and edit modes, depending on props and state.
+   */
+
   const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
 
+  /**
+   * Fetches study group details and enum options (e.g. tags) from the server when the component 
+   * mounts or when chatID or isEdit changes.
+   */
   useEffect(() => {
     const fetchStudyGroup = async () => {
       try {
@@ -103,18 +114,21 @@ const StudyGroupInfo =(
           ]);
           return;
         }
+
+        // Fetch available study habit tags
         const enumsResponse = await fetch(`${REACT_APP_API_URL}/api/enums`);
         const enumsData = await enumsResponse.json();
         setEnumOptions({
           studyHabitTags: enumsData.studyHabitTags,
         });
 
+        // Fetch group data by chat ID
         const response = await axios.get(
           `${REACT_APP_API_URL}/api/study-groups/chat/${chatID}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
 
-        // Set the form fields with the existing study group values
+        // Set the form fields with the data received
         const data = response.data;
         setStudyGroup(data);
         setName(data.name);
@@ -133,17 +147,21 @@ const StudyGroupInfo =(
     };
 
   // Fetch the study group details when the component is mounted
-
     fetchStudyGroup();
   }, [chatID, isEdit]);
 
  
-  
+  /**
+   * Enables the edit mode by setting isEdit to true.
+   */
   const handleEdit = () => {
     setIsEdit(true);
   };
-  
 
+
+  /**
+   * Disables the edit mode by setting isEdit to false.
+   */
   const handleClose = () => {
     setIsEdit(false);
   };
@@ -193,7 +211,7 @@ const StudyGroupInfo =(
             }}
         >Chat</button>
         <Link to={`/studyGroup/${groupId}/schedule`}>
-        <button className='Availability-Button'> Availability </button>
+        <button className='Availability-Button' data-testid = 'avail-button'> Availability </button>
       </Link>
         <button className='Edit-Button' onClick={handleEdit}> Edit </button>
 

@@ -19,5 +19,11 @@ module.exports = {
   transformIgnorePatterns: [
     '/node_modules/(?!axios)'
   ],
-  extensionsToTreatAsEsm: ['.ts', '.tsx']
+  extensionsToTreatAsEsm: ['.ts', '.tsx'],
+  // Add these worker-related configurations
+  workerIdleMemoryLimit: '500MB',      // How much memory a worker can consume before being restarted
+  maxWorkers: '50%',                   // Use 50% of available CPU cores
+  detectOpenHandles: true,             // Helps identify async operations that weren't stopped
+  forceExit: true,                     // Force Jest to exit after tests complete
+  testTimeout: 30000,                  // Increase timeout if tests are slow
 };

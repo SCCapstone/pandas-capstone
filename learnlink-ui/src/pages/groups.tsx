@@ -16,6 +16,7 @@ import CustomAlert from '../components/CustomAlert';
 import { unescape } from 'querystring';
 import { useNavigate } from "react-router-dom";
 import { handleSendSystemMessage,updateChatTimestamp} from "../utils/messageUtils";
+import { group } from 'console';
 
 
   interface User {
@@ -58,14 +59,12 @@ import { handleSendSystemMessage,updateChatTimestamp} from "../utils/messageUtil
     chatId: number;
     liked: boolean;
     system: boolean;
-    
   }
 
   const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
 
 
   const Groups: React.FC = () => {
-
     const [groups, setGroups] = useState<Group[]>([]);
     const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
     const [currentGroupId, setCurrentGroupId] =  useState<number | null>(null);
@@ -73,28 +72,36 @@ import { handleSendSystemMessage,updateChatTimestamp} from "../utils/messageUtil
     const [currentUserId, setCurrentUserId] = useState<number | null>(null);
     const [loadingGroups, setLoadingGroups] = useState<boolean>(true);
     const [groupNames, setGroupNames] = useState<{ [key: number]: string }>({});
-
     const [alerts, setAlerts] = useState<{ id: number; alertText: string; alertSeverity: "error" | "warning" | "info" | "success"; visible: boolean }[]>([]);
     const alertVisible = alerts.some(alert => alert.visible);
-  
     const [chats, setChats] = useState<Chat[]>([]);
     const [isUserPanelVisible, setIsUserPanelVisible] = useState(false);
     const [isPanelVisible, setIsPanelVisible] = useState(false);
     const [selectedGroupUsers, setSelectedGroupUsers] = useState<User[] | null>(null);
     const [isEditMode, setIsEditMode] = useState<boolean>(false);
     const hasStudyGroup = Boolean(selectedGroup);
-    const searchParams = new URLSearchParams(window.location.search);
+    const [searchParams] = useSearchParams();
     const selectedGroupId = searchParams.get("groupId");
     const tab = searchParams.get("tab");
     const navigate = useNavigate();
 
+
+    /********** USE EFFECTS **********/
+
+
+
+
+    /*
+      On initial render, fetch the current group, current user, and all study groups from the API. 
+      Sets up various UI states based on the data.
+    */
 
     useEffect(() => {
       const fetchGroups = async () => {
         const token = localStorage.getItem('token');
 
         console.log("groups selected group id: ",selectedGroupId);
-        
+        // Fetch currently selected group info
         const getCurrentGroup = async () => {
           if (!selectedGroupId){
             return;
@@ -116,7 +123,7 @@ import { handleSendSystemMessage,updateChatTimestamp} from "../utils/messageUtil
         }
 
         await getCurrentGroup();
-      
+        // Fetch current logged-in user
         const getCurrentUser = async () => {
             if (token) {
               try {
@@ -131,6 +138,8 @@ import { handleSendSystemMessage,updateChatTimestamp} from "../utils/messageUtil
           }
         await getCurrentUser();
         console.log("currentUserId: ", currentUserId);
+
+        // Fetch all study groups
         const getGroups = async () => {
             if (token) {
                 try {
@@ -151,31 +160,49 @@ import { handleSendSystemMessage,updateChatTimestamp} from "../utils/messageUtil
         console.log("current groups complete");
 
         // Clear search params
-        navigate(window.location.pathname, { replace: true });
-        };
-        fetchGroups();
-        console.log("fetch groups complete");
-      }, []);
-
-      useEffect(()=> {
-        const printEdit = async() => {
-          console.log("PRINT EDIT",isEditMode)
-        }
-        printEdit();
-      }, [isEditMode])
-
-    
+        navigate('/groups', { replace: true });
+      };
+      fetchGroups();
+      console.log("fetch groups complete");
+    }, []);
 
 
-      useEffect(() => {
-        console.log("Updated selected group users:", selectedGroupUsers);
-      }, [selectedGroupUsers]);
+    /*
+      Logs whether edit mode is enabled when isEditMode changes.
+    */
+
+    useEffect(()=> {
+      const printEdit = async() => {
+        console.log("PRINT EDIT",isEditMode)
+      }
+      printEdit();
+    }, [isEditMode])
+
+  
+    /*
+      Logs updated user list when selectedGroupUsers changes.
+    */
+
+    useEffect(() => {
+      console.log("Updated selected group users:", selectedGroupUsers);
+    }, [selectedGroupUsers]);
 
 
+
+    /********** FUNCTIONS **********/
+
+    /*
+      Removes a user from selectedGroupUsers state.  
+    */
 
     const updateUsers = (userId: number) => {
-    setSelectedGroupUsers(prevUsers => (prevUsers || []).filter(user => user.id !== userId));
+      setSelectedGroupUsers(prevUsers => (prevUsers || []).filter(user => user.id !== userId));
     };
+
+
+    /*
+      Updates the profile picture for a specific group (matched by chatID).
+    */
 
     const updatePFP = (chatId: number, newPFP: string) => {
       setGroups(prev =>
@@ -186,7 +213,9 @@ import { handleSendSystemMessage,updateChatTimestamp} from "../utils/messageUtil
     };
 
 
-    
+    /*
+      Updates the name of a group chat.
+    */
 
     const updateChatName = (chatId: number, newName: string) => {
       setGroups(prev =>
@@ -196,50 +225,76 @@ import { handleSendSystemMessage,updateChatTimestamp} from "../utils/messageUtil
       );
     };
 
+
+    /**
+     * Removes a user from a study group. 
+     * Updates group state and UI accordingly. 
+     * Also sends a system message if applicable.
+     * @param userId 
+     * @param groupId 
+     * @returns 
+     */
+    
     const removeUser = async (userId: number, groupId: number | null) => {
       if (!groupId) {
-          console.error('Group ID is missing.');
-          return;
+        console.error('Group ID is missing.');
+        return;
+      }
+      if (!userId) {
+        console.error('User ID is missing.');
+        return;
       }
       try {
-          const response = await axios.delete(`${REACT_APP_API_URL}/api/study-groups/${groupId}/users/${userId}`);
-          
-          if (response.status === 200) {
-              // Update selectedGroupUsers state
-              setSelectedGroupUsers(prevUsers => (prevUsers || []).filter(user => user.id !== userId));
-  
-              
-  
-              // Send a system message when a user is removed
-              const removedUser = selectedGroupUsers?.find(user => user.id === userId);
-              if (removedUser ) {
-                  let mess = userId === currentUserId
-                      ? `${removedUser.firstName} ${removedUser.lastName}  left the group.`
-                      : `${removedUser.firstName} ${removedUser.lastName}  was removed from the group.`;
-                  
-                  handleSendSystemMessage(mess, selectedGroup?.chatID);
-
-                  updateChatTimestamp(selectedGroup?.chatID);
-              
-              }
-              // ✅ Update the groups UI if the current user left the group
-              if (userId === currentUserId) {
-                setGroups(prevGroups => prevGroups.filter(group => group.id !== groupId));
-
-                // Optionally deselect the group if it’s open
-                if (selectedGroup?.id === groupId) {
-                  setSelectedGroup(null);
-                }
-              }
-          } else {
-              console.error('Failed to delete the user.');
+        const response = await axios.delete(`${REACT_APP_API_URL}/api/study-groups/${groupId}/users/${userId}`);
+    
+        if (response.status === 200) {
+          /// Remove from UI
+          setSelectedGroupUsers(prevUsers => (prevUsers || []).filter(user => user.id !== userId));
+    
+          // If current user left
+          if (userId === currentUserId) {
+            setGroups(prevGroups => prevGroups.filter(group => group.id !== groupId));
+    
+            // Optionally deselect the group if it’s open
+            if (selectedGroup?.id === groupId) {
+              setSelectedGroup(null);
+            }
           }
+    
+          // Verify if group still exists
+          const groupCheck = await axios.get(`${REACT_APP_API_URL}/api/study-groups/${groupId}`).catch(() => null);
+          
+          
+          if (!(groupCheck?.status === 200)) {
+            setGroups(prevGroups => prevGroups.filter(group => group.id !== groupId));
+    
+            // Optionally deselect the group if it’s open
+            if (selectedGroup?.id === groupId) {
+              setSelectedGroup(null);
+            }
+          }
+
+          // If group is still valid, send system message
+          if (groupCheck?.status === 200) {
+            const removedUser = selectedGroupUsers?.find(user => user.id === userId);
+            if (removedUser) {
+              let mess =
+                userId === currentUserId
+                  ? `${removedUser.firstName} ${removedUser.lastName} left the group.`
+                  : `${removedUser.firstName} ${removedUser.lastName} was removed from the group.`;
+    
+              handleSendSystemMessage(mess, selectedGroup?.chatID);
+              updateChatTimestamp(selectedGroup?.chatID);
+            }
+          }
+        } else {
+          console.error('Failed to delete the user.');
+        }
       } catch (error) {
-          console.error('Error deleting user:', error);
+        console.error('Error deleting user:', error);
       }
-  };
-  
-  
+    };
+    
     return (
         <div className="Groups">
           <div>
@@ -304,7 +359,9 @@ import { handleSendSystemMessage,updateChatTimestamp} from "../utils/messageUtil
               {/* Display message if no group is selected */}
               {!selectedGroup ? (
                 <div className="NoGroupSelected">
-                  Please select a group
+                  {groups.length === 0
+                    ? "No groups found. Go to the Match page to join one or chat with someone to create one."
+                    : "Please select a group"}
                 </div>
               ) : (
                 selectedGroupUsers && (
@@ -332,3 +389,4 @@ import { handleSendSystemMessage,updateChatTimestamp} from "../utils/messageUtil
 };
 
 export default Groups;
+

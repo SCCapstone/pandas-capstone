@@ -92,43 +92,45 @@ const EditStudyGroup =(
 
   const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
 
-
-
-  // Fetch the study group details when the component is mounted
+  // Fetches and loads the study group data from the backend when the component is mounted or when chatID changes.
   useEffect(() => {
     const fetchStudyGroup = async () => {
       try {
         const token = localStorage.getItem('token');
         if (!token) {
           // alert('You need to be logged in to edit the study group.');
+          // Show alert if user is not logged in
           setAlerts((prevAlerts) => [
             ...prevAlerts,
             { id: Date.now(), alertText: 'You need to be logged in to edit the study group.', alertSeverity: "error", visible: true },
           ]);
           return;
         }
+        // Fetch enum values (e.g., study habits) from backend
         const enumsResponse = await fetch(`${REACT_APP_API_URL}/api/enums`);
         const enumsData = await enumsResponse.json();
         setEnumOptions({
           studyHabitTags: enumsData.studyHabitTags,
         });
 
+        // Fetch enum values (e.g., study habits) from backend
         const response = await axios.get(
           `${REACT_APP_API_URL}/api/study-groups/chat/${chatID}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
 
-        // Set the form fields with the existing study group values
+        // Pre-fill form fields with existing study group data
         const data = response.data;
         console.log(data)
         setStudyGroup(data);
-        setName(data.name);
+        setName(data.name); 
         setImagePreview(data.profilePic? data.profilePic : "https://learnlink-pfps.s3.us-east-1.amazonaws.com/profile-pictures/circle_busts-in-silhouette.png")
         setDescription(data.description);
         setSubject(data.subject);
         setIdealMatchFactor(data.ideal_match_factor ? { value: data.ideal_match_factor, label: formatEnum(data.ideal_match_factor) } : null);
         setProfilePic(data.profilePic);
       } catch (error) {
+        // Show error alert
         console.error('Error fetching study group:', error);
         // alert('Failed to load study group details.');
         setAlerts((prevAlerts) => [
@@ -141,18 +143,23 @@ const EditStudyGroup =(
     fetchStudyGroup();
   }, [chatID]);
 
+
+  // Logs the updated imagePreview URL to the console every time it changes.
   useEffect(() => {
     console.log('Updated imagePreview:', imagePreview);
   }, [imagePreview]);  // Only run this effect when imagePreview changes
 
 
+  // Handles the selection of an emoji avatar. Sets the image preview and closes the emoji modal.
   const handleEmojiSelect = (emoji: string, URL:string) => {
     console.log("PASSED URL", URL)
-    setImagePreview(URL)  
-    setPfpModalOpen(false); // Close modal after selection
+    setImagePreview(URL)  // Set the chosen image URL
+    setPfpModalOpen(false); // Close the profile picture modal
   };
 
-  // Handle form submission to save the changes
+
+  // Called when the user saves the form
+  // Validates and saves updated study group information to the backend, then updates the UI accordingly.
   const handleSave = async () => {
     try {
       const token = localStorage.getItem('token');
@@ -165,10 +172,12 @@ const EditStudyGroup =(
         return;
       }
       
+      // Build the updated study group object
       const updatedStudyGroup = { name, description, subject, chatID, ideal_match_factor, profile_pic: imagePreview };
 
       console.log(updatedStudyGroup)
 
+      // Basic validation
       if (name==='' || name === null) {
         // alert('Please enter a study group name.');
         setAlerts((prevAlerts) => [
@@ -187,6 +196,7 @@ const EditStudyGroup =(
         return;
       }
 
+      // Submit updated study group to backend
       const response = await axios.put(
         `${REACT_APP_API_URL}/api/study-groups/chat/${chatID}`,
         updatedStudyGroup,
@@ -195,20 +205,24 @@ const EditStudyGroup =(
 
       console.log('Study group updated:', response.data);
       
+      // Update chat name and image if applicable
       updateChatName(chatID, name);
       if(imagePreview){
       updateChatName(chatID, imagePreview);
       }
 
+      // Notify parent or state that the group was updated
       onGroupUpdated(name, imagePreview);
 
 
+      // Show success alert
       setAlerts((prevAlerts) => [
         ...prevAlerts,
         { id: Date.now(), alertText: 'Study group updated', alertSeverity: "success", visible: true },
       ]);
       
       // alert('Study group updated successfully!');
+      // Close the modal or editing window
       onClose();
     } catch (error) {
       console.error('Error saving study group:', error);
@@ -220,36 +234,12 @@ const EditStudyGroup =(
     }
   };
 
-  const handleUpload = async () => {
-    console.log('Uploading image...'); // Debug log
-    setImageUrl(imagePreview)
-    if (!imageUrl) return;
-    console.log(imageUrl);
-  
-    const formData = new FormData();
-    formData.append('profilePic', imageUrl);
-    formData.append('chatID', chatID.toString());
-    const token = localStorage.getItem('token');
-    if (!token) {
-      console.error("No token found in localStorage");
-      return;
-    }
+
+  // Opens the profile picture selection modal when a user uploads an image.
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPfpModalOpen(true)
   };
   
-
-  // Handle form submission
-    
-    // Function to handle file selection
-  
-  
-    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-      setPfpModalOpen(true)
-    };
-  
-
-    
-
-
 
   if (!studyGroup) return <div>Loading...</div>; // Show loading message while fetching the study group data
 

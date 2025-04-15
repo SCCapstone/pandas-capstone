@@ -148,3 +148,8 @@ singleValue: (styles) => ({
 
   }),
 };
+
+
+export const standardizeCourseInput = (course: string): string => {
+  return course.trim().replace(/\s+/g, ' ').toUpperCase(); // Normalize spaces and make it uppercase
+};

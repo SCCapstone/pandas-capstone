@@ -11,8 +11,11 @@ type LoginInputs = {
     userName: string;
     userPassword: string;
 };
+interface LoginProps {
+    onLogin: (userId: number) => void; // This function will be passed from the parent to handle login
+  }
 
-const Login: React.FC = () => {
+const Login: React.FC<LoginProps> = ({ onLogin }) => {
     const navigate = useNavigate();
     const [username, setUsername] = useState<string>('');
     const [password, setPassword] = useState<string>('');
@@ -62,6 +65,8 @@ const Login: React.FC = () => {
             // Get the response body, which should contain a JWT or session data
             const data = await response.json();
             localStorage.setItem('token', data.token); // Store the JWT in localStorage
+            onLogin(data.userId)
+
 
             // Navigate to landing page after successful login
             navigate('/swiping'); 

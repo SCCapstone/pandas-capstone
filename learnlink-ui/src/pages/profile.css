@@ -38,7 +38,7 @@
   gap: 1rem; /* Similar to the padding between inputs in login form */
 }
 
-.profile-details {
+.profile-page-details {
   width: 100%;
   display: flex;
   flex-direction: row;
@@ -46,12 +46,12 @@
 }
 
 /* Profile header and title */
-.profile-header {
+.profile-page-header {
   text-align: left;
   padding: 1rem 0;
 }
 
-.profile-title {
+.profile-page-title {
   font-family: 'Inter';
   font-size: 64px; /* Match the font size from the login form */
   font-weight: normal;
@@ -59,7 +59,7 @@
   margin-bottom: 15px;
 }
 
-.profile-form {
+.profile-page-form {
   display: flex;
   flex-direction: column;
   gap: 1rem; /* Similar to the padding between inputs in login form */
@@ -67,7 +67,7 @@
 }
 
 /* Form styles */
-.profile-side {
+.profile-page-side {
   max-width: 50%;
   display: flex;
   flex-direction: column;
@@ -77,8 +77,8 @@
 }
 
 /* Label styling */
-.profile-side label,
-.profile-side textarea
+.profile-page-side label,
+.profile-page-side textarea
 {
   font-family: 'Inter';
   font-size: 16px; /* Match font size */
@@ -91,9 +91,9 @@
 }
 
 /* Input and textarea styling */
-.profile-side input,
-.profile-side textarea,
-.profile-side select {
+.profile-page-side input,
+.profile-page-side textarea,
+.profile-page-side select {
 
   font-size: 16px;
   color:#3B3C3D;
@@ -106,7 +106,7 @@
   box-sizing: border-box; /* Include padding and border in total height */
 }
 
-.profile-side select {
+.profile-page-side select {
   width: 100%;
   -webkit-appearance: none; /* Remove default browser style */
   -moz-appearance: none;
@@ -117,7 +117,7 @@
 }
 
 /* Profile picture section */
-.profile-picture {
+.profile-page-picture {
   flex: 0.5;
   display: flex;
   justify-content: center;
@@ -148,7 +148,7 @@
 }
 
 /* Profile buttons section */
-.profile-buttons {
+.profile-page-buttons {
   display: flex;
   justify-content: space-between;
   width: 100%; /* Adjust to take up full width */
@@ -175,7 +175,7 @@
   background-color: #004f6a; /* Darker shade for hover */
 }
 
-.update-profile-name {
+.update-profile-page-page-name {
   margin-top: 15px;
   display: flex;
   flex-direction: row;
@@ -183,7 +183,7 @@
   justify-content: space-between;
 }
 
-.profile-name input {
+.profile-page-page-name input {
   width: 100%;
   
 }

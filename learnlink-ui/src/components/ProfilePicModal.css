@@ -29,6 +29,10 @@ text-align: left;
 
 }
 
+.pfp-modal-content button {
+  background-color: none  !important; 
+}
+
 .pfp-modal-close-button {
   position: absolute;
   top: 12px;
@@ -41,8 +45,11 @@ text-align: left;
   background-color: none !important;
   color: rgb(86, 86, 86) !important;
 }
+
 .pfp-modal-close-button:hover {
   color: rgb(165, 42, 42) !important;
+  background-color: none !important;
+
 }
 
 .emoji-grid {
@@ -51,6 +58,7 @@ text-align: left;
   gap: 15px;
   margin-top: 16px;
   overflow: scroll;
+  padding: 16px;
 
 }
 

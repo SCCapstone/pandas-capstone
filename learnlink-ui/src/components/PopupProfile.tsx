@@ -17,39 +17,66 @@ const PopupProfile: React.FC<PopupProfileProps> = ({ id, onClose }) => {
   const [error, setError] = useState<string | null>(null);
   const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
 
+  /**
+   *  is a React functional component designed to display a detailed user profile in a modal-style popup. 
+   */
+
+
+  /**
+   * This hook runs when the component mounts or when the id prop changes. 
+   * It defines and invokes an asynchronous function fetchUser, 
+   * which makes a GET request to the API to retrieve the profile data of the user with the given id. 
+   * The request includes an authorization token from local storage. 
+   * If successful, the user data is stored in state; if not, an error message is set.
+   */
   useEffect(() => {
+    
     const fetchUser = async () => {
       try {
+        // Send GET request to fetch profile data for the given user ID
         const response = await axios.get(`${REACT_APP_API_URL}/api/users/profile/${id}`, {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
+            Authorization: `Bearer ${localStorage.getItem('token')}`, // Include auth token from local storage
           },
         });
-        setUser(response.data);
+        setUser(response.data); // Update user state with fetched data
       } catch (err) {
         setError('Failed to fetch user data.');
       }
     };
-    fetchUser();
-  }, [id]);
+    fetchUser(); // Invoke the data fetching function
+  }, [id]); // Dependency: re-run when `id` changes
 
+
+  /**
+   * This hook sets up an event listener to detect clicks outside the popup panel. 
+   * If a click occurs outside the referenced DOM node (panelRef), the onClose function is triggered to close the popup. 
+   * The event listener is removed when the component unmounts or when onClose changes, to avoid memory leaks.
+   */
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
+      // If click occurred outside the panelRef element, close the popup
       if (panelRef.current && !panelRef.current.contains(event.target as Node)) {
         onClose();
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('mousedown', handleClickOutside); // Add click listener on mount
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('mousedown', handleClickOutside); // Clean up on unmount
     };
-  }, [onClose]);
+  }, [onClose]); // Dependency: re-setup if `onClose` changes
 
+  /**
+   * If there’s an error in fetching the data, it displays an error message.
+   */
   if (error) {
     return <div className="popup-profile-panel"><p>{error}</p></div>;
   }
 
+  /**
+   * If the user data hasn't loaded yet, it displays a loading message.
+   */
   if (!user) {
     return <div className="popup-profile-panel"><p>Loading profile...</p></div>;
   }

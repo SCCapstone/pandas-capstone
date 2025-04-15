@@ -41,18 +41,26 @@ jest.mock('../../components/CustomAlert', () => ({
   ),
 }));
 
+// Mock ProfilePictureModal
+jest.mock('../../components/ProfilePictureModal', () => ({
+  __esModule: true,
+  default: () => <div data-testid="profile-picture-modal" />,
+}));
+
 describe('EditStudyGroup Component Unit Tests', () => {
   const mockOnClose = jest.fn();
   const mockUpdateChatName = jest.fn();
+  const mockUpdatePFP = jest.fn();
   const mockOnRemoveUser = jest.fn();
   const mockUpdateUsers = jest.fn();
+  const mockOnGroupUpdated = jest.fn();
   const mockStudyGroup = {
     name: 'Math Study Group',
     description: 'For calculus students',
     subject: 'Mathematics',
     chatID: 1,
     ideal_match_factor: 'MORNING_PERSON',
-    profilePic: 'math-group.jpg',
+    profile_pic: 'math-group.jpg',
   };
 
   beforeEach(() => {
@@ -83,11 +91,13 @@ describe('EditStudyGroup Component Unit Tests', () => {
         chatID={1}
         onClose={mockOnClose}
         updateChatName={mockUpdateChatName}
+        updatePFP={mockUpdatePFP}
         groupId={1}
         currentId={1}
         users={[]}
         onRemoveUser={mockOnRemoveUser}
         updateUsers={mockUpdateUsers}
+        onGroupUpdated={mockOnGroupUpdated}
       />
     );
   };
@@ -153,14 +163,11 @@ describe('EditStudyGroup Component Unit Tests', () => {
           name: 'Math Study Group',
           description: 'For calculus students',
           subject: 'Mathematics',
-          chatID: 1
+          chatID: 1,
+          profile_pic: expect.any(String)
         }),
         expect.any(Object)
       );
     });
   });
-
-
-  
-  
 });

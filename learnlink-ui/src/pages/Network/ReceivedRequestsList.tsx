@@ -25,7 +25,7 @@ const ReceivedRequestsList: React.FC<ReceivedRequestsListProps> = ({ handleSelec
     const [loadingApproval, setLoadingApproval] = useState<number | null>(null); // Tracks which request is being approved
     const [receivedRequestsList, setRecievedRequestsList] = useState<SwipeRequest[]>([]);
     const currentUserId = getLoggedInUserId();
-    const { joinRequestCount, setJoinRequestCount } = useJoinRequest(); // Get joinRequestCount and the setter function
+    const { updateRequestCount, refetchRequests } = useJoinRequest();
 
     
 
@@ -84,6 +84,7 @@ const ReceivedRequestsList: React.FC<ReceivedRequestsListProps> = ({ handleSelec
             console.error('Error fetching requests:', err);
             setError('Failed to load requests.');
         } finally {
+          await refetchRequests();
             setLoadingRequests(false);
         }
     };
@@ -199,18 +200,22 @@ const handleApproval = async (
       if (axios.isAxiosError(err) && err.response?.status === 405) {
         console.log("Caught 405 error in catch block");
         setError("This study group is full. You cannot approve this request.");
+        console.log(error)
         handleDenial(requestId);
 
         // handleDeleteRequest(requestId);
         handleRequestsChange(requestId);
-      }
-      if (axios.isAxiosError(err)) {
+      } else if (axios.isAxiosError(err)) {
         if (err.response) {
           // API responded with an error
           setError(err.response.data.message || "An error occurred while processing the request.");
+          console.log(error)
+
         } else if (err.request) {
           // No response received
           setError("No response from server. Please check your network.");
+          console.log(error)
+
         }
       } else if (err instanceof Error) {
         // General JavaScript error
@@ -221,7 +226,7 @@ const handleApproval = async (
     }
     finally {
       setLoadingApproval(null); // Reset loading state
-      setJoinRequestCount((prevCount) => prevCount - 1);
+      updateRequestCount(-1);; // live update from backend
 
     }
   };
@@ -232,7 +237,7 @@ const handleApproval = async (
     updateSwipeStatus(requestId, SwipeStatus.Denied);  // Pass the enum value
     // handleDeleteRequest(requestId);
     handleRequestsChange(requestId);
-    setJoinRequestCount((prevCount) => prevCount - 1);
+    updateRequestCount(-1); // live update from backend
 
   };
 

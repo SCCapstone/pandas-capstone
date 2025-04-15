@@ -10,9 +10,12 @@
     margin-top: 20px;
     display: flex;
     flex-direction: column;
-    width: 80%;
+    width: 100vw;
+    padding-left: 70px;
+    padding-right: 70px;
     align-self: center;
     overflow-y: scroll;
+    box-sizing: border-box;
 }
 
 

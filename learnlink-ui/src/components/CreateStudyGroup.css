@@ -34,6 +34,17 @@
     /* border: .7px solid #3B3C3D; */
   }
   
+.create-study-group-buttons {
+  display:flex;
+  gap:10px;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.create-study-group-buttons button {
+  cursor: pointer;
+}
+
 .create-study-group-panel input {
   height: 40px;
   margin-bottom: 15px;
@@ -43,14 +54,34 @@
   width: 100%;
 }
 
-  
-  .create-study-group-panel button {
+.save-create-button {
     margin-right: 10px;
     background-color: #00668C;
     color: white;
     border: none;
     padding: 10px 20px;
     border-radius: 5px;
+    flex:1;
+  }
+
+  .save-create-button:hover {
+    background-color: #005270;
+
+  }
+  .cancel-create-button {
+    margin-right: 10px;
+    background-color: brown;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    flex:1;
+
+  }
+
+  .cancel-create-button:hover {
+    background-color: rgb(139, 36, 36);
+
   }
 
   .create-study-group-profile-picture {
