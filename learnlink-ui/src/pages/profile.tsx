@@ -272,13 +272,13 @@ const Profile: React.FC = () => {
       ) : (
       <div className='main-container'>
 
-        <header className="profile-header">
-          <h1 className="profile-title">Update Profile</h1>
+        <header className="profile-page-header">
+          <h1 className="profile-page-title">Update Profile</h1>
         </header>
-        <main className="profile-content">
-          <form className='profile-form' onSubmit={handleSubmit} onReset={() => window.location.reload()}>
-            <div className="profile-details">
-              <div className="profile-side">
+        <main className="profile-page-content">
+          <form className='profile-page-form' onSubmit={handleSubmit} onReset={() => window.location.reload()}>
+            <div className="profile-page-details">
+              <div className="profile-page-side">
                 <label>
                   Age: <input type="number" name="age" value={formData.age} onChange={handleChange} min={0} max={100}/>
                 </label>
@@ -358,10 +358,10 @@ const Profile: React.FC = () => {
                 </label>
               </div>
 
-              <div className="profile-side">
-                <div className="profile-picture">
+              <div className="profile-page-side">
+                <div className="profile-page-picture">
 
-                  <div className="profile-picture">
+                  <div className="profile-page-picture">
                     {/* If an image is selected, display it; otherwise, show the button */}
                     {imagePreview ? (
                       <img
@@ -374,7 +374,7 @@ const Profile: React.FC = () => {
                       <div>
                       <img
                       className='upload-button'
-                        src={formData?.profilePic || 'https://learnlink-pfps.s3.us-east-1.amazonaws.com/profile-pictures/circle_bust-in-silhouette.png'}
+                        src={formData?.profilePic || 'https://learnlink-pfps.s3.us-east-1.amazonaws.com/profile-page-pictures/circle_bust-in-silhouette.png'}
                         alt="Profile"
                         width="100"
                         height={100}
@@ -414,7 +414,7 @@ const Profile: React.FC = () => {
 
 
                 </div>
-                <div className="update-profile-name">
+                <div className="update-profile-page-name">
                   <label>
                     First Name <input type="text" name="first_name"  maxLength={25} value={formData.first_name} onChange={handleChange} />
                   </label>
@@ -475,7 +475,7 @@ const Profile: React.FC = () => {
                   />
                 </label>
 
-                <div className="profile-buttons">
+                <div className="profile-page-buttons">
                   <button type="reset" className="back-button">CANCEL</button>
                   <button type="submit" className="save-button">SAVE</button>
                 </div>
@@ -484,7 +484,7 @@ const Profile: React.FC = () => {
           </form>
         </main>
       </div>
-    )};
+    )}
       <footer>
         <CopyrightFooter />
       </footer>
