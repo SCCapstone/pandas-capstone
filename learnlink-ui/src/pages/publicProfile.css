@@ -2,6 +2,7 @@
     display: flex;
     flex-direction: column;
     height: 100vh;
+    max-height: 100vh;
     background-color: #fff;
 }
 
@@ -9,114 +10,34 @@
     flex:1;
     justify-self: center;
     display: flex;
-    flex-direction: column;
     justify-content: center;
+    flex-direction: column;
     align-items: center;
-    gap: 1rem;
     width: 100%;
     /* padding: 1rem; */
-    overflow-y: scroll;
+    position: relative;
 }
-
-
 .whole-public-component {
-    width: 100%;
-    height: 100%;    
-    justify-content: center;
-    align-items: center;
-    display: flex;
-    padding: 20px;
+  flex: 1;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  padding: 20px;
+  position: relative;
+  flex-direction: column;
+  overflow-y: scroll;
+}
+.public-profile-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* contain scroll */
 }
 
-.public-main-container {
-    width: 100%;
-    height: 80vh;
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-start;
-    gap: 3rem;
-    overflow-y: scroll;
-    /* background-color: tomato; */
-}
-
-.public-main-container h1 {
-    font-size: 64px;
-    font-weight: normal;
-    margin-bottom: 1rem;
-    color: black;
-    text-align: left;
-}
-
-.public-main-container h2 {
-    font-size: 30px;
-    font-weight: normal;
-    margin-bottom: 1rem;
-    margin-top: 2rem;
-}
-
-.public-main-container p {
-    padding-left: 0;
-    font-size: 1.25rem;
-    font-weight: 300;
-    text-align: left;
-    color: black;
-
-}
-
-.public-main-container a:link {
-    font-size: 1.25rem;
-    font-weight: 400;
-    color: #FEAD2B;
-    text-decoration: none;
-}
-
-.public-main-container a:hover {
-    text-decoration: underline;
-}
-
-.public-right-side {
-    flex-grow: 1;
-}
-
-.public-left-side {
-    width: 20%;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-}
-
-.profile-details-container {
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-start;
-    gap: 1rem;
-    width: 80%;
-
-}
-
-.public-profile-details {
-    display: block;
-    width: 50%;
-}
-
-.public-profile-pic {
-    width: 100%;
-    height: auto;
-    border-radius: 50%;
-    margin-bottom: 1rem;
-    margin-top: 2.5rem;
-}
 
 .bold-first-word {
-    font-weight: bold;
-}
-
-.public-right-side h3 {
-    font-size: 1.5rem;
-    font-weight: 400;
-    margin-bottom: 1rem;
-    font-weight: bold;
-    color: #00668C;
+  font-weight: bold;
 }
 
 .public-action-buttons {
@@ -204,6 +125,9 @@
     display: flex;
     flex-direction: column;
     gap: 24px;
+    box-sizing: border-box;
+    overflow-y: auto; /* or remove this line */
+
   }
 
   .profile-header {
@@ -289,6 +213,7 @@
   }
 
   .profile-tags {
+    flex: 0 0 80%;
     width: 100%;
     display: flex;
     flex-wrap: wrap;
@@ -302,6 +227,7 @@
     font-size: 13px;
     background-color: #eee;
     font-weight: 500;
+    height: fit-content;
   }
 
   .tag.Quiet {

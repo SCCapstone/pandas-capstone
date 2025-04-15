@@ -238,27 +238,27 @@ const PublicProfile: React.FC = () => {
                                             <div className="profile-details">
                                                 <div className="detail-item">
                                                     <span className="detail-label">Age</span>
-                                                    <span className="detail-value">{user.age}</span>
+                                                    <span className="detail-value">{user.age? user.age : "N/A"}</span>
                                                 </div>
                                                 <div className="detail-item">
                                                     <span className="detail-label">Grade</span>
-                                                    <span className="detail-value">{formatEnum(user.grade)}</span>
+                                                    <span className="detail-value">{formatEnum(user.grade).length ? formatEnum(user.grade) : "N/A"}</span>
                                                 </div>
                                                 <div className="detail-item">
                                                     <span className="detail-label">College</span>
-                                                    <span className="detail-value">{user.college}</span>
+                                                    <span className="detail-value">{user.college.length > 0 ? user.college : "N/A"}</span>
                                                 </div>
                                                 <div className="detail-item">
                                                     <span className="detail-label">Major</span>
-                                                    <span className="detail-value">{user.major}</span>
+                                                    <span className="detail-value">{user.major.length > 0 ? user.major : "N/A"}</span>
                                                 </div>
                                                 <div className="detail-item">
                                                     <span className="detail-label">Gender</span>
-                                                    <span className="detail-value">{formatEnum(user.gender)}</span>
+                                                    <span className="detail-value">{formatEnum(user.gender).length > 0 ? formatEnum(user.gender) : "N/A"}</span>
                                                 </div>
                                                 <div className="detail-item">
                                                     <span className="detail-label">Relevant Coursework</span>
-                                                    <span className="detail-value">{user.relevant_courses}</span>
+                                                    <span className="detail-value">{user.relevant_courses.length > 0 ? user.relevant_courses : "N/A" }</span>
                                                 </div>
                                                 <div className="detail-item">
                                                     <span className="detail-label">Fav Study Method</span>
