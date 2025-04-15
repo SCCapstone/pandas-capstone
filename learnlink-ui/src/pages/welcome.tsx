@@ -28,7 +28,7 @@ function Welcome() {
                 <div className="WelcomePage">
                     <div className="titleContainer">
                         <h1 className="well">Welcome to LearnLink!</h1>
-                        <p>The best way to find your study partner!</p>
+                        <p>The best way to find study groups!</p>
                         <button className="getStarted" onClick={handleGetStarted}>Get Started</button>
                     </div>
                 </div>
@@ -52,7 +52,7 @@ function Welcome() {
                 <div className="videoSection">
                     <h2>See LearnLink in Action</h2>
                     {/* Replace the image below with an <iframe> when your final demo video is ready */}
-                    <img src={"https://www.youtube.com/embed/placeholder"} alt="Demo video placeholder" className="videoPlaceholder" />
+                    <img src={"https://www.youtube.com/embed/placeholder" } alt="Demo video placeholder" className="videoPlaceholder" />
                     {/* Example for embedding video:
                         <iframe src="https://www.youtube.com/embed/YOUR_VIDEO_ID" title="Final Demo" allowFullScreen /> */}
                 </div>
@@ -61,10 +61,14 @@ function Welcome() {
                 <div className="infoSection">
                     <h2>Why LearnLink?</h2>
                     <p>
+                        Large classes can feel overwhelming. LearnLink makes collaboration easy by helping you connect with the right study partners, keep conversations organized, and track your success.
+                    </p>
+                    <p>
                         LearnLink helps students in large classes find reliable study partners, organize group chats,
                         share resources, and track their grades. With our user-friendly interface and smart matching,
                         collaboration becomes seamless and effective.
                     </p>
+
                 </div>
 
                 {/* About Section */}
