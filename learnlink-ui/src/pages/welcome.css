@@ -125,6 +125,38 @@ p {
   margin: 0 auto;
 }
 
+.videoSection, .infoSection, .aboutSection, .githubSection {
+  margin: 40px auto;
+  max-width: 800px;
+  text-align: center;
+  padding: 20px;
+}
+
+.videoPlaceholder {
+  width: 100%;
+  max-width: 700px;
+  border-radius: 8px;
+}
+
+.aboutSection ul {
+  list-style: none;
+  padding: 0;
+}
+
+.aboutSection li {
+  margin: 10px 0;
+}
+
+.aboutSection a {
+  color: #0073b1;
+  text-decoration: none;
+}
+
+.aboutSection a:hover {
+  text-decoration: underline;
+}
+
+
 @media (max-width: 1024px) {
   .menuButtons {
     font-size: 22px;
@@ -167,3 +199,4 @@ p {
     min-height: 100px;
   }
 }
+
