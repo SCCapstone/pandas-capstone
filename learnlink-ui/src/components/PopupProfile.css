@@ -14,6 +14,7 @@
     padding: 24px;
     z-index: 1000;
     overflow-y: scroll;
+    gap: 20px;
   }
   
   /* Header Styling */
@@ -33,6 +34,9 @@
   }
   
   .popup-close-button {
+    position:fixed;
+    top: 15px;
+    right: 15px;
     background: none;
     border: none;
     font-size: 1.5rem;
@@ -42,7 +46,7 @@
   }
   
   .popup-close-button:hover {
-    color: #111827;
+    color: rgb(165, 42, 42);
   }
   
   /* Content Area */
