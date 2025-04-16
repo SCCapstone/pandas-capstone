@@ -56,7 +56,7 @@
     cursor: pointer;
     font-size: 15px;
     height: 50px;
-    margin-bottom: 20px;
+    /* margin-bottom: 20px; */
 }
 
 .public-action-buttons .match-button-status-pending {
@@ -142,8 +142,8 @@
   }
 
   .profile-avatar img{
-    width: 150px;
-    height: 150px;
+    width: 130px;
+    height: 130px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -231,7 +231,7 @@
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
-    margin-top: 12px;
+    margin-top: 5px;
   }
 
   .tag {
@@ -309,4 +309,5 @@
     flex-direction: row;
     justify-content: space-evenly;
     gap: 10px;
+    max-height: fit-content;
   }

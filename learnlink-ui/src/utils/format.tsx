@@ -71,7 +71,7 @@ export const useColleges = () => {
           setColleges(data);
           setIsLoading(false);
         } else {
-          console.error("No colleges data available.");
+          console.error("No college data available.");
           setIsLoading(false);
         }
       } catch (error) {
@@ -83,6 +83,34 @@ export const useColleges = () => {
     fetchColleges();
   }, []);
   return { colleges, isLoading };
+};
+
+export const useCourses = () => {
+  const [courses, setCourses] = useState<string[]>([]);
+  const [isLoadingCourses, setIsLoading] = useState(true);
+  useEffect(() => {
+    // Fetch the preloaded colleges data from the public directory
+    const fetchColleges = async () => {
+      try {
+        const courseOptionsResponse = await fetch(`${REACT_APP_API_URL}/api/users/courses`);
+        const data = await courseOptionsResponse.json()
+
+        if (data) {
+          setCourses(data);
+          setIsLoading(false);
+        } else {
+          console.error("No course data available.");
+          setIsLoading(false);
+        }
+      } catch (error) {
+        console.error("Error fetching courses:", error);
+        setIsLoading(false);
+      }
+    };
+
+    fetchColleges();
+  }, []);
+  return { courses, isLoadingCourses };
 };
 
 export const useUserAgeRange = () => {
@@ -147,9 +175,19 @@ singleValue: (styles) => ({
     fontSize: "small", // Adjust font size
 
   }),
+  menuList: (provided) => ({
+    ...provided,
+    maxHeight: "150px", // limit dropdown height
+    overflowY: "auto",  // scroll when too many options
+  }),
 };
 
 
-export const standardizeCourseInput = (course: string): string => {
-  return course.trim().replace(/\s+/g, ' ').toUpperCase(); // Normalize spaces and make it uppercase
+export function normalizeCourseInput(input: string): string {
+  const trimmed = input.trim().toUpperCase();
+  const match = trimmed.match(/^([A-Z]+)\s*0*([0-9]+[A-Z]?)$/);
+
+  if (!match) return trimmed;
+  const [, letters, numbers] = match;
+  return `${letters} ${numbers}`;
 };

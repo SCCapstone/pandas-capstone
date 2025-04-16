@@ -3,7 +3,7 @@ import '../pages/messaging.css';
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { on } from 'events';
-import { selectStyles, formatEnum } from '../utils/format';
+import { selectStyles, formatEnum, normalizeCourseInput } from '../utils/format';
 import Select from 'react-select';
 import makeAnimated from 'react-select/animated';
 import GroupUserList from '../components/GroupUserList';
@@ -11,11 +11,19 @@ import { StylesConfig, ControlProps, CSSObjectWithLabel } from 'react-select';
 import CustomAlert from './CustomAlert';
 import GroupUserContainer from './GroupUserContainer';
 import ProfilePictureModal from './ProfilePictureModal';
+import { useCourses } from '../utils/format';
+import CreatableSelect from "react-select/creatable";
+import { MultiValue } from "react-select";
 
 
 
 
 const animatedComponents = makeAnimated();
+
+type OptionType = {
+  label: string;
+  value: string;
+};
 
 interface StudyGroup {
   name: string;
@@ -85,6 +93,8 @@ const EditStudyGroup =(
   const [alerts, setAlerts] = useState<{ id: number; alertText: string; alertSeverity: "error" | "warning" | "info" | "success"; visible: boolean }[]>([]);
   const alertVisible = alerts.some(alert => alert.visible);
   const [pfpModalOpen, setPfpModalOpen] = useState(false);
+  const { isLoadingCourses, courses } = useCourses();
+  
 
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
   const [currentGroupId, setCurrentGroupId] =  useState<number | null>(null);
@@ -260,39 +270,39 @@ const EditStudyGroup =(
       )}
       <h1>Edit Study Group</h1>
       <form onSubmit={(e) => e.preventDefault()}>
-        
-          <div className="edit-study-group-profile-picture">
-            {/* If an image is selected, display it; otherwise, show the button */}
-            {imagePreview ? (
+
+        <div className="edit-study-group-profile-picture">
+          {/* If an image is selected, display it; otherwise, show the button */}
+          {imagePreview ? (
+            <img
+              className='upload-button'
+              src={imagePreview}  // Display the preview returned by the backend
+              alt="Selected Profile"
+              onClick={() => setPfpModalOpen(true)} // Allow re-selecting an image
+            />
+          ) : (
+            <div>
+
               <img
                 className='upload-button'
-                src={imagePreview}  // Display the preview returned by the backend
-                alt="Selected Profile"
-                onClick={() => setPfpModalOpen(true)} // Allow re-selecting an image
+                src={profilePic ? profilePic : 'https://learnlink-pfps.s3.us-east-1.amazonaws.com/profile-pictures/circle_busts-in-silhouette.png'}
+                alt="Profile"
+                width="100"
+                height={100}
+                onClick={() => setPfpModalOpen(true)}
+
               />
-            ) : (
-              <div>
-                
-                <img
-                  className='upload-button'
-                  src={profilePic? profilePic : 'https://learnlink-pfps.s3.us-east-1.amazonaws.com/profile-pictures/circle_busts-in-silhouette.png'}
-                  alt="Profile"
-                  width="100"
-                  height={100}
-                  onClick={() => setPfpModalOpen(true)}
+            </div>
+          )}
 
-                />
-              </div>
-            )}
-
-            {/* Hidden file input */}
-            <input
-              id="emoji-pfp-upload"
-              type="button"
-              accept="image/*"
-              onChange={handleImageUpload}
-              style={{ display: "none" }}
-            />
+          {/* Hidden file input */}
+          <input
+            id="emoji-pfp-upload"
+            type="button"
+            accept="image/*"
+            onChange={handleImageUpload}
+            style={{ display: "none" }}
+          />
           {/* <button onClick={handleUpload}>Upload</button> */}
           <ProfilePictureModal
             isOpen={pfpModalOpen}
@@ -303,13 +313,13 @@ const EditStudyGroup =(
         </div>
         <div>
           <div>
-          <label>Study Group Name:</label>
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
-        </div>
+            <label>Study Group Name:</label>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+          </div>
           <label>Bio:</label>
           <input
             type="text"
@@ -318,13 +328,43 @@ const EditStudyGroup =(
           />
         </div>
         <div>
+          <label className="block text-sm font-medium mb-1">
+            Relevant Course(s) (e.g., BIO 101, CSCE 145)
+          </label>
+          <CreatableSelect
+            name="edit_sg_subject"
+            options={courses.map((course) => ({
+              label: course,
+              value: course,
+            }))}
+            value={subject ? { label: subject, value: subject } : null}
+            onChange={(selected: OptionType | null) => {
+              setSubject(selected?.value || "");
+            }}
+            onCreateOption={(input) => {
+              const normalized = normalizeCourseInput(input);
+
+              // Set it as selected
+              setSubject(normalized);
+
+            }}
+            placeholder="Start typing a course..."
+            formatCreateLabel={(inputValue) =>
+              `Add "${normalizeCourseInput(inputValue)}"`
+            }
+            isMulti={false}
+            styles={selectStyles}
+          />
+        </div>
+
+        {/* </div>
           <label>Relevant Course:</label>
           <input
             type="text"
             value={subject}
             onChange={(e) => setSubject(e.target.value)}
           />
-        </div>
+        </div> */}
         <div>
           <label>Ideal Match Factor:</label>
           <Select
@@ -346,8 +386,7 @@ const EditStudyGroup =(
             isMulti={false}
             styles={selectStyles}
           />
-          </div>
-          
+        </div>
 
         <button className='save-group-button' onClick={handleSave}>Save</button>
         <button className='cancel-edit-button' onClick={onClose}>Cancel</button>

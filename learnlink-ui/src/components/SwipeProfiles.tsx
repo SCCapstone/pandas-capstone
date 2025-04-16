@@ -349,31 +349,60 @@ const SwipeProfiles = ({ userId }: { userId: number }) => {
                       <span className="detail-label">Gender</span>
                       <span className="detail-value">{formatEnum(currentProfile.gender)?.length > 0 ? formatEnum(currentProfile.gender) : "N/A"}</span>
                     </div>
-                    <div className="detail-item">
-                      <span className="detail-label">Relevant Coursework</span>
-                      <span className="detail-value">{currentProfile.relevant_courses[0] && currentProfile.relevant_courses.length > 0 ? currentProfile.relevant_courses : "N/A"}</span>
-                    </div>
-                    <div className="detail-item">
-                      <span className="detail-label">Fav Study Method</span>
-                      <span className="detail-value">{currentProfile.study_method?.length > 0 ? currentProfile.study_method : "N/A"}</span>
-                    </div>
-                  </div>
-                  <div className='tags-buttons'>
-                    <div className='tags-detail'>
-                      <span className="detail-label">Study Tags</span>
-                      <div className="profile-tags">
-                        {currentProfile.studyHabitTags?.length > 0 ? (
-                          currentProfile.studyHabitTags.map((tag: string, index: number) => (
-                            <span key={index} className={`tag ${tag}`}>
-                              {formatEnum(tag)}
-                            </span>
-                          ))
-                        ) : (
+                    {/* <div className="detail-item">
+                          <span className="detail-label">Relevant Coursework</span>
+                          <span className="detail-value">{currentProfile.relevant_courses[0] && currentProfile.relevant_courses.length > 0 ? currentProfile.relevant_courses : "N/A"}</span>
+                        </div> */}
+                        <div className="detail-item">
+                          <span className="detail-label">Fav Study Method</span>
+                          <span className="detail-value">{currentProfile.study_method?.length > 0 ? currentProfile.study_method : "N/A"}</span>
+                        </div>
+                        <div className="detail-item">
+                          <span className="detail-label">Relevant Coursework</span>
+                          <div className="profile-tags">
+                            {currentProfile.relevant_courses?.length > 0 ? (
+                              currentProfile.relevant_courses.map((course: string, index: number) => (
+                                <span key={index} className="tag course-tag">
+                                  {course}
+                                </span>
+                              ))
+                            ) : (
+                              <span className="detail-value">N/A</span>
+                            )}
+                          </div>
+                        </div>
+                        <div className='tags-detail'>
+                          <span className="detail-label">Study Tags</span>
+                          <div className="profile-tags">
+                            {currentProfile.studyHabitTags?.length > 0 ? (
+                              currentProfile.studyHabitTags.map((tag: string, index: number) => (
+                                <span key={index} className={`tag ${tag}`}>
+                                  {formatEnum(tag)}
+                                </span>
+                              ))
+                            ) : (
                               <span className="detail-value">No study tags specified</span>
                             )}
 
                           </div>
                         </div>
+                      </div>
+                      <div className='tags-buttons'>
+                        {/* <div className='tags-detail'>
+                          <span className="detail-label">Study Tags</span>
+                          <div className="profile-tags">
+                            {currentProfile.studyHabitTags?.length > 0 ? (
+                              currentProfile.studyHabitTags.map((tag: string, index: number) => (
+                                <span key={index} className={`tag ${tag}`}>
+                                  {formatEnum(tag)}
+                                </span>
+                              ))
+                            ) : (
+                              <span className="detail-value">No study tags specified</span>
+                            )}
+
+                          </div>
+                        </div> */}
 
 
                         <div className="public-action-buttons" >
