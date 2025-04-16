@@ -181,7 +181,7 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ setNotifCou
           <li key={notif.id} onClick={() => handleSelectNotif(notif)} className={notif.read ? 'read' : 'unread'}>
             <span className="notif-icon">{getNotificationIcon(notif.type)}</span>
             <p>{notif.message}</p>
-            <button className="DeleteButton" onClick={(event: React.MouseEvent<HTMLButtonElement>) => { event.stopPropagation(); handleDeleteNotif(notif); }}> <FaXmark /></button>
+            <button data-testid="delete-notifs" className="DeleteButton" onClick={(event: React.MouseEvent<HTMLButtonElement>) => { event.stopPropagation(); handleDeleteNotif(notif); }}> <FaXmark /></button>
           </li>
         ))}
       </ul>

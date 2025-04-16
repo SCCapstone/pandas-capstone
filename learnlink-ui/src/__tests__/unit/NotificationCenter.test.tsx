@@ -19,13 +19,11 @@ const renderWithRouter = (ui: JSX.Element) => {
       <MemoryRouter initialEntries={['/']}>
         <Routes>
           <Route path="/" element={ui} />
-          {/* You can add other routes if necessary */}
         </Routes>
       </MemoryRouter>
     );
-  };
+};
   
-
 describe('NotificationDropdown Component Unit Tests', () => {
     const mockNotifications = [
     {
