@@ -351,7 +351,7 @@ const SwipeProfiles = ({ userId }: { userId: number }) => {
                     </div>
                     <div className="detail-item">
                       <span className="detail-label">Relevant Coursework</span>
-                      <span className="detail-value">{currentProfile.relevant_courses?.length > 0 ? currentProfile.relevant_courses : "N/A"}</span>
+                      <span className="detail-value">{currentProfile.relevant_courses[0] && currentProfile.relevant_courses.length > 0 ? currentProfile.relevant_courses : "N/A"}</span>
                     </div>
                     <div className="detail-item">
                       <span className="detail-label">Fav Study Method</span>
