@@ -11,13 +11,16 @@
   gap: 20px;
 
 }
-
+.public-group-info {
+  display: flex;
+  flex-direction: column;
+}
 .public-member-card {
   background: #fff;
   padding: 8px;
   border-radius: 8px;
   text-align: left;
-  width: 350px;
+  width: 325px;
   box-shadow: 0px 2px 7px rgba(0, 0, 0, 0.2);
   display:flex;
   flex-direction: column;
@@ -29,7 +32,7 @@
 }
 
 .public-member-card h1 {
-  font-size: 15px;
+  font-size: 18px;
   font-weight: bold;
   color: #333;
   margin: 0 0 5px 0;
@@ -37,7 +40,7 @@
 }
 
 .public-member-card h2 {
-  font-size: 13px;
+  font-size: 15px;
   font-weight: bold;
   color: #004c72;
   margin: 0 0 0 0;
@@ -80,5 +83,5 @@
 }
 
 .member.tag {
-  font-size: 11px;
+  font-size: 13px;
 }
