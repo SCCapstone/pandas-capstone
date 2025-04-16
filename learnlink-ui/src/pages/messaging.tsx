@@ -1611,7 +1611,7 @@ const Messaging: React.FC = () => {
                             <div className="MessageContainer">
                               { }
                             {!message.system && (index === 0 || selectedChat.messages[index - 1].userId !== message.userId) && (
-                              <div className={`username ${message.userId === currentUserId ? 'MyUsername' : ''}`}>
+                              <div className={`message-username ${message.userId === currentUserId ? 'MyUsername' : ''}`}>
                                 {message.userId !== undefined && msgUsernames[message.userId] ? msgUsernames[message.userId] : "Loading..."}
                                 {/* {message.userId !== undefined && msgPfps[message.userId] ? (
                                 <img src={msgPfps[message.userId] } className="message-pfp" alt="" height={"40px"} />

@@ -5,7 +5,8 @@
     left: 50%;
     transform: translate(-50%, -50%);
     width: 80%;
-    height: 80%;
+    height: fit-content;
+    max-height: 80%;
     background: #f9fafb;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
     border-radius: 16px;
