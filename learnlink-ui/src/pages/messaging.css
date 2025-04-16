@@ -434,6 +434,11 @@
   width: 65px;
 }
 
+.message-username {
+  font-size: 15px;
+
+}
+
 .MyUsername {
   align-self: flex-end;
 }
