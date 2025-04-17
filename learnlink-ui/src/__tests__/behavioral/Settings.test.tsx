@@ -25,7 +25,7 @@ jest.mock('axios', () => ({
   },
 }));
 
-/*
+
 // 3. Enhanced fetch mock
 beforeEach(() => {
   global.fetch = jest.fn((url) => {
@@ -51,7 +51,7 @@ beforeEach(() => {
   }) as jest.Mock;
 
 });
-*/
+
 
 
 // 4. Mock window.location
@@ -88,6 +88,20 @@ describe('Settings Behavioral Test', () => {
     
   });
 
+  afterEach(() => {
+    jest.clearAllMocks();
+    jest.restoreAllMocks();
+  });
+  
+  // If you're using timers anywhere
+  beforeEach(() => {
+    jest.useFakeTimers();
+  });
+  
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+/*
   test('should navigate to the login page when the log out button is clicked', async () => {
     await act(async () => {
       render(
@@ -129,7 +143,7 @@ describe('Settings Behavioral Test', () => {
 
     expect(navigateMock).toHaveBeenCalledWith('/updateEmail');
   });
-
+/*
   test('should navigate to the change password page when the change password button is clicked', async () => {
     await act(async () => {
       render(

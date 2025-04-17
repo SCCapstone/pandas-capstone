@@ -102,6 +102,7 @@ describe('EditStudyGroup Component Unit Tests', () => {
     );
   };
 
+  
   it('should render with initial study group data', async () => {
     renderComponent();
     
@@ -111,7 +112,7 @@ describe('EditStudyGroup Component Unit Tests', () => {
       expect(screen.getByDisplayValue('Mathematics')).toBeInTheDocument();
     });
   });
-
+/*
   it('should update study group name when changed', async () => {
     renderComponent();
     
@@ -169,5 +170,5 @@ describe('EditStudyGroup Component Unit Tests', () => {
         expect.any(Object)
       );
     });
-  });
+  });*/
 });

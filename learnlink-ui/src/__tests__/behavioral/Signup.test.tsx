@@ -82,19 +82,25 @@ describe("Signup Behavior Tests", () => {
             expect(screen.getByText("* Username is already taken")).toBeInTheDocument();
         });
     });
-
     test("Successfully signs up and navigates to landing page", async () => {
-        (global.fetch as jest.Mock).mockResolvedValueOnce({
-            ok: true,
-            json: async () => ({ token: "fake-jwt-token" }),
-        });
-
+        // Mock both API responses
+        (global.fetch as jest.Mock)
+            .mockResolvedValueOnce({  // First call - signup
+                ok: true,
+                json: async () => ({ token: "fake-jwt-token" }),
+            })
+            .mockResolvedValueOnce({  // Second call - email
+                ok: true,
+                json: async () => ({}),
+            });
+    
         render(
             <MemoryRouter>
                 <Signup />
             </MemoryRouter>
         );
-
+    
+        // Fill out form
         fireEvent.change(screen.getByPlaceholderText("John"), { target: { value: "John" } });
         fireEvent.change(screen.getByPlaceholderText("Doe"), { target: { value: "Doe" } });
         fireEvent.change(screen.getByPlaceholderText("example@learnlink.com"), {
@@ -109,9 +115,9 @@ describe("Signup Behavior Tests", () => {
         fireEvent.change(screen.getByTestId("su-rt-password"), {
             target: { value: "password123" },
         });
-
+    
         fireEvent.click(screen.getByTestId("su-button"));
-
+    
         await waitFor(() => {
             expect(localStorage.getItem("token")).toBe("fake-jwt-token");
             expect(navigateMock).toHaveBeenCalledWith("/LandingPage");
