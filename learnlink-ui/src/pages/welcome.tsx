@@ -11,6 +11,8 @@ import resourcesImage from '../images/resources.png';
 import videoPlaceholder from '../images/video-placeholder.png';
 import kennedy from '../images/profile pictures/kennedy-profile.png';
 import kelly from '../images/profile pictures/kelly-profile.png';
+import natalie from '../images/profile pictures/natalie-profile.png';
+
 
 function Welcome() {
     const navigate = useNavigate();
@@ -89,7 +91,7 @@ function Welcome() {
                 <div className="aboutSection">
                     <h2>Meet the Team</h2>
                     <div className="teamMembers">
-                        <div className="teamMember"><img className="profilePic" src={kennedy} alt="kennedy-profile" /><p>Natalie Crawford</p></div>
+                        <div className="teamMember"><img className="profilePic" src={natalie} alt="kennedy-profile" /><p>Natalie Crawford</p></div>
                         <div className="teamMember"><img className="profilePic" src={kelly} alt="kennedy-profile" /><p>Kelly Finnegan</p></div>
                         <div className="teamMember"><img className="profilePic" src={kennedy} alt="kennedy-profile" /><p>Kennedy Houston</p></div>
                         <div className="teamMember"><img className="profilePic" src={kennedy} alt="kennedy-profile" /><p>Rae Jones</p></div>
@@ -99,8 +101,7 @@ function Welcome() {
 
                 {/* GitHub Link */}
                 <div className="githubSection">
-                    <h2>Check Out the Code</h2>
-                    <a href="https://github.com/your-repo-link" target="_blank" rel="noopener noreferrer">GitHub Repository</a>
+                    <a className="githubLink" href="https://github.com/SCCapstone/pandas-capstone" target="_blank" rel="noopener noreferrer">Check Out Our Code on GitHub</a>
                 </div>
 
                 <div>
