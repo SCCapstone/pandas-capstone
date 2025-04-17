@@ -29,7 +29,7 @@ describe("PlusButton component", () => {
 
   it("renders PlusButton and opens the menu", () => {
     setup();
-    const button = screen.getByRole("button", { name: "" }); 
+    const button = screen.getByRole("button", { name: "Open menu" }); 
     fireEvent.click(button);
     expect(screen.getByText("Weekly Scheduler")).toBeInTheDocument();
     expect(screen.getByText("Calendar Event")).toBeInTheDocument();
@@ -37,7 +37,7 @@ describe("PlusButton component", () => {
 
   it("disables Weekly Scheduler when studyGroupId is null", () => {
     setup({ studyGroupId: null });
-    const plusButton = screen.getByRole("button", { name: "" });
+    const plusButton = screen.getByRole("button", { name: "Open menu" });
     fireEvent.click(plusButton);
     const weeklyScheduler = screen.getByText("Weekly Scheduler");
     expect(weeklyScheduler.closest("button")).toBeDisabled();
@@ -45,7 +45,7 @@ describe("PlusButton component", () => {
 
   it("opens calendar modal when Calendar Event is selected", async () => {
     setup();
-    fireEvent.click(screen.getByRole("button", { name: "" }));
+    fireEvent.click(screen.getByRole("button", { name: "Open menu" }));
     fireEvent.click(screen.getByText("Calendar Event"));
     await waitFor(() => {
       expect(screen.getByText("Create Calendar Event")).toBeInTheDocument();
@@ -54,7 +54,7 @@ describe("PlusButton component", () => {
 
   it("calls onSendButtonMessage when Weekly Scheduler is clicked", () => {
     setup();
-    fireEvent.click(screen.getByRole("button", { name: "" }));
+    fireEvent.click(screen.getByRole("button", { name: "Open menu" }));
     fireEvent.click(screen.getByText("Weekly Scheduler"));
     expect(mockOnSendButtonMessage).toHaveBeenCalledWith({
       action: "weekly-scheduler",
