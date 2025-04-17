@@ -11,6 +11,8 @@ import resourcesImage from '../images/resources.png';
 import videoPlaceholder from '../images/video-placeholder.png';
 import kennedy from '../images/profile pictures/kennedy-profile.png';
 import kelly from '../images/profile pictures/kelly-profile.png';
+import rae from '../images/profile pictures/rae-profile.jpeg';
+
 
 function Welcome() {
     const navigate = useNavigate();
@@ -91,8 +93,8 @@ function Welcome() {
                     <div className="teamMembers">
                         <div className="teamMember"><img className="profilePic" src={kennedy} alt="kennedy-profile" /><p>Natalie Crawford</p></div>
                         <div className="teamMember"><img className="profilePic" src={kelly} alt="kennedy-profile" /><p>Kelly Finnegan</p></div>
+                        <div className="teamMember"><img className="profilePic" src={rae} alt="rae-profile" /><p>Rae Jones</p></div>
                         <div className="teamMember"><img className="profilePic" src={kennedy} alt="kennedy-profile" /><p>Kennedy Houston</p></div>
-                        <div className="teamMember"><img className="profilePic" src={kennedy} alt="kennedy-profile" /><p>Rae Jones</p></div>
                         <div className="teamMember"><img className="profilePic" src={kennedy} alt="kennedy-profile" /><p>Yesha Patel</p></div>
                     </div>
                 </div>
