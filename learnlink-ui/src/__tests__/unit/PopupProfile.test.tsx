@@ -33,7 +33,7 @@ describe('PopupProfile Component', () => {
     major: 'Computer Science',
     gender: 'MALE',
     grade: 'SENIOR',
-    relevant_courses: 'CS101, CS202',
+    relevant_courses: ['CS101', 'CS202'],
     study_method: 'Pomodoro',
     studyHabitTags: ['MORNING_PERSON', 'QUIET_ENVIRONMENT']
   };
@@ -141,13 +141,14 @@ describe('PopupProfile Component', () => {
       ...mockUser,
       bio: '',
       studyHabitTags: [],
+      relevant_courses: [],
     };
     require('axios').default.get.mockResolvedValueOnce({ data: minimalUser });
 
     render(<PopupProfile {...mockProps} />);
 
     await waitFor(() => {
-      expect(screen.getByText('No study tags specified')).toBeInTheDocument();
+      expect(screen.getByText(/No study tags specified/i)).toBeInTheDocument();
     });
   });
 });
