@@ -8,8 +8,9 @@ import studyGroupsImage from '../images/study-groups.png';
 import calculatorImage from '../images/calculator.png';
 import messagingImage from '../images/messaging.png';
 import resourcesImage from '../images/resources.png';
-
-import placeholderVideo from '../images/video-placeholder.png'; // Add a placeholder image for the video
+import videoPlaceholder from '../images/video-placeholder.png';
+import kennedy from '../images/profile pictures/kennedy-profile.png';
+import kelly from '../images/profile pictures/kelly-profile.png';
 
 function Welcome() {
     const navigate = useNavigate();
@@ -48,20 +49,19 @@ function Welcome() {
                     </div>
                 </div>
 
-                {/* Embedded Video Section */}
+                {/* Demo Section */}
                 <div className="videoSection">
                     <h2>See LearnLink in Action</h2>
-                    {/* Replace the image below with an <iframe> when your final demo video is ready */}
-                    <img src={"https://www.youtube.com/embed/placeholder" } alt="Demo video placeholder" className="videoPlaceholder" />
-                    {/* Example for embedding video:
-                        <iframe src="https://www.youtube.com/embed/YOUR_VIDEO_ID" title="Final Demo" allowFullScreen /> */}
+                    <p>Watch our short demo to learn how it works!</p>
+                    <img src={videoPlaceholder} alt="Demo video placeholder" className="videoPlaceholder"/>
                 </div>
 
-                {/* Explanation Section */}
+                {/* Why LearnLink Section */}
                 <div className="infoSection">
                     <h2>Why LearnLink?</h2>
                     <p>
-                        Large classes can feel overwhelming. LearnLink makes collaboration easy by helping you connect with the right study partners, keep conversations organized, and track your success.
+                        Large classes can feel overwhelming. LearnLink makes collaboration easy by helping you connect
+                        with the right study partners, keep conversations organized, and track your success.
                     </p>
                     <p>
                         LearnLink helps students in large classes find reliable study partners, organize group chats,
@@ -69,15 +69,32 @@ function Welcome() {
                         collaboration becomes seamless and effective.
                     </p>
 
+                    <div className="whyBoxes">
+                        <div className="whyBox">
+                            <h3>Study Smarter</h3>
+                            <p>Find peers with similar schedules and goals.</p>
+                        </div>
+                        <div className="whyBox">
+                            <h3>Stay Connected</h3>
+                            <p>Easy messaging and notifications.</p>
+                        </div>
+                        <div className="whyBox">
+                            <h3>Track Progress</h3>
+                            <p>Use our built-in calculator to stay on track.</p>
+                        </div>
+                    </div>
                 </div>
 
-                {/* About Section */}
+                {/* Team Section */}
                 <div className="aboutSection">
                     <h2>Meet the Team</h2>
-                    <ul>
-                        <li><a href="https://www.linkedin.com/in/natalie-crawford-b85137221/" target="_blank" rel="noopener noreferrer">Natalie Crawford</a></li>
-                        {/* Add teammates here */}
-                    </ul>
+                    <div className="teamMembers">
+                        <div className="teamMember"><img className="profilePic" src={kennedy} alt="kennedy-profile" /><p>Natalie Crawford</p></div>
+                        <div className="teamMember"><img className="profilePic" src={kelly} alt="kennedy-profile" /><p>Kelly Finnegan</p></div>
+                        <div className="teamMember"><img className="profilePic" src={kennedy} alt="kennedy-profile" /><p>Kennedy Houston</p></div>
+                        <div className="teamMember"><img className="profilePic" src={kennedy} alt="kennedy-profile" /><p>Rae Jones</p></div>
+                        <div className="teamMember"><img className="profilePic" src={kennedy} alt="kennedy-profile" /><p>Yesha Patel</p></div>
+                    </div>
                 </div>
 
                 {/* GitHub Link */}
@@ -85,10 +102,11 @@ function Welcome() {
                     <h2>Check Out the Code</h2>
                     <a href="https://github.com/your-repo-link" target="_blank" rel="noopener noreferrer">GitHub Repository</a>
                 </div>
-            </div>
 
-            <div>
-                <Copyright />
+                <div>
+                    <Copyright />
+                </div>
+
             </div>
         </div>
     );

@@ -20,7 +20,6 @@ h1, h2, h3, h4, h5, h6 {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  gap: 50px;
   align-items: center;
   background-color: #D4EAF7;
   padding: 20px;
@@ -35,12 +34,22 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .WelcomePage {
-  width: 70%;
   margin-top: 60px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  padding:20px;
+}
+
+.videoSection,
+.infoSection,
+.aboutSection,
+.githubSection {
+  width: 100vw;
+  padding: 2rem 1rem;
+  margin: 0;
+  box-sizing: border-box;
 }
 
 .titleContainer {
@@ -51,6 +60,7 @@ h1, h2, h3, h4, h5, h6 {
   text-align: center;
   gap: 20px;
   width: 100%;
+  padding:20px;
 }
 
 /* Main heading */
@@ -76,7 +86,6 @@ p {
   border-radius: 12px;
   border-color: #FEAD2B;
   width: 25%;
-  max-width: 600px;
   height: 50px;
   display: flex;
   justify-content: center;
@@ -98,6 +107,7 @@ p {
   gap: 20px; /* Space between buttons */
   flex-wrap: wrap; /* Ensure buttons wrap on smaller screens */
   width: 100%;
+  padding:20px;
 }
 
 /* Menu buttons */
@@ -123,13 +133,6 @@ p {
   height: auto;
   display: block;
   margin: 0 auto;
-}
-
-.videoSection, .infoSection, .aboutSection, .githubSection {
-  margin: 40px auto;
-  max-width: 800px;
-  text-align: center;
-  padding: 20px;
 }
 
 .videoPlaceholder {
@@ -198,5 +201,87 @@ p {
     font-size: 16px;
     min-height: 100px;
   }
+}
+
+.videoSection {
+  background-color: #126487;
+  color: white;
+  text-align: center;
+  padding: 2rem;
+}
+
+.videoPlaceholder {
+  width: 90%;
+  max-width: 500px;
+  margin-top: 1rem;
+}
+
+.infoSection {
+  background-color: #d6ecf7;
+  text-align: center;
+  padding: 2rem 1rem;
+}
+
+.infoSection p {
+  text-align: left;
+}
+
+.whyBoxes {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.whyBox {
+  background-color: #f7a72d;
+  padding: 1rem;
+  border-radius: 10px;
+  width: 250px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.aboutSection {
+  background-color: #126487;
+  color: white;
+  text-align: center;
+  padding: 2rem;
+}
+
+.teamMembers {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+}
+
+.teamMember {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size:20pt;
+}
+
+.profilePic {
+  width: 150px;
+  height: 150px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.githubSection {
+  background-color: #f7a72d;
+  text-align: center;
+}
+
+.githubLink {
+  font-size: 1.5rem;
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
 }
 
