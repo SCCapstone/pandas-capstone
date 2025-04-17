@@ -59,7 +59,7 @@ describe('PopupProfile Component', () => {
     render(<PopupProfile {...mockProps} />);
 
     await waitFor(() => {
-      expect(screen.getByText(`${mockUser.first_name} ${mockUser.last_name}'s Profile`)).toBeInTheDocument();
+      expect(screen.getByText(`${mockUser.first_name} ${mockUser.last_name}`)).toBeInTheDocument();
       expect(screen.getByText(`@${mockUser.username}`)).toBeInTheDocument();
       expect(screen.getByText(mockUser.bio)).toBeInTheDocument();
     });
@@ -93,7 +93,7 @@ describe('PopupProfile Component', () => {
   
     // Wait for the component to load
     await waitFor(() => {
-      expect(screen.getByText(`${mockUser.first_name} ${mockUser.last_name}'s Profile`)).toBeInTheDocument();
+      expect(screen.getByText(`${mockUser.first_name} ${mockUser.last_name}`)).toBeInTheDocument();
     });
   
     // Create a DOM element that's outside the popup
@@ -147,7 +147,7 @@ describe('PopupProfile Component', () => {
     render(<PopupProfile {...mockProps} />);
 
     await waitFor(() => {
-      expect(screen.getByText('No study tags specified.')).toBeInTheDocument();
+      expect(screen.getByText('No study tags specified')).toBeInTheDocument();
     });
   });
 });
