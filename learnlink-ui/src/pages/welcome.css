@@ -22,7 +22,7 @@ h1, h2, h3, h4, h5, h6 {
   min-height: 100vh;
   align-items: center;
   background-color: #D4EAF7;
-  padding: 20px;
+  padding-top: 20px;
 }
 
 .Logo2 {
@@ -39,7 +39,7 @@ h1, h2, h3, h4, h5, h6 {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding:20px;
+  padding-top:25px;
 }
 
 .videoSection,
@@ -47,7 +47,7 @@ h1, h2, h3, h4, h5, h6 {
 .aboutSection,
 .githubSection {
   width: 100vw;
-  padding: 2rem 1rem;
+  padding: 1.5rem .5rem;
   margin: 0;
   box-sizing: border-box;
 }
@@ -58,7 +58,6 @@ h1, h2, h3, h4, h5, h6 {
   align-items: center;
   justify-content: center;
   text-align: center;
-  gap: 20px;
   width: 100%;
   padding:20px;
 }
@@ -159,67 +158,39 @@ p {
   text-decoration: underline;
 }
 
-
-@media (max-width: 1024px) {
-  .menuButtons {
-    font-size: 22px;
-  }
+.videoPlaceholder {
+  width: 45%;
 }
 
-@media (max-width: 768px) {
-  .welcome {
-    gap: 30px;
-  }
-
-  .well {
-    font-size: 40px;
-  }
-
-  p {
-    font-size: 18px;
-  }
-
-  .getStarted {
-    width: 60%;
-  }
-
-  .menuButtonGroup {
-    gap: 15px;
-  }
-
-  .menuButtons {
-    width: 45%;
-    padding: 15px;
-    font-size: 20px;
-    min-height: 120px;
-  }
-}
-
-@media (max-width: 480px) {
-  .menuButtons {
-    width: 100%;
-    font-size: 16px;
-    min-height: 100px;
-  }
-}
 
 .videoSection {
   background-color: #126487;
-  color: white;
+  color: #d6ecf7;
   text-align: center;
-  padding: 2rem;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-.videoPlaceholder {
-  width: 90%;
-  max-width: 500px;
-  margin-top: 1rem;
+.videoSection:hover h1 {
+  transform: scale(1.05);
 }
+
+
+.videoSection p {
+  color: #d6ecf7;
+  transition: color 0.3s ease;
+}
+
+.videoSection:hover{
+  background-color: #f7a72d;
+  color: #126487;
+}
+
 
 .infoSection {
   background-color: #d6ecf7;
   text-align: center;
   padding: 2rem 1rem;
+  color: #126487;
 }
 
 .infoSection p {
@@ -230,16 +201,26 @@ p {
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
-  gap: 1rem;
+  gap: 2rem;
   margin-top: 2rem;
+  color:#d6ecf7;
 }
 
 .whyBox {
   background-color: #f7a72d;
   padding: 1rem;
   border-radius: 10px;
-  width: 250px;
+  width: 200px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.whyBox p{
+  font-size: 12pt;
+  text-align:center;
+}
+
+.whyBox img{
+  width: 65%;
 }
 
 .aboutSection {
@@ -281,18 +262,86 @@ p {
 }
 
 .githubSection {
-  background-color: #f7a72d;
+  background-color:#d6ecf7;
   text-align: center;
 }
 
 .githubLink {
   font-size: 1.5rem;
-  color:#d6ecf7;
+  color:#126487;
   text-decoration: none;
   font-weight: bold;
+  display: inline-block;
+  font-size: 1.5rem;
+  transition: transform 0.3s ease, text-shadow 0.3s ease, color 0.3s ease;
 }
 
 .githubLink:hover{
+  transform: scale(1.05);
   color: #126487;
 }
 
+.githubSection:hover{
+  background-color:#f7a72d;
+  transition:  background-color 0.3s ease;
+}
+
+.whyBox img {
+  max-width: 100%; 
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+
+@media (max-width: 480px) {
+  .menuButtons {
+    width: 60%;
+    font-size: 16px;
+    min-height: 100px;
+  }
+  .well{
+    padding-top: 35px;
+    
+  }
+}
+
+@media (max-width: 768px) {
+
+  .well {
+    font-size: 40px;
+    padding: 30px;
+  }
+
+  .titleContainer p{
+    margin-top: -10px;
+  }
+  
+
+  p {
+    font-size: 18px;
+  }
+
+  .getStarted {
+    width: 60%;
+  }
+
+
+  .menuButtons {
+    width: 30%;
+    padding: 15px;
+    font-size: 20px;
+    min-height: 120px;
+  }
+
+  .whyBox {
+    width: 45%;
+    padding: 15px;
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .menuButtons {
+    font-size: 22px;
+  }
+}

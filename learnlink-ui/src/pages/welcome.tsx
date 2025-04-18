@@ -8,13 +8,14 @@ import studyGroupsImage from '../images/study-groups.png';
 import calculatorImage from '../images/calculator.png';
 import messagingImage from '../images/messaging.png';
 import resourcesImage from '../images/resources.png';
+import studySmarter from '../images/study-smarter-cropped.png';
+import stayConnected from '../images/stay-connected.png';
+import trackProgress from '../images/track-progress.png';
 import videoPlaceholder from '../images/video-placeholder.png';
 import kennedy from '../images/profile pictures/kennedy-profile.png';
 import kelly from '../images/profile pictures/kelly-profile.png';
 import natalie from '../images/profile pictures/natalie-profile.png';
-
 import rae from '../images/profile pictures/rae-profile.jpeg';
-
 
 function Welcome() {
     const navigate = useNavigate();
@@ -55,14 +56,14 @@ function Welcome() {
 
                 {/* Demo Section */}
                 <div className="videoSection">
-                    <h2>See LearnLink in Action</h2>
+                    <h1>See LearnLink in Action</h1>
                     <p>Watch our short demo to learn how it works!</p>
                     <img src={videoPlaceholder} alt="Demo video placeholder" className="videoPlaceholder"/>
                 </div>
 
                 {/* Why LearnLink Section */}
                 <div className="infoSection">
-                    <h2>Why LearnLink?</h2>
+                    <h1>Why LearnLink?</h1>
                     <p>
                         Large classes can feel overwhelming. LearnLink makes collaboration easy by helping you connect
                         with the right study partners, keep conversations organized, and track your success.
@@ -75,23 +76,26 @@ function Welcome() {
 
                     <div className="whyBoxes">
                         <div className="whyBox">
-                            <h3>Study Smarter</h3>
+                            <h2>Study Smarter</h2>
                             <p>Find peers with similar schedules and goals.</p>
+                            <img src={studySmarter} alt="Study Smarter Icon" />
                         </div>
                         <div className="whyBox">
-                            <h3>Stay Connected</h3>
+                            <h2>Stay Connected</h2>
                             <p>Easy messaging and notifications.</p>
+                            <img src={stayConnected} alt="Stay Connected Icon" />
                         </div>
                         <div className="whyBox">
-                            <h3>Track Progress</h3>
+                            <h2>Track Progress</h2>
                             <p>Use our built-in calculator to stay on track.</p>
+                            <img src={trackProgress} alt="Study Groups Icon" />
                         </div>
                     </div>
                 </div>
 
                 {/* Team Section */}
                 <div className="aboutSection">
-                    <h2>Meet the Team</h2>
+                    <h1>Meet the Team</h1>
                     <div className="teamMembers">
                         <div className="teamMember"><img className="profilePic" src={natalie} alt="kennedy-profile" /><p>Natalie Crawford</p></div>
                         <div className="teamMember"><img className="profilePic" src={kelly} alt="kennedy-profile" /><p>Kelly Finnegan</p></div>
