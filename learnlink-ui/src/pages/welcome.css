@@ -1,14 +1,12 @@
+/* Welcome CSS */
 :root {
   font-family: Inter, sans-serif;
   font-feature-settings: 'liga' 1, 'calt' 1;
 }
 @supports (font-variation-settings: normal) {
-  :root { font-family: InterVariable, sans-serif; }
-}
-
-body .welcome {
-  background-image: url('../components/Curve.svg');
-  background-repeat: no-repeat;
+  :root {
+    font-family: InterVariable, sans-serif;
+  }
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -16,44 +14,54 @@ h1, h2, h3, h4, h5, h6 {
   font-family: 'Inter';
 }
 
+p {
+  font-size: 25px;
+  color: #004c72;
+}
+
+body .welcome {
+  background-image: url('../components/Curve.svg');
+  background-repeat: no-repeat;
+}
+
 .welcome {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  gap: 50px;
   align-items: center;
   background-color: #D4EAF7;
-  padding: 20px;
-}
-
-.Logo2 {
-  position: absolute; /* Position the logo absolutely */
-  top: 20px; /* Adjust this value as needed for vertical spacing */
-  left: 20px; /* Adjust this value for horizontal spacing */
-  width: 150px; /* Adjust the width of the logo if needed */
-  height: auto;
+  padding-top: 20px;
 }
 
 .WelcomePage {
-  width: 70%;
   margin-top: 60px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  padding-top: 25px;
 }
 
+.videoSection,
+.infoSection,
+.aboutSection,
+.githubSection {
+  width: 100vw;
+  padding: 1.5rem 0.5rem;
+  box-sizing: border-box;
+}
+
+/* Title Container */
 .titleContainer {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
-  gap: 20px;
   width: 100%;
+  padding: 20px;
 }
 
-/* Main heading */
 .well {
   font-size: 56px;
   color: #004c72;
@@ -62,11 +70,16 @@ h1, h2, h3, h4, h5, h6 {
   margin-bottom: 0;
 }
 
-p {
-  font-size: 25px;
-  color: #004c72;
+/* Logo */
+.Logo2 {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  width: 300px;
+  height: auto;
 }
 
+/* Get Started Button */
 .getStarted {
   background-color: #FEAD2B;
   color: #FFFEFB;
@@ -76,7 +89,6 @@ p {
   border-radius: 12px;
   border-color: #FEAD2B;
   width: 25%;
-  max-width: 600px;
   height: 50px;
   display: flex;
   justify-content: center;
@@ -91,51 +103,180 @@ p {
   transform: scale(1.05);
 }
 
-/* Menu button group styling */
+/* Top Feature Boxes */
 .menuButtonGroup {
   display: flex;
   justify-content: center;
-  gap: 20px; /* Space between buttons */
-  flex-wrap: wrap; /* Ensure buttons wrap on smaller screens */
+  gap: 20px;
+  flex-wrap: wrap;
   width: 100%;
+  padding: 40px;
 }
 
-/* Menu buttons */
 .menuButtons {
-  font-size: 25px; /* Default font size for larger screens */
+  font-size: 25px;
   font-weight: 700;
   width: 18%;
-  min-height: 150px; /* Set a fixed minimum height to avoid resizing when text wraps */
+  min-height: 150px;
   text-align: center;
   border-radius: 15px;
   padding: 20px;
   background-color: #00668C;
   color: #FFFEFB;
-  transition: background-color 0.3s ease-in-out, transform 0.2s ease;
   display: flex;
   flex-direction: column;
-  justify-content: center; /* Vertically center the content */
+  justify-content: center;
+  transition: background-color 0.3s ease-in-out, transform 0.2s ease;
 }
 
-/* Menu buttons images */
 .menuButtons img {
-  max-width: 100%; 
+  max-width: 100%;
   height: auto;
   display: block;
   margin: 0 auto;
 }
 
-.videoSection, .infoSection, .aboutSection, .githubSection {
-  margin: 40px auto;
-  max-width: 800px;
+/* Video Section */
+.videoSection {
+  background-color: #00668C;
+  color: #d6ecf7;
   text-align: center;
-  padding: 20px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.videoSection:hover {
+  background-color: #f7a72d;
+  color: #126487;
+}
+
+.videoSection:hover h1 {
+  transform: scale(1.05);
+}
+
+.videoSection p {
+  color: #d6ecf7;
+  transition: color 0.3s ease;
 }
 
 .videoPlaceholder {
   width: 100%;
   max-width: 700px;
   border-radius: 8px;
+}
+
+.videoPlaceholder {
+  width: 25%;
+}
+
+/* Info Section */
+.infoSection {
+  background-color: #d6ecf7;
+  text-align: center;
+  padding: 2rem 1rem;
+  color: #126487;
+}
+
+.infoSection p {
+  max-width: 950px;
+  margin: 0 auto 1.5rem;
+  line-height: 1.6;
+  font-size: 1.1rem;
+  color: #444;
+  text-align: left;
+}
+
+/* Why Section */
+.whyBoxes {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 2rem;
+  margin-top: 2rem;
+  color: #d6ecf7;
+}
+
+.whyBox {
+  background-color: #f7a72d;
+  padding: 20px;
+  border-radius: 16px;
+  width: 300px;
+  cursor: pointer;
+  box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.whyBox:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.whyBox p {
+  font-size: 15pt;
+  text-align: center;
+}
+
+.whyBox img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+  width: 40%;
+}
+
+/* Screenshot Overlay */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modalContent {
+  position: relative;
+  background: white;
+  padding: 2rem;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.modalContent img {
+  max-width: 90vw;
+  max-height: 90vh;
+  object-fit: contain;
+}
+
+.closeButton {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(255, 0, 0, 0.8);
+  color: white;
+  border: none;
+  padding: 0.5rem;
+  font-size: 1.5rem;
+  border-radius: 50%;
+  cursor: pointer;
+  z-index: 1100;
+  width: 50px;
+  height: 50px;
+}
+
+.closeButton:hover {
+  background: rgba(255, 0, 0, 1);
+}
+
+/* About Section */
+.aboutSection {
+  background-color: #126487;
+  color: white;
+  text-align: center;
+  padding: 2rem;
 }
 
 .aboutSection ul {
@@ -156,20 +297,89 @@ p {
   text-decoration: underline;
 }
 
+/* Team Members */
+.teamMembers {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+}
 
-@media (max-width: 1024px) {
+.teamMember {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 20pt;
+}
+
+.teamMember p {
+  color: #d6ecf7;
+  font-size: 10pt;
+  width: 100%;
+  text-align: center;
+}
+
+.profilePic {
+  width: 150px;
+  height: 150px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  transition: transform 0.3s ease;
+}
+
+.profilePic:hover {
+  transform: scale(1.1);
+}
+
+/* Github Section */
+.githubSection {
+  background-color: #d6ecf7;
+  text-align: center;
+}
+
+.githubSection:hover {
+  background-color: #f7a72d;
+  transition: background-color 0.3s ease;
+}
+
+.githubLink {
+  font-size: 1.5rem;
+  color: #126487;
+  text-decoration: none;
+  font-weight: bold;
+  display: inline-block;
+  transition: transform 0.3s ease, text-shadow 0.3s ease, color 0.3s ease;
+}
+
+.githubLink:hover {
+  transform: scale(1.05);
+  color: #126487;
+}
+
+/* Responsive Styles */
+@media (max-width: 480px) {
   .menuButtons {
-    font-size: 22px;
+    width: 60%;
+    font-size: 16px;
+    min-height: 100px;
+  }
+
+  .well {
+    padding-top: 35px;
   }
 }
 
 @media (max-width: 768px) {
-  .welcome {
-    gap: 30px;
-  }
-
   .well {
     font-size: 40px;
+    padding: 30px;
+  }
+
+  .titleContainer p {
+    margin-top: -10px;
   }
 
   p {
@@ -180,23 +390,22 @@ p {
     width: 60%;
   }
 
-  .menuButtonGroup {
-    gap: 15px;
-  }
-
   .menuButtons {
-    width: 45%;
+    width: 30%;
     padding: 15px;
     font-size: 20px;
     min-height: 120px;
   }
-}
 
-@media (max-width: 480px) {
-  .menuButtons {
-    width: 100%;
-    font-size: 16px;
-    min-height: 100px;
+  .whyBox {
+    width: 45%;
+    padding: 15px;
+    font-size: 20px;
   }
 }
 
+@media (max-width: 1024px) {
+  .menuButtons {
+    font-size: 22px;
+  }
+}

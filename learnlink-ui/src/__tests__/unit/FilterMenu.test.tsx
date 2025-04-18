@@ -21,10 +21,12 @@ jest.mock('../../utils/format', () => ({
   useColleges: () => ({
     isLoading: false,
     colleges: [
-      { label: 'Engineering', value: 'engineering' },
-      { label: 'Business', value: 'business' },
-      { label: 'Arts', value: 'arts' },
+      { label: 'The University of Alabama', value: 'The University of Alabama' },
     ],
+  }),
+  useCourses: () => ({ // Add this mock
+    isLoadingCourses: false,
+    courses: ['Biology 101', 'Chemistry 101', 'Physics 101'],
   }),
   formatEnum: (value: string) => value.charAt(0).toUpperCase() + value.slice(1),
   useUserAgeRange: () => ({
@@ -48,38 +50,43 @@ describe('FilterMenu Component', () => {
     expect(screen.getByText((text) => text.includes('Age Range'))).toBeInTheDocument();
     expect(screen.getByText((text) => text.includes('Gender'))).toBeInTheDocument();
 
+    // College selection
+    const collegeDropdown = screen.getByText('College:').closest('div')?.querySelector('input') as HTMLElement;
+    await userEvent.click(collegeDropdown);
+    await userEvent.type(collegeDropdown, 'The University of Alabama');
 
-    // Interact with College dropdown using placeholder
-    // Use label text matching instead of placeholder
-    const collegeInput = screen.getByText('College:').closest('div');
-    await userEvent.click(collegeInput!);
-    await userEvent.type(collegeInput!, 'Arts');
-    await waitFor(() => expect(screen.getByText('Arts')).toBeInTheDocument());
-    await userEvent.click(screen.getByText('Arts'));
+    // Wait for and select the college option
+    const collegeOption = await screen.findByText('The University of Alabama', {}, { timeout: 2000 });
+    await userEvent.click(collegeOption);
 
-    const courseInput = screen.getByText('Course:').closest('div');
-    await userEvent.click(courseInput!);
-    await userEvent.type(courseInput!, 'Biology 101');
+     // Course selection
+    const courseDropdown = screen.getByText('Courses:').closest('div')?.querySelector('input') as HTMLElement;
+    await userEvent.click(courseDropdown);
+    await userEvent.type(courseDropdown, 'Biology 101');
+    
+    // Wait for and select the course option
+    const courseOption = await screen.findByText('Biology 101', {}, { timeout: 2000 });
+    await userEvent.click(courseOption);
 
-    // Simulate a dropdown suggestion appearing (optional mock if needed)
-    await waitFor(() => expect(screen.getByText('Biology 101')).toBeInTheDocument());
-    await userEvent.click(screen.getByText('Biology 101'));
-
-
-    // Click Apply Filters
-    const applyBtn = screen.getByText('Apply Filters');
-    await userEvent.click(applyBtn);
-
-    // Click Clear
+    
+    // Apply and clear filters
+    await userEvent.click(screen.getByText('Apply Filters'));
     const clearBtn = screen.getByText('Clear');
     await userEvent.click(clearBtn);
-
+    
     // Verify options are cleared
     await waitFor(() => {
-      expect(screen.queryByText('Arts')).not.toBeInTheDocument();
-      expect(screen.queryByText('Biology 101')).not.toBeInTheDocument();
+      // Check selected values are cleared
+      expect(screen.queryByText('The University of Alabama', { selector: '.select__multi-value__label' }))
+        .not.toBeInTheDocument();
+      expect(screen.queryByText('Biology 101', { selector: '.select__multi-value__label' }))
+        .not.toBeInTheDocument();
+      
+      // Also verify the inputs are cleared
+      const collegeInput = screen.getByText('College:').closest('div')?.querySelector('input') as HTMLInputElement;
+      expect(collegeInput.value).toBe('');
     });
   });
 });
 
-/* This keeps failing will come back to it*/
+

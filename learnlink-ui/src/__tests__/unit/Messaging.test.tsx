@@ -185,6 +185,16 @@ describe('Messaging Component', () => {
     (useLocation as jest.Mock).mockReturnValue(mockLocation);
   });
 
+  afterEach(async () => {
+    // Clear all timers
+    jest.clearAllTimers();
+  
+  });
+  
+  afterAll(async () => {
+    
+  });
+
   const renderMessaging = () => {
     return render(
       <MemoryRouter>

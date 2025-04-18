@@ -2,6 +2,7 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import EditStudyGroup from '../../components/EditStudyGroup';
+import { useCourses } from '../../utils/format'; 
 
 // Mock axios with proper ESM handling
 jest.mock('axios', () => ({
@@ -47,6 +48,20 @@ jest.mock('../../components/ProfilePictureModal', () => ({
   default: () => <div data-testid="profile-picture-modal" />,
 }));
 
+// Mock format utilities
+jest.mock('../../utils/format', () => ({
+  __esModule: true,
+  ...jest.requireActual('../../utils/format'), // Keep other actual implementations
+  useCourses: jest.fn(() => ({
+    courses: ['Mathematics', 'Physics', 'Chemistry'],
+    isLoadingCourses: false,
+    error: null,
+  })),
+  formatEnum: jest.fn((str) => str), // Simple mock that returns the input
+  normalizeCourseInput: jest.fn((str) => str), // Mock if needed
+  selectStyles: {}, // Mock if needed
+}));
+
 describe('EditStudyGroup Component Unit Tests', () => {
   const mockOnClose = jest.fn();
   const mockUpdateChatName = jest.fn();
@@ -79,6 +94,13 @@ describe('EditStudyGroup Component Unit Tests', () => {
         }),
       })
     ) as jest.Mock;
+  
+    // Reset and properly mock useCourses
+    (useCourses as jest.Mock).mockReturnValue({
+      courses: ['Mathematics', 'Physics', 'Chemistry'],
+      isLoadingCourses: false,
+      error: null,
+    });
   });
 
   afterEach(() => {
@@ -102,6 +124,7 @@ describe('EditStudyGroup Component Unit Tests', () => {
     );
   };
 
+  
   it('should render with initial study group data', async () => {
     renderComponent();
     

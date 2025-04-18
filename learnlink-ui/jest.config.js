@@ -26,4 +26,8 @@ module.exports = {
   detectOpenHandles: true,             // Helps identify async operations that weren't stopped
   forceExit: true,                     // Force Jest to exit after tests complete
   testTimeout: 30000,                  // Increase timeout if tests are slow
+  "resetMocks": true,
+  "resetModules": true,
+  "restoreMocks": true
+  
 };

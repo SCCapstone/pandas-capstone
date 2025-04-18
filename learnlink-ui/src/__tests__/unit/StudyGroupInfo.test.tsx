@@ -151,6 +151,13 @@ describe('StudyGroupInfo Component Unit Tests', () => {
   });
 
 
+  afterEach(async () => {
+    // Clear all timers
+    jest.clearAllTimers();
+  
+  });
+  
+  
   const renderComponent = (props = {}) => {
     return render(
       <MemoryRouter>

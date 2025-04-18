@@ -6,7 +6,7 @@ import './components.css';
 import Logo from '../components/Logo';
 import { FaSearch, FaBell, FaCog, FaUserCircle, FaTimes, FaSlidersH } from 'react-icons/fa';
 import Select from 'react-select';
-import { useEnums, formatEnum, useColleges,useUserAgeRange } from '../utils/format';
+import { useEnums, formatEnum, useColleges,useUserAgeRange, useCourses} from '../utils/format';
 import  makeAnimated from 'react-select/animated';
 import { set } from 'react-hook-form';
 import ReactSlider from 'react-slider'
@@ -36,6 +36,8 @@ const navigate = useNavigate();
 
   const { grade, gender, studyHabitTags } = useEnums();
   const { isLoading, colleges } = useColleges();
+  const { isLoadingCourses, courses } = useCourses();
+
   const { maxAge, minAge } = useUserAgeRange();
 
   const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
@@ -173,12 +175,15 @@ const navigate = useNavigate();
           />
         </div>
         <div className="coursework-filter">
-          <label>Course:</label>
+          <label>Courses:</label>
           <Select
             isMulti
             name="course-filter"
             components={animatedComponents}
-            options={[]} // Can be prefilled with options if needed
+            options={isLoadingCourses ? [] : courses.map((course) => ({
+              label: course,
+              value: course,
+            }))} // Can be prefilled with options if needed
             value={selectedCourses}
             onChange={handleCourseChange}
             isClearable

@@ -251,41 +251,66 @@ const PublicProfile: React.FC = () => {
                                         </div>
                                         <div className="detail-item">
                                             <span className="detail-label">Major</span>
-                                            <span className="detail-value">{user.major?.length >0 ? user.major : "N/A"}</span>
-                                        </div>
-                                        <div className="detail-item">
-                                            <span className="detail-label">Gender</span>
-                                            <span className="detail-value">{formatEnum(user.gender)?.length > 0 ? formatEnum(user.gender) : "N/A"}</span>
-                                        </div>
-                                        <div className="detail-item">
-                                            <span className="detail-label">Relevant Coursework</span>
-                                            <span className="detail-value">{user.relevant_courses?.length > 0 ? user.relevant_courses : "N/A"}</span>
-                                        </div>
-                                        <div className="detail-item">
-                                            <span className="detail-label">Fav Study Method</span>
-                                            <span className="detail-value">{user.study_method?.length > 0 ? user.study_method : "N/A"}</span>
-                                        </div>
-                                    </div>
-                                    <div className='tags-buttons'>
-                                        <div className='tags-detail'>
-                                            <span className="detail-label">Study Tags</span>
-                                            <div className="profile-tags">
-                                                {user.studyHabitTags?.length > 0 ? (
-                                                    user.studyHabitTags.map((tag: string, index: number) => (
-                                                        <span key={index} className={`tag ${tag}`}>
-                                                            {formatEnum(tag)}
-                                                        </span>
-                                                    ))
-                                                ) : (
-                                                    <span className="detail-value">No study tags specified</span>
-                                                )}
+                                                    <span className="detail-value">{user.major?.length > 0 ? user.major : "N/A"}</span>
+                                                </div>
+                                                <div className="detail-item">
+                                                    <span className="detail-label">Gender</span>
+                                                    <span className="detail-value">{formatEnum(user.gender)?.length > 0 ? formatEnum(user.gender) : "N/A"}</span>
+                                                </div>
+                                                <div className="detail-item">
+                                                    <span className="detail-label">Fav Study Method</span>
+                                                    <span className="detail-value">{user.study_method?.length > 0 ? user.study_method : "N/A"}</span>
+                                                </div>
+                                                <div className="detail-item">
+                                                    <span className="detail-label">Relevant Coursework</span>
+                                                    <div className="profile-tags">
+                                                        {user.relevant_courses?.length > 0 ? (
+                                                            user.relevant_courses.map((course: string, index: number) => (
+                                                                <span key={index} className="tag course-tag">
+                                                                    {course}
+                                                                </span>
+                                                            ))
+                                                        ) : (
+                                                            <span className="detail-value">N/A</span>
+                                                        )}
+                                                    </div>                                        
+                                                </div>
+                                                <div className='tags-detail'>
+                                                    <span className="detail-label">Study Tags</span>
+                                                    <div className="profile-tags">
+                                                        {user.studyHabitTags?.length > 0 ? (
+                                                            user.studyHabitTags.map((tag: string, index: number) => (
+                                                                <span key={index} className={`tag ${tag}`}>
+                                                                    {formatEnum(tag)}
+                                                                </span>
+                                                            ))
+                                                        ) : (
+                                                            <span className="detail-value">No study tags specified</span>
+                                                        )}
 
+                                                    </div>
+                                                </div>
                                             </div>
-                                        </div>
+                                            <div className='tags-buttons'>
+                                                {/* <div className='tags-detail'>
+                                                    <span className="detail-label">Study Tags</span>
+                                                    <div className="profile-tags">
+                                                        {user.studyHabitTags?.length > 0 ? (
+                                                            user.studyHabitTags.map((tag: string, index: number) => (
+                                                                <span key={index} className={`tag ${tag}`}>
+                                                                    {formatEnum(tag)}
+                                                                </span>
+                                                            ))
+                                                        ) : (
+                                                            <span className="detail-value">No study tags specified</span>
+                                                        )}
 
-                                        <div className="public-action-buttons" >
-                                            <button className={`match-button-status-${matchButton.buttonText.toLowerCase()}`}
-                                                disabled={matchButton.isButtonDisabled}
+                                                    </div>
+                                                </div> */}
+
+                                                <div className="public-action-buttons" >
+                                                    <button className={`match-button-status-${matchButton.buttonText.toLowerCase()}`}
+                                                        disabled={matchButton.isButtonDisabled}
                                                 onClick={handleInvite}
                                             >
 

@@ -33,7 +33,7 @@ describe('PopupProfile Component', () => {
     major: 'Computer Science',
     gender: 'MALE',
     grade: 'SENIOR',
-    relevant_courses: 'CS101, CS202',
+    relevant_courses: ['CS101', 'CS202'],
     study_method: 'Pomodoro',
     studyHabitTags: ['MORNING_PERSON', 'QUIET_ENVIRONMENT']
   };
@@ -59,7 +59,7 @@ describe('PopupProfile Component', () => {
     render(<PopupProfile {...mockProps} />);
 
     await waitFor(() => {
-      expect(screen.getByText(`${mockUser.first_name} ${mockUser.last_name}'s Profile`)).toBeInTheDocument();
+      expect(screen.getByText(`${mockUser.first_name} ${mockUser.last_name}`)).toBeInTheDocument();
       expect(screen.getByText(`@${mockUser.username}`)).toBeInTheDocument();
       expect(screen.getByText(mockUser.bio)).toBeInTheDocument();
     });
@@ -93,7 +93,7 @@ describe('PopupProfile Component', () => {
   
     // Wait for the component to load
     await waitFor(() => {
-      expect(screen.getByText(`${mockUser.first_name} ${mockUser.last_name}'s Profile`)).toBeInTheDocument();
+      expect(screen.getByText(`${mockUser.first_name} ${mockUser.last_name}`)).toBeInTheDocument();
     });
   
     // Create a DOM element that's outside the popup
@@ -141,13 +141,14 @@ describe('PopupProfile Component', () => {
       ...mockUser,
       bio: '',
       studyHabitTags: [],
+      relevant_courses: [],
     };
     require('axios').default.get.mockResolvedValueOnce({ data: minimalUser });
 
     render(<PopupProfile {...mockProps} />);
 
     await waitFor(() => {
-      expect(screen.getByText('No study tags specified.')).toBeInTheDocument();
+      expect(screen.getByText(/No study tags specified/i)).toBeInTheDocument();
     });
   });
 });

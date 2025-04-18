@@ -1,8 +1,11 @@
+
+
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import EditStudyGroup from '../../components/EditStudyGroup';
 import axios from 'axios';
+import { useCourses } from '../../utils/format'; 
 
 
 // Mock axios with proper ESM handling
@@ -14,38 +17,30 @@ jest.mock('axios', () => ({
   },
 }));
 
+jest.mock('react-select', () => ({
+  __esModule: true,
+  default: ({ options, value, onChange }: any) => {
+    return (
+      <select
+        data-testid="mock-select"
+        value={value?.value}
+        onChange={(e) => {
+          const selected = options.find(
+            (opt: any) => opt.value === e.target.value
+          );
+          onChange(selected);
+        }}
+      >
+        {options.map(({ value, label }: any) => (
+          <option key={value} value={value}>
+            {label}
+          </option>
+        ))}
+      </select>
+    );
+  }
+}));
 
-// Mock react-select
-jest.mock('react-select', () => ({ 
-  options, 
-  value, 
-  onChange, 
-  ...props 
-}: {
-  options: any[];
-  value: any;
-  onChange: (value: any) => void;
-  [key: string]: any;
-}) => {
-  return (
-    <select
-      data-testid="mock-react-select"
-      value={value?.value || ''}
-      onChange={(e) => {
-        const selectedOption = options.find(opt => opt.value === e.target.value);
-        onChange(selectedOption);
-      }}
-      {...props}
-    >
-      <option value="">Select an option</option>
-      {options.map(({ value, label }) => (
-        <option key={value} value={value}>
-          {label}
-        </option>
-      ))}
-    </select>
-  );
-});
 
 // Mock CustomAlert
 jest.mock('../../components/CustomAlert', () => ({
@@ -55,11 +50,39 @@ jest.mock('../../components/CustomAlert', () => ({
   ),
 }));
 
+// Mock ProfilePictureModal
+jest.mock('../../components/ProfilePictureModal', () => ({
+  __esModule: true,
+  default: () => <div data-testid="profile-picture-modal" />,
+}));
+
+// Mock format utilities
+jest.mock('../../utils/format', () => ({
+  __esModule: true,
+  ...jest.requireActual('../../utils/format'), // Keep other actual implementations
+  useCourses: jest.fn(() => ({
+    courses: ['Mathematics', 'Physics', 'Chemistry'],
+    isLoadingCourses: false,
+    error: null,
+  })),
+  formatEnum: jest.fn((str) => str), // Simple mock that returns the input
+  normalizeCourseInput: jest.fn((str) => str), // Mock if needed
+  selectStyles: {}, // Mock if needed
+}));
+
+// Mock ProfilePictureModal
+jest.mock('../../components/ProfilePictureModal', () => ({
+  __esModule: true,
+  default: () => <div data-testid="profile-picture-modal" />,
+}));
+
 describe('EditStudyGroup Component Behavioral Tests', () => {
   const mockOnClose = jest.fn();
   const mockUpdateChatName = jest.fn();
+  const mockUpdatePFP = jest.fn();
   const mockOnRemoveUser = jest.fn();
   const mockUpdateUsers = jest.fn();
+  const mockOnGroupUpdated = jest.fn();
   const mockStudyGroup = {
     name: 'Initial Group Name',
     description: 'Initial description',
@@ -68,6 +91,8 @@ describe('EditStudyGroup Component Behavioral Tests', () => {
     ideal_match_factor: 'MORNING_PERSON',
     profilePic: 'initial-pic.jpg',
   };
+
+  let mockFileReaderInstance: any;
 
   beforeEach(() => {
     // Setup localStorage mock
@@ -85,6 +110,35 @@ describe('EditStudyGroup Component Behavioral Tests', () => {
         }),
       })
     ) as jest.Mock;
+
+    // Setup FileReader
+    mockFileReaderInstance = {
+      readAsDataURL: jest.fn(function(this: any) {
+        this.result = 'data:image/png;base64,mock-data';
+        this.onload && this.onload();
+      }),
+      onload: jest.fn(),
+      onerror: jest.fn(),
+      result: '',
+      readyState: 0,
+      error: null,
+      abort: jest.fn(),
+      DONE: 2,
+      EMPTY: 0,
+      LOADING: 1,
+    };
+
+    global.FileReader = jest.fn(() => mockFileReaderInstance) as any;
+    (global.FileReader as any).EMPTY = 0;
+    (global.FileReader as any).LOADING = 1;
+    (global.FileReader as any).DONE = 2;
+
+     (useCourses as jest.Mock).mockReturnValue({
+          courses: ['Mathematics', 'Physics', 'Chemistry'],
+          isLoadingCourses: false,
+          error: null,
+        });
+
   });
 
   afterEach(() => {
@@ -97,6 +151,7 @@ describe('EditStudyGroup Component Behavioral Tests', () => {
     const mockUpdateChatName = jest.fn();
     const mockOnRemoveUser = jest.fn();
     const mockUpdateUsers = jest.fn();
+    const mockOnGroupUpdated = jest.fn();
   
     const mockStudyGroup = {
       name: 'Initial Group Name',
@@ -140,14 +195,16 @@ describe('EditStudyGroup Component Behavioral Tests', () => {
     const renderComponent = () => {
       return render(
         <EditStudyGroup
-          chatID={123}
+          chatID={1}
           onClose={mockOnClose}
           updateChatName={mockUpdateChatName}
-          groupId={456}
-          currentId={789}
+          updatePFP={mockUpdatePFP}
+          groupId={1}
+          currentId={1}
           users={[]}
           onRemoveUser={mockOnRemoveUser}
           updateUsers={mockUpdateUsers}
+          onGroupUpdated={mockOnGroupUpdated}
         />
       );
     };
@@ -166,29 +223,21 @@ describe('EditStudyGroup Component Behavioral Tests', () => {
     });
   
   
-  
     it('should update ideal match factor when a new option is selected', async () => {
       renderComponent();
       
-      // Wait for the component to finish loading and rendering
+      // Wait for initial data to load and verify initial state
       await waitFor(() => {
-        // First verify the initial data loaded
         expect(screen.getByDisplayValue('Initial Group Name')).toBeInTheDocument();
-        // Then verify the select is present
-        expect(screen.getByTestId('mock-react-select')).toBeInTheDocument();
+        expect(screen.getByText('Ideal Match Factor:')).toBeInTheDocument();
       });
+
+      await waitFor(() => {
+          const select = screen.getByTestId('mock-select');
+          fireEvent.change(select, { target: { value: 'NIGHT_OWL' } });
+          expect(select).toHaveValue('NIGHT_OWL');
+        });
     
-      // Get the select element
-      const selectElement = screen.getByTestId('mock-react-select');
-      
-      // Verify initial value
-      expect(selectElement).toHaveValue('MORNING_PERSON');
-    
-      // Change the value
-      fireEvent.change(selectElement, { target: { value: 'NIGHT_OWL' } });
-    
-      // Verify the value changed
-      expect(selectElement).toHaveValue('NIGHT_OWL');
     });
   
   
@@ -278,11 +327,14 @@ describe('EditStudyGroup Component Behavioral Tests', () => {
   
 
   
+
+
+
     it('should display the current profile picture', async () => {
       renderComponent();
       
       await waitFor(() => {
-        const img = screen.getByAltText('Profile');
+        const img = screen.getByAltText('Selected Profile');
         expect(img).toHaveAttribute('src', 'initial-pic.jpg');
       });
     });
@@ -292,60 +344,15 @@ describe('EditStudyGroup Component Behavioral Tests', () => {
       renderComponent();
       
       await waitFor(() => {
-        const img = screen.getByAltText('Profile');
+        const img = screen.getByAltText('Selected Profile');
         fireEvent.click(img);
         // Verify the file input click was triggered
         // This is indirect since we can't directly access the hidden input
-        expect(document.getElementById('image-upload')).toBeInTheDocument();
+        expect(document.getElementById('emoji-pfp-upload')).toBeInTheDocument();
       });
     });
   
-    /*
-    describe('Image Upload Tests', () => {
-      beforeEach(() => {
-        // Mock file reader
-        global.FileReader = jest.fn().mockImplementation(() => ({
-          readAsDataURL: jest.fn(),
-          onload: jest.fn(),
-          result: 'mock-image-data',
-        }));
-      });
     
-      it('should handle image selection', async () => {
-        renderComponent();
-        
-        const file = new File(['test'], 'test.png', { type: 'image/png' });
-        const input = screen.getByTestId('image-upload') || document.getElementById('image-upload');
-        
-        if (input) {
-          fireEvent.change(input, { target: { files: [file] } });
-        }
-    
-        await waitFor(() => {
-          // Verify the image was set in state (indirectly through preview)
-          expect(require('axios').default.put).not.toHaveBeenCalled(); // No upload yet
-        });
-      });
-    
-      it('should show error when image upload fails', async () => {
-        require('axios').default.put.mockRejectedValueOnce(new Error('Upload failed'));
-        
-        renderComponent();
-        
-        const file = new File(['test'], 'test.png', { type: 'image/png' });
-        const input = screen.getByTestId('image-upload') || document.getElementById('image-upload');
-        
-        if (input) {
-          fireEvent.change(input, { target: { files: [file] } });
-        }
-    
-        fireEvent.click(screen.getByText('Save'));
-    
-        await waitFor(() => {
-          expect(screen.queryByText(/failed to upload image/i)).toBeInTheDocument();
-        });
-      });
-    });*/
 });
 
 

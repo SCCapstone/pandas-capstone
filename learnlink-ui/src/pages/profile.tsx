@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
-import { useEnums, formatEnum, useColleges } from '../utils/format';
+import { useEnums, formatEnum, useColleges, normalizeCourseInput } from '../utils/format';
 import './profile.css';
 import CopyrightFooter from '../components/CopyrightFooter';
 import makeAnimated from 'react-select/animated';
@@ -9,12 +9,37 @@ import { profile } from 'console';
 import { set } from 'react-hook-form';
 import CustomAlert from '../components/CustomAlert';
 import ProfilePictureModal from '../components/ProfilePictureModal';
+import CreatableSelect from "react-select/creatable";
+import { MultiValue } from "react-select";
+
+
 
 const animatedComponents = makeAnimated();
+
+type OptionType = {
+  label: string;
+  value: string;
+};
+
+const initialOptions: string[] = [
+  "CSCE 145",
+  "MATH 221",
+  "BIO 101L",
+];
+
 
 const Profile: React.FC = () => {
   const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
   const { isLoading, colleges } = useColleges();
+  const [options, setOptions] = useState<string[]>(initialOptions);
+  const [selectedCourses, setSelectedCourses] = useState<string[]>([]);
+
+  const handleCreate = (inputValue: string) => {
+    const normalized = normalizeCourseInput(inputValue);
+    const newOption = normalized;
+    setOptions((prev) => [...prev, newOption]);
+    setSelectedCourses((prev) => [...prev, newOption]);
+  };
   
   const [formData, setFormData] = useState({
     first_name: '',
@@ -36,6 +61,7 @@ const Profile: React.FC = () => {
 
   // State to store enum options
   const [enumOptions, setEnumOptions] = useState({ grade: [], gender: [], studyHabitTags: [] });
+  const [courseOptions, setCourseOptions] = useState<string[]>([]);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [alerts, setAlerts] = useState<{ id: number; alertText: string; alertSeverity: "error" | "warning" | "info" | "success"; visible: boolean }[]>([]);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -59,6 +85,10 @@ const Profile: React.FC = () => {
           gender: enumsData.gender,
           studyHabitTags: enumsData.studyHabitTags,
         });
+        const courseOptionsResponse = await fetch(`${REACT_APP_API_URL}/api/users/courses`);
+        const courseOptionsdata = await courseOptionsResponse.json()
+
+        setCourseOptions(courseOptionsdata)
 
         // Fetch the current user profile data
         const token = localStorage.getItem('token');
@@ -302,7 +332,8 @@ const Profile: React.FC = () => {
                     classNamePrefix="select"
                 noOptionsMessage={() => "Type to add a new college"}
             
-              /></label>
+              />
+              </label>
             </div>
                 <label>
                   Major: <input type="text" name="major" value={formData.major} onChange={handleChange} />
@@ -317,31 +348,71 @@ const Profile: React.FC = () => {
                       </option>
                     ))}
                   </select>
-                </label>
-                <label>
-                  {/* Relevant Course: <input type="text" name="relevant_courses" value={formData.relevant_courses} onChange={handleChange} /> */}
-                  Relevant Course:
-                  <input
-                    type="text"
-                    maxLength={10}
-                    name="relevant_courses"
-                    value={formData.relevant_courses.join(', ')} // Convert array to string for display
-                    onChange={(e) => {
-                      const coursesArray = e.target.value
-                        .split(',')
-                        .map((course) => {
-                          const trimmed = course.trim().toUpperCase();
-                          // Add space between letters and numbers
-                          const formatted = trimmed.replace(/^([A-Z]+)\s*([0-9]+[A-Z]*)$/, '$1 $2');
+                    </label>
+                    <div className="course-select">
+                      <label className="block text-sm font-medium mb-1">
+                        Relevant Course(s) (e.g., BIO 101, CSCE 145)
+                      </label>
+                      <CreatableSelect
+                        isMulti
+                        options={courseOptions.map((course) => ({
+                          label: course,
+                          value: course,
+                        }))}
+                        value={formData.relevant_courses.map((course) => ({
+                          label: course,
+                          value: course,
+                        }))}
+                        onChange={(selected: MultiValue<OptionType>) => {
+                          const selectedValues = selected.map((option) => option.value); // Still readonly
+
+                          setFormData((prevData) => ({
+                            ...prevData,
+                            relevant_courses: [...selectedValues], // Convert to mutable array
+                          }));
+                        }}
+                        onCreateOption={(input) => {
+                          const normalized = normalizeCourseInput(input);
+
+                          // Prevent duplicates
+                          if (!options.includes(normalized)) {
+                            setOptions((prev) => [...prev, normalized]);
+                          }
+
+                          setFormData((prevData) => ({
+                            ...prevData,
+                            relevant_courses: [...prevData.relevant_courses, normalized],
+                          }));
+                        }}
+                        placeholder="Start typing a course..."
+                        formatCreateLabel={(inputValue) =>
+                          `Add "${normalizeCourseInput(inputValue)}"`
+                        }
+                      />
+                      </div>
+                      {/* <label>
+                        Relevant Course:
+                        <input
+                          type="text"
+                          maxLength={10}
+                          name="relevant_courses"
+                          value={formData.relevant_courses.join(', ')} // Convert array to string for display
+                          onChange={(e) => {
+                          const coursesArray = e.target.value
+                            .split(',')
+                            .map((course) => {
+                              const trimmed = course.trim().toUpperCase();
+                              // Add space between letters and numbers
+                              const formatted = trimmed.replace(/^([A-Z]+)\s*([0-9]+[A-Z]*)$/, '$1 $2');
                           return formatted;
                         });
-                      setFormData((prevData) => ({
-                        ...prevData,
-                        relevant_courses: coursesArray,
-                      }));
+                      // setFormData((prevData) => ({
+                      //   ...prevData,
+                      //   relevant_courses: coursesArray,
+                      // }));
                     }}
                   />
-                </label>
+                </label> */}
                 <label>
                   Fav Study Method: <input type="text" name="study_method" value={formData.study_method} onChange={handleChange} />
                 </label>

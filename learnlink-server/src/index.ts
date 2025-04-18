@@ -321,6 +321,29 @@ app.get('/api/users/profile', authenticate, async (req, res):Promise<any> => {
   }
 });
 
+app.get('/api/users/courses', async (req, res): Promise<any> => {
+  try {
+    // Fetch all users' relevant_courses arrays
+    const users = await prisma.user.findMany({
+      select: {
+        relevant_courses: true,
+      },
+    });
+
+    // Flatten all arrays into one big array
+    const allCourses = users.flatMap((user) => user.relevant_courses || []);
+
+    // Remove duplicates using a Set
+    const uniqueCourses = [...new Set(allCourses)];
+
+    res.json(uniqueCourses.filter((course) => course.length > 0));
+  } catch (error) {
+    console.error('Error fetching all relevant courses:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+
 // Update study group schedule
 app.put('/api/study-groups/:groupId/schedule', authenticate, async (req, res): Promise<any> => {
   const { groupId } = req.params;
