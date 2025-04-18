@@ -106,7 +106,7 @@ p {
   gap: 20px; /* Space between buttons */
   flex-wrap: wrap; /* Ensure buttons wrap on smaller screens */
   width: 100%;
-  padding:20px;
+  padding:40px;
 }
 
 /* Menu buttons */
@@ -159,12 +159,12 @@ p {
 }
 
 .videoPlaceholder {
-  width: 45%;
+  width: 25%;
 }
 
 
 .videoSection {
-  background-color: #126487;
+  background-color: #00668C /*#84C3EB*/;
   color: #d6ecf7;
   text-align: center;
   transition: background-color 0.3s ease, color 0.3s ease;
@@ -181,7 +181,7 @@ p {
 }
 
 .videoSection:hover{
-  background-color: #f7a72d;
+  background-color:  #f7a72d;
   color: #126487;
 }
 
@@ -210,17 +210,17 @@ p {
   background-color: #f7a72d;
   padding: 1rem;
   border-radius: 10px;
-  width: 200px;
+  width: 40;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .whyBox p{
-  font-size: 12pt;
+  font-size: 10pt;
   text-align:center;
 }
 
 .whyBox img{
-  width: 65%;
+  width: 40%;
 }
 
 .aboutSection {
@@ -259,6 +259,29 @@ p {
   justify-content: center;
   align-items: center;
   margin-bottom: 0.5rem;
+  transition: transform 0.3s ease;
+}
+
+.infoSection p {
+  max-width: 950px;
+  margin: 0 auto 1.5rem;
+  line-height: 1.6;
+  font-size: 1.1rem;
+  color: #444;
+}
+
+ul {
+  padding-left: 1.2rem;
+  line-height: 1.8;
+}
+li {
+  list-style: none;
+  margin-bottom: 0.5rem;
+}
+
+
+.profilePic:hover {
+  transform: scale(1.1);
 }
 
 .githubSection {

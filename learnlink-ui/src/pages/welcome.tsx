@@ -63,16 +63,13 @@ function Welcome() {
 
                 {/* Why LearnLink Section */}
                 <div className="infoSection">
-                    <h1>Why LearnLink?</h1>
-                    <p>
-                        Large classes can feel overwhelming. LearnLink makes collaboration easy by helping you connect
-                        with the right study partners, keep conversations organized, and track your success.
-                    </p>
-                    <p>
-                        LearnLink helps students in large classes find reliable study partners, organize group chats,
-                        share resources, and track their grades. With our user-friendly interface and smart matching,
-                        collaboration becomes seamless and effective.
-                    </p>
+                <h1>Why LearnLink?</h1>
+<p>
+  In large classes, it’s easy to feel lost or disconnected. LearnLink simplifies collaboration by connecting you with the right study partners, keeping conversations organized, and helping you track your academic progress.
+</p>
+<p>
+  With a user-friendly interface and smart matching tools, LearnLink empowers students to build reliable study groups, share resources effortlessly, and stay on top of their goals throughout the semester.
+</p>
 
                     <div className="whyBoxes">
                         <div className="whyBox">
@@ -97,11 +94,11 @@ function Welcome() {
                 <div className="aboutSection">
                     <h1>Meet the Team</h1>
                     <div className="teamMembers">
-                        <div className="teamMember"><img className="profilePic" src={natalie} alt="kennedy-profile" /><p>Natalie Crawford</p></div>
-                        <div className="teamMember"><img className="profilePic" src={kelly} alt="kennedy-profile" /><p>Kelly Finnegan</p></div>
-                        <div className="teamMember"><img className="profilePic" src={rae} alt="rae-profile" /><p>Rae Jones</p></div>
-                        <div className="teamMember"><img className="profilePic" src={kennedy} alt="kennedy-profile" /><p>Kennedy Houston</p></div>
-                        <div className="teamMember"><img className="profilePic" src={kennedy} alt="kennedy-profile" /><p>Yesha Patel</p></div>
+                        <div className="teamMember"><a target="new" href="https://www.linkedin.com/in/natalie-crawford-b85137221/"><img className="profilePic" src={natalie} alt="kennedy-profile" /></a><p>Natalie Crawford</p></div>
+                        <div className="teamMember"><a target="new" href="https://www.linkedin.com/in/kelly-fin/"><img className="profilePic" src={kelly} alt="kennedy-profile" /></a><p>Kelly Finnegan</p></div>
+                        <div className="teamMember"><a target="new" href="https://www.linkedin.com/in/rae-j/"><img className="profilePic" src={rae} alt="rae-profile" /></a><p>Rae Jones</p></div>
+                        <div className="teamMember"><a target="new" href="https://www.linkedin.com/in/kennedy-houston-883782223/"><img className="profilePic" src={kennedy} alt="kennedy-profile" /></a><p>Kennedy Houston</p></div>
+                        <div className="teamMember"><a target="new" href="https://www.linkedin.com/in/yeshappatel/"><img className="profilePic" src={kennedy} alt="kennedy-profile" /></a><p>Yesha Patel</p></div>
                     </div>
                 </div>
 
