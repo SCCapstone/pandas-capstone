@@ -1614,9 +1614,9 @@ const Messaging: React.FC = () => {
 
 
                         return (
-                          <div key={index} className={`Message-pfp-container ${message.userId === currentUserId ? 'MyMessage-pfp-container' : ''}`}>
+                        <div key={index} className={`Message-pfp-container ${message.userId === currentUserId ? 'MyMessage-pfp-container' : ''}`}>
 
-                            <div className="MessageContainer">
+                          <div className="MessageContainer">
                               { }
                             {!message.system && (index === 0 || selectedChat.messages[index - 1].userId !== message.userId) && (
                               <div className={`message-username ${message.userId === currentUserId ? 'MyUsername' : ''}`}>
@@ -1694,7 +1694,7 @@ const Messaging: React.FC = () => {
                             {message.userId !== currentUserId ? (
                               !message.system && isLastInCluster ? (
                                 <div
-                                  className={`profilePic ${
+                                  className={`msgProfilePic ${
                                     message.userId === currentUserId ? "MyProfilePic" : ""
                                   }`}
                                 >
