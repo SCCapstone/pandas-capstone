@@ -10,15 +10,16 @@ import messagingImage from '../images/messaging.png';
 import resourcesImage from '../images/resources.png';
 import studySmarter from '../images/study-smarter-cropped.png';
 import stayConnected from '../images/stay-connected.png';
-import trackProgress from '../images/track-progress.png';
+import weeklyScheduler from '../images/weekly-scheduler.png';
 import videoPlaceholder from '../images/video-placeholder.png';
 import kennedy from '../images/profile pictures/kennedy-profile.png';
 import kelly from '../images/profile pictures/kelly-profile.png';
 import natalie from '../images/profile pictures/natalie-profile.png';
 import rae from '../images/profile pictures/rae-profile.jpeg';
+import yesha from '../images/profile pictures/yesha-profile.png';
 import studySmarterScreenshot from '../images/screenshots/Study-smarter-screenshot.png';
 import stayConnectedScreenshot from '../images/screenshots/Stay-connected-screenshot.png';
-import trackProgressScreenshot from '../images/screenshots/track-progress-screenshot.png';
+import weeklySchedulerScreenshot from '../images/screenshots/weekly-scheduler-screenshot.png';
 
 import { useState } from 'react';
 
@@ -96,10 +97,10 @@ function Welcome() {
                             <p>Easy messaging and notifications.</p>
                             <img src={stayConnected} alt="Stay Connected Icon" />
                         </div>
-                        <div title = "View Screenshot" className="whyBox" onClick={() => handleOpenModal(trackProgressScreenshot)}>
-                            <h2>Track Progress</h2>
-                            <p>Use our built-in calculator to stay on track.</p>
-                            <img src={trackProgress} alt="Track Progress Icon" />
+                        <div title = "View Screenshot" className="whyBox" onClick={() => handleOpenModal(weeklySchedulerScreenshot)}>
+                            <h2>Weekly Scheduler</h2>
+                            <p>Find the best times for your group to study together.</p>
+                            <img src={weeklyScheduler} alt="Track Progress Icon" />
                         </div>
                     </div>
                 </div>
@@ -122,7 +123,7 @@ function Welcome() {
                         <div className="teamMember"><a target="new" href="https://www.linkedin.com/in/kelly-fin/"><img className="profilePic" src={kelly} alt="kennedy-profile" /></a><p>Kelly Finnegan</p></div>
                         <div className="teamMember"><a target="new" href="https://www.linkedin.com/in/rae-j/"><img className="profilePic" src={rae} alt="rae-profile" /></a><p>Rae Jones</p></div>
                         <div className="teamMember"><a target="new" href="https://www.linkedin.com/in/kennedy-houston-883782223/"><img className="profilePic" src={kennedy} alt="kennedy-profile" /></a><p>Kennedy Houston</p></div>
-                        <div className="teamMember"><a target="new" href="https://www.linkedin.com/in/yeshappatel/"><img className="profilePic" src={kennedy} alt="kennedy-profile" /></a><p>Yesha Patel</p></div>
+                        <div className="teamMember"><a target="new" href="https://www.linkedin.com/in/yeshappatel/"><img className="profilePic" src={yesha} alt="kennedy-profile" /></a><p>Yesha Patel</p></div>
                     </div>
                 </div>
 
