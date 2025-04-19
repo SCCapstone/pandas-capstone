@@ -86,22 +86,25 @@ function Welcome() {
                     <p> In large classes, it’s easy to feel lost or disconnected. LearnLink simplifies collaboration by connecting you with the right study partners, keeping conversations organized, and helping you track your academic progress.</p>
                     <p> With a user-friendly interface and smart matching tools, LearnLink empowers students to build reliable study groups, share resources effortlessly, and stay on top of their goals throughout the semester.</p>
 
-                    <div className="whyBoxes">
-                        <div title = "View Screenshot" className="whyBox" onClick={() => handleOpenModal(studySmarterScreenshot)}>
-                            <h2>Study Smarter</h2>
-                            <p>Find peers with similar schedules and goals.</p>
-                            <img src={studySmarter} alt="Study Smarter Icon" />
-                        </div>
-                        <div title = "View Screenshot" className="whyBox" onClick={() => handleOpenModal(stayConnectedScreenshot)}>
-                            <h2>Stay Connected</h2>
-                            <p>Easy messaging and notifications.</p>
-                            <img src={stayConnected} alt="Stay Connected Icon" />
-                        </div>
-                        <div title = "View Screenshot" className="whyBox" onClick={() => handleOpenModal(weeklySchedulerScreenshot)}>
-                            <h2>Weekly Scheduler</h2>
-                            <p>Find the best times for your group to study together.</p>
-                            <img src={weeklyScheduler} alt="Track Progress Icon" />
-                        </div>
+                        <div className="whyBoxes">
+                            <div className="whyBox" onClick={() => handleOpenModal(studySmarterScreenshot)}>
+                                <div className="hoverOverlay">Click to View Screenshot</div>
+                                <h2>Study Smarter</h2>
+                                <p>Find peers with similar schedules and goals.</p>
+                                <img src={studySmarter} alt="Study Smarter Icon" />
+                            </div>
+                            <div className="whyBox" onClick={() => handleOpenModal(stayConnectedScreenshot)}>
+                                <div className="hoverOverlay">Click to View Screenshot</div>
+                                <h2>Stay Connected</h2>
+                                <p>Easy messaging and notifications.</p>
+                                <img src={stayConnected} alt="Stay Connected Icon" />
+                            </div>
+                            <div className="whyBox" onClick={() => handleOpenModal(weeklySchedulerScreenshot)}>
+                                <div className="hoverOverlay">Click to View Screenshot</div>
+                                <h2>Weekly Scheduler</h2>
+                                <p>Find the best times for your group to study together.</p>
+                                <img src={weeklyScheduler} alt="Weekly Scheduler Icon" />
+                            </div>
                     </div>
                 </div>
 

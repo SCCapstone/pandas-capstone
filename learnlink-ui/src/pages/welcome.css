@@ -223,6 +223,31 @@ body .welcome {
   width: 40%;
 }
 
+.hoverOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(200, 127, 31, 0.6);/* Dark transparent overlay */
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  transition: opacity 0.3s ease;
+  z-index: 1;
+  pointer-events: none;
+  border-radius: 16px;
+
+}
+
+.whyBox:hover .hoverOverlay {
+  opacity: 1;
+}
+
 /* Screenshot Overlay */
 .modalOverlay {
   position: fixed;
