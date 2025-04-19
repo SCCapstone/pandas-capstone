@@ -31,6 +31,7 @@ import { getLoggedInUserId } from './utils/auth';
 import PublicGroupProfile from './pages/publicGroupProfile';
 import Navbar from './components/Navbar';
 import React, { useState, useEffect } from 'react';
+import UserHome from './pages/userHome';
 
 
 
@@ -92,6 +93,7 @@ const App: React.FC = () => {
                 <Route path="/user-profile/:id" element={<PublicProfile />} />
                 <Route path="/group-profile/:id" element={<PublicGroupProfile />} />
                 <Route path="/advancedsearch" element={<AdvancedSearch />} />
+                <Route path="/user-home" element={<UserHome />} />
               </Route>
             </Routes>
           </JoinRequestNotifs>
