@@ -1,9 +1,9 @@
 import './WelcomeComponent.css';
 import studyGroupsImage from '../images/study-groups.png';
-import calculatorImage from '../images/calculator.png';
+import calendarImage from '../images/Calendar-invite.png';
 import messagingImage from '../images/messaging.png';
 import resourcesImage from '../images/resources.png';
-import studySmarter from '../images/study-smarter-cropped.png';
+import studySmarter from '../images/study-smarter.png';
 import stayConnected from '../images/stay-connected.png';
 import weeklyScheduler from '../images/weekly-scheduler.png';
 import videoPlaceholder from '../images/video-placeholder.png';
@@ -37,20 +37,28 @@ function Welcome() {
         <div>
             <div className="welcomeComponent">
 
-                <div className="menuButtonGroup">
-                    <div className="menuButtons">Study Groups
-                        <img src={studyGroupsImage} alt="Study Groups" />
-                    </div>
-                    <div className="menuButtons">Study Resources
-                        <img src={resourcesImage} alt="Study Resources" />
-                    </div>
-                    <div className="menuButtons">Messaging
-                        <img src={messagingImage} alt="Messaging" />
-                    </div>
-                    <div className="menuButtons">Grade Calculator
-                        <img src={calculatorImage} alt="Grade Calculator" />
-                    </div>
+            <div className="menuButtonGroup">
+                <div className="menuButtons">
+                    <div className="menuHoverOverlay">LearnLink helps you form study groups by matching you with study partners.</div>
+                    Study Groups
+                    <img src={studyGroupsImage} alt="Study Groups" />
                 </div>
+                <div className="menuButtons">
+                    <div className="menuHoverOverlay">LearnLink provides study tips, external resources, & a grade calculator.</div>
+                    Study Resources
+                    <img src={resourcesImage} alt="Study Resources" />
+                </div>
+                <div className="menuButtons">
+                    <div className="menuHoverOverlay">LearnLink supports 1/1 and group messaging for easy and convenient collaboration.</div>
+                    Messaging
+                    <img src={messagingImage} alt="Messaging" />
+                </div>
+                <div className="menuButtons">
+                    <div className="menuHoverOverlay">Schedule study sessions and add them to your calendar.</div>
+                    Calendar Invites
+                    <img src={calendarImage} alt="Calendar Invite" />
+                </div>
+            </div>
 
                 {/* Demo Section */}
                 <div className="videoSection">
