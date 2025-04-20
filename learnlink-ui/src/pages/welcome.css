@@ -53,7 +53,7 @@ body .welcome {
 /* Logo */
 .Logo2 {
   position: absolute;
-  top: 20px;
+  top: 30px;
   left: 20px;
   width: 300px;
   height: auto;
@@ -81,4 +81,41 @@ body .welcome {
 .getStarted:hover {
   background-color: #e8911d;
   transform: scale(1.05);
+}
+
+@media (max-width: 600px) {
+
+  .well {
+    font-size: 28px;
+    padding:15px;
+  }
+
+  .titleContainer{
+    padding: 15px;
+  }
+
+  .WelcomePage {
+    margin-top: 75px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding-top: 25px;
+  }
+
+  .logo2{
+    width: 200px;
+    height: auto;
+  }
+}
+
+@media (max-width: 480px) {
+
+
+  .logo2{
+    width: 200px;
+    height: auto;
+  }
+
+
 }

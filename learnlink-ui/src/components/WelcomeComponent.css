@@ -53,6 +53,7 @@
     gap: 20px;
     width: 100%;
     padding-top: 40px;
+    flex-wrap: wrap;
     padding-bottom: 40px;
   }
   
@@ -155,7 +156,14 @@
     font-size: 1.1rem;
     color: #444;
     text-align: left;
+    padding-left: 5px;
+    padding-right: 5px;
   }
+
+  .infoSection:hover h1 {
+    transform: scale(1.05);
+  }
+  
   
   /* Why Section */
   .whyBoxes {
@@ -181,7 +189,7 @@
     transform: scale(1.05);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   }
-  
+
   .whyBox p {
     font-size: 15pt;
     text-align: center;
@@ -330,6 +338,11 @@
   .profilePic:hover {
     transform: scale(1.1);
   }
+
+  .aboutSection:hover h1 {
+    transform: scale(1.05);
+  }
+  
   
   /* Github Section */
   .githubSection {
@@ -386,9 +399,12 @@
   }
 
   .menuButtons {
+    width: 30%;
+    padding: 15px;
     font-size: 20px;
     min-height: 120px;
   }
+
 
   .whyBox {
     font-size: 18px;
@@ -396,10 +412,7 @@
 }
 
 @media (max-width: 600px) {
-  .menuButtons {
-    font-size: 14px;
-    min-height: 90px;
-  }
+
 
   .whyBox {
     font-size: 14px;
@@ -409,10 +422,6 @@
     width: 90%;
   }
 
-  .well {
-    font-size: 32px;
-  }
-
   .menuHoverOverlay {
     font-size: 8pt;
   }
@@ -420,17 +429,13 @@
     width: 125px;
     height:125px;
   }
+  .menuButtons:hover .menuHoverOverlay {
+    opacity: 0;
+  }
+
 }
 
 @media (max-width: 480px) {
-  .menuButtons {
-    font-size: 16px;
-    width: 100px;
-  }
-
-  .well {
-    padding-top: 35px;
-  }
 
   .menuHoverOverlay {
     font-size: 8pt;
@@ -438,5 +443,8 @@
   .profilePic {
     width: 100px;
     height:100px;
+  }
+  .menuButtons:hover .menuHoverOverlay {
+    opacity: 0;
   }
 }
