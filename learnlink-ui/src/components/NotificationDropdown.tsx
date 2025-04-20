@@ -165,7 +165,7 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ setNotifCou
   };
 
   return (
-    <div className="notif-dropdown">
+    <div data-testid="notification-dropdown" className="notif-dropdown">
       {error && <p>{error}</p>} {/* Show error message if any */}
       {notifs.length > 0 && (
         <button className="clear-all-btn" onClick={handleClearAll}>
