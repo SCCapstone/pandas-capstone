@@ -28,7 +28,7 @@
       padding: 1.5rem 0.5rem;
       box-sizing: border-box;
   }
-  
+
   /* Title Container */
   .titleContainer {
     display: flex;
@@ -37,7 +37,6 @@
     justify-content: center;
     text-align: center;
     width: 100%;
-    padding: 20px;
   }
   
   .well {
@@ -46,8 +45,18 @@
     font-weight: 600;
     letter-spacing: 2px;
     margin-bottom: 0;
+    justify-content: center;
+    text-align: center;
+    align-items: center;
   }
   
+  .briefEx{
+    justify-content: center;
+    text-align: center;
+    align-items: center;
+  }
+
+
   /* Top Feature Boxes */
   .menuButtonGroup {
     display: flex;
@@ -330,6 +339,7 @@
   .aboutSection a {
     color: #0073b1;
     text-decoration: none;
+
   }
   
   .aboutSection a:hover {
@@ -354,9 +364,10 @@
   
   .teamMember p {
     color: #d6ecf7;
-    font-size: 10pt;
+    font-size: 12pt;
     width: 100%;
     text-align: center;
+    font-family: 'Inter';
   }
   
   .profilePic {

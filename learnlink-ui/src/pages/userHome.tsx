@@ -18,7 +18,7 @@ function userHome() {
                 <div>
                     <div className="titleContainer">
                         <h1 className="well">Learn more about LearnLink!</h1>
-                        <p>The best way to find study groups!</p>
+                        <p className='briefEx'>The best way to find study groups!</p>
                     </div>
                 </div>
 
