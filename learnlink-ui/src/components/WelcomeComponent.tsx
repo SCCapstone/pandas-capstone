@@ -81,10 +81,10 @@ function Welcome() {
                 {/* Why LearnLink Section */}
                 <div className="infoSection">
                     <h1>Why LearnLink?</h1>
-                    <p> Tired of studying alone or struggling to find the right people to prep with? In large classes, it’s easy to feel lost or disconnected. LearnLink is your solution.</p>
-                    <p> Our website makes it easy to find and connect with like-minded students for more productive and collaborative study sessions.</p>
-                    <p> Whether you're looking for a one-on-one partner or a full-on study squad, you can browse and match with individual users or existing groups. 
-                        Once a request is accepted, you can start messaging immediately, share weekly schedules, and send calendar invites to stay on track together.</p>
+                    <h2> Tired of studying alone or struggling to find the right people to prep with? In large classes, it’s easy to feel lost or disconnected. LearnLink is your solution. 
+                        Our website makes it easy to find and connect with like-minded students for more productive and collaborative study sessions.</h2>
+                    <h2> Whether you're looking for a one-on-one partner or a full-on study squad, you can browse and match with individual users or existing groups. 
+                        Once a request is accepted, you can start messaging immediately, share weekly schedules, and send calendar invites to stay on track together.</h2>
                         <div className="whyBoxes">
                             <div className="whyBox" onClick={() => handleOpenModal(studySmarterScreenshot)}>
                                 <div className="hoverOverlay">Click to View Screenshot</div>
@@ -118,7 +118,7 @@ function Welcome() {
                             </div>
                             <div className="whyBox" onClick={() => handleOpenModal(profileScreenshot)}>
                                 <div className="hoverOverlay">Click to View Screenshot</div>
-                                <h2>Profile</h2>
+                                <h2>Profile Page</h2>
                                 <p>Customize your profile with classes you're taking, your study preferences, and your ideal match factor.</p>
                                 <img src={profileImage} alt="Profile Icon" />
                             </div>
@@ -136,10 +136,10 @@ function Welcome() {
                             </div>
                     </div>
                     <p></p>
-                    <p> This app was built for students by students who know how challenging it can be to stay on top of coursework in large or fast-paced classes.
-                        From finding the right people to study with to coordinating your schedules, this app streamlines the entire process.
-                    </p>
-                    <p> Whether you're cramming for a final, tackling a group project, or just need a motivation boost, your next study buddy—or your entire support squad—is just a few clicks away.</p>
+                    <h2> This app was built for students by students who know how challenging it can be to stay on top of coursework in large or fast-paced classes.
+                        From finding the right people to study with to coordinating your schedules, this website streamlines the entire process.
+                    </h2>
+                    <h2> Whether you're cramming for a final, tackling a group project, or just need a motivation boost, your next study buddy—or your entire support squad—is just a few clicks away.</h2>
                 </div>
 
                 {/* Modal for Enlarged Screenshot */}
