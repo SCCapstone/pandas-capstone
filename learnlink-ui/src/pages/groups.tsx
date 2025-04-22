@@ -296,7 +296,7 @@ import { group } from 'console';
     };
     
     return (
-        <div className="Groups">
+        <div className="Groups" data-testid = "groups-component">
           <div>
             <Navbar/>
           </div>
@@ -331,7 +331,7 @@ import { group } from 'console';
               
                     {/* List of groups */}
                     {loadingGroups ? (
-                        <div className="loading-container">
+                        <div className="loading-container" data-testid ="loading-spinner" > 
                         Loading... <span className="loading-spinner"></span>
                         </div>
                     ) : (
@@ -365,7 +365,7 @@ import { group } from 'console';
                 </div>
               ) : (
                 selectedGroupUsers && (
-                  <div className="study-group-panel">
+                  <div className="study-group-panel" data-testid = "study-group-panel">
                     <StudyGroupInfo
                       chatID={selectedGroup.chatID}
                       updateChatName={updateChatName}
