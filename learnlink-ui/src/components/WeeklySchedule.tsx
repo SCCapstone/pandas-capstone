@@ -591,7 +591,7 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ studyGroupId }) => {
                         </tbody>
                     </table>
 
-                    <table className="merged-availability-table">
+                    <table aria-label="group-schedule-table" className="merged-availability-table">
                         <thead>
                             <tr>
                                 <th className="empty-cell"></th>
@@ -693,7 +693,7 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ studyGroupId }) => {
                                                 key={user.id}>
                                                 <img
                                                     src={user.profilePic || 'https://learnlink-pfps.s3.us-east-1.amazonaws.com/profile-pictures/circle_bust-in-silhouette.png'}
-                                                    alt={`${user.firstName} ${user.lastName}`}
+                                                    alt={`${user.firstName} ${user.lastName} pfp`}
                                                     className="tooltip-pfp"
                                                 ></img>
                                                 <div>
@@ -713,7 +713,7 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ studyGroupId }) => {
                                                 key={user.id}>
                                                 <img
                                                     src={user.profilePic || 'https://learnlink-pfps.s3.us-east-1.amazonaws.com/profile-pictures/circle_bust-in-silhouette.png'}
-                                                    alt={`${user.firstName} ${user.lastName}`}
+                                                    alt={`${user.firstName} ${user.lastName} pfp`}
                                                     className="tooltip-pfp"
                                                 ></img>
                                                 <div>

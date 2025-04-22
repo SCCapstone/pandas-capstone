@@ -180,10 +180,14 @@ const navigate = useNavigate();
             isMulti
             name="course-filter"
             components={animatedComponents}
-            options={isLoadingCourses ? [] : courses.map((course) => ({
-              label: course,
-              value: course,
-            }))} // Can be prefilled with options if needed
+            options={
+              isLoadingCourses || !Array.isArray(courses)
+                ? []
+                : courses.map((course) => ({
+                    label: course,
+                    value: course,
+                  }))
+            }
             value={selectedCourses}
             onChange={handleCourseChange}
             isClearable
