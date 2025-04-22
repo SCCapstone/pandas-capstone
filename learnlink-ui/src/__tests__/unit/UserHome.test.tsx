@@ -1,7 +1,4 @@
 import { render, screen } from '@testing-library/react';
-import Navbar from '../../components/Navbar';
-import Copyright from '../../components/CopyrightFooter';
-import WelcomeComponent from '../../components/WelcomeComponent';
 import UserHome from '../../pages/userHome';
 
 
@@ -9,7 +6,7 @@ jest.mock('../../components/Navbar', () => () => <div data-testid="navbar">Mock 
 jest.mock('../../components/CopyrightFooter', () => () => <div data-testid="copyright">Mock Copyright</div>);
 jest.mock('../../components/WelcomeComponent', () => () => <div data-testid="welcome">Mock WelcomeComponent</div>);
 
-describe('UserHome component', () => {
+describe('UserHome page', () => {
     beforeEach(() => {
       render(<UserHome />);
     });
