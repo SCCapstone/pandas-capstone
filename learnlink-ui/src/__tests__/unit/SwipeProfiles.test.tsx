@@ -27,6 +27,18 @@ jest.mock('react-router-dom', () => ({
   useNavigate: () => jest.fn(),
 }));
 
+// Mock fetch to return no profiles
+beforeEach(() => {
+    jest.spyOn(global, 'fetch').mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ profiles: [] }),
+    } as Response);
+  });
+  
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
 describe('SwipeProfiles Component', () => {
   it('displays loading initially and then shows no profiles message', async () => {
     render(
@@ -35,7 +47,12 @@ describe('SwipeProfiles Component', () => {
       </MemoryRouter>
     );
     // Check for loading text
-    expect(screen.getByText('loading')).toBeInTheDocument();
+    expect(screen.getByTestId('loading')).toBeInTheDocument();
+
+    await waitFor(() =>
+      expect(screen.queryByTestId('loading')).not.toBeInTheDocument()
+    );
+
     await waitFor(() => {
         expect(
             screen.getByText((content) =>
