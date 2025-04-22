@@ -212,7 +212,7 @@ const Signup: React.FC = () => {
 
     return (
         <div className="signupPage">
-            <div className="Logo2-signup">
+            <div className="Logo2-signup" onClick={() => navigate('/welcome')}>
                 <Logo />
             </div>
             {/* Display the alert if it's visible */}

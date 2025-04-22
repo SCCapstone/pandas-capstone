@@ -88,5 +88,7 @@ describe('NotificationDropdown Component Unit Tests', () => {
         expect(await screen.findByText(/No new notifications/i)).toBeInTheDocument();
     });
 
+    
+
 
 });

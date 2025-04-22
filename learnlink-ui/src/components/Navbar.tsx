@@ -327,7 +327,9 @@ const Navbar: React.FC = () => {
 
   return (
     <header className="navbar">
-      <div className="nav-logo"><Logo /></div>
+      <div className="nav-logo" onClick={() => navigate('/user-home')} style={{ cursor: 'pointer' }}>
+          <Logo />
+      </div>
       <FaBars className="hamburger" onClick={() => setIsNavOpen(true)} />
 
       {/* Normal Navigation Links*/}

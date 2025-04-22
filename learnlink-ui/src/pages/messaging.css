@@ -416,7 +416,7 @@
   background-color: #f0f0f0;
   align-self: flex-start;
 }
-.profilePic {
+.msgProfilePic {
   margin-left: 20px;
   align-self: flex-end;
   margin-bottom: 0;
@@ -429,6 +429,8 @@
   margin-bottom: 0;
 
 }
+
+
 
 .pfp-placeholder {
   width: 65px;

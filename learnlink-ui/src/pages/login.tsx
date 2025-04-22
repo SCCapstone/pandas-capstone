@@ -83,7 +83,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
 
     return (
         <div className='loginPage'>
-            <div className="Logo2-login">
+            <div className="Logo2-login" onClick={() => navigate('/welcome')}>
                 <Logo />
             </div>
             <div className="login">

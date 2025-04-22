@@ -170,7 +170,7 @@ const SwipeProfiles = ({ userId }: { userId: number }) => {
 
   };
 
-  if (loadingProfiles) return <div className="loading-container">Loading... <span className="loading-spinner"></span> </div>;
+  if (loadingProfiles) return <div className="loading-container" data-testid="loading">Loading... <span className="loading-spinner"></span> </div>;
   if (!profiles || !currentProfile) return <p className="no-requests">No more profiles to swipe on.</p>
 
   if (profiles?.length === 0) return <p className="no-requests">No more profiles to swipe on.</p>

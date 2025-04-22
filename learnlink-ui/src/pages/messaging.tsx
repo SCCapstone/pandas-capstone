@@ -1283,12 +1283,11 @@ const Messaging: React.FC = () => {
   
       if (response.status === 200) {
         // Remove user from chat UI
-        setSelectedChatUsers((prevUsers) => (prevUsers || []).filter(user => user.id !== userId));
-  
-        // Clear selected chat if current user matches the removed user
-        if (userId === currentUserId) {
-          setSelectedChat(null);
+        if(selectedChat?.id === chatId){
+          setSelectedChatUsers((prevUsers) => (prevUsers || []).filter(user => user.id !== userId));
         }
+    
+        
 
         // Create an appropriate system message
         const username = chatUsernames[userId] || "Unknown";
@@ -1307,9 +1306,18 @@ const Messaging: React.FC = () => {
   
           setUpdateMessage(mess);
   
-          // Send system message if a chat is selected
-          if (selectedChat) {
-            handleSendSystemMessage(mess, selectedChat.id, setSelectedChat, setChats, setUpdateMessage);
+          if (chatId) {
+            if(chatId === selectedChat?.id){
+              handleSendSystemMessage(mess, chatId, setSelectedChat, setChats, setUpdateMessage);
+            }
+            else{
+              handleSendSystemMessage(mess, chatId);
+            }
+          
+            // Only update UI if selected chat matches the group being modified
+            if (selectedChat?.id === chatId && userId === currentUserId) {
+              setSelectedChat(null);
+            }
           }
         } else {
           // Group no longer exists — clear chat and UI
@@ -1606,9 +1614,9 @@ const Messaging: React.FC = () => {
 
 
                         return (
-                          <div key={index} className={`Message-pfp-container ${message.userId === currentUserId ? 'MyMessage-pfp-container' : ''}`}>
+                        <div key={index} className={`Message-pfp-container ${message.userId === currentUserId ? 'MyMessage-pfp-container' : ''}`}>
 
-                            <div className="MessageContainer">
+                          <div className="MessageContainer">
                               { }
                             {!message.system && (index === 0 || selectedChat.messages[index - 1].userId !== message.userId) && (
                               <div className={`message-username ${message.userId === currentUserId ? 'MyUsername' : ''}`}>
@@ -1686,7 +1694,7 @@ const Messaging: React.FC = () => {
                             {message.userId !== currentUserId ? (
                               !message.system && isLastInCluster ? (
                                 <div
-                                  className={`profilePic ${
+                                  className={`msgProfilePic ${
                                     message.userId === currentUserId ? "MyProfilePic" : ""
                                   }`}
                                 >

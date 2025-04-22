@@ -329,7 +329,7 @@ const handleApproval = async (
                   )}
                   
                   {/* Display request message */}
-                  <p className='request-message'><strong>Message: </strong> {request.message}</p>
+                  <p className='request-message' data-testid="join-request-1"><strong>Message: </strong> {request.message}</p>
                 
                 </div>
   
