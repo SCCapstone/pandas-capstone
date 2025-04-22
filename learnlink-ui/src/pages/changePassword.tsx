@@ -101,16 +101,18 @@ const ChangePassword: React.FC = () => {
           <h1 className="p1">Change Password</h1>
           <div className="change-password-container">
             <form onSubmit={handleSubmit}>
-              <label>Old Password</label>
+              <label htmlFor="oldPassword">Old Password</label>
               <input
+                id="oldPassword"
                 type="password"
                 placeholder="********"
                 value={oldPassword}
                 onChange={handleOldPasswordChange}
                 required
               />
-              <label>New Password</label>
+              <label htmlFor="newPassword">New Password</label>
               <input
+                id="newPassword"
                 type="password"
                 placeholder="********"
                 value={newPassword}
