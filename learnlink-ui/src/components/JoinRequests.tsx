@@ -280,12 +280,12 @@ const handleApproval = async (
   };
 
   return (
-    <div className="requests-panel">
+    <div className="requests-panel" data-testid="e1">
       {/* Display error message if any */}
-      {error && <p className="error-message">{error}</p>}
+      {error && <p className="error-message" >{error}</p>}
       
       {loadingRequests ? (
-      <div className="loading-container">
+      <div className="loading-container" data-testid="l2">
         Loading... <span className="loading-spinner"></span>
       </div>
     ) : requests.length === 0 ? (
