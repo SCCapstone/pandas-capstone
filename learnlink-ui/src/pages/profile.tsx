@@ -355,10 +355,14 @@ const Profile: React.FC = () => {
                       </label>
                       <CreatableSelect
                         isMulti
-                        options={courseOptions.map((course) => ({
-                          label: course,
-                          value: course,
-                        }))}
+                        options={
+                          courseOptions && courseOptions.length > 0
+                            ? courseOptions.map((course) => ({
+                                label: course,
+                                value: course,
+                              }))
+                            : []
+                        }
                         value={formData.relevant_courses.map((course) => ({
                           label: course,
                           value: course,
