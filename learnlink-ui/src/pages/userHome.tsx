@@ -22,7 +22,7 @@ function userHome() {
                     </div>
                 </div>
 
-                 <WelcomeComponent />
+                 <WelcomeComponent data-testid="welcome-component"/>
 
 
                 <div>
