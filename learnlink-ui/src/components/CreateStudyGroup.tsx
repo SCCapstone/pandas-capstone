@@ -275,6 +275,7 @@ const CreateStudyGroup =(
             {/* Hidden file input */}
             <input
               id="image-upload"
+              data-testid="image-upload-input"
               type="file"
               accept="image/*"
               onChange={handleImageUpload}
@@ -348,3 +349,4 @@ const CreateStudyGroup =(
 };
 
 export default CreateStudyGroup;
+
