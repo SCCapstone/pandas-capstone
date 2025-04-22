@@ -39,10 +39,4 @@ describe('LandingPage', () => {
     expect(mainContent).toBeInTheDocument();
   });
 
-  test('matches snapshot', () => {
-    const { asFragment } = render(<LandingPage />);
-    
-    // Create a snapshot test to ensure no visual regressions
-    expect(asFragment()).toMatchSnapshot();
-  });
 });

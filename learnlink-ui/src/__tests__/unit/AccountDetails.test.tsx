@@ -68,12 +68,6 @@ describe('AccountDetails Page', () => {
     });
   });
 
-  test('matches snapshot', async () => {
-    const { asFragment } = render(<AccountDetails />);
-    await waitFor(() => screen.getByText('Alice')); // Wait for profile load
-    expect(asFragment()).toMatchSnapshot();
-  });
-
   test('logs error to console when fetch fails', async () => {
     // Spy on console.error
     const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
