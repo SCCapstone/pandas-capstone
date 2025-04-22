@@ -85,7 +85,7 @@ function Welcome() {
                         Our website makes it easy to find and connect with like-minded students for more productive and collaborative study sessions.</h2>
                     <h2> Whether you're looking for a one-on-one partner or a full-on study squad, you can browse and match with individual users or existing groups. 
                         Once a request is accepted, you can start messaging immediately, share weekly schedules, and send calendar invites to stay on track together.</h2>
-                        <div className="whyBoxes">
+                        <div className="whyBoxes" data-testid="whyBoxes">
                             <div className="whyBox" onClick={() => handleOpenModal(studySmarterScreenshot)}>
                                 <div className="hoverOverlay">Click to View Screenshot</div>
                                 <h2>Match & Connect</h2>
@@ -156,11 +156,11 @@ function Welcome() {
                 <div className="aboutSection">
                     <h1>Meet the Team</h1>
                     <div className="teamMembers">
-                        <div className="teamMember"><a target="new" href="https://www.linkedin.com/in/natalie-crawford-b85137221/"><img className="profilePic" src={natalie} alt="kennedy-profile" /></a><p>Natalie Crawford</p></div>
-                        <div className="teamMember"><a target="new" href="https://www.linkedin.com/in/kelly-fin/"><img className="profilePic" src={kelly} alt="kennedy-profile" /></a><p>Kelly Finnegan</p></div>
+                        <div className="teamMember"><a target="new" href="https://www.linkedin.com/in/natalie-crawford-b85137221/"><img className="profilePic" src={natalie} alt="natalie-profile" /></a><p>Natalie Crawford</p></div>
+                        <div className="teamMember"><a target="new" href="https://www.linkedin.com/in/kelly-fin/"><img className="profilePic" src={kelly} alt="kelly-profile" /></a><p>Kelly Finnegan</p></div>
                         <div className="teamMember"><a target="new" href="https://www.linkedin.com/in/rae-j/"><img className="profilePic" src={rae} alt="rae-profile" /></a><p>Rae Jones</p></div>
                         <div className="teamMember"><a target="new" href="https://www.linkedin.com/in/kennedy-houston-883782223/"><img className="profilePic" src={kennedy} alt="kennedy-profile" /></a><p>Kennedy Houston</p></div>
-                        <div className="teamMember"><a target="new" href="https://www.linkedin.com/in/yeshappatel/"><img className="profilePic" src={yesha} alt="kennedy-profile" /></a><p>Yesha Patel</p></div>
+                        <div className="teamMember"><a target="new" href="https://www.linkedin.com/in/yeshappatel/"><img className="profilePic" src={yesha} alt="yesha-profile" /></a><p>Yesha Patel</p></div>
                     </div>
                 </div>
 
