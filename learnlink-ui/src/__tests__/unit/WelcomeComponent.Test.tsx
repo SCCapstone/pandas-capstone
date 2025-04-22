@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, within } from '@testing-library/react';
 import WelcomeComponent from '../../components/WelcomeComponent';
 
 describe('Welcome Component', () => {
@@ -16,6 +16,45 @@ describe('Welcome Component', () => {
         expect(screen.getByText('Messaging')).toBeInTheDocument();
         const menuButtons = screen.getByText('Calendar Invites', { selector: '.menuButtons' });
         expect(menuButtons).toBeInTheDocument();
+    });
+
+    it('renders all feature boxes under the Why LearnLink section', () => {
+        render(<WelcomeComponent />);
+        
+        // Select the section that contains the feature boxes
+        const whyBoxesSection = screen.getByTestId('whyBoxes');    
+        // Verify each expected feature box exists
+        const expectedBoxes = [
+            'Match & Connect',
+            'Stay Connected',
+            'Weekly Scheduler',
+            'Groups Page',
+            'Resources Page',
+            'Profile Page',
+            'Calendar Invites',
+            'Network Page'
+        ];
+        
+        expectedBoxes.forEach(text => {
+            expect(within(whyBoxesSection).getByText(text)).toBeInTheDocument();
+        });
+    });
+
+    it('renders all team member profile images in the About Section', () => {
+        render(<WelcomeComponent />);
+    
+        // Array of expected image alt texts
+        const expectedImages = [
+            'natalie-profile',
+            'kelly-profile',
+            'rae-profile',
+            'kennedy-profile',
+            'yesha-profile'
+        ];
+    
+        expectedImages.forEach(altText => {
+            expect(screen.getByAltText(altText)).toBeInTheDocument();
+        });
     });
 
     it('renders GitHub link correctly', () => {
