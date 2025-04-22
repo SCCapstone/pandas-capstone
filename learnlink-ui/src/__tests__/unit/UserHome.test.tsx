@@ -1,7 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import UserHome from '../../pages/userHome';
 
-
 jest.mock('../../components/Navbar', () => () => <div data-testid="navbar">Mock Navbar</div>);
 jest.mock('../../components/CopyrightFooter', () => () => <div data-testid="copyright">Mock Copyright</div>);
 jest.mock('../../components/WelcomeComponent', () => () => <div data-testid="welcome">Mock WelcomeComponent</div>);
