@@ -1,0 +1,69 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`AccountDetails Page matches snapshot 1`] = `
+<DocumentFragment>
+  <div
+    class="page-container"
+  >
+    <header>
+      <div
+        data-testid="navbar"
+      >
+        Navbar
+      </div>
+    </header>
+    <main
+      class="content"
+    >
+      <div
+        class="account-details"
+      >
+        <div
+          class="account-details-container"
+        >
+          <div
+            class="heading"
+          >
+            Account Details
+          </div>
+          <div
+            class="details"
+          >
+            <p>
+              <strong>
+                First Name:
+              </strong>
+               Alice
+            </p>
+            <p>
+              <strong>
+                Last Name:
+              </strong>
+               Smith
+            </p>
+            <p>
+              <strong>
+                Username:
+              </strong>
+               alicesmith
+            </p>
+            <p>
+              <strong>
+                Email:
+              </strong>
+               alice@example.com
+            </p>
+          </div>
+        </div>
+      </div>
+    </main>
+    <footer>
+      <div
+        data-testid="footer"
+      >
+        Footer
+      </div>
+    </footer>
+  </div>
+</DocumentFragment>
+`;
