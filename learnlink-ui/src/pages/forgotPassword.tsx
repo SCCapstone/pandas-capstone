@@ -2,12 +2,13 @@ import Logo from '../components/Logo';
 import './forgotPassword.css';
 
 import CopyrightFooter from '../components/CopyrightFooter';
-import {useNavigate} from 'react-router-dom';
+import {Navigate, useNavigate} from 'react-router-dom';
 import React, {useState} from 'react';
 import ResendEmail from '../components/ResendEmail';
 import CustomAlert from '../components/CustomAlert';
 
 const ForgotPassword: React.FC = () => {
+    const navigate = useNavigate();
     const [email, setEmail] = useState<string>('');
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
@@ -86,7 +87,7 @@ const ForgotPassword: React.FC = () => {
 
     return (
         <div className='forgotPassword-page'>
-            <div className="Logo2">
+            <div className="Logo2" onClick={() => navigate('/welcome')}>
                 <Logo />
             </div>
             <div className="forgotPassword">

@@ -192,6 +192,7 @@ const NewChatList: React.FC<MatchesListProps> = ({ handleSelectUser, onClose}) =
                 <div className='alert-container'>
                 {alerts.map(alert => (
                     <CustomAlert
+                        data-testid = "custom-alert"
                         key={alert.id}
                         text={alert.alertText || ''}
                         severity={alert.alertSeverity || 'info' as "error" | "warning" | "info" | "success"}
@@ -224,7 +225,7 @@ const NewChatList: React.FC<MatchesListProps> = ({ handleSelectUser, onClose}) =
                               className='network-profile-pic'
                           />
                           <div className='network-bio'>
-                              <h3>{friend.username}</h3>
+                              <h3 data-testid="username"> {friend.username}</h3>
                               <p>{friend.firstName} {friend.lastName}</p>
                           </div>
                       </div>
