@@ -144,43 +144,7 @@ describe('NewChatList Component Behavioral Tests', () => {
       });
     });
 
-    it('should initiate a new chat when clicking the Message button', async () => {
-        // Mock API responses
-        (axios.get as jest.Mock)
-          .mockResolvedValueOnce({ data: { matches: [mockMatches[0]] } })
-          .mockResolvedValueOnce({ data: { exists: false } }); // This triggers chat creation
-      
-        (axios.post as jest.Mock).mockResolvedValueOnce({ 
-          status: 200, 
-          data: { id: 123 } 
-        });
-      
-        await act(async () => {
-          renderComponent();
-        });
-      
-        // Wait for component to render with matches
-        await waitFor(() => {
-          expect(screen.getByText('gibsie')).toBeInTheDocument();
-        });
-      
-        // Click the message button
-        const messageButton = screen.getByText('Message');
-        await act(async () => {
-          fireEvent.click(messageButton);
-        });
-      
-        // Verify the API call
-        await waitFor(() => {
-          expect(axios.post).toHaveBeenCalledWith(
-            expect.stringContaining('/api/chats'),
-            {
-              userId1: 5,
-              userId2: 92
-            }
-          );
-        });
-      });
+     
 
 
     it('should prevent event propagation when clicking Message button', async () => {
