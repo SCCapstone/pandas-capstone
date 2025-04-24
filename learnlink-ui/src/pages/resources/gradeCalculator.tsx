@@ -124,7 +124,7 @@ const GradeCalculator: React.FC = () => {
                 ))}
               </tbody>
             </table>
-            <button onClick={addCategory}>Add Category</button>
+            <button data-testid="add-category-button" onClick={addCategory}>Add Category</button>
             </div>
             <div className="table-region">
             <h2>Assignments</h2>
