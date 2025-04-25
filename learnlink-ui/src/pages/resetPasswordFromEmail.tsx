@@ -136,7 +136,7 @@ const ResetPasswordFromEmail: React.FC = () => {
 
                     </div>
                     <button type="submit" className="send-email-btn" disabled={disabled}>
-                        {loading ? "Sending..." : "Send Reset Link"}
+                        {loading ? "Sending..." : "Reset Password"}
                     </button>
                 </form>
             </div>
