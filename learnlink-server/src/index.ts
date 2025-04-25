@@ -2225,8 +2225,7 @@ app.post('/api/chats/updateLastOpened', async (req, res) : Promise<any>=> {
 
 
 // Get all chats for a user
-// WORKS
-// Pulls up the chats with the user's authentication code
+// Pulls up the chats with becuase of the user's authentication code
 app.get('/api/chats', authenticate, async (req, res): Promise<any> => {
   const userId = res.locals.userId; // Use res.locals to get the userId set by the authenticate middleware
 
