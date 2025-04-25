@@ -44,13 +44,14 @@
 }
 
 .customAlert h1 {
-    font-size: 1.25rem;
-    margin: 0;
+    font-size: 1.25rem !important;
+    margin: 0 !important;
+    font-weight: medium !important;
 }
 
 .customAlert p {
-    font-size: 1rem;
-    margin: 0;
+    font-size: 1rem  !important;
+    margin: 0 !important;
 }
 
 

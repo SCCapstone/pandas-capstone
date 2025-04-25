@@ -1498,6 +1498,7 @@ const Messaging: React.FC = () => {
               loadingChatList={loadingChatList}
               removeUser={removeUser}
               updateChats = {updateChats}
+              data-testid = "chats-navi"
             />
           )}
 

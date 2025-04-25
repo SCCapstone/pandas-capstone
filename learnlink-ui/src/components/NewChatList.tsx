@@ -13,7 +13,7 @@ import { updateChatTimestamp } from "../utils/messageUtils";
 
 interface MatchesListProps {
   handleSelectUser: (id: number, isStudyGroup:boolean) => void;
-  onClose: () => void;  // Add this to close the popup
+  onClose: () => void; 
 }
 const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
 
@@ -230,7 +230,14 @@ const NewChatList: React.FC<MatchesListProps> = ({ handleSelectUser, onClose}) =
                           </div>
                       </div>
                       <div className='network-list-status'>
-                              <button className='network-message-button' onClick={(event: React.MouseEvent<HTMLButtonElement>) => { event.stopPropagation(); handleMessage(friend.id,currentUserId );}}>Message</button>
+                              <button className='network-message-button' 
+                              onClick={(event: React.MouseEvent<HTMLButtonElement>) => {
+                                event.stopPropagation(); 
+                                handleMessage(friend.id,currentUserId );
+                                }}
+                                data-testid="message-button"
+                                >
+                                  Message</button>
                       </div>
 
                       

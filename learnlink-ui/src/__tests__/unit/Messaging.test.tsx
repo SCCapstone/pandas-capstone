@@ -478,7 +478,7 @@ describe('Messaging Component', () => {
     // In a real test, you might want to test the ChatsNavi component separately
   });
 
-  // doesnt work
+  
   it('handles weekly scheduler button in study group', async () => {
     // Mock navigation
     const mockNavigate = jest.fn();
