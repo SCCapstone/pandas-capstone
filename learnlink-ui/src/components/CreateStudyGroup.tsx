@@ -50,12 +50,15 @@ const CreateStudyGroup =(
     updateChatName,
     handleCreateStudyGroup,
     setCurrentGroupId,
+    fetchChatPfps
   }: {
     chatID: number;
     onClose: () => void ;
     updateChatName: (chatId: number, newName: string) => void;
     handleCreateStudyGroup: ((chatId: number) => Promise<number | void>);
     setCurrentGroupId: React.Dispatch<React.SetStateAction<number | null>>; 
+    fetchChatPfps:  () => void ;
+    
   }) => {
   const [studyGroup, setStudyGroup] = useState<StudyGroup | null>(null);
   const [name, setName] = useState('');
@@ -199,6 +202,7 @@ const CreateStudyGroup =(
       // Update chat metadata (like name and timestamp)
       updateChatTimestamp(chatID);
       updateChatName(chatID, name);
+      fetchChatPfps();
 
       // Show success alert
       setAlerts((prevAlerts) => [

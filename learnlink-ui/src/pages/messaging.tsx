@@ -497,6 +497,7 @@ const Messaging: React.FC = () => {
   }, [chats]); // Runs only when `chats` change
   
 
+
   // Ensures the chat window scrolls smoothly to the latest message whenever new messages arrive, 
   // keeping the user focused on the most recent conversation.
 
@@ -994,6 +995,32 @@ const Messaging: React.FC = () => {
     }
   };
   
+  // responsible for fetching the pfps for the chat 
+
+  const fetchChatPfps = async() => {
+    const newChatPfps: { [key: number]: string } = { ...chatPfps };
+    
+    // Use Promise.all to fetch all chat pfps concurrently
+    const fetchPromises = chats.map(async (chat) => {
+        try {
+          const chatPfp = await getChatPfp(chat);
+          if (chatPfp) {
+            newChatPfps[chat.id] = chatPfp;
+          } else {
+            console.warn(`No pfp for chat with ID: ${chat.id}`);
+          }
+        } catch (error) {
+          console.error(`Error fetching pfp for chat with ID: ${chat.id}`, error);
+        }
+      
+    });
+
+    // Wait for all chat pfps to be fetched
+    await Promise.all(fetchPromises);
+    console.log('Chat pfps:', newChatPfps);
+
+    setChatPfps(newChatPfps);
+  };
 
 
   /*
@@ -1074,8 +1101,16 @@ const Messaging: React.FC = () => {
         setHasStudyGroup(true);
       }
 
+      /*
+      const res = await axios.get(`${REACT_APP_API_URL}/api/chats/pfps`);
+      setChatPfps(res.data);
+      */
+
+
+      //fetchChatPfps();
       // Return the ID of the newly created study group
       return newStudyGroupID;
+
 
     } catch (error) {
       // Handle and log any errors during the process
@@ -1596,6 +1631,7 @@ const Messaging: React.FC = () => {
                       updateChatName={updateChatName}
                       handleCreateStudyGroup = {handleCreateStudyGroup}
                       setCurrentGroupId={(id:any) => setCurrentGroupId(id)}
+                      fetchChatPfps = {fetchChatPfps}
                     />
                   </div>
                 )}
