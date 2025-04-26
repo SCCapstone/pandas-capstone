@@ -14,10 +14,13 @@ import { RiFontSize } from 'react-icons/ri';
 import "./publicGroupProfile.css"
 import PopupProfile from '../components/PopupProfile';
 
-
+// Main functional component for displaying a public study group profile
 
 const PublicGroupProfile: React.FC = () => {
+       // Using React Router hooks to get the group ID from URL params
     const { id } = useParams<{ id: string }>();
+    
+        // State management for study group, loading, error, and alert handling
     const [studyGroup, setStudyGroup] = useState<StudyGroup | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [showInvitePanel, setShowInvitePanel] = useState(false);
@@ -29,21 +32,23 @@ const PublicGroupProfile: React.FC = () => {
     const [isLoading, setLoading] = useState<boolean>(true)
     const [notFound, setNotFound] = useState<boolean>(false)
 
-
+    // Placeholder images for generic profiles
     const genericUserPfp = "https://learnlink-pfps.s3.us-east-1.amazonaws.com/profile-pictures/circle_bust-in-silhouette.png";
     const genericStudyGroupPfp = "https://learnlink-pfps.s3.us-east-1.amazonaws.com/profile-pictures/circle_busts-in-silhouette.png";
 
 
+        // Getting the match button status for the group
     const matchButton = useMatchButtonStatusGroup(numericId);
-
-
 
     const navigate = useNavigate();
     const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
 
+        // Function to navigate to the messaging page
     const handleMessage = () => {
         navigate('/messaging');
     };
+
+        // Effect to refresh the match button status when the ID changes
     useEffect(() => {
         console.log("ID CHAGING")
         matchButton.refreshStatus();
@@ -67,6 +72,7 @@ const PublicGroupProfile: React.FC = () => {
         }
     };
 
+        // Handle swipe actions (Yes or No) for the group, sends a request to the backend
     const handleSwipe = async (direction: 'Yes' | 'No', targetId: number, isStudyGroup: boolean, message: string | undefined) => {
         try {
             const token = localStorage.getItem('token');
@@ -81,6 +87,7 @@ const PublicGroupProfile: React.FC = () => {
 
             const currentStudyGroup = studyGroup;
 
+                        // Send the swipe request to the API
             await fetch(`${REACT_APP_API_URL}/api/swipe`, {
                 method: 'POST',
                 headers: {
@@ -100,6 +107,7 @@ const PublicGroupProfile: React.FC = () => {
 
         } catch (error) {
             console.error('Error swiping:', error);
+                        // Show an error alert if swipe fails
             setAlerts((prevAlerts) => [
                 ...prevAlerts,
                 { id: Date.now(), alertText: 'Error swiping. Please try again later. ', alertSeverity: "error", visible: true },
@@ -107,11 +115,12 @@ const PublicGroupProfile: React.FC = () => {
 
         }
     };
-
+    // Function to send match request notification
     const handleMatchNotification = async () => {
         await sendMatchRequestNotification(studyGroup)
     };
 
+        // Function to send a message and handle the swipe action
     const handleSendMessage = async (message: string) => {
         if (studyGroup)
             handleSwipe("Yes", studyGroup.id, true, message);
@@ -142,6 +151,8 @@ const PublicGroupProfile: React.FC = () => {
     //     fetchButtonStatus();
     // }, [id]);
 
+
+        // Fetch the study group data from the API
     useEffect(() => {
         const fetchStudyGroup = async () => {
             try {
@@ -193,6 +204,9 @@ const PublicGroupProfile: React.FC = () => {
     //     return <div>Loading...</div>;
     // }
 
+
+
+        // JSX rendering logic
     return (
         <div className="public-profile-page">
             <header>
@@ -352,4 +366,4 @@ const PublicGroupProfile: React.FC = () => {
     );
 };
 
-export default PublicGroupProfile;
+export default PublicGroupProfile; // Export component

@@ -13,27 +13,30 @@ import CreatableSelect from "react-select/creatable";
 import { MultiValue } from "react-select";
 
 
-
+// Animated components for select dropdowns
 const animatedComponents = makeAnimated();
 
+// Define types for options in select dropdown
 type OptionType = {
   label: string;
   value: string;
 };
 
+// Initial courses list
 const initialOptions: string[] = [
   "CSCE 145",
   "MATH 221",
   "BIO 101L",
 ];
 
-
+// Profile component
 const Profile: React.FC = () => {
   const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
   const { isLoading, colleges } = useColleges();
   const [options, setOptions] = useState<string[]>(initialOptions);
   const [selectedCourses, setSelectedCourses] = useState<string[]>([]);
 
+    // Handle course creation (for user input that doesn't exist in the options)
   const handleCreate = (inputValue: string) => {
     const normalized = normalizeCourseInput(inputValue);
     const newOption = normalized;
@@ -41,6 +44,7 @@ const Profile: React.FC = () => {
     setSelectedCourses((prev) => [...prev, newOption]);
   };
   
+    // Form data to store user input
   const [formData, setFormData] = useState({
     first_name: '',
     last_name: '',
@@ -101,6 +105,7 @@ const Profile: React.FC = () => {
           const userData = await userResponse.json();
           console.log('Fetched user data:', userData); // Debug log
 
+                    // Update form data with user profile data
           setFormData({
             first_name: userData.first_name || '',
             last_name: userData.last_name || '',
@@ -152,6 +157,7 @@ const Profile: React.FC = () => {
     }
   };
 
+  // Handle image upload
   const handleUpload = async () => {
     console.log('Uploading image...'); // Debug log
     if (!image) return;
@@ -242,7 +248,7 @@ const Profile: React.FC = () => {
 
   const [image, setImage] = useState<File | null>(null);
 
-
+  // Handle emoji selection for profile picture
   const handleEmojiSelect = (emoji: string, URL:string) => {
     setSelectedEmoji(emoji);
     setImagePreview(URL)

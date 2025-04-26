@@ -6,11 +6,15 @@ import './resetPasswordFromEmail.css';
 import { set } from 'react-hook-form';
 import CustomAlert from '../components/CustomAlert';
 
-
+// Functional component for the Reset Password page
 const ResetPasswordFromEmail: React.FC = () => {
 
+    // Extract the token from the URL parameters using useParams
     const { token } = useParams<{ token: string }>();
+    
     const navigate = useNavigate();
+    
+    // State variables to manage password inputs, errors, loading, etc.
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [error, setError] = useState("");
@@ -21,7 +25,7 @@ const ResetPasswordFromEmail: React.FC = () => {
 
     const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
 
-  
+      // useEffect hook to validate password match on each password change
     React.useEffect(() => {
         const validatePassword = (): boolean => {
             if (password === "" || confirmPassword === "") {
@@ -48,6 +52,7 @@ const ResetPasswordFromEmail: React.FC = () => {
     }, [password, confirmPassword]);
     
 
+   // Handle the password reset form submission
     const handleResetPassword = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
@@ -61,6 +66,7 @@ const ResetPasswordFromEmail: React.FC = () => {
             setLoading(false);
             return;
         }
+                // Make API request to reset password
         const response = await fetch(`${REACT_APP_API_URL}/api/reset-password/email`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },

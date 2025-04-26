@@ -4,6 +4,7 @@ import './accountDetails.css';
 import CopyrightFooter from '../components/CopyrightFooter';
 
 const AccountDetails: React.FC = () => {
+    // Use the environment variable for the API URL, fallback to localhost for development
 const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
 
 
@@ -15,6 +16,7 @@ const [formData, setFormData] = useState({
   username: ''
 });
 
+  // Fetch user profile data when the component mounts
 useEffect(() => {
   const fetchData = async () => {
     try {
@@ -30,7 +32,8 @@ useEffect(() => {
 
         const userData = await userResponse.json();
         console.log('User data:', userData);
-
+         
+        // Update the state with the fetched user data
         setFormData({
           first_name: userData.first_name || '',
           last_name: userData.last_name || '',

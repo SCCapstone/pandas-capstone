@@ -7,7 +7,7 @@ import { logout, getLoggedInUserIdString} from '../utils/auth';
 import ConfirmPopup from '../components/ConfirmPopup';
 import { handleSendSystemMessage,updateChatTimestamp} from "../utils/messageUtils";
 
-
+// Define the User interface to describe expected user object shape
 interface User {
   id: number;
   username: string;
@@ -18,6 +18,7 @@ interface User {
 
 
 const Settings: React.FC = () => {
+    // React state hooks
   const [userId, setUserId] = useState<string | null>(null);
   const [message, setMessage] = useState('');
   const [deleteUser, setDeleteUser] = useState<User | null>(null);
@@ -109,7 +110,7 @@ const Settings: React.FC = () => {
         return;
       }
     
-  
+        // Make DELETE request to remove user
       const response = await fetch(`${REACT_APP_API_URL}/api/users/${userId}`, {
         method: 'DELETE',
         headers: { 

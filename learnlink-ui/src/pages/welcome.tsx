@@ -5,11 +5,13 @@ import Logo from '../components/Logo';
 import Copyright from '../components/CopyrightFooter';
 import WelcomeComponent from '../components/WelcomeComponent';
 
+// Function component for the welcome page
 function Welcome() {
     const navigate = useNavigate();
 
+        // Function to handle the "Get Started" button click and navigate to the login page
     const handleGetStarted = () => {
-        navigate('/login');
+        navigate('/login'); // Navigates to the login page when clicked
     };
 
     return (

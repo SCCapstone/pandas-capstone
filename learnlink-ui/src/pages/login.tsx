@@ -5,16 +5,21 @@ import { useNavigate } from 'react-router-dom';
 import React, { useState } from 'react';
 import CustomAlert from '../components/CustomAlert';
 
+// API URL for the backend
 const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
 
+// Define the type for Login Inputs
 type LoginInputs = {
     userName: string;
     userPassword: string;
 };
+
+// Define the interface for Login Props, expecting an onLogin function passed as a prop
 interface LoginProps {
     onLogin: (userId: number) => void; // This function will be passed from the parent to handle login
   }
 
+  // Define the Login component
 const Login: React.FC<LoginProps> = ({ onLogin }) => {
     const navigate = useNavigate();
     const [username, setUsername] = useState<string>('');
@@ -81,6 +86,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
         }
     };
 
+        // Render the login page
     return (
         <div className='loginPage'>
             <div className="Logo2-login" onClick={() => navigate('/welcome')}>

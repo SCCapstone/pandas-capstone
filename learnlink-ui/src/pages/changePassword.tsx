@@ -10,13 +10,16 @@ const ChangePassword: React.FC = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [alerts, setAlerts] = useState<{ id: number; alertText: string; alertSeverity: "error" | "warning" | "info" | "success"; visible: boolean }[]>([]);
+   
+  // Backend API URL
   const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
 
-
+  // Handlers for input fields
   const handleOldPasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setOldPassword(e.target.value);
   };
 
+  // Handlers for input fields
   const handleNewPasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setNewPassword(e.target.value);
   };
@@ -43,7 +46,7 @@ const ChangePassword: React.FC = () => {
       const data = await response.json();
 
       if (!response.ok) {
-
+        // Handle warnings or errors from the backend
         if (data.warning) {
           setError(data.warning || 'An error occurred');
           setAlerts((prevAlerts) => [
@@ -75,7 +78,8 @@ const ChangePassword: React.FC = () => {
       setLoading(false);
     }
   };
-
+  
+  // Check if any alert is currently visible
   const alertVisible = alerts.some(alert => alert.visible);
 
   return (

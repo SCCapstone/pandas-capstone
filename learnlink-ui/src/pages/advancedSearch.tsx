@@ -9,10 +9,10 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { query } from 'express';
 
 const AdvancedSearch: React.FC = () => {
-    const location = useLocation();
-    const navigate = useNavigate();
+    const location = useLocation(); // Gives access to the current URL query string
+    const navigate = useNavigate(); // Used to programmatically navigate to a different route
 
-
+    // Interface to define the structure of a User object
     interface User {
         id: number;
         username: string;
@@ -29,7 +29,7 @@ const AdvancedSearch: React.FC = () => {
     const[userQuery, setUserQuery] = useState<string>('');
     const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
 
-
+    // useEffect will run when the component mounts or when the URL query string changes
     useEffect(() => {
         console.log("Fetching search results for:", location.search);
 

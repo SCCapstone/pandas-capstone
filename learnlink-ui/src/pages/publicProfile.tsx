@@ -34,6 +34,8 @@ const PublicProfile: React.FC = () => {
     const handleMessage = () => {
         navigate('/messaging');
     };
+
+        // Effect to handle changes in user ID and refresh match button status
     useEffect(() => {
         console.log("ID CHAGING")
         matchButton.refreshStatus();
@@ -44,6 +46,8 @@ const PublicProfile: React.FC = () => {
         console.log("PublicProfile re-render:", matchButton);
     }, [matchButton]);
 
+
+    // Handle match button click event
     // Example: after performing a match-related action, refresh the status
     const handleMatchButtonClick = async () => {
         if (!matchButton.isButtonDisabled) {
@@ -57,6 +61,7 @@ const PublicProfile: React.FC = () => {
         }
     };
 
+        // Handle swipe action (Yes/No) with associated message
     const handleSwipe = async (direction: 'Yes' | 'No', targetId: number, isStudyGroup: boolean, message: string | undefined) => {
         try {
             const token = localStorage.getItem('token');

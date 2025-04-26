@@ -1,6 +1,7 @@
 import Logo from '../components/Logo';
 import CopyrightFooter from '../components/CopyrightFooter';
 
+// Define the ResetPassword functional component
 const ResetPassword: React.FC = () => {
     return(
         <div className="resetPassword">
@@ -21,4 +22,6 @@ const ResetPassword: React.FC = () => {
     );
 }
 
+
+// Export the ResetPassword component for use in other parts of the application
 export default ResetPassword;

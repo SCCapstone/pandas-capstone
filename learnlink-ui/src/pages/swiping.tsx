@@ -7,6 +7,7 @@ import SwipeProfiles from '../components/SwipeProfiles';  // Import the SwipePro
 import { getLoggedInUserId } from '../utils/auth';
 
 const Swiping: React.FC = () => {
+    // State to store the user's ID, initially set to null
   const [userId, setUserId] = useState<number | null>(null);  // State to store the user's ID
 
   useEffect(() => {
@@ -20,7 +21,8 @@ const Swiping: React.FC = () => {
     } else {
       console.log('User is not logged in or token is invalid');
     }
-  }, []);
+  }, []); // Empty dependency array means this effect runs once when the component mounts
+  
 
   return (
     <div className="swiping-page">

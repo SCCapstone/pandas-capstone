@@ -7,6 +7,7 @@ import React, {useState} from 'react';
 import ResendEmail from '../components/ResendEmail';
 import CustomAlert from '../components/CustomAlert';
 
+// Component definition
 const ForgotPassword: React.FC = () => {
     const navigate = useNavigate();
     const [email, setEmail] = useState<string>('');
@@ -15,7 +16,7 @@ const ForgotPassword: React.FC = () => {
     const [success, setSuccess] = useState<string | null>(null);
     const [alerts, setAlerts] = useState<{ id: number; alertText: string; alertSeverity: "error" | "warning" | "info" | "success"; visible: boolean }[]>([]);
     const alertVisible = alerts.some(alert => alert.visible);
-
+    // API URL (fallback to localhost for development)
     const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -26,10 +27,12 @@ const ForgotPassword: React.FC = () => {
         const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
         return regex.test(email);
     };
-
+    // Handles form submission for sending reset link
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         console.log(email)
+
+                // If email field is empty, show an error alert
         if(!email) {
             setError('Enter your email');
             setAlerts((prevAlerts) => [
@@ -47,12 +50,13 @@ const ForgotPassword: React.FC = () => {
             setError('Enter a valid email address');
             return;
         }
-
+        // Start loading state and reset messages
         setLoading(true);
         setSuccess(null);
         setError(null);
 
         try {
+                        // Send POST request to backend API
             const response = await fetch (`${REACT_APP_API_URL}/api/forgot-password/email`, {
             method: 'POST',
             headers: {
@@ -61,6 +65,7 @@ const ForgotPassword: React.FC = () => {
             body: JSON.stringify({ email }),
             });
 
+                        // If the response is not ok, handle the error
             if(!response.ok){
                 setAlerts((prevAlerts) => [
                     ...prevAlerts,
@@ -69,6 +74,8 @@ const ForgotPassword: React.FC = () => {
                 const errorData = await response.json();
                 throw new Error(errorData.message || "Failed to send reset link");
             }
+            
+                        // Show success message if request was successful
             setAlerts((prevAlerts) => [
                 ...prevAlerts,
                 { id: Date.now(), alertText: 'Password reset link sent! Check Your Email.', alertSeverity: "success", visible: true },

@@ -4,7 +4,7 @@ import WelcomeComponent from '../components/WelcomeComponent';
 import Navbar from '../components/Navbar';
 
 
-
+// Function component for the user's home page
 function userHome() {
 
     return (
