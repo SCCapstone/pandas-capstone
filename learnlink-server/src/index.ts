@@ -321,6 +321,7 @@ app.get('/api/users/profile', authenticate, async (req, res):Promise<any> => {
   }
 });
 
+// Retrieves all users' relevant courses, removes duplicates and empty entries, and returns the cleaned list as JSON.
 app.get('/api/users/courses', async (req, res): Promise<any> => {
   try {
     // Fetch all users' relevant_courses arrays
@@ -652,7 +653,7 @@ app.post('/api/update-email', authenticate, async (req, res):Promise<any> => {
   }
 });
 
-
+// Authenticates the user, verifies the old password, ensures the new password is different, updates the password in the database, and returns a success message.
 app.post('/api/update-password', authenticate, async (req, res):Promise<any> => {
   const { oldPassword, newPassword } = req.body;
   const userId = res.locals.userId; 
@@ -775,6 +776,7 @@ app.get('/api/swipe/:currentUser', async (req, res): Promise<any> => {
   }
 });
 
+// Fetches and returns all swipe requests sent by the specified user, validating the user ID beforehand.
 app.get('/api/swipe/sentRequests/:currentUser', async (req, res): Promise<any> => {
   let { currentUser } = req.params;
   console.log('Fetching requests for user:', currentUser);
@@ -904,6 +906,7 @@ app.get('/api/swipe/user/pendingRequestCheck/:targetUser', authenticate, async (
     res.status(500).json({ error: 'Something went wrong' });
   }
 });
+
 // Fetches request staus between a user and another user
 app.get('/api/swipe/user/pendingRequestCheck/Group/:targetGroup', authenticate, async (req, res): Promise<any> => {
   const { targetGroup } = req.params;
@@ -998,7 +1001,7 @@ app.get('/api/swipe/user/pendingRequestCheck/Group/:targetGroup', authenticate, 
   }
 });
 
-//for deleting a request in the reject button in requests panel
+// For deleting a request in the reject button in requests panel
 app.delete('/api/swipe/:requestId', async(req, res): Promise<any> =>{
   let {requestId} = req.params;
   console.log('Deleting request with ID:', requestId);
@@ -1072,6 +1075,8 @@ const createMatchForStudyGroup = async (userId: number, targetGroupId: number) =
   }
 };
 
+// Deletes a match between two users, along with any associated one-on-one chats, shared study groups (if only those two users), 
+// and previous swipes, then records a rejection to prevent future re-matching.
 app.delete('/api/match/:id', authenticate, async (req: Request, res: Response): Promise<any> => {
   try {
     const currUserId = res.locals.userId;
@@ -1237,6 +1242,8 @@ app.get('/api/profiles', authenticate, async (req: Request, res: Response) => {
   }
 });
 
+// Fetches a list of users and study groups the current user hasn't interacted with yet, 
+// calculates a similarity score based on shared attributes, and returns them sorted by highest match potential.
 app.get('/api/profiles/:userId', async (req, res): Promise<any> => {
   const userId = parseInt(req.params.userId);
   type UserWithScore = User & { similarityScore: number; type: 'user' };
@@ -1476,7 +1483,7 @@ export const deleteUserById = async (userId: number) => {
   }
 };
 
-
+// Deletes the user with the specified ID after verifying the ID and ensuring the authenticated user has proper permissions.
 app.delete('/api/users/:id', authenticate, async (req, res): Promise<any> => {
   const userId = parseInt(req.params.id);
   console.log('Deleting user with ID:', userId);
@@ -1500,6 +1507,9 @@ app.delete('/api/users/:id', authenticate, async (req, res): Promise<any> => {
 });
   
 /********* STUDY GROUPS */
+
+// Creates a new study group with the specified name, subject, description, users, and chat ID,
+// while associating it with the authenticated user.
 app.post('/api/study-groups', authenticate, async (req, res): Promise<any> => {
   const userId = res.locals.userId;
   const { name, subject, description, users, chatID } = req.body;
@@ -1536,6 +1546,7 @@ app.post('/api/study-groups', authenticate, async (req, res): Promise<any> => {
   }
 });
 
+// Retrieves the study groups the authenticated user is a member of, including group details, users, and associated chat information.
 app.get('/api/study-groups', authenticate, async (req, res) : Promise<any> => {
   const userId = res.locals.userId;
 
@@ -1586,8 +1597,7 @@ app.get('/api/study-groups', authenticate, async (req, res) : Promise<any> => {
   }
 });
 
-
-
+// Retrieves a study group by its ID, including details about the group, its members, and creator.
 app.get('/api/study-groups/:id', async (req, res): Promise<any> => {
   const studyGroupId = parseInt(req.params.id);  // Extract study group ID from the request parameters
 
@@ -1620,7 +1630,7 @@ app.get('/api/study-groups/:id', async (req, res): Promise<any> => {
   }
 });
 
-
+// Fetches the study group associated with a given chat ID and returns its details, or null if not found.
 app.get("/api/study-groups/chat/:chatId", async (req, res): Promise<any> => {
   const { chatId } = req.params;
   console.log('Fetching study group for chat:', chatId);
@@ -1651,7 +1661,7 @@ app.get("/api/study-groups/chat/:chatId", async (req, res): Promise<any> => {
   }
 });
 
-
+// Updates a study group with new details (name, description, subject, etc.) based on its chat ID.
 app.put('/api/study-groups/chat/:chatID', async (req, res) : Promise<any> =>  {
   const { chatID } = req.params; // Extract chatID from the URL
   const { name, description, subject, ideal_match_factor, profile_pic } = req.body; // Extract new study group data from the request body
@@ -1683,7 +1693,7 @@ app.put('/api/study-groups/chat/:chatID', async (req, res) : Promise<any> =>  {
 });
 
 
-
+// Retrieves the chat ID associated with a specific study group based on its ID.
 app.get("/api/study-groups/:studyGroupId/chat", async (req, res): Promise<any> => {
   const { studyGroupId } = req.params;
   console.log('Fetching chat ID for study group:', studyGroupId);
@@ -1914,7 +1924,6 @@ app.delete('/api/study-groups/:groupId/users/:userId', async (req, res): Promise
 
 
 //for the request panel 
-
 //gets a study a group name
 app.get('/api/study-groups/:groupId', async (req, res):Promise<any> => {
   const { groupId } = req.params;
@@ -1969,7 +1978,7 @@ app.get('/api/study-groups/:groupId', async (req, res): Promise<any> => {
 });
 
 
-
+// Searches for users based on various filters (query, gender, college, age range, course) and returns matching results with profile information.
 app.get('/api/users/search', authenticate, async (req, res): Promise<any> => {
   const { query, gender, college, ageRange, course } = req.query;
   console.log('Received search query:', req.query);
@@ -2056,6 +2065,7 @@ app.get('/api/users/search', authenticate, async (req, res): Promise<any> => {
   }
 });
 
+// Retrieves the minimum and maximum ages of users from the database and returns them as a response.
 app.get('/api/users/ages', async (req, res): Promise<any> => {
   try {
     // Get the min and max age from all users
@@ -2111,7 +2121,7 @@ app.get('/api/currentUser', authenticate, async (req, res): Promise<any> => {
 
 
 
-// WORKS
+// Fetches all users from the database
 app.get('/api/users', async (req, res) => {
   try {
     // Fetch users from the database using Prisma
@@ -2127,9 +2137,7 @@ app.get('/api/users', async (req, res) => {
 });
 
 
-
-
-//used for getting request list in messaging page
+//used for getting users with a certain ID
 app.get('/api/users/:id', async (req, res) : Promise<any> => {
   try {
     const userId = parseInt(req.params.id);
@@ -2161,6 +2169,7 @@ app.get('/api/users/:id', async (req, res) : Promise<any> => {
   }
 });
 
+// Retrieves the last opened timestamps for a specific user
 app.get('/api/chats/lastOpened/:userId', async (req, res): Promise<any> => {
   const { userId } = req.params; // Get userId from the URL parameter
 
@@ -2189,7 +2198,7 @@ app.get('/api/chats/lastOpened/:userId', async (req, res): Promise<any> => {
 
 
 
-
+// Updates or creates a last opened timestamp entry for a chat and user, ensuring all required fields are provided
 app.post('/api/chats/updateLastOpened', async (req, res) : Promise<any>=> {
   const { chatId, userId, lastOpened } = req.body;
 
@@ -2267,6 +2276,7 @@ app.get('/api/chats', authenticate, async (req, res): Promise<any> => {
   }
 });
 
+// Checks if a chat exists between two users, ensuring that both users are part of the chat, and returns the existing chat ID or indicates no chat exists.
 app.get('/api/chats/check', async (req, res): Promise<any> => {
   const { userId1, userId2 } = req.query;
 
@@ -2312,6 +2322,7 @@ app.get('/api/chats/check', async (req, res): Promise<any> => {
 });
 
 
+// Fetches a specific chat by its ID, ensuring the user is authenticated, part of the chat, and returns the chat details along with messages and users.
 app.get('/api/chats/:chatId', authenticate, async (req, res): Promise<any> => {
   const userId = res.locals.userId; // Use res.locals to get the userId set by the authenticate middleware
   const { chatId } = req.params;  // Get the chatId from the URL parameters
@@ -2361,11 +2372,6 @@ app.get('/api/chats/:chatId', authenticate, async (req, res): Promise<any> => {
   }
 });
 
-
-
-
-
-//WORKS
 // Delete a chat
 app.delete('/api/chats/:chatId', async (req, res): Promise<any> => {
   const { chatId } = req.params;
@@ -2422,8 +2428,7 @@ app.delete('/api/chats/:chatId', async (req, res): Promise<any> => {
 
 
 
-// WORKS
-// Add a message to a chat
+// Add a message to a chat ie sending messages
 app.post('/api/chats/:chatId/messages', authenticate, async (req, res): Promise<any> => {
   const { chatId } = req.params;
   const { content } = req.body;
@@ -2477,33 +2482,6 @@ app.patch('/api/messages/:messageId/like', authenticate, async (req, res): Promi
     res.status(500).json({ error: 'Internal server error' });
   }
 });
-/*
-//also for adding a like 
-app.patch('/api/messages/:id/like', authenticate, async (req, res):Promise<any>  => {
-  const { id } = req.params;
-
-  try {
-    // Find the message and toggle the 'liked' status
-    const message = await prisma.message.findUnique({
-      where: { id: parseInt(id) },
-    });
-
-    if (!message) {
-      return res.status(404).json({ error: 'Message not found' });
-    }
-
-    const updatedMessage = await prisma.message.update({
-      where: { id: parseInt(id) },
-      data: { liked: !message.liked },
-    });
-
-    res.json(updatedMessage);
-  } catch (error) {
-    console.error('Error updating like status:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
-*/
 
 // Create a new chat
 app.post('/api/chats', async (req, res) : Promise<any> => {
@@ -2514,22 +2492,6 @@ app.post('/api/chats', async (req, res) : Promise<any> => {
   }
 
   try {
-    /*
-    // Check if a chat between these users already exists
-    const existingChat = await prisma.chat.findFirst({
-      where: {
-        users: {
-          every: {
-            id: { in: [userId1, userId2] },
-          },
-        },
-      },
-    });
-
-    if (existingChat) {
-      return res.status(200).json(existingChat); // Return existing chat if found
-    }*/
-    
     // Retrieve recipient's name
     const recipient = await prisma.user.findUnique({
       where: { id: userId1 },
@@ -2566,6 +2528,8 @@ app.post('/api/chats', async (req, res) : Promise<any> => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
+
+// Updates the timestamp and last updated information of a chat by its ID, ensuring the chat exists before making changes.
 app.put("/api/study-groups/chats/:chatId", async (req, res):Promise<any> => {
   try {
     const { chatId } = req.params;
@@ -2594,7 +2558,7 @@ app.put("/api/study-groups/chats/:chatId", async (req, res):Promise<any> => {
 });
 
 
-
+// Creates a new chat between two users by connecting them and emitting a "new-chat" event, ensuring both users exist and the authenticated user is valid.
 app.post('/api/chats/:userId', authenticate, async (req: Request, res: Response): Promise<any> => {
   const { recipientUserId, chatName } = req.body;
   const userId = res.locals.userId;
@@ -2647,6 +2611,7 @@ app.post('/api/chats/:userId', authenticate, async (req: Request, res: Response)
   }
 });
 
+// Updates an existing chat's name and/or study group ID if the user is a participant, and emits a "chat-updated" event to notify others of the changes.
 app.put('/api/chats/:chatId', authenticate, async (req: Request, res: Response): Promise<any> => {
   const { chatId } = req.params;
   const { chatName, studyGroupId } = req.body; // Expect studyGroupId here
@@ -2933,6 +2898,7 @@ io.on("connection", (socket) => {
   
 // };
 
+// Sends a welcome email to a user based on their email address, using a template and email service, after verifying the user's existence in the database.
 app.post("/api/sign-up-email", async (req: Request, res: Response): Promise<any>  => {
   try {
     const { to } = req.body; // Get data from frontend
@@ -2983,6 +2949,7 @@ app.post("/api/send-email", async (req, res) => {
   }
 });
 
+// Handles a password reset request by generating a secure reset token, saving it in the database, and sending a reset email to the user with a password reset link.
 app.post("/api/forgot-password/email", async (req, res):Promise<any> => {
   const { email } = req.body;
 
@@ -3023,6 +2990,7 @@ app.post("/api/forgot-password/email", async (req, res):Promise<any> => {
   }
 });
 
+// Handles password reset by validating the reset token, hashing the new password, and updating the user's password in the database while clearing the reset token and expiry.
 app.post("/api/reset-password/email", async (req, res): Promise<any> => {
   const { token, password } = req.body;
 
@@ -3052,6 +3020,7 @@ app.post("/api/reset-password/email", async (req, res): Promise<any> => {
   res.json({ message: "Password reset successful" });
 });
 
+// Handles user profile picture upload, with validation for file size and image processing, then updates the user's profile with the new picture URL in the database.
 app.post(
   "/api/users/upload-pfp",
   authenticate,
@@ -3092,6 +3061,7 @@ app.post(
   }
 );
 
+// Handles the process of uploading, processing, and updating a study group's profile picture in the database, with validation and error handling.
 app.post('/api/study-group/upload-pfp',
   authenticate,
   (req, res, next) => {
@@ -3139,6 +3109,7 @@ app.post('/api/study-group/upload-pfp',
 
 const upload_preview = multer({ storage: multer.memoryStorage() });  // Store file in memory
 
+// This code handles the uploading of a profile picture preview, logs the file info, and processes the image with error handling.
 app.post("/api/upload-preview", upload_preview.single("profilePic"), (req, res, next) => {
   console.log("Received file:", req.file);  // Log the file info to ensure it's being uploaded
   handleImagePreview(req, res).catch(next);
@@ -3147,6 +3118,8 @@ app.post("/api/upload-preview", upload_preview.single("profilePic"), (req, res, 
 
 
 // NOTIFICATIONS
+
+// Retrieves unread notifications for an authenticated user, ensuring fresh data by disabling caching and returning the notifications in descending order of creation.
 app.get('/api/notifications', authenticate, async (req: Request, res: Response) => {
   const userId = res.locals.userId;
   try {
@@ -3169,7 +3142,7 @@ app.get('/api/notifications', authenticate, async (req: Request, res: Response) 
   }
 });
 
-
+// This creates and sends a notification to a user based on the provided data, ensuring required fields are present, and broadcasts the notification via WebSocket.
 app.post('/notifications/send', async (req, res): Promise<any> => {
   try {
     const { userId, other_id, message, type, chatID, studyGroupID} = req.body;
@@ -3206,6 +3179,7 @@ app.post('/notifications/send', async (req, res): Promise<any> => {
   }
 });
 
+// Deletes a notification by its ID, ensuring the notification exists before removal and handling potential errors during the process.
 app.delete('/api/notifications/delete/:id', async (req, res): Promise<any> => {
   const notificationId = parseInt(req.params.id);
 
@@ -3231,6 +3205,7 @@ app.delete('/api/notifications/delete/:id', async (req, res): Promise<any> => {
   }
 });
 
+// Deletes all notifications for the authenticated user and handles errors during the deletion process.
 app.delete('/api/notifications/deleteAll', authenticate, async (req, res) => {
   console.log("deleting all notifications...");
   const userId = res.locals.userId;
@@ -3253,6 +3228,9 @@ app.delete('/api/notifications/deleteAll', authenticate, async (req, res) => {
 
 import { SwipeStatus } from '@prisma/client'; // Import enum
 
+
+// Updates the status of a swipe request, deletes conflicting requests, creates matches between users or study group members when accepted, 
+// and handles various scenarios for user and group interactions.
 app.put('/api/swipe-requests/:id', async (req, res): Promise<any> => {
   const { id } = req.params;
   const { status }: { status: SwipeStatus } = req.body; // Expect status to be of enum type
@@ -3398,6 +3376,7 @@ app.put('/api/swipe-requests/:id', async (req, res): Promise<any> => {
 //   const pendingRequests = await prisma..findMany({
 // });
 
+// Retrieves the availability information for a specific study group, including user details if requested, and returns it as a response.
 app.get("/api/studyGroup/:studyGroupId/availability", authenticate,  async (req, res) => {
   const { studyGroupId } = req.params;
 
@@ -3421,6 +3400,7 @@ const days = ["Sun", "Mon", "Tues", "Wed", "Thur", "Fri", "Sat"] as const;
 
 type Day = typeof days[number];
 
+// Handles saving a user's availability for a specific study group by first deleting any existing availability records.
 app.post("/api/studyGroup/:studyGroupId/availability", async (req, res) => {
   const { studyGroupId } = req.params;
   const { userId, availability } = req.body; // `availability` should be a JSON object
