@@ -14,12 +14,8 @@ import ProfilePictureModal from './ProfilePictureModal';
 import { useCourses } from '../utils/format';
 import CreatableSelect from "react-select/creatable";
 import { MultiValue } from "react-select";
-
-// Animated components for react-select
 const animatedComponents = makeAnimated();
 
-
-// Define types for Option and StudyGroup
 type OptionType = {
   label: string;
   value: string;
@@ -54,8 +50,6 @@ interface User {
   lastName: string;
 }
 
-
-// Main functional component for editing a study group
 const EditStudyGroup =(
     {
     chatID, 
@@ -103,7 +97,7 @@ const EditStudyGroup =(
 
   const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
 
-  // Load study group data on component mount or when chatID changes
+  // Fetches and loads the study group data from the backend when the component is mounted or when chatID changes.
   useEffect(() => {
     const fetchStudyGroup = async () => {
       try {

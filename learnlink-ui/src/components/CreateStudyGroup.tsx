@@ -12,12 +12,8 @@ import { StylesConfig, ControlProps, CSSObjectWithLabel } from 'react-select';
 import CustomAlert from './CustomAlert';
 import GroupUserContainer from './GroupUserContainer';
 import ProfilePictureModal from './ProfilePictureModal';
-
-
-// Set up animated components for the Select dropdown
 const animatedComponents = makeAnimated();
 
-// TypeScript interfaces for study group, group, and user data
 interface StudyGroup {
   name: string;
   description: string;
@@ -47,9 +43,6 @@ interface User {
   lastName: string;
 }
 
-
-
-// Main component for creating a study group
 const CreateStudyGroup =(
     {
     chatID, 
@@ -64,8 +57,6 @@ const CreateStudyGroup =(
     handleCreateStudyGroup: ((chatId: number) => Promise<number | void>);
     setCurrentGroupId: React.Dispatch<React.SetStateAction<number | null>>; 
   }) => {
-
-    // State variables for study group details, user selection, and alerts
   const [studyGroup, setStudyGroup] = useState<StudyGroup | null>(null);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
