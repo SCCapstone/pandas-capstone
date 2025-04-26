@@ -79,6 +79,7 @@ const ChatsNavi: React.FC<ChatsNaviProps> = ({
   const [showConfirmPopup, setShowConfirmPopup] = useState(false);
   const [confirmAction, setConfirmAction] = useState<() => void>(() => () => {});
   const [confirmMessage, setConfirmMessage] = useState('');
+  
 
   /********** USE EFFECTS **********/
 
