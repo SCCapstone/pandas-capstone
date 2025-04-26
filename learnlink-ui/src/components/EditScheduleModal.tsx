@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import './EditScheduleModal.css';
 import CustomAlert from '../components/CustomAlert';
 
+
+// Defining props that EditScheduleModal will receive
 interface EditScheduleModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -11,6 +13,7 @@ const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:200
 
 
 const EditScheduleModal: React.FC<EditScheduleModalProps> = ({ isOpen, onClose, groupId }) => {
+    // State for selected days, start time, end time, and alerts
   const [days, setSelectedDays] = useState<string[]>(['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']);
   const [startTime, setStartTime] = useState<string>("9:00 AM");
   const [endTime, setEndTime] = useState<string>("10:00 AM");
@@ -106,6 +109,8 @@ const EditScheduleModal: React.FC<EditScheduleModalProps> = ({ isOpen, onClose, 
     }
   }, [isOpen, groupId]);
 
+
+    // Handle start time change
   const handleStartTimeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setStartTime(e.target.value);
     if (timeTo24Hr(e.target.value) >= timeTo24Hr(endTime)) {
@@ -119,6 +124,8 @@ const EditScheduleModal: React.FC<EditScheduleModalProps> = ({ isOpen, onClose, 
     }
   };
 
+
+    // Handle end time change
   const handleEndTimeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setEndTime(e.target.value);
     if (timeTo24Hr(e.target.value) <= timeTo24Hr(startTime)) {
@@ -132,6 +139,8 @@ const EditScheduleModal: React.FC<EditScheduleModalProps> = ({ isOpen, onClose, 
     }
   };
 
+
+    // Handle day selection toggle
   const handleDaySelection = (e: React.ChangeEvent<HTMLInputElement>) => {
     const day = e.target.value;
     setSelectedDays((prevDays) =>
@@ -139,6 +148,8 @@ const EditScheduleModal: React.FC<EditScheduleModalProps> = ({ isOpen, onClose, 
     );
   };
 
+
+    // Handle save functionality
   const handleSave = async () => {
     if (days.length === 0) {
       setAlerts((prevAlerts) => [
@@ -259,5 +270,3 @@ const EditScheduleModal: React.FC<EditScheduleModalProps> = ({ isOpen, onClose, 
     </div>
   ) : null;
 };
-
-export default EditScheduleModal;

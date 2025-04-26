@@ -2,6 +2,7 @@ import React from 'react';
 import './FullScreenAlert.css';
 import { RiErrorWarningFill } from "react-icons/ri";
 
+// Defining the types for the props that the ConfirmPopup component will receive
 interface ConfirmPopupProps {
     message: string;
     HeaderText?: string;
@@ -9,9 +10,11 @@ interface ConfirmPopupProps {
     OnCancel: () => void;
 }
 
+// Creating the ConfirmPopup component with props defined above
 const ConfirmPopup: React.FC<ConfirmPopupProps> = ({ message, HeaderText= "Alert", buttonText = "Okay", OnCancel}) => {
 
     return (
+                // Main overlay that covers the screen to show the full-screen popup
         <div className="fullscreen-popup-overlay">
             <div className="fullscreen-popup">
                 <div className='fullscreen-header'>
@@ -27,4 +30,5 @@ const ConfirmPopup: React.FC<ConfirmPopupProps> = ({ message, HeaderText= "Alert
     );
 };
 
+// Exporting the ConfirmPopup component so it can be used in other parts of the app
 export default ConfirmPopup;

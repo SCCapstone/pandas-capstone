@@ -2,6 +2,8 @@ import React, { useEffect, useState, ReactNode, createContext, useContext, useCa
 import axios from 'axios';
 import { SwipeRequest, SwipeStatus } from '../utils/types';
 
+
+// Define the context type for managing join requests state
 interface JoinRequestContextType {
   joinRequestCount: number;
   updateRequestCount: (change: number) => void; // Add this
@@ -9,15 +11,18 @@ interface JoinRequestContextType {
   loading: boolean;
 }
 
-
+// Creating the context to provide join request data to the component tree
 const JoinRequestContext = createContext<JoinRequestContextType | undefined>(undefined);
 const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
 
+// Define the props for the JoinRequestNotifs component
 interface JoinRequestNotifsProps {
   notifCurrentUserId: number | null;
   children?: ReactNode;
 }
 
+
+// The main component that manages join requests for notifications
 const JoinRequestNotifs: React.FC<JoinRequestNotifsProps> = ({ notifCurrentUserId, children }) => {
   const [joinRequestCount, setJoinRequestCount] = useState<number>(0);
   const [loadingRequests, setLoadingRequests] = useState<boolean>(true);
@@ -81,6 +86,7 @@ const JoinRequestNotifs: React.FC<JoinRequestNotifsProps> = ({ notifCurrentUserI
   }, [notifCurrentUserId, fetchJoinRequestCount]);
 
   return (
+        // Provide the context to the rest of the component tree
     <JoinRequestContext.Provider 
       value={{ 
         joinRequestCount,
@@ -94,7 +100,7 @@ const JoinRequestNotifs: React.FC<JoinRequestNotifsProps> = ({ notifCurrentUserI
   );
 };
 
-
+// Custom hook to access the join request context data
 export const useJoinRequest = () => {
   const context = useContext(JoinRequestContext);
   if (!context) {

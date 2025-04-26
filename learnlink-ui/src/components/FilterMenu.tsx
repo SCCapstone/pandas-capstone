@@ -12,6 +12,8 @@ import { set } from 'react-hook-form';
 import ReactSlider from 'react-slider'
 
 const animatedComponents = makeAnimated();
+
+// Define types for filter criteria
 interface FilterCriteria {
     selectedColleges: { label: string; value: string }[];
     selectedCourses: { label: string; value: string }[];
@@ -24,7 +26,7 @@ const FilterMenu = () => {
 const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // Filter Consts
+  // State variables for filter options
   const [selectedGenders, setSelectedGenders] = useState<{ value: string; label: string }[]>([]);
   const [ageRange, setAgeRange] = useState<[number, number] | null>(null); // Default range can be null  
   const [selectedColleges, setSelectedColleges] = useState<{ label: string; value: string }[]>([]);
@@ -34,10 +36,10 @@ const navigate = useNavigate();
   const [filterCriteria, setFilterCriteria] = useState({ selectedColleges, selectedCourses, selectedGenders, ageRange });
   const [query, setQuery] = useState(searchParams.get('query') || '');
 
+    // Fetch data for enums, colleges, courses, and age range
   const { grade, gender, studyHabitTags } = useEnums();
   const { isLoading, colleges } = useColleges();
   const { isLoadingCourses, courses } = useCourses();
-
   const { maxAge, minAge } = useUserAgeRange();
 
   const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
@@ -136,11 +138,6 @@ const navigate = useNavigate();
     });
 
   };
-
-
-
-
-
 
 
   return (

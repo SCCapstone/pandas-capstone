@@ -4,12 +4,15 @@ import './GroupUserContainer.css'
 import React, { useEffect, useState , useRef} from 'react';
 import axios from 'axios';
 import { on } from 'events';
+
+// Defining the structure of a StudyGroup object
 interface StudyGroup {
   name: string;
   chatID: number; 
   users: User[];   
 }
 
+// Defining the structure of a User object
 interface User {
   id: number;     
   firstName: string; 

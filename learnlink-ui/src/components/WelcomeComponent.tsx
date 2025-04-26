@@ -26,19 +26,24 @@ import profileScreenshot from '../images/screenshots/Profile.png';
 import calendarInviteScreenshot from '../images/screenshots/CalendarInvite.png';
 import networkScreenshot from '../images/screenshots/Network.png';
 
+// Importing React hooks for managing state
 import { useState } from 'react';
 import { group } from 'console';
 
-function Welcome() {
 
+// Main functional component for the Welcome page
+function Welcome() {
+    // State to handle modal visibility and content
     const [modalOpen, setModalOpen] = useState(false);
     const [modalImage, setModalImage] = useState<string | undefined>(undefined);
 
+        // Function to open modal and display selected screenshot
     const handleOpenModal = (image: string | undefined) => {
         setModalImage(image || videoPlaceholder);
         setModalOpen(true);
     };
 
+        // Function to close the modal
     const handleCloseModal = () => {
         setModalOpen(false);
         setModalImage(undefined);

@@ -8,7 +8,7 @@ import GroupUserList from '../components/GroupUserList';
 import { group } from 'console';
 
 
-
+// Defining the structure of a StudyGroup object
 interface StudyGroup {
     name: string;   // Name of the study group
     chatID: number; // Unique identifier for the group's chat
@@ -22,6 +22,7 @@ interface StudyGroup {
     lastName: string;  // User's last name
   }
 
+  // The GroupUserContainer component
 const GroupUserContainer = ({
   groupId,
   currentId,

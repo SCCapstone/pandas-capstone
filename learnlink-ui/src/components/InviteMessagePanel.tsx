@@ -4,6 +4,8 @@ import '../pages/messaging.css';
 import React, { useState } from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextareaAutosize } from "@mui/material";
 
+
+// Defining the structure of the props passed to the InviteMessagePanel component
 interface InviteMessagePanelProps {
   open: boolean;
   onClose: () => void;
@@ -12,14 +14,17 @@ interface InviteMessagePanelProps {
 }
 
 const InviteMessagePanel: React.FC<InviteMessagePanelProps> = ({ open, onClose, onConfirm, targetName }) => {
+    // Using useState to manage the message input state
   const [message, setMessage] = useState("");
 
+    // Handle confirm button click
   const handleConfirm = () => {
     onConfirm(message);
     setMessage(""); // Reset message after sending
   };
 
   return (
+        // Material-UI Dialog component to display a popup modal
     <Dialog
       open={open}
       onClose={onClose}

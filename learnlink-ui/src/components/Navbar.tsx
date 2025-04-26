@@ -17,20 +17,17 @@ import JoinRequestsNotificationBadge from './JoinRequestsNotificationBadge';
 import { getLoggedInUserId } from '../utils/auth';
 import { useJoinRequest } from '../components/JoinRequestsContext'; // Correct path to the file
 
-
-
-
-
 const animatedComponents = makeAnimated();
 // const location = useLocation(); // ✅ Correct way to use location in React
 
-
+// Interface for props used by NavbarIcon components
 interface NavbarIconProps {
   'data-testid': string;
   className?: string;
   onClick: () => void;
 }
 
+// Interface for User object
 interface User {
   id: number;
   username: string;
@@ -42,6 +39,8 @@ interface User {
   coursework: string[];
   profilePic: string;
 }
+
+// Interface for filter criteria used in search
 interface FilterCriteria {
   age?: { min?: number; max?: number };
   gender?: "Male" | "Female" | "Nonbinary" | "Other" | "Prefer not to say";
@@ -49,6 +48,8 @@ interface FilterCriteria {
   coursework?: string[];
 }
 
+
+// Navbar component
 const Navbar: React.FC = () => {
   const [notifCount, setNotifCount] = useState<number>(0); // Track the notification count
   const navigate = useNavigate();
@@ -75,9 +76,9 @@ const Navbar: React.FC = () => {
   const { grade, gender, studyHabitTags } = useEnums();
   const {isLoading, colleges} = useColleges();
 
-  
   const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
 
+    // Effect hook to sync URL search params with state (filters, query)
   useEffect(() => {
     // Sync the search query and filter criteria from URL params whenever the URL changes
     const query = searchParams.get('query') || '';
@@ -122,7 +123,6 @@ const Navbar: React.FC = () => {
   }
   
     const token = localStorage.getItem('token');
-
     const queryParams = new URLSearchParams({
       query: query,
       gender: selectedGenders.map(gender => gender.label).join(','),
@@ -168,6 +168,7 @@ const Navbar: React.FC = () => {
     }
   };
 
+  // Updates the filters in the URL based on selected options
   const updateFiltersInURL = () => {
     const queryParams = new URLSearchParams();
     queryParams.set('query', searchQuery);
@@ -300,6 +301,7 @@ const Navbar: React.FC = () => {
     setFilterCriteria({});
   };
 
+    // Fetch notifications count on mount
   useEffect(() => {
     const fetchNotificationCount = async () => {
       try {
@@ -325,6 +327,7 @@ const Navbar: React.FC = () => {
     fetchNotificationCount();
   }, []);
 
+    // JSX rendering
   return (
     <header className="navbar">
       <div className="nav-logo" onClick={() => navigate('/user-home')} style={{ cursor: 'pointer' }}>
