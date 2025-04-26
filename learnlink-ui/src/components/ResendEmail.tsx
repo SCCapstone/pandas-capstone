@@ -12,17 +12,20 @@ interface ApiResponse {
 }
 
 const ResendEmail = ({ email }: ResendEmailProps) => {
+        // State hooks for loading state, response message, and alerts
     const [loading, setLoading] = useState<boolean>(false);
     const [message, setMessage] = useState<string>("");
     const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
     const [alerts, setAlerts] = useState<{ id: number; alertText: string; alertSeverity: "error" | "warning" | "info" | "success"; visible: boolean }[]>([]);
     const alertVisible = alerts.some(alert => alert.visible);
 
+        // Function to handle email resend request
     const handleResend = async () => {
         setLoading(true);
         setMessage("");
 
         try {
+                        // Make POST request to API to send email
             const response = await fetch(`${REACT_APP_API_URL}/api/forgot-password/email`, {
                 method: "POST",
                 headers: {
@@ -34,6 +37,7 @@ const ResendEmail = ({ email }: ResendEmailProps) => {
             });
 
             const data: ApiResponse = await response.json();
+                       // Handle the response from the API
             if (data.success) {
                 setAlerts((prevAlerts) => [
                     ...prevAlerts,
@@ -48,6 +52,7 @@ const ResendEmail = ({ email }: ResendEmailProps) => {
                 setMessage("Failed to send email.");
             }
         } catch (error) {
+                        // Handle any errors during the API call
             setAlerts((prevAlerts) => [
                 ...prevAlerts,
                 { id: Date.now(), alertText: 'Error sending email.', alertSeverity: "error", visible: true },

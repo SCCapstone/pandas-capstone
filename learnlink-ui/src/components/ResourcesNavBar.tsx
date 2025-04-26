@@ -3,7 +3,8 @@ import { NavLink } from "react-router-dom";
 import "./components.css";
 
 const ResourcesNavBar: React.FC = () => {
-  const [isOpen, setIsOpen] = useState(false);
+    // State hook to toggle the visibility of the sidenav
+const [isOpen, setIsOpen] = useState(false);
 
   return (
     <div>

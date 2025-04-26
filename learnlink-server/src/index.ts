@@ -2225,8 +2225,7 @@ app.post('/api/chats/updateLastOpened', async (req, res) : Promise<any>=> {
 
 
 // Get all chats for a user
-// WORKS
-// Pulls up the chats with the user's authentication code
+// Pulls up the chats with becuase of the user's authentication code
 app.get('/api/chats', authenticate, async (req, res): Promise<any> => {
   const userId = res.locals.userId; // Use res.locals to get the userId set by the authenticate middleware
 
@@ -2303,7 +2302,8 @@ app.get('/api/chats/check', async (req, res): Promise<any> => {
         return res.json({ exists: true, chatId: existingChats[0].id });
       
     }
-
+// checking for chat
+// error message 
     res.json({ exists: false });
   } catch (error) {
     console.error('Error checking for existing chat:', error);
@@ -2505,10 +2505,6 @@ app.patch('/api/messages/:id/like', authenticate, async (req, res):Promise<any> 
 });
 */
 
-
-
-
-
 // Create a new chat
 app.post('/api/chats', async (req, res) : Promise<any> => {
   const { userId1, userId2 } = req.body; // Expecting both user IDs
@@ -2544,7 +2540,7 @@ app.post('/api/chats', async (req, res) : Promise<any> => {
     }
 
     const currentTime = new Date().toISOString();
-    // Create a new chat linking both users
+    // Create a new chat that links both users
     const newChat = await prisma.chat.create({
       data: {
         name: recipient.firstName + " " + recipient.lastName,

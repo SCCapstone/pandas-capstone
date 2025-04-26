@@ -12,7 +12,6 @@ import { StylesConfig, ControlProps, CSSObjectWithLabel } from 'react-select';
 import CustomAlert from './CustomAlert';
 import GroupUserContainer from './GroupUserContainer';
 import ProfilePictureModal from './ProfilePictureModal';
-
 const animatedComponents = makeAnimated();
 
 interface StudyGroup {
@@ -43,7 +42,6 @@ interface User {
   firstName: string;
   lastName: string;
 }
-
 
 const CreateStudyGroup =(
     {

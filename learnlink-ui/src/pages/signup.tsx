@@ -6,7 +6,7 @@ import Copyright from '../components/CopyrightFooter';
 import { set } from 'react-hook-form';
 import CustomAlert from '../components/CustomAlert';
 
-
+// Defining the User type for form data structure
 type User = {
     id: number;
     firstName: string;
@@ -23,7 +23,9 @@ type User = {
 };
 
 const Signup: React.FC = () => {
+        // Using React Router's `useNavigate` hook to handle navigation after signup
     const navigate = useNavigate();
+        // Using React's `useState` hook to manage form state, including form data and error states
     const [formData, setFormData] = useState<User>({
         id: 0,
         firstName: '',
@@ -35,6 +37,8 @@ const Signup: React.FC = () => {
         updated_at: '',
     });
 
+
+        // States for additional form fields and error handling
     const [confirmPassword, setConfirmPassword] = useState<string>('');
     const [error, setError] = useState<string | null>(null);
     const [emailError, setEmailError] = useState<string | null>(null);
@@ -45,6 +49,8 @@ const Signup: React.FC = () => {
     const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
     const alertVisible = alerts.some(alert => alert.visible);
 
+
+        // Handles input change for form fields
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setFormData((prev) => ({
@@ -53,6 +59,7 @@ const Signup: React.FC = () => {
         }));
     };
 
+        // Handles confirm password input change
     const handleConfirmPasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setConfirmPassword(e.target.value);
     };
@@ -66,6 +73,7 @@ const Signup: React.FC = () => {
         setPasswordError(null);
         e.preventDefault();
 
+                // Check if passwords match
         if (formData.password !== confirmPassword) {
             console.log('Passwords do not match');
             setError('Passwords do not match');
@@ -77,6 +85,7 @@ const Signup: React.FC = () => {
             return;
         }
 
+                // Check if all fields are filled
         if (!formData.firstName || !formData.lastName || !formData.email || !formData.username || !formData.password) {
             console.log('All fields are required');
             setError('All fields are required');
@@ -150,7 +159,7 @@ const Signup: React.FC = () => {
 
             }
 
-            // Clear form
+            // Clear form data and reset state
             setFormData({
                 id: 0,
                 firstName: '',

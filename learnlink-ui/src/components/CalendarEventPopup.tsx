@@ -3,6 +3,7 @@ import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField } 
 import CustomAlert from '../components/CustomAlert';
 import './CalendarEventPopup.css'
 
+// Define the interface for the props of CalendarEventPopup component
 interface CalendarEventPopupProps {
   open: boolean;
   onClose: () => void;
@@ -16,6 +17,7 @@ interface CalendarEventPopupProps {
   }) => void;
 }
 
+// CalendarEventPopup component function
 const CalendarEventPopup: React.FC<CalendarEventPopupProps> = ({ open, onClose, onSubmit }) => {
   const [alerts, setAlerts] = useState<{ id: number; alertText: string; alertSeverity: "error" | "warning" | "info" | "success"; visible: boolean }[]>([]);
     const alertVisible = alerts.some(alert => alert.visible);
@@ -50,6 +52,7 @@ const CalendarEventPopup: React.FC<CalendarEventPopupProps> = ({ open, onClose, 
     }
   }, [open]);
 
+    // Handler for input changes in the form fields
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEventData((prev) => ({
       ...prev,
@@ -57,6 +60,7 @@ const CalendarEventPopup: React.FC<CalendarEventPopupProps> = ({ open, onClose, 
     }));
   };
 
+    // Handler for form submission
   const handleSubmit = () => {
     console.log("Event Data:", eventData);
     const { title, date, startTime, endTime, location } = eventData;

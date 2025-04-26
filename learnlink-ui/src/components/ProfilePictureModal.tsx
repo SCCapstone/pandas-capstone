@@ -3,6 +3,7 @@ import './ProfilePicModal.css';
 
 const baseUrl = "https://learnlink-pfps.s3.us-east-1.amazonaws.com/profile-pictures/circle_";
 
+// Array of emoji options with associated background colors, filenames, and URLs.
 const emojiOptions = [
   { emoji: "🌸", bgColor: "#F9D5E5", filename: "cherry_blossom.png", URL: `${baseUrl}cherry_blossom.png` },
   { emoji: "☕", bgColor: "#D7CCC8", filename: "coffee.png", URL: `${baseUrl}coffee.png` },
@@ -47,6 +48,7 @@ interface ProfilePicModalProps {
 }
 
 const ProfilePictureModal: React.FC<ProfilePicModalProps> = ({ isOpen, onRequestClose, onSelect }) => {
+    // Close modal if not open
   if (!isOpen) return null;
 
   const handleSelectEmoji = (emoji: string, URL:string) => {

@@ -14,10 +14,6 @@ import ProfilePictureModal from './ProfilePictureModal';
 import { useCourses } from '../utils/format';
 import CreatableSelect from "react-select/creatable";
 import { MultiValue } from "react-select";
-
-
-
-
 const animatedComponents = makeAnimated();
 
 type OptionType = {
@@ -53,7 +49,6 @@ interface User {
   firstName: string;
   lastName: string;
 }
-
 
 const EditStudyGroup =(
     {

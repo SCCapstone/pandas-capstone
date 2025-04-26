@@ -4,6 +4,7 @@ import './GroupUserContainer.css'
 import React, { useEffect, useState , useRef} from 'react';
 import axios from 'axios';
 import { on } from 'events';
+
 interface StudyGroup {
   name: string;
   chatID: number; 

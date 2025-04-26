@@ -1,3 +1,4 @@
+/* This styles the entire page that contains the swipeable content */
 .swiping-page {
     height: 100vh;
     background-color: #ffff;
@@ -5,6 +6,7 @@
     flex-direction: column;
 }
 
+/* This styles the swipe content area within the swiping-page */
 .swipe-content {
     flex:1;
     margin-top: 20px;

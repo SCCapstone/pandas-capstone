@@ -4,6 +4,7 @@ import Navbar from '../components/Navbar';
 import './LandingPage.css';
 import CopyrightFooter from '../components/CopyrightFooter';
 
+// Functional component for the LandingPage
 const LandingPage: React.FC = () => {
   return (
     <div className="landing-page">
@@ -20,4 +21,5 @@ const LandingPage: React.FC = () => {
   );
 };
 
+// Exporting the LandingPage component for use in other parts of the app
 export default LandingPage;

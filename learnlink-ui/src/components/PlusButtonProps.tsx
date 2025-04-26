@@ -4,6 +4,7 @@ import {createCalendarEvent} from '../utils/messageUtils';
 import CalendarEventPopup from "./CalendarEventPopup";
 import './PlusButtonProps.css';
 
+// Define the interface for PlusButton props
 interface PlusButtonProps {
     onSelect: (element: JSX.Element) => void;
     studyGroupId: number | null;
@@ -12,11 +13,13 @@ interface PlusButtonProps {
   }
 
 export default function PlusButton({ onSelect, studyGroupId, selectedChatId, onSendButtonMessage}: PlusButtonProps) {
+      // State hooks to manage component behavior  
     const [isOpen, setIsOpen] = useState(false);
     const [calendarModalOpen, setCalendarModalOpen] = useState(false);
     const [calendarEventURL, setCalendarEventURL] = useState<string | null>(null);
     
 
+        // Options available for the plus menu
     const options = [
         {
             label: "Weekly Scheduler",
@@ -29,6 +32,8 @@ export default function PlusButton({ onSelect, studyGroupId, selectedChatId, onS
             value: "calendar-event",
         },
     ];
+
+        // Function to convert 24-hour time to 12-hour format
     const convertTo12HourFormat = (time: string) => {
         const [hours, minutes] = time.split(":").map(Number);
         const date = new Date();
@@ -39,6 +44,7 @@ export default function PlusButton({ onSelect, studyGroupId, selectedChatId, onS
         return date.toLocaleTimeString([], options);
       };
 
+          // Handle event details and generate a calendar URL
     const handleCalendarURL = (eventDetails: {
         title: string;
         date: string;
@@ -50,6 +56,7 @@ export default function PlusButton({ onSelect, studyGroupId, selectedChatId, onS
         const eventURL = createCalendarEvent(eventDetails);
         setCalendarEventURL(eventURL);
       
+                // Only proceed if there's a selected chat
         if (selectedChatId) {
           const validStudyGroupId = studyGroupId ?? undefined; 
       
@@ -76,7 +83,7 @@ export default function PlusButton({ onSelect, studyGroupId, selectedChatId, onS
         }
       };
       
-
+    // Handle the selection of an option in the plus menu
       const handleSelect = (value: string) => {
         console.log("Selected value:", value);
       
@@ -87,6 +94,7 @@ export default function PlusButton({ onSelect, studyGroupId, selectedChatId, onS
           return; // Don't proceed further until the modal is submitted
         }
       
+                // Handle weekly scheduler option
         const validStudyGroupId = studyGroupId ?? undefined; 
       
         const buttonData = {

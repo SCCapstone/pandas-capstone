@@ -5,6 +5,7 @@ import './updateEmail.css';
 import CustomAlert from '../components/CustomAlert';
 
 const UpdateEmail: React.FC = () => {
+    // Declaring state variables to store old email, new email, error messages, loading state, and alerts
   const [oldEmail, setOldEmail] = useState('');
   const [newEmail, setNewEmail] = useState('');
   const [error, setError] = useState('');
@@ -14,14 +15,17 @@ const UpdateEmail: React.FC = () => {
 
   const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:2000';
 
+    // Function to handle change in old email input field
   const handleOldEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setOldEmail(e.target.value);
   };
 
+    // Function to handle change in new email input field
   const handleNewEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setNewEmail(e.target.value);
   };
 
+    // Function to validate email input, ensuring old and new emails are not the same
   const validateEmail = (): boolean => {
   
     if (oldEmail === newEmail) {
@@ -35,6 +39,8 @@ const UpdateEmail: React.FC = () => {
     return true;
   };
 
+
+    // Function to handle form submission for updating email
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -46,6 +52,7 @@ const UpdateEmail: React.FC = () => {
     // }
 
     try {
+            // Make an API request to update the email
       const response = await fetch(`${REACT_APP_API_URL}/api/update-email`, {
         method: 'POST',
         headers: {
@@ -62,6 +69,7 @@ const UpdateEmail: React.FC = () => {
       console.log(data.err)
 
       if (!response.ok) {
+                // Handle different error status codes from the API
         switch (response.status) {
 
           case 451:
@@ -128,12 +136,14 @@ const UpdateEmail: React.FC = () => {
       ]);
       }
     } catch (err) {
+            // Handle network errors or any other issues
       setError('Failed to update email. Please try again later.');
       setAlerts((prevAlerts) => [
         ...prevAlerts,
         { id: Date.now(), alertText: 'Failed to update email. Please try again later. ', alertSeverity: "error", visible: true },
     ]);
     } finally {
+            // Reset loading state
       setLoading(false);
     }
   };
