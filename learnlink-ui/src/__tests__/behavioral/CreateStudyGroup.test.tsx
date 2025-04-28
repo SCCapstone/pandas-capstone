@@ -100,17 +100,20 @@ describe('CreateStudyGroup Component Behavioral Tests', () => {
     };
   
     const mockOnClose = jest.fn();
-    const mockUpdateChatName = jest.fn();
-    const mockHandleCreateStudyGroup = jest.fn().mockResolvedValue(123);
-    const mockSetCurrentGroupId = jest.fn();
-  
-    const defaultProps = {
-      chatID: 1,
-      onClose: mockOnClose,
-      updateChatName: mockUpdateChatName,
-      handleCreateStudyGroup: mockHandleCreateStudyGroup,
-      setCurrentGroupId: mockSetCurrentGroupId
-    };
+    
+  const mockUpdateChatName = jest.fn();
+  const mockHandleCreateStudyGroup = jest.fn().mockResolvedValue(123);
+  const mockSetCurrentGroupId = jest.fn();
+  const mockFetchChatPfps = jest.fn();
+
+  const defaultProps = {
+    chatID: 1,
+    onClose: mockOnClose,
+    updateChatName: mockUpdateChatName,
+    handleCreateStudyGroup: mockHandleCreateStudyGroup,
+    setCurrentGroupId: mockSetCurrentGroupId,
+    fetchChatPfps: mockFetchChatPfps
+  }
   
     beforeEach(() => {
         jest.clearAllMocks();
