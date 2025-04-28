@@ -270,3 +270,4 @@ const EditScheduleModal: React.FC<EditScheduleModalProps> = ({ isOpen, onClose, 
     </div>
   ) : null;
 };
+export default EditScheduleModal;
