@@ -80,8 +80,14 @@ function Welcome() {
                 <div className="videoSection">
                     <h1>See LearnLink in Action</h1>
                     <p>Watch our short demo to learn how it works!</p>
-                    <img src={videoPlaceholder} alt="Demo video placeholder" className="videoPlaceholder"/>
-                </div>
+                    <iframe
+                        width="560"
+                        height="315"
+                        src="https://www.youtube.com/embed/1bzXs333ww4"
+                        frameBorder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                    ></iframe>                </div>
 
                 {/* Why LearnLink Section */}
                 <div className="infoSection">
