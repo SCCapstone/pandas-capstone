@@ -44,7 +44,7 @@ jest.mock('axios', () => ({
         expect(formatEnum('NIGHT_OWL')).toBe('Night Owl');
         expect(formatEnum('VISUAL_LEARNER')).toBe('Visual Learner');
         expect(formatEnum('')).toBe('');
-        expect(formatEnum(undefined as unknown as string)).toBe('undefined');
+        expect(formatEnum(undefined as unknown as string)).toBe('');
       });
     });
   
