@@ -24,8 +24,7 @@ start-ui:
 
 test:
 	@echo "INFO testing both server and UI..."
-	osascript -e 'tell application "Terminal" to do script "$(TEST_SERVER)"'
-	osascript -e 'tell application "Terminal" to do script "$(TEST_UI)"'
+	$(TEST_UI)
 
 test-server:
 	@echo "INFO testing server..."
