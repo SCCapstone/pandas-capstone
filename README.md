@@ -8,9 +8,6 @@ Users can use the resources and have a personal grade calculator as well.
 # Website Link
 https://main.d31vpxqs9hcxco.amplifyapp.com
 
-# For QA Testing
-We recommend creating at least two accounts for testing purposes. This allows you to test features like matching, messaging, and group creation between the two users without needing approval from a separate account. If you test between your own accounts it will be quicker and easier for all involved. 
-
 ## External Requirements
 
 In order to build this project you first have to install:
@@ -82,7 +79,8 @@ make start
 
 # Testing
 
-## UI Tests
+## Test Locations
+
 The unit tests are in `learnlink-ui/src/__tests__/unit`.
 
 The behavioral tests are in `learnlink-ui/src/__tests__/behavioral`.
