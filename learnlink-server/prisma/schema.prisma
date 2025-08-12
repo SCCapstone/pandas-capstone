@@ -13,8 +13,8 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = "postgresql://postgres:KzutHhFD5pYppDa6@uniformly-animating-catbird.data-1.use1.tembo.io:5432/postgres"
-}
+  url      = env("DADATABASE_URL")
+  }
 
 enum StudyTags {
   Quiet
