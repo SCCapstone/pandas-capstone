@@ -6,7 +6,7 @@ Users can message eachother, create a profile and match with other users for wha
 Users can use the resources and have a personal grade calculator as well.
 
 # Website Link
-https://main.d31vpxqs9hcxco.amplifyapp.com
+[https://main.d31vpxqs9hcxco.amplifyapp.com](https://main.d1oermo53uhnfk.amplifyapp.com)
 
 ## External Requirements
 
